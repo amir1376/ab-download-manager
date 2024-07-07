@@ -1,0 +1,100 @@
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+
+permissions:
+  contents: write
+
+jobs:
+  create-packages:
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest" , "windows-latest" ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setting up Jetbrains Runtime
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          jdksPath="$HOME/.jdks"
+          os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
+          jdkFileName="jbrsdk_jcef-17.0.10-$os-b1207.14"
+          jdkFileNameWithExt="$jdkFileName.tar.gz"
+          link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
+          curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileNameWithExt"
+          tar -xf "$jdksPath/$jdkFileNameWithExt" -C "$jdksPath"
+          echo "JAVA_HOME=$jdksPath/$jdkFileName" >> "$GITHUB_ENV"
+          echo "PATH=$jdksPath/$jdkFileName/bin:$PATH" >> "$GITHUB_ENV"
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ matrix.os }}-gradle
+          enableCrossOsArchive: true
+      - name: make Gradlew executable
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          chmod 755 ./gradlew
+        shell: "bash"
+      - name: Gradle
+#          at the current version of compose plugin
+#          first attempt to init gradle always fails because of "BuildScopeServices has been closed"
+#          remove this after this bug is fixed
+        continue-on-error: true
+        run: |
+          ./gradlew
+        shell: "bash"
+
+      - name: Build package for current OS using gradle
+        shell: bash
+        run: |
+          ./gradlew desktop:app:createReleaseFolderForCi
+
+      - name: Release Gradle to unlock cache files
+        shell: bash
+        run: |
+          ./gradlew -stop
+
+      - name: Upload output to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./build/ci-release
+          name: app-${{ matrix.os }}
+
+  release:
+    runs-on: "ubuntu-latest"
+    needs: ["create-packages"]
+    steps:
+      - uses: "actions/download-artifact@v4"
+        name: "Download All Artifacts Into One Directory"
+        with:
+          path: release
+          pattern: app-*
+          merge-multiple: true
+
+      - name: Version Info
+        id: version
+        uses: nowsprinting/check-version-format-action@v3
+        with:
+          prefix: "v"
+
+      - name: "Show the output tree of release"
+        run: |
+          tree .
+      - uses: softprops/action-gh-release@v2
+        with:
+          prerelease: ${{ !steps.version.outputs.is_stable }}
+          make_latest: legacy
+          files: |
+            release/binaries/*
+          body_path: release/release-notes.md
+      - name: "Remove artifacts to free space"
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: app-*

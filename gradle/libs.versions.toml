@@ -1,0 +1,117 @@
+[versions]
+kotlin = "2.0.0"
+ksp = "2.0.0-1.0.21"
+compose = "1.6.11"
+ktorVersion = "2.3.7"
+kotlin-serialization = "1.6.3"
+okhttp = "4.12.0"
+okio = "3.9.0"
+coroutines = "1.8.1"
+koin = "3.5.6"
+koinAnnotation = "1.3.1"
+debugboard = "0.3.1"
+decompose = "3.0.0"
+logback = "1.3.5"
+buildConfig = "5.3.5"
+changelog = "2.2.0"
+http4k = "5.14.1.0"
+arrow = "1.2.4"
+datastore = "1.1.1"
+aboutLibraries = "11.2.0"
+
+[libraries]
+
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization" }
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+
+okhttp-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+okhttp-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okio-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+retrofit-logging = "com.squareup.okhttp3:logging-interceptor:4.9.3"
+
+debugboard-core = { module = "com.github.amir1376.debugboard:core", version.ref = "debugboard" }
+debugboard-backend = { module = "com.github.amir1376.debugboard:backend", version.ref = "debugboard" }
+debugboard-ktor = { module = "com.github.amir1376.debugboard:ktor", version.ref = "debugboard" }
+debugboard-okhttp = { module = "com.github.amir1376.debugboard:okhttp", version.ref = "debugboard" }
+debugboard-compose = { module = "com.github.amir1376.debugboard:compose", version.ref = "debugboard" }
+debugboard-core-noop = { module = "com.github.amir1376.debugboard:core-no-op", version.ref = "debugboard" }
+debugboard-backend-noop = { module = "com.github.amir1376.debugboard:backend-no-op", version.ref = "debugboard" }
+debugboard-ktor-noop = { module = "com.github.amir1376.debugboard:ktor-no-op", version.ref = "debugboard" }
+debugboard-okhttp-noop = { module = "com.github.amir1376.debugboard:okhttp-no-op", version.ref = "debugboard" }
+debugboard-compose-noop = { module = "com.github.amir1376.debugboard:compose-no-op", version.ref = "debugboard" }
+
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version = "1.0.1" }
+koin-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koinAnnotation" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koinAnnotation" }
+
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+decompose-jbCompose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
+
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlin-coroutines-debug = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-debug", version.ref = "coroutines" }
+kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlin-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+
+kotlin-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.1"
+composeFilePicker = "com.darkrockstudios:mpfilepicker:3.1.0"
+
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktorVersion" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" }
+ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktorVersion" }
+ktor-server-contentNegotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktorVersion" }
+ktor-server-statusPages = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktorVersion" }
+ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktorVersion" }
+ktor-server-callLogging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktorVersion" }
+
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorVersion" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorVersion" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktorVersion" }
+ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorVersion" }
+ktor-serialization-kotlinxJson = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
+
+loggers-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "logback" }
+loggers-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+nanoHttpd-core = "org.nanohttpd:nanohttpd:2.3.1"
+http4k-core = { module = "org.http4k:http4k-core", version.ref = "http4k" }
+http4k-server-jetty = { module = "org.http4k:http4k-server-jetty", version.ref = "http4k" }
+http4k-client-okhttp = { module = "org.http4k:http4k-client-okhttp", version.ref = "http4k" }
+
+compose-material-rippleEffect = { module = "org.jetbrains.compose.material:material-ripple", version.ref = "compose" }
+compose-reorderable = "org.burnoutcrew.composereorderable:reorderable:0.9.6"
+
+semver = "io.github.z4kn4fein:semver:2.0.0"
+jgit = "org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r"
+
+aboutLibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
+aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
+
+pluginComposeMultiplatform = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
+pluginComposeCopmiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+pluginKotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+pluginSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+pluginChangeLog = { module = "org.jetbrains.intellij.plugins:gradle-changelog-plugin", version.ref = "changelog" }
+pluginBuildConfig = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildConfig" }
+pluginKsp = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
+pluginAboutLibraries = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutLibraries" }
+
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
+arrow-opticKsp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref = "arrow" }
+
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
+changeLog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
+

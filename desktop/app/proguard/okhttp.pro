@@ -1,0 +1,2 @@
+-dontwarn okhttp3.internal.platform.**
+-dontwarn okio.**

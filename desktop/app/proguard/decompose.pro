@@ -1,0 +1,2 @@
+-dontwarn com.arkivanov.decompose.**
+-keep class * implements com.arkivanov.decompose.mainthread.MainThreadChecker
