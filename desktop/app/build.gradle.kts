@@ -150,7 +150,7 @@ buildConfig {
     buildConfigField(
         "PROJECT_SOURCE_CODE",
         provider {
-            "https://github.com/amir1376/ABDownloadManager"
+            "https://github.com/amir1376/ab-download-manager"
         }
     )
 }
