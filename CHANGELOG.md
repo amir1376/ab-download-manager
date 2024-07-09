@@ -14,6 +14,14 @@
 
 ### Security
 
+## 1.0.1
+
+- UI improvements
+
+### Changed
+
+- repository url updated
+
 ## 1.0.0
 
 - This is the first release of the app
