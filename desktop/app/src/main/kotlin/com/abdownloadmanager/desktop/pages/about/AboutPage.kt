@@ -11,16 +11,26 @@ import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.ui.WithContentAlpha
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.desktop.ui.util.ifThen
 
 @Composable
 fun AboutPage(
@@ -109,15 +119,40 @@ fun LinkText(
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
     val handler = LocalUriHandler.current
-    Text(
-        text = text,
-        style = LocalTextStyle.current.merge(LinkStyle),
-        modifier = modifier.clickable {
-            handler.openUri(link)
-        },
-        overflow = overflow,
-        maxLines = maxLines,
-    )
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    Row(
+        modifier
+            .pointerHoverIcon(PointerIcon.Hand)
+            .hoverable(interactionSource)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) {
+                handler.openUri(link)
+            }
+    ) {
+        Text(
+            text = text,
+            style = LocalTextStyle.current
+                .merge(LinkStyle).ifThen(isHovered){
+                    copy(
+                        textDecoration = TextDecoration.Underline
+                    )
+                }
+            ,
+            overflow = overflow,
+            maxLines = maxLines,
+        )
+        MyIcon(
+            MyIcons.externalLink,
+            null,
+            Modifier.size(10.dp).alpha(
+                if (isHovered) 0.75f
+                else 0.5f
+            )
+        )
+    }
 }
 
 @Composable

@@ -75,4 +75,6 @@ object MyIcons : IMyIcons {
     override val appearance: IconSource get() = "icons/color.svg".asIconSource()
     override val downloadEngine: IconSource get() = "icons/down_speed.svg".asIconSource()
     override val network: IconSource get() = "icons/network.svg".asIconSource()
+
+    override val externalLink: IconSource get() = "icons/external_link.svg".asIconSource()
 }
