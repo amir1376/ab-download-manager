@@ -1,5 +1,8 @@
 package ir.amirab.downloader.exception
 
-class TooManyErrorException : Exception(
-    "Download is stopped because all parts exceeds max retries"
+class TooManyErrorException(
+    lastException: Throwable,
+) : Exception(
+    "Download is stopped because all parts exceeds max retries",
+    lastException,
 )

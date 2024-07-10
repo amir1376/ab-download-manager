@@ -121,14 +121,12 @@ class PartDownloader(
                     } catch (e: Exception) {
                         tries++
                         onCanceled(e)
-                        if (!canRetry(e)) {
-                            if (e is DownloadValidationException) {
-                                iCantRetryAnymore(e)
-                            }
-                            break
-                        } else {
-                            continue
+                        when(canRetry(e)){
+                            CanRetryResult.Yes -> continue
+                            CanRetryResult.No -> {}
+                            CanRetryResult.NoAndStopDownloadJob -> iCantRetryAnymore(e)
                         }
+                        break
                     }
                     //download progress started, but maybe we have errors
                     //wait for a finish/error event...
@@ -138,16 +136,13 @@ class PartDownloader(
                     }
                     when (status) {
                         is PartDownloadStatus.Canceled -> {
-
-                            if (!canRetry(status.e)) {
-                                if (status.e is DownloadValidationException) {
-                                    iCantRetryAnymore(status.e)
-                                }
-                                break
-                            } else {
-                                tries++
-                                continue
+                            tries++
+                            when(canRetry(status.e)){
+                                CanRetryResult.Yes -> continue
+                                CanRetryResult.No -> {}
+                                CanRetryResult.NoAndStopDownloadJob -> iCantRetryAnymore(status.e)
                             }
+                            break
                         }
 
                         PartDownloadStatus.Completed -> break
@@ -169,15 +164,26 @@ class PartDownloader(
         }
     }
 
-    private fun canRetry(e: Throwable): Boolean {
+    private sealed interface CanRetryResult{
+        data object Yes:CanRetryResult
+        data object No:CanRetryResult
+        data object NoAndStopDownloadJob:CanRetryResult
+    }
+
+    private fun canRetry(e: Throwable): CanRetryResult {
         return when {
             ExceptionUtils.isNormalCancellation(e) -> {
-                false
+                CanRetryResult.No
             }
-
-            e is DownloadValidationException -> false
+            e is DownloadValidationException -> if (e.isCritical()){
+                //download validation occurs, and also it is critical,
+                //so we can't proceed any further
+                CanRetryResult.NoAndStopDownloadJob
+            }else{
+                CanRetryResult.Yes
+            }
             else -> {
-                true
+                CanRetryResult.Yes
             }
         }
     }
@@ -225,9 +231,10 @@ class PartDownloader(
         if (contentLength != partCopy.remainingLength) {
             conn.closeable.close()
             throw ServerPartIsNotTheSameAsWeExpectException(
-                "part remaining length: ${part.remainingLength} and response length: ${conn.contentLength} not match"
-                        + "\n request headers ${conn.responseInfo.requestHeaders}"
-                        + "\n response headers ${conn.responseInfo.responseHeaders}"
+                start = partCopy.current,
+                end = partCopy.to,
+                expectedLength = partCopy.remainingLength,
+                actualLength = contentLength
             )
         }
         thread = thread {

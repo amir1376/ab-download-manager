@@ -356,9 +356,14 @@ class DownloadJob(
     }
 
     private fun onPartHaveToManyError(throwable: Throwable) {
+        var paused = false
         if (throwable is DownloadValidationException) {
-            scope.launch {
-                pause(throwable)
+            if (throwable.isCritical()){
+                //stop the whole job! as we have big problem here
+                paused = true
+                scope.launch {
+                    pause(throwable)
+                }
             }
         }
         val allHaveError = partDownloaderList.values
@@ -366,11 +371,11 @@ class DownloadJob(
             .all {
                 it.injured()
             }
-        if (allHaveError) {
+        if (allHaveError && !paused) {
 //            println("all have error!")
             scope.launch {
 //                println("request pause send")
-                pause(TooManyErrorException())
+                pause(TooManyErrorException(throwable))
             }
         }
     }
