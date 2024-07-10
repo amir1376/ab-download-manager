@@ -83,6 +83,11 @@ class PartDownloader(
     @Volatile
     internal var tries = 0
 
+    // make sure to not lake resource in this exception
+    @Volatile
+    private var lastCriticalException: Throwable? = null
+
+    // make sure to not lake resource in this exception
     @Volatile
     private var lastException: Throwable? = null
 
@@ -100,6 +105,7 @@ class PartDownloader(
         }
         scope.launch {
             tries = 0
+            lastCriticalException = null
             lastException = null
             val result = kotlin.runCatching {
                 while (coroutineContext.isActive || !stop) {
@@ -110,7 +116,10 @@ class PartDownloader(
                     if (haveToManyErrors()) {
 //                        println("tell them we have error!")
                         iCantRetryAnymore(
-                            PartTooManyErrorException(part)
+                            PartTooManyErrorException(
+                                part,
+                                lastException?:Exception("BUG : if you see me please report it to the developer! when we encounter error so it have to be a least one last exception"),
+                            )
                         )
                     }
                     if (part.isCompleted) {
@@ -190,7 +199,7 @@ class PartDownloader(
 
     lateinit var onTooManyErrors: ((Throwable) -> Unit)
     private fun iCantRetryAnymore(throwable: Throwable) {
-        lastException = throwable
+        lastCriticalException = throwable
         GlobalScope.launch {
             onTooManyErrors(throwable)
         }
@@ -201,7 +210,7 @@ class PartDownloader(
     }
 
     private fun haveCriticalError(): Boolean {
-        return lastException != null
+        return lastCriticalException != null
     }
 
     internal fun injured(): Boolean {
@@ -333,6 +342,7 @@ class PartDownloader(
     }
 
     private fun onCanceled(e: Throwable) {
+        lastException = e
         val canceled = PartDownloadStatus.Canceled(e)
         onNewStatus(canceled)
         e.printStackIfNOtUsual()

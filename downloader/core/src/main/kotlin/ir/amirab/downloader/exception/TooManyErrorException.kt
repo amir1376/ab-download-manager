@@ -1,8 +1,14 @@
 package ir.amirab.downloader.exception
 
 class TooManyErrorException(
-    lastException: Throwable,
+    override val cause: Throwable
 ) : Exception(
     "Download is stopped because all parts exceeds max retries",
-    lastException,
-)
+) {
+    fun findActualDownloadErrorCause(): Throwable {
+        return when (cause) {
+            is PartTooManyErrorException -> cause.cause
+            else -> cause
+        }
+    }
+}

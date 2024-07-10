@@ -34,6 +34,7 @@ import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
+import ir.amirab.downloader.exception.TooManyErrorException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -274,43 +275,11 @@ class AppComponent(
             )
         )
     }
-
     init {
         downloadSystem
             .downloadEvents
             .onEach {
-                if (it.context[ResumedBy]?.by !is User){
-                    //only notify events that is started by user
-                    return@onEach
-                }
-//                or
-//                val qm = downloadSystem.queueManager
-//                val queueId = qm.findItemInQueue(it.downloadItem.id)
-//                if (queueId != null) {
-//                    return@onEach
-//                    // skip download events when download is triggered by queue
-////                    if (qm.getQueue(queue).isQueueActive){
-////                      return@onEach
-////                    }
-//                }
-                if (it is DownloadManagerEvents.OnJobCanceled) {
-                    if (!ExceptionUtils.isNormalCancellation(it.e)) {
-                        sendNotification(
-                            "downloadId=${it.downloadItem.id}",
-                            title = it.downloadItem.name,
-                            description = "Error" + it.e.localizedMessage?.let { " $it" }.orEmpty(),
-                            type = NotificationType.Error,
-                        )
-                    }
-                }
-                if (it is DownloadManagerEvents.OnJobCompleted) {
-                    sendNotification(
-                        tag = "downloadId=${it.downloadItem.id}",
-                        title = it.downloadItem.name,
-                        description = "Finished",
-                        type = NotificationType.Success,
-                    )
-                }
+                onNewDownloadEvent(it)
             }
             .launchIn(scope)
 //        IntegrationPortBroadcaster.cleanOnClose()
@@ -335,6 +304,57 @@ class AppComponent(
                     }
                 }
             }.launchIn(scope)
+    }
+
+    private fun onNewDownloadEvent(it: DownloadManagerEvents) {
+        if (it.context[ResumedBy]?.by !is User){
+            //only notify events that is started by user
+            return
+        }
+//                or
+//                val qm = downloadSystem.queueManager
+//                val queueId = qm.findItemInQueue(it.downloadItem.id)
+//                if (queueId != null) {
+//                    return@onEach
+//                    // skip download events when download is triggered by queue
+////                    if (qm.getQueue(queue).isQueueActive){
+////                      return@onEach
+////                    }
+//                }
+        if (it is DownloadManagerEvents.OnJobCanceled) {
+            val exception = it.e
+            if (ExceptionUtils.isNormalCancellation(exception)) {
+                return
+            }
+            var isMaxTryReachedError = false
+            val actualCause = if (exception is TooManyErrorException){
+                isMaxTryReachedError=true
+                exception.findActualDownloadErrorCause()
+            }else exception
+            if (ExceptionUtils.isNormalCancellation(actualCause)) {
+                return
+            }
+            val prefix = if (isMaxTryReachedError) {
+                "Too Many Error: "
+            }else{
+                "Error: "
+            }
+            val reason = actualCause.message?:"Unknown"
+            sendNotification(
+                "downloadId=${it.downloadItem.id}",
+                title = it.downloadItem.name,
+                description = prefix + reason,
+                type = NotificationType.Error,
+            )
+        }
+        if (it is DownloadManagerEvents.OnJobCompleted) {
+            sendNotification(
+                tag = "downloadId=${it.downloadItem.id}",
+                title = it.downloadItem.name,
+                description = "Finished",
+                type = NotificationType.Success,
+            )
+        }
     }
 
     override fun openAddDownloadDialog(
