@@ -14,6 +14,14 @@
 
 ### Security
 
+## 1.0.2
+
+- Error messages improvements
+
+### Fixed
+
+- handle some webservers does not respect requested range at first place
+
 ## 1.0.1
 
 - UI improvements
