@@ -34,12 +34,26 @@ import kotlin.math.min
 val PART_MAX_TRIES = 10
 const val RetryDelay = 1_000L
 
+/**
+ * @param strictMode
+ *  `false` - this is not the purpose of its app, so we don't strict here
+ *
+ *  download part without checking for length validation
+ *  this is where we want to only copy data arrived from server
+ *  for example, a web page link that maybe get us different response length
+ *  we only need to download it no matter what is inside
+ *
+ *  `true` - main purpose of this class
+ *
+ *  validate download size before trying to write to the filesystem
+ */
 class PartDownloader(
     val credentials: IDownloadCredentials,
     val getDestWriter: () -> DestWriter,
     val part: Part,
     val client: DownloaderClient,
     val speedLimiters: List<Throttler>,
+    val strictMode:Boolean,
     private val partSplitLock: Any,
 ) {
     class ShouldNotHappened(msg: String?) : RuntimeException(msg)
@@ -238,13 +252,15 @@ class PartDownloader(
             }
         }
         if (contentLength != partCopy.remainingLength) {
-            conn.closeable.close()
-            throw ServerPartIsNotTheSameAsWeExpectException(
-                start = partCopy.current,
-                end = partCopy.to,
-                expectedLength = partCopy.remainingLength,
-                actualLength = contentLength
-            )
+            if (strictMode){
+                conn.closeable.close()
+                throw ServerPartIsNotTheSameAsWeExpectException(
+                    start = partCopy.current,
+                    end = partCopy.to,
+                    expectedLength = partCopy.remainingLength,
+                    actualLength = contentLength
+                )
+            }
         }
         thread = thread {
             if (stop || Thread.currentThread().isInterrupted) {

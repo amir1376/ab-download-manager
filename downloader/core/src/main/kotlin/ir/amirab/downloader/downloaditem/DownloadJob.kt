@@ -3,14 +3,13 @@ package ir.amirab.downloader.downloaditem
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.connection.response.expectSuccess
+import ir.amirab.downloader.connection.response.isWebPage
 import ir.amirab.downloader.destination.SimpleDownloadDestination
+import ir.amirab.downloader.downloaditem.DownloadItem.Companion.LENGTH_UNKNOWN
 import ir.amirab.downloader.exception.DownloadValidationException
 import ir.amirab.downloader.exception.FileChangedException
 import ir.amirab.downloader.exception.TooManyErrorException
-import ir.amirab.downloader.part.Part
-import ir.amirab.downloader.part.PartDownloadStatus
-import ir.amirab.downloader.part.PartDownloader
-import ir.amirab.downloader.part.awaitIdle
+import ir.amirab.downloader.part.*
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.downloader.utils.printStackIfNOtUsual
 import ir.amirab.downloader.utils.splitToRange
@@ -81,6 +80,12 @@ class DownloadJob(
         }.orEmpty())
     }
 
+
+    // if strict mode is false part downloader going to download data without any validation of content length
+    // this is only acceptable when resume is not supported and multiple get requests results multiple result
+    @Volatile
+    private var strictDownload = true
+
     private val _status = MutableStateFlow<DownloadJobStatus>(DownloadJobStatus.IDLE)
     val status = _status.asStateFlow()
     fun expectValid(size: Long, parts: List<LongRange>) {
@@ -103,6 +108,7 @@ class DownloadJob(
         downloadItem.status = DownloadStatus.Added
         downloadItem.startTime = null
         downloadItem.completeTime = null
+        strictDownload = true
         saveState()
         downloadManager.onDownloadItemChange(downloadItem)
     }
@@ -162,6 +168,8 @@ class DownloadJob(
     ) {
         withContext(Dispatchers.IO) {
             destination.outputSize = downloadItem.contentLength
+                .takeIf { strictDownload }
+                    ?: LENGTH_UNKNOWN
             if (!destination.isDownloadedPartsIsValid()) {
                 //file deleted or something!
                 parts.forEach { it.resetCurrent() }
@@ -253,13 +261,21 @@ class DownloadJob(
                 listOf(Part(0, null, 0))
             )
         } else {
-            setParts(splitToRange(
-                minPartSize = downloadManager.settings.minPartSize,
-                maxPartCount = getRequestedPartitionCount().toLong(),
-                size = downloadItem.contentLength,
-            ).map {
-                Part(it.first, it.last)
-            })
+            if (supportsConcurrent){
+                //split parts
+                setParts(splitToRange(
+                    minPartSize = downloadManager.settings.minPartSize,
+                    maxPartCount = getRequestedPartitionCount().toLong(),
+                    size = downloadItem.contentLength,
+                ).map {
+                    Part(it.first, it.last)
+                })
+            }else{
+                setParts(
+                    listOf(Part(0, (downloadItem.contentLength-1).takeIf { it>=0 }, 0))
+                )
+            }
+
         }
 
 //        thisLogger().info("dl_$id parts created $parts")
@@ -492,6 +508,7 @@ class DownloadJob(
                         downloadManager.throttler,
                         jobThrottler,
                     ),
+                    strictMode = strictDownload,
                     partSplitLock = partSplitLock
                 ).also { partDownloader: PartDownloader ->
                     partDownloader.onTooManyErrors = {
@@ -526,7 +543,12 @@ class DownloadJob(
             //new download
             downloadItem.contentLength = totalLength ?: -1
             downloadItem.serverETag=newServerETag
+            // don't strict if it's a webpage let it download and not a link with resume support
+            if (response.isWebPage() && !response.resumeSupport){
+                strictDownload = false
+            }
         } else {
+            // at the beginning of download
             if (totalLength != downloadItem.contentLength) {
                 throw FileChangedException.LengthChangedException(downloadItem.contentLength, totalLength ?: -1)
             }
