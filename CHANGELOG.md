@@ -14,6 +14,17 @@
 
 ### Security
 
+## 1.0.3
+
+### Improved
+
+- Download Info Page now show users that a download file supports resuming or not
+
+### Fixed
+
+- Download links that does not support resume now handled correctly
+- Some Web pages does not download correctly
+
 ## 1.0.2
 
 - Error messages improvements
