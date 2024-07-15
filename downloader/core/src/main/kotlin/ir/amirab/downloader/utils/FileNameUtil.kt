@@ -4,6 +4,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import java.io.File
+import java.security.cert.Extension
 
 object FileNameUtil {
     private fun getExtensionOrNull(name: String): String? {
@@ -32,5 +33,15 @@ object FileNameUtil {
                 counter++
             }
         }
+    }
+
+    fun replaceExtension(filename: String, newExtension: String, appendIfNotExists: Boolean=true): String {
+        val ext = getExtensionOrNull(filename) ?: if (appendIfNotExists) {
+            return "$filename.$newExtension"
+        } else {
+            return filename
+        }
+        val filenameWithoutExtension = filename.substring(0, filename.length - ext.length)
+        return "$filenameWithoutExtension$newExtension"
     }
 }

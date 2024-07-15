@@ -4,6 +4,7 @@ import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.connection.response.ResponseInfo
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import com.abdownloadmanager.utils.isValidUrl
+import ir.amirab.util.UrlUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

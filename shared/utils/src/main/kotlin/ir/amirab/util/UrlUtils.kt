@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.utils
+package ir.amirab.util
 
 import java.net.URL
 import java.net.URLDecoder

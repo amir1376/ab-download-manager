@@ -26,17 +26,17 @@ class OkHttpDownloaderClient(
                         ?.filter {
                             //OkHttp handles this header and if we override it,
                             //makes redirected links to have this "Host" instead of their own!, and cause error
-                            !it.key.equals("Host",true)
+                            !it.key.equals("Host", true)
                         }
                         ?.forEach { (k, v) ->
-                        header(k, v)
-                    }
+                            header(k, v)
+                        }
                     val username = downloadCredentials.username
                     val password = downloadCredentials.password
                     if (username?.isNotBlank() == true && password?.isNotBlank() == true) {
                         header("Authorization", Credentials.basic(username, password))
                     }
-                    downloadCredentials.userAgent?.let { userAgent->
+                    downloadCredentials.userAgent?.let { userAgent ->
                         header("User-Agent", userAgent)
                     }
                 }
@@ -65,6 +65,7 @@ class OkHttpDownloaderClient(
         return ResponseInfo(
             statusCode = response.code,
             message = response.message,
+            requestUrl = response.request.url.toString(),
             requestHeaders = response.request.headers.associate { (key, value) ->
                 key.lowercase() to value
             },
@@ -88,7 +89,7 @@ class OkHttpDownloaderClient(
             }
         ).await()
         val body = runCatching {
-            requireNotNull(response.body){
+            requireNotNull(response.body) {
                 "body is null"
             }
         }.onFailure {
