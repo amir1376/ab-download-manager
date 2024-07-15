@@ -58,6 +58,11 @@ class SingleDownloadComponent(
                         add("Remaining Time" to (it.remainingTime?.let { remainingTime ->
                             convertTimeRemainingToHumanReadable(remainingTime, TimeNames.ShortNames)
                         }.orEmpty()))
+                        add("Resume Support" to when(it.supportResume){
+                            true->"Yes"
+                            false->"No"
+                            null->"Unknown"
+                        })
                     }
                 }
             }

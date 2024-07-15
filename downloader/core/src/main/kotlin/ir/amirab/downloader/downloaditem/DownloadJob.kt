@@ -46,7 +46,8 @@ class DownloadJob(
     private var booted = false
 
 
-    var supportsConcurrent: Boolean = false
+    var supportsConcurrent: Boolean? = null
+        private set
 
     private val _isDownloadActive = MutableStateFlow(false)
     val isDownloadActive = _isDownloadActive.asStateFlow()
@@ -56,6 +57,10 @@ class DownloadJob(
             val outFile = downloadManager.calculateOutputFile(downloadItem)
             destination = SimpleDownloadDestination(outFile, downloadManager.diskStat)
             loadPartState()
+            supportsConcurrent = when(getParts().size){
+                in 2..Int.MAX_VALUE -> true
+                else -> null
+            }
             applySpeedLimit()
             booted = true
 //            thisLogger().info("job for dl_$id booted")
@@ -261,7 +266,7 @@ class DownloadJob(
                 listOf(Part(0, null, 0))
             )
         } else {
-            if (supportsConcurrent){
+            if (supportsConcurrent==true){
                 //split parts
                 setParts(splitToRange(
                     minPartSize = downloadManager.settings.minPartSize,
@@ -313,7 +318,7 @@ class DownloadJob(
                         val inactivePart =
                                 kotlin.runCatching { mutableInactivePartDownloaderList.removeAt(0) }.getOrNull()
                         if (inactivePart != null) return inactivePart
-                        if (supportsConcurrent && downloadManager.settings.dynamicPartCreationMode) {
+                        if (supportsConcurrent==true && downloadManager.settings.dynamicPartCreationMode) {
                             synchronized(partSplitLock) {
                                 val candidates = getPartDownloaderList()
                                     .toList()

@@ -55,7 +55,7 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
         val onRequestClose = {
             component.closeDownloadDialog(singleDownloadComponent.downloadId)
         }
-        val defaultHeight = 270f
+        val defaultHeight = 290f
         val defaultWidth = 450f
 
         val showPartInfo by singleDownloadComponent.showPartInfo

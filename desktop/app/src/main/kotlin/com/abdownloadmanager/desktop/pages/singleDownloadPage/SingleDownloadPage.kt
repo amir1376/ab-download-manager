@@ -77,7 +77,7 @@ fun SingleDownloadPage(singleDownloadComponent: SingleDownloadComponent) {
                 val tabContentModifier = Modifier
 
                 Box(
-                    Modifier.height(130.dp)
+                    Modifier.height(150.dp)
                         .clip(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp))
                         .background(myColors.background)
                         .verticalScroll(scrollState)
@@ -543,6 +543,7 @@ private fun ToggleButton(
     itemState: ProcessingDownloadItemState,
     toggle: () -> Unit,
 ) {
+    val isResumeSupported = itemState.supportResume == true
     val (icon, text) = when (itemState.status) {
         is DownloadJobStatus.CanBeResumed -> {
             MyIcons.resume to "Resume"
@@ -560,6 +561,15 @@ private fun ToggleButton(
         },
         icon = icon,
         text = text,
+        color = if (isResumeSupported){
+            LocalContentColor.current
+        }else{
+            if (itemState.status is DownloadJobStatus.IsActive){
+                myColors.error
+            }else{
+                LocalContentColor.current
+            }
+        },
     )
 }
 

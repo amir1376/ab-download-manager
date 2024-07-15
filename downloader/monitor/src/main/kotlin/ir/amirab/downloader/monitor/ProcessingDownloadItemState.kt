@@ -20,6 +20,7 @@ data class ProcessingDownloadItemState(
     val status: DownloadJobStatus,
     val speed: Long,
     val parts: List<UiPart>,
+    val supportResume: Boolean?,
 ) : IDownloadItemState {
     val progress = parts.sumOf {
         it.howMuchProceed
@@ -62,6 +63,7 @@ data class ProcessingDownloadItemState(
                     UiPart.fromPart(it)
                 },
                 speed = speed,
+                supportResume = downloadJob.supportsConcurrent,
                 downloadLink = downloadItem.link
             )
         }
@@ -82,7 +84,8 @@ data class ProcessingDownloadItemState(
                 saveLocation = downloadItem.name,
                 parts = emptyList(),
                 speed = 0,
-                downloadLink = downloadItem.link
+                downloadLink = downloadItem.link,
+                supportResume = null,
             )
         }
     }
