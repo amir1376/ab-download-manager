@@ -1,5 +1,6 @@
 package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
+import androidx.compose.runtime.Immutable
 import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
 import com.abdownloadmanager.desktop.utils.*
@@ -24,6 +25,14 @@ sealed interface SingleDownloadEffects {
     data object BringToFront : SingleDownloadEffects
 }
 
+@Immutable
+data class SingleDownloadPagePropertyItem(
+    val name: String,
+    val value: String,
+    val valueState: ValueType = ValueType.Normal,
+) {
+    enum class ValueType { Normal, Error, Success }
+}
 class SingleDownloadComponent(
     ctx: ComponentContext,
     val onDismiss: () -> Unit,
@@ -41,28 +50,36 @@ class SingleDownloadComponent(
     val showPartInfo = mutableStateOf(false)
 
 
-    val extraDownloadInfo: StateFlow<List<Pair<String, String>>> = itemStateFlow
+    val extraDownloadInfo: StateFlow<List<SingleDownloadPagePropertyItem>> = itemStateFlow
         .filterNotNull()
         .map {
             buildList {
-                add("Name" to it.name)
-                add("Status" to createStatusString(it))
-                add("Size" to convertSizeToHumanReadable(it.contentLength))
+                add(SingleDownloadPagePropertyItem("Name", it.name))
+                add(SingleDownloadPagePropertyItem("Status", createStatusString(it)))
+                add(SingleDownloadPagePropertyItem("Size", convertSizeToHumanReadable(it.contentLength)))
                 when (it) {
                     is CompletedDownloadItemState -> {
                     }
 
                     is ProcessingDownloadItemState -> {
-                        add("Downloaded" to convertBytesToHumanReadable(it.progress).orEmpty())
-                        add("Speed" to convertSpeedToHumanReadable(it.speed))
-                        add("Remaining Time" to (it.remainingTime?.let { remainingTime ->
+                        add(SingleDownloadPagePropertyItem("Downloaded" , convertBytesToHumanReadable(it.progress).orEmpty()))
+                        add(SingleDownloadPagePropertyItem("Speed" , convertSpeedToHumanReadable(it.speed)))
+                        add(SingleDownloadPagePropertyItem("Remaining Time" , (it.remainingTime?.let { remainingTime ->
                             convertTimeRemainingToHumanReadable(remainingTime, TimeNames.ShortNames)
-                        }.orEmpty()))
-                        add("Resume Support" to when(it.supportResume){
-                            true->"Yes"
-                            false->"No"
-                            null->"Unknown"
-                        })
+                        }.orEmpty())))
+                        add(SingleDownloadPagePropertyItem(
+                            "Resume Support",
+                            when (it.supportResume) {
+                                true -> "Yes"
+                                false -> "No"
+                                null -> "Unknown"
+                            },
+                            when (it.supportResume) {
+                                true -> SingleDownloadPagePropertyItem.ValueType.Success
+                                false -> SingleDownloadPagePropertyItem.ValueType.Error
+                                null -> SingleDownloadPagePropertyItem.ValueType.Normal
+                            }
+                        ))
                     }
                 }
             }

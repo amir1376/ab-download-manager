@@ -386,10 +386,9 @@ sealed class PartInfoCells : TableCell<IndexedValue<UiPart>> {
 
 
 @Composable
-fun RenderPropertyItem(
-    title: String,
-    value: String,
-) {
+fun RenderPropertyItem(propertyItem: SingleDownloadPagePropertyItem) {
+    val title= propertyItem.name
+    val value= propertyItem.value
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
@@ -400,7 +399,6 @@ fun RenderPropertyItem(
                 modifier = Modifier.weight(0.3f),
                 maxLines = 1,
                 fontSize = myTextSizes.base
-
             )
         }
         WithContentAlpha(1f) {
@@ -410,7 +408,12 @@ fun RenderPropertyItem(
                     .basicMarquee()
                     .weight(0.7f),
                 maxLines = 1,
-                fontSize = myTextSizes.base
+                fontSize = myTextSizes.base,
+                color = when(propertyItem.valueState){
+                    SingleDownloadPagePropertyItem.ValueType.Normal -> LocalContentColor.current
+                    SingleDownloadPagePropertyItem.ValueType.Error -> myColors.error
+                    SingleDownloadPagePropertyItem.ValueType.Success -> myColors.success
+                }
             )
         }
     }
@@ -426,9 +429,9 @@ fun RenderInfo(
             .padding(horizontal = 16.dp)
             .padding(top = 8.dp)
     ) {
-        for ((title, value) in singleDownloadComponent.extraDownloadInfo.collectAsState().value) {
+        for (propertyItem in singleDownloadComponent.extraDownloadInfo.collectAsState().value) {
             Spacer(Modifier.height(2.dp))
-            RenderPropertyItem(title, value)
+            RenderPropertyItem(propertyItem)
         }
     }
 }
