@@ -313,7 +313,7 @@ class DownloadJob(
                         val inactivePart =
                                 kotlin.runCatching { mutableInactivePartDownloaderList.removeAt(0) }.getOrNull()
                         if (inactivePart != null) return inactivePart
-                        if (downloadManager.settings.dynamicPartCreationMode) {
+                        if (supportsConcurrent && downloadManager.settings.dynamicPartCreationMode) {
                             synchronized(partSplitLock) {
                                 val candidates = getPartDownloaderList()
                                     .toList()
