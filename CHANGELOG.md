@@ -14,9 +14,11 @@
 
 ### Security
 
-## 1.0.3
+## 1.0.4
 
-### Improved
+- Improved UI/UX in Download Page
+
+## 1.0.3
 
 - Download Info Page now show users that a download file supports resuming or not
 
