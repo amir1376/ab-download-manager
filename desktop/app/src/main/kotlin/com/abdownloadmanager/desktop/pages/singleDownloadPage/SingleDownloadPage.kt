@@ -27,9 +27,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.rememberComponentRectPositionProvider
+import com.abdownloadmanager.desktop.ui.widget.menu.MyDropDown
 import com.abdownloadmanager.utils.compose.useIsInDebugMode
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
@@ -464,7 +473,11 @@ fun RenderActions(
                 is ProcessingDownloadItemState -> {
                     PartInfoButton(showingPartInfo, onRequestShowPartInfo)
                     Spacer(Modifier.weight(1f))
-                    ToggleButton(it, singleDownloadComponent::toggle)
+                    ToggleButton(it,
+                        singleDownloadComponent::toggle,
+                        singleDownloadComponent::resume,
+                        singleDownloadComponent::pause,
+                    )
                     CloseButton(singleDownloadComponent::close)
                 }
             }
@@ -545,7 +558,13 @@ private fun OpenFolderButton(open: () -> Unit) {
 private fun ToggleButton(
     itemState: ProcessingDownloadItemState,
     toggle: () -> Unit,
+    resume: () -> Unit,
+    pause: () -> Unit,
 ) {
+    var showPromptOnNonePresumablePause by remember(itemState.status is DownloadJobStatus.IsActive) {
+        mutableStateOf(false)
+    }
+
     val isResumeSupported = itemState.supportResume == true
     val (icon, text) = when (itemState.status) {
         is DownloadJobStatus.CanBeResumed -> {
@@ -558,22 +577,79 @@ private fun ToggleButton(
 
         else -> return
     }
-    SingleDownloadPageButton(
-        {
-            toggle()
-        },
-        icon = icon,
-        text = text,
-        color = if (isResumeSupported){
-            LocalContentColor.current
-        }else{
-            if (itemState.status is DownloadJobStatus.IsActive){
-                myColors.error
-            }else{
+
+    Box {
+        SingleDownloadPageButton(
+            {
+                if (isResumeSupported){
+                    toggle()
+                }else{
+                    if (itemState.status is DownloadJobStatus.IsActive){
+                        showPromptOnNonePresumablePause=true
+                    }else{
+                        toggle()
+                    }
+                }
+            },
+            icon = icon,
+            text = text,
+            color = if (isResumeSupported){
                 LocalContentColor.current
+            }else{
+                if (itemState.status is DownloadJobStatus.IsActive){
+                    myColors.error
+                }else{
+                    LocalContentColor.current
+                }
+            },
+        )
+        if (showPromptOnNonePresumablePause){
+            val shape = RoundedCornerShape(6.dp)
+            val closePopup = {
+                showPromptOnNonePresumablePause = false
             }
-        },
-    )
+            Popup(
+                popupPositionProvider = rememberComponentRectPositionProvider(
+                    offset = DpOffset.Zero,
+                    anchor = Alignment.TopEnd,
+                    alignment = Alignment.TopStart,
+                ),
+                onDismissRequest = closePopup
+            ) {
+                Column(
+                    Modifier
+                        .clip(shape)
+                        .border(2.dp, myColors.onBackground / 10, shape)
+                        .background(
+                            Brush.linearGradient(
+                                listOf(
+                                    myColors.surface,
+                                    myColors.background,
+                                )
+                            )
+                        )
+                        .padding(16.dp)
+                        .widthIn(max = 140.dp)
+                ) {
+                    Text(buildAnnotatedString {
+                        withStyle(SpanStyle(color = myColors.warning)){
+                            append("WARNING:\n")
+                        }
+                        append("This download doesn't support resuming! You may have to RESTART it later in the Download List")
+                    })
+                    Spacer(Modifier.height(8.dp))
+                    ActionButton(
+                        "Stop Anyway",
+                        onClick = {
+                            closePopup()
+                            pause()
+                        },
+                        contentColor = myColors.error
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable

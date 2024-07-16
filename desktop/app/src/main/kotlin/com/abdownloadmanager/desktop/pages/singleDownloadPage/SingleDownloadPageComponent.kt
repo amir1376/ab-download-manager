@@ -138,6 +138,22 @@ class SingleDownloadComponent(
             }
         }
     }
+    fun resume() {
+        val state = itemStateFlow.value as ProcessingDownloadItemState ?: return
+        scope.launch {
+            if (state.status is DownloadJobStatus.CanBeResumed) {
+                downloadSystem.manualResume(downloadId)
+            }
+        }
+    }
+    fun pause() {
+        val state = itemStateFlow.value as ProcessingDownloadItemState ?: return
+        scope.launch {
+            if (state.status is DownloadJobStatus.IsActive) {
+                downloadSystem.manualPause(downloadId)
+            }
+        }
+    }
 
     fun close() {
         scope.launch {
