@@ -81,7 +81,7 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
             LaunchedEffect(Unit) {
                 window.minimumSize = Dimension(defaultWidth.toInt(), defaultHeight.toInt())
             }
-            val singleDownloadPageSizing = remember { SingleDownloadPageSizing() }
+            val singleDownloadPageSizing = remember(showPartInfo) { SingleDownloadPageSizing() }
             WindowTitle(itemState?.let { getDownloadTitle(it) } ?: "Download")
             WindowIcon(MyIcons.appIcon)
             var h = defaultHeight
