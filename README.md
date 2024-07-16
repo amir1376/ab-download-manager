@@ -67,21 +67,13 @@ You can join to our [Telegram Group](https://t.me/abdownloadmanager_discussion) 
 
 ## Repositories And Source Code
 
-There is 3 repository related to this project
+There are multiple repositories related to the **AB Download Manager** project
 
-### Application Repo (You are here)
-
-This repo, contains the **Application** that runs on your **device**
-
-### Browser Integration Repo
-
-This [repo](https://github.com/amir1376/ab-download-manager-browser-integration), contains the **Browser Extension** to be installed on your **browser** 
-
-### Project Website Repo
-
-This [repo](https://github.com/amir1376/ab-download-manager-website), contains the [website](https://abdownloadmanager.com) that introduces you the project
-
-### Support Me
+| Repository                                                                                 | Description                                                                   |
+|--------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| [Main Application](https://github.com/amir1376/ab-download-manager) (You are here)         | Contains the  **Application** that runs on your  **device**                   |
+| [Browser Integration](https://github.com/amir1376/ab-download-manager-browser-integration) | Contains the **Browser Extension** to be installed on your  **browser**       |
+| [Website](https://github.com/amir1376/ab-download-manager-website)                         | Contains the **AB Download Manager** [website](https://abdownloadmanager.com) |
 
 I spent a lot of time to create this project.
 
