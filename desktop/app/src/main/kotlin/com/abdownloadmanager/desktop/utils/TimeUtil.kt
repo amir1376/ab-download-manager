@@ -82,8 +82,8 @@ fun prettifyRelativeTime(
         names = names,
     )
     val leftOrAgo =
-        if (isLater) names.left
-        else names.ago
+            if (isLater) names.left
+            else names.ago
     return "$relativeTime $leftOrAgo"
 }
 
@@ -107,30 +107,45 @@ private fun relativeTime(
         }
         if (used == count) return@buildString
         if (months > 0) {
+            if (used > 0) {
+                append(" ")
+            }
             used++
             append(months)
             append(" ${names.months}")
         }
         if (used == count) return@buildString
         if (days > 0) {
+            if (used > 0) {
+                append(" ")
+            }
             used++
             append(days)
             append(" ${names.days}")
         }
         if (used == count) return@buildString
         if (hours > 0) {
+            if (used > 0) {
+                append(" ")
+            }
             used++
             append(hours)
             append(" ${names.hours}")
         }
         if (used == count) return@buildString
         if (minutes > 0) {
+            if (used > 0) {
+                append(" ")
+            }
             used++
             append(minutes)
             append(" ${names.minutes}")
         }
         if (used == count) return@buildString
         if (seconds > 0) {
+            if (used > 0) {
+                append(" ")
+            }
             used++
             append(seconds)
             append(" ${names.seconds}")
