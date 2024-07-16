@@ -13,9 +13,7 @@
 
 ## Description
 
-
-[AB Download Manager](https://abdownloadmanager.com) is a desktop app which let you manage and organize your download files better than before
-
+[AB Download Manager](https://abdownloadmanager.com) is a desktop app which lets you manage and organize your download files better than before
 
 ## Features
 
@@ -66,7 +64,6 @@ You can join to our [Telegram Group](https://t.me/abdownloadmanager_discussion) 
 - Report problems
 - Suggest features
 - Get help about the app
-
 
 ## Repositories And Source Code
 
