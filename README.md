@@ -67,6 +67,29 @@ You can join to our [Telegram Group](https://t.me/abdownloadmanager_discussion) 
 - Suggest features
 - Get help about the app
 
+
+## Repositories And Source Code
+
+There is 3 repository related to this project
+
+### Application Repo (You are here)
+
+This repo, contains the **Application** that runs on your **device**
+
+### Browser Integration Repo
+
+This [repo](https://github.com/amir1376/ab-download-manager-browser-integration), contains the **Browser Extension** to be installed on your **browser** 
+
+### Project Website Repo
+
+This [repo](https://github.com/amir1376/ab-download-manager-website), contains the [website](https://abdownloadmanager.com) that introduces you the project
+
+### Support Me
+
+I spent a lot of time to create this project.
+
+If you like my work, Please consider giving it a ⭐ Thanks ❤️
+
 ## Bug Report
 
 If you see bugs in the source code! please report them in the `GitHub Issues` section
