@@ -35,10 +35,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
-import com.abdownloadmanager.desktop.ui.widget.menu.MyDropDown
 import com.abdownloadmanager.utils.compose.useIsInDebugMode
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
@@ -257,7 +255,15 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                     itemState.parts
                         .let { parts ->
                             if (onlyActiveParts) {
-                                parts.filter { it.status is PartDownloadStatus.IsActive }
+                                parts.filter {
+                                    when(it.status){
+                                        is PartDownloadStatus.Canceled -> true
+                                        PartDownloadStatus.Completed -> false
+                                        PartDownloadStatus.IDLE -> false
+                                        PartDownloadStatus.ReceivingData -> true
+                                        PartDownloadStatus.SendGet -> true
+                                    }
+                                }
                             } else {
                                 parts
                             }
@@ -314,7 +320,7 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                         }
 
                         PartInfoCells.Status -> {
-                            SimpleCellText("${it.value.status}")
+                            SimpleCellText("${prettifyStatus(it.value.status)}")
                         }
 
                         PartInfoCells.Downloaded -> {
@@ -352,6 +358,16 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
         Handle(Modifier.fillMaxWidth().height(8.dp), orientation = Orientation.Vertical) {
             singleDownloadPageSizing.partInfoHeight += it
         }
+    }
+}
+
+fun prettifyStatus(status: PartDownloadStatus): String {
+    return when(status){
+        is PartDownloadStatus.Canceled -> "Disconnected"
+        PartDownloadStatus.IDLE -> "IDLE"
+        PartDownloadStatus.Completed -> "Completed"
+        PartDownloadStatus.ReceivingData -> "Receiving Data"
+        PartDownloadStatus.SendGet -> "Send Get"
     }
 }
 
