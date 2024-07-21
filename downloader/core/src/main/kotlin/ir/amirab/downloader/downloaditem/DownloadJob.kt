@@ -108,7 +108,7 @@ class DownloadJob(
         pause()
         clearPartDownloaderList()
         setParts(emptyList())
-        downloadItem.contentLength = -1
+        downloadItem.contentLength = LENGTH_UNKNOWN
         downloadItem.serverETag = null
         downloadItem.status = DownloadStatus.Added
         downloadItem.startTime = null
@@ -254,7 +254,7 @@ class DownloadJob(
         if (parts.isNotEmpty()) {
             return
         }
-        if (downloadItem.contentLength == -1L) {
+        if (downloadItem.contentLength == LENGTH_UNKNOWN) {
             setParts(
                 listOf(Part(0, null, 0))
             )
@@ -450,7 +450,7 @@ class DownloadJob(
         scope.launch {
             destination.onAllPartsCompleted()
             downloadItem.status = DownloadStatus.Completed
-            if (downloadItem.contentLength == -1L) {
+            if (downloadItem.contentLength == LENGTH_UNKNOWN) {
                 //in case of blind part, update download item length
                 if (parts.size == 1) {
                     downloadItem.contentLength = parts[0].howMuchProceed()
@@ -547,7 +547,7 @@ class DownloadJob(
                 // we don't want to page downloaded with multi connection
                 // so the download will be restarted [@see prepareDestination]
                 supportsConcurrent = false
-                downloadItem.contentLength = -1
+                downloadItem.contentLength = LENGTH_UNKNOWN
                 downloadItem.serverETag = null
             } else {
                 // if download was not a webpage and now this is a webpage
@@ -559,19 +559,19 @@ class DownloadJob(
         val totalLength = response.totalLength
         val oldServerETag = downloadItem.serverETag
         val newServerETag = response.etag
-        if (downloadItem.contentLength == -1L) {
-            //new download
+        if (downloadItem.contentLength == LENGTH_UNKNOWN) {
+            //new download / or restart
             downloadItem.contentLength = totalLength ?: -1
             downloadItem.serverETag = newServerETag
         } else {
-            // at the beginning of download
+            // check if we file not changed from remote
             if (totalLength != downloadItem.contentLength) {
                 throw FileChangedException.LengthChangedException(downloadItem.contentLength, totalLength ?: -1)
             }
             if (oldServerETag != null && newServerETag != null) {
                 // we already know that sizes are the same,
                 // but we also have etag header
-                // so we have chance to compare file contents of local and server
+                // so, we have chance to compare file contents of local and server
                 if (oldServerETag != newServerETag) {
                     throw FileChangedException.ETagChangedException(oldServerETag, newServerETag)
                 }
