@@ -19,14 +19,16 @@ data class ResponseInfo(
     }
 
     val contentLength by lazy {
-        responseHeaders["content-length"]?.toLongOrNull()
+        responseHeaders["content-length"]?.toLongOrNull()?.takeIf { it >= 0L }
     }
 
     //total length of whole file even if it is partial content
     val totalLength by lazy {
-        if (statusCode == 206) {
+        val responseLength = contentLength ?: return@lazy null
+        // partial length only valid when we have content-length header
+        if (isPartial) {
             getContentRange()?.fullSize
-        } else contentLength
+        } else responseLength
     }
     val requiresAuth by lazy {
         statusCode == 401
@@ -36,21 +38,27 @@ data class ResponseInfo(
         requiresAuth && (responseHeaders["www-authenticate"]?.contains("basic", true) ?: false)
     }
 
-    val resumeSupport by lazy {
+    val isPartial by lazy {
         statusCode == 206
     }
+
+    val resumeSupport by lazy {
+        // maybe server does not give us content-length, so we ignore resume support
+        isPartial && contentLength != null
+    }
+
     val fileName: String? by lazy {
         val foundName = run {
             val nameFromHeader = responseHeaders["content-disposition"]?.let {
                 extractFileNameFromContentDisposition(it)
             }
-            if (nameFromHeader!=null){
+            if (nameFromHeader != null) {
                 return@lazy nameFromHeader
             }
             UrlUtils.extractNameFromLink(requestUrl).orEmpty()
         }
         var valueToReturn = foundName
-        if (isWebPage()){
+        if (isWebPage()) {
             valueToReturn = FileNameUtil.replaceExtension(
                 valueToReturn,
                 "html",

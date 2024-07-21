@@ -57,7 +57,7 @@ class DownloadJob(
             val outFile = downloadManager.calculateOutputFile(downloadItem)
             destination = SimpleDownloadDestination(outFile, downloadManager.diskStat)
             loadPartState()
-            supportsConcurrent = when(getParts().size){
+            supportsConcurrent = when (getParts().size) {
                 in 2..Int.MAX_VALUE -> true
                 else -> null
             }
@@ -148,7 +148,6 @@ class DownloadJob(
                 createPartDownloaderList()
 //                println("part downloaders created")
                 beginDownloadParts()
-                enableProgressUpdater()
                 startAutoSaver()
                 downloadItem.status = DownloadStatus.Downloading
                 if (downloadItem.startTime == null) {
@@ -173,8 +172,15 @@ class DownloadJob(
     ) {
         withContext(Dispatchers.IO) {
             destination.outputSize = downloadItem.contentLength
-                .takeIf { strictDownload }
-                    ?: LENGTH_UNKNOWN
+                .takeIf {
+                    // reset size if we have a non-strict download (webpage etc.
+                    strictDownload
+                }
+                ?.takeIf {
+                    // reset output file if we can't support the file
+                    supportsConcurrent != false
+                }
+                ?: LENGTH_UNKNOWN
             if (!destination.isDownloadedPartsIsValid()) {
                 //file deleted or something!
                 parts.forEach { it.resetCurrent() }
@@ -195,19 +201,6 @@ class DownloadJob(
 //            it.progressFlow.value.value
 //        }
     }
-
-    private val _downloadProgressFlow = MutableStateFlow(0L)
-    val downloadProgressFlow = _downloadProgressFlow.asStateFlow()
-
-    private fun enableProgressUpdater() {
-        activeDownloadScope?.launch {
-            while (isActive) {
-                _downloadProgressFlow.value = getDownloadedSize()
-                delay(100)
-            }
-        }
-    }
-
 
     private fun startAutoSaver() {
         activeDownloadScope?.launch(Dispatchers.IO) {
@@ -254,7 +247,7 @@ class DownloadJob(
 
     fun getRequestedPartitionCount(): Int {
         return downloadItem.preferredConnectionCount
-                ?: downloadManager.settings.defaultThreadCount
+            ?: downloadManager.settings.defaultThreadCount
     }
 
     private suspend fun createPartsIfNotCreated() {
@@ -266,7 +259,7 @@ class DownloadJob(
                 listOf(Part(0, null, 0))
             )
         } else {
-            if (supportsConcurrent==true){
+            if (supportsConcurrent == true) {
                 //split parts
                 setParts(splitToRange(
                     minPartSize = downloadManager.settings.minPartSize,
@@ -275,9 +268,9 @@ class DownloadJob(
                 ).map {
                     Part(it.first, it.last)
                 })
-            }else{
+            } else {
                 setParts(
-                    listOf(Part(0, (downloadItem.contentLength-1).takeIf { it>=0 }, 0))
+                    listOf(Part(0, (downloadItem.contentLength - 1).takeIf { it >= 0 }, 0))
                 )
             }
 
@@ -316,9 +309,9 @@ class DownloadJob(
 
                     fun getPartDownloader(): PartDownloader? {
                         val inactivePart =
-                                kotlin.runCatching { mutableInactivePartDownloaderList.removeAt(0) }.getOrNull()
+                            kotlin.runCatching { mutableInactivePartDownloaderList.removeAt(0) }.getOrNull()
                         if (inactivePart != null) return inactivePart
-                        if (supportsConcurrent==true && downloadManager.settings.dynamicPartCreationMode) {
+                        if (supportsConcurrent == true && downloadManager.settings.dynamicPartCreationMode) {
                             synchronized(partSplitLock) {
                                 val candidates = getPartDownloaderList()
                                     .toList()
@@ -379,7 +372,7 @@ class DownloadJob(
     private fun onPartHaveToManyError(throwable: Throwable) {
         var paused = false
         if (throwable is DownloadValidationException) {
-            if (throwable.isCritical()){
+            if (throwable.isCritical()) {
                 //stop the whole job! as we have big problem here
                 paused = true
                 scope.launch {
@@ -401,7 +394,7 @@ class DownloadJob(
         }
     }
 
-//    var maxRetries = 3
+    //    var maxRetries = 3
 //    var failTries = 0
     private fun onPartStatusChanged(
         partDownloader: PartDownloader,
@@ -534,6 +527,10 @@ class DownloadJob(
         partDownloaderList.remove(part.from)
     }
 
+    private fun isDownloadItemIsAWebpage(): Boolean {
+        return downloadItem.name.endsWith(".html", true)
+    }
+
     private suspend fun fetchDownloadInfoAndValidate(
     ) {
 //        println("fetch download ")
@@ -541,17 +538,31 @@ class DownloadJob(
 //        thisLogger().info("fetchDownloadInfoAndValidate")
         val response = client.head(downloadItem).expectSuccess()
         supportsConcurrent = response.resumeSupport
+        if (response.isWebPage()) {
+            if (isDownloadItemIsAWebpage()) {
+                // don't strict if it's a webpage let it download without checks
+                strictDownload = false
+
+                // this makes the file not resume able
+                // we don't want to page downloaded with multi connection
+                // so the download will be restarted [@see prepareDestination]
+                supportsConcurrent = false
+                downloadItem.contentLength = -1
+                downloadItem.serverETag = null
+            } else {
+                // if download was not a webpage and now this is a webpage
+                // it means maybe user have to change its download link
+                // we should not restart download here!
+                throw FileChangedException.GotAWebPage()
+            }
+        }
         val totalLength = response.totalLength
         val oldServerETag = downloadItem.serverETag
         val newServerETag = response.etag
         if (downloadItem.contentLength == -1L) {
             //new download
             downloadItem.contentLength = totalLength ?: -1
-            downloadItem.serverETag=newServerETag
-            // don't strict if it's a webpage let it download and not a link with resume support
-            if (response.isWebPage() && !response.resumeSupport){
-                strictDownload = false
-            }
+            downloadItem.serverETag = newServerETag
         } else {
             // at the beginning of download
             if (totalLength != downloadItem.contentLength) {
@@ -639,7 +650,8 @@ sealed class DownloadJobStatus(
     data class PreparingFile(val percent: Int) : DownloadJobStatus(1, DownloadStatus.Downloading),
         IsActive
 
-    data class Canceled(val e: Throwable) : DownloadJobStatus(2,
+    data class Canceled(val e: Throwable) : DownloadJobStatus(
+        2,
         if (ExceptionUtils.isNormalCancellation(e)) DownloadStatus.Paused else DownloadStatus.Error
     ),
         CanBeResumed

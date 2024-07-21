@@ -1,5 +1,7 @@
 # Changelog
 
+- Improve Download Engine
+
 ## Unreleased
 
 ### Added
