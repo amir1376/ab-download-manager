@@ -1,7 +1,5 @@
 # Changelog
 
-- Improve Download Engine
-
 ## Unreleased
 
 ### Added
@@ -15,6 +13,10 @@
 ### Fixed
 
 ### Security
+
+## 1.0.5
+
+- Improve Download Engine
 
 ## 1.0.4
 
