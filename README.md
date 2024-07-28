@@ -11,6 +11,11 @@
     <a href="https://t.me/abdownloadmanager"><img alt="Telegram Channel" src="https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram&labelColor=gray"></a>
 </p>
 
+<a href="https://abdownloadmanager.com" target="_blank">
+    <img alt="AB Download Manager Banner" src="assets/banners/app_banner.png"/>
+</a>
+
+
 ## Description
 
 [AB Download Manager](https://abdownloadmanager.com) is a desktop app which lets you manage and organize your download files better than before
