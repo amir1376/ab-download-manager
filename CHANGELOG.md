@@ -4,11 +4,7 @@
 
 ### Added
 
-- Add Community and Browser Integration links to the app menu
-
 ### Changed
-
-- Change default download folder
 
 ### Deprecated
 
@@ -16,9 +12,21 @@
 
 ### Fixed
 
-- Exception will not throw if System Tray is not supported by the OS
-
 ### Security
+
+## 1.0.6
+
+### Added
+
+- Add Community and Browser Integration links to the app menu
+
+### Changed
+
+- Change default download folder
+
+### Fixed
+
+- Exception will not throw anymore if System Tray is not supported by the OS
 
 ## 1.0.5
 
