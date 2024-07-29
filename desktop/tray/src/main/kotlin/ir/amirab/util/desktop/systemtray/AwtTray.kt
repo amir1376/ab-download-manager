@@ -31,16 +31,7 @@ fun AwtTray(
     val density by rememberUpdatedState(GlobalDensity)
     if (!isTraySupported) {
         DisposableEffect(Unit) {
-            // We should notify developer, but shouldn't throw an exception.
-            // If we would throw an exception, some application wouldn't work on some platforms at
-            // all, if developer doesn't check that application crashes.
-            //
-            // We can do this because we don't return anything in Tray function, and following
-            // code doesn't depend on something that is created/calculated in this function.
-            System.err.println(
-                "Tray is not supported on the current platform. " +
-                        "Use the global property `isTraySupported` to check."
-            )
+            System.err.println("System tray is not supported")
             onDispose {}
         }
         return
@@ -58,11 +49,11 @@ fun AwtTray(
         icon.toAwtImage(GlobalDensity, GlobalLayoutDirection, trayIconSize)
     }
 
-    val tray = remember {
+    val trayIcon = remember {
         TrayIcon(awtIcon)
     }
-    DisposableEffect(tray) {
-        with(tray) {
+    DisposableEffect(trayIcon) {
+        with(trayIcon) {
             val doubleClickListener = object : MouseListener {
                 override fun mouseClicked(p0: MouseEvent?) {
                     when (p0?.button) {
@@ -95,21 +86,32 @@ fun AwtTray(
         }
     }
     SideEffect {
-        if (tray.image != awtIcon) tray.image = awtIcon
-        if (tray.toolTip != tooltip) tray.toolTip = tooltip
+        if (trayIcon.image != awtIcon) trayIcon.image = awtIcon
+        if (trayIcon.toolTip != tooltip) trayIcon.toolTip = tooltip
     }
 
     val coroutineScope = rememberCoroutineScope()
 
     DisposableEffect(Unit) {
-        SystemTray.getSystemTray().add(tray)
+        val systemTray = kotlin.runCatching {
+            // some linux users reporting that system tray will not support by distro and throws exception after entering to lock screen
+            // I have to investigate why!
+            SystemTray.getSystemTray()
+        }.getOrNull()
 
-        state.notificationFlow
-            .onEach(tray::displayMessage)
-            .launchIn(coroutineScope)
+        if (systemTray!=null){
+            systemTray.add(trayIcon)
+            state.notificationFlow
+                .onEach(trayIcon::displayMessage)
+                .launchIn(coroutineScope)
+        }
 
         onDispose {
-            SystemTray.getSystemTray().remove(tray)
+            // don't get hard!
+            // linux have some strange behaviors in system tray I have to improve this
+            runCatching {
+                systemTray?.remove(trayIcon)
+            }
         }
     }
 }

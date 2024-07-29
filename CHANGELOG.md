@@ -16,6 +16,8 @@
 
 ### Fixed
 
+- Exception will not throw if System Tray is not supported by the OS
+
 ### Security
 
 ## 1.0.5
