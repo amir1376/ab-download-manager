@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Change default download folder
+
 ### Deprecated
 
 ### Removed

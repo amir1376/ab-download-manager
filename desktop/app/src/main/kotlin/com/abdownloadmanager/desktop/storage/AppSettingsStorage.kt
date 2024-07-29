@@ -22,8 +22,9 @@ data class AppSettingsModel(
     val speedLimit: Long = 0,
     val autoStartOnBoot: Boolean = true,
     val notificationSound: Boolean = true,
-    val defaultDownloadFolder: String = File(System.getProperty("user.home")).resolve("Downloads/AB"
-    ).canonicalFile.absolutePath,
+    val defaultDownloadFolder: String = File(System.getProperty("user.home"))
+        .resolve("Downloads/ABDM")
+        .canonicalFile.absolutePath,
     val browserIntegrationEnabled: Boolean = true,
     val browserIntegrationPort: Int = 15151,
 ) {
@@ -82,7 +83,7 @@ data class AppSettingsModel(
 
 class AppSettingsStorage(
     settings: DataStore<MapConfig>,
-) : ConfigBaseSettings<AppSettingsModel>(settings,AppSettingsModel.ConfigLens) {
+) : ConfigBaseSettings<AppSettingsModel>(settings, AppSettingsModel.ConfigLens) {
     var theme = from(AppSettingsModel.theme)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
