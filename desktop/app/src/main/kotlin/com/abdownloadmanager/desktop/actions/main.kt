@@ -1,17 +1,24 @@
 package com.abdownloadmanager.desktop.actions
 
 import com.abdownloadmanager.desktop.AppComponent
+import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.widget.menu.SubMenu
+import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
 import com.abdownloadmanager.desktop.utils.action.AnAction
 import com.abdownloadmanager.desktop.utils.action.MenuItem
+import com.abdownloadmanager.desktop.utils.action.buildMenu
 import com.abdownloadmanager.desktop.utils.action.simpleAction
+import com.abdownloadmanager.desktop.utils.getIcon
+import com.abdownloadmanager.desktop.utils.getName
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.inactiveQueuesFlow
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import ir.amirab.util.UrlUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -92,6 +99,21 @@ val exitAction = simpleAction(
 ) {
     appComponent.requestClose()
 }
+
+val browserIntegrations = MenuItem.SubMenu(
+    title = "Download Browser Integration",
+    icon = MyIcons.download,
+    items = buildMenu {
+        for (browserExtension in SharedConstants.browserIntegrations){
+            item(
+                title = browserExtension.type.getName(),
+                icon = browserExtension.type.getIcon(),
+                onClick = { UrlUtils.openUrl(browserExtension.url) }
+            )
+        }
+    }
+)
+
 val gotoSettingsAction = simpleAction(
     "Settings",
     MyIcons.settings,
@@ -122,6 +144,28 @@ val openOpenSourceThirdPartyLibraries = simpleAction(
 ) {
     appComponent.openOpenSourceLibraries()
 }
+
+val supportActionGroup = MenuItem.SubMenu(
+    title = "Support & Community",
+    icon = MyIcons.group,
+    items = buildMenu {
+        item("Website",MyIcons.appIcon){
+            UrlUtils.openUrl(AppInfo.website)
+        }
+        item("Source Code",MyIcons.openSource){
+            UrlUtils.openUrl(AppInfo.sourceCode)
+        }
+        subMenu("Telegram",MyIcons.telegram){
+            item("Channel",MyIcons.speaker){
+                UrlUtils.openUrl(SharedConstants.telegramChannelUrl)
+            }
+            item("Group",MyIcons.group){
+                UrlUtils.openUrl(SharedConstants.telegramGroupUrl)
+            }
+        }
+    }
+)
+
 val openQueuesAction = simpleAction(
     title = "Open Queues",
     icon = MyIcons.queue

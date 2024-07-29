@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.ui.icon
 
 object MyIcons : IMyIcons {
-    override val appIcon: IconSource get() = "icons/app_icon.svg".asIconSource()
+    override val appIcon: IconSource get() = "icons/app_icon.svg".asIconSource(false)
 
     override val settings get() = "icons/settings.svg".asIconSource()
     override val search get() = "icons/search.svg".asIconSource()
@@ -19,6 +19,15 @@ object MyIcons : IMyIcons {
     override val undo get() = "icons/undo.svg".asIconSource()
 
     override val openSource: IconSource get() = "icons/open_source.svg".asIconSource()
+    override val telegram: IconSource get() = "icons/telegram.svg".asIconSource(false)
+    override val speaker: IconSource get() = "icons/speaker.svg".asIconSource()
+    override val group: IconSource get() = "icons/group.svg".asIconSource()
+
+
+    override val browserMozillaFirefox: IconSource get() = "icons/browser_mozilla_firefox.svg".asIconSource(false)
+    override val browserGoogleChrome: IconSource get() = "icons/browser_google_chrome.svg".asIconSource(false)
+    override val browserMicrosoftEdge: IconSource get() = "icons/browser_microsoft_edge.svg".asIconSource(false)
+    override val browserOpera: IconSource get() = "icons/browser_opera.svg".asIconSource(false)
 
 //    override val menu get() = TablerIcons.Menu.asIconSource()
 //    override val menuClose get() = TablerIcons.X.asIconSource()

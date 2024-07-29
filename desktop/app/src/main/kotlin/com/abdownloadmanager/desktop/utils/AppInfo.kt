@@ -36,3 +36,6 @@ fun AppInfo.isInDebugMode(): Boolean {
 
 val AppInfo.configDir: File get() = File(AppProperties.getConfigDirectory())
 val AppInfo.downloadDbDir:File get() =  AppInfo.configDir.resolve("download_db")
+fun AppInfo.extensions(){
+
+}

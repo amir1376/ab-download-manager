@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add Community and Browser Integration links to the app menu
+
 ### Changed
 
 - Change default download folder

@@ -337,11 +337,15 @@ class HomeComponent(
                 +dummyMessage
                 separator()
             }
+            +browserIntegrations
+            separator()
             +gotoSettingsAction
         }
         subMenu("Help") {
             //TODO Enable Updater
 //            +checkForUpdateAction
+            +supportActionGroup
+            separator()
             +openOpenSourceThirdPartyLibraries
             +openAboutAction
         }

@@ -153,6 +153,30 @@ buildConfig {
             "https://github.com/amir1376/ab-download-manager"
         }
     )
+    buildConfigField(
+        "INTEGRATION_CHROME_LINK",
+        provider {
+            "https://chromewebstore.google.com/detail/ab-download-manager-brows/bbobopahenonfdgjgaleledndnnfhooj"
+        }
+    )
+    buildConfigField(
+        "INTEGRATION_FIREFOX_LINK",
+        provider {
+            "https://addons.mozilla.org/en-US/firefox/addon/ab-download-manager/"
+        }
+    )
+    buildConfigField(
+        "TELEGRAM_GROUP",
+        provider {
+            "https://t.me/abdownloadmanager_discussion"
+        }
+    )
+    buildConfigField(
+        "TELEGRAM_CHANNEL",
+        provider {
+            "https://t.me/abdownloadmanager"
+        }
+    )
 }
 
 

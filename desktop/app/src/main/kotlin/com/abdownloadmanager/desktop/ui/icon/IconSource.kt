@@ -1,5 +1,6 @@
 package com.abdownloadmanager.desktop.ui.icon
 
+import androidx.compose.foundation.Image
 import com.abdownloadmanager.desktop.ui.LocalContentAlpha
 import com.abdownloadmanager.desktop.ui.LocalContentColor
 import com.abdownloadmanager.desktop.ui.widget.Icon
@@ -15,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 @Immutable
 sealed interface IconSource {
     val value: Any
+    val requiredTint: Boolean
 
     @Composable
     fun rememberPainter(): Painter
@@ -22,25 +24,27 @@ sealed interface IconSource {
     @Immutable
     data class StorageIconSource(
         override val value: String,
+        override val requiredTint: Boolean,
     ) : IconSource {
         @Composable
-        override fun rememberPainter():Painter = painterResource(value)
+        override fun rememberPainter(): Painter = painterResource(value)
     }
 
     @Immutable
     data class VectorIconSource(
         override val value: ImageVector,
+        override val requiredTint: Boolean,
     ) : IconSource {
         @Composable
-        override fun rememberPainter():Painter = rememberVectorPainter(value)
+        override fun rememberPainter(): Painter = rememberVectorPainter(value)
     }
 }
 
 context (IMyIcons)
-fun ImageVector.asIconSource() = IconSource.VectorIconSource(this)
+fun ImageVector.asIconSource(requiredTint: Boolean = true) = IconSource.VectorIconSource(this, requiredTint)
 
 context (IMyIcons)
-fun String.asIconSource() = IconSource.StorageIconSource(this)
+fun String.asIconSource(requiredTint: Boolean = true) = IconSource.StorageIconSource(this, requiredTint)
 
 
 @Composable
@@ -50,17 +54,26 @@ fun MyIcon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
 ) {
-    Icon(
-        painter = icon.rememberPainter(),
-        contentDescription = contentDescription,
-        modifier = modifier,
-        tint = tint,
-    )
+    val painter = icon.rememberPainter()
+    if (icon.requiredTint) {
+        Icon(
+            painter = painter,
+            contentDescription = contentDescription,
+            modifier = modifier,
+            tint = tint,
+        )
+    } else {
+        Image(
+            painter = painter,
+            contentDescription = contentDescription,
+            modifier = modifier,
+        )
+    }
 }
 
 
 interface IMyIcons {
-    val appIcon:IconSource
+    val appIcon: IconSource
 
     val settings: IconSource
     val search: IconSource
@@ -78,6 +91,15 @@ interface IMyIcons {
 //    val menuClose: IconSource
 
     val openSource: IconSource
+    val telegram: IconSource
+    val speaker: IconSource
+    val group: IconSource
+
+    //browser icons
+    val browserMozillaFirefox: IconSource
+    val browserGoogleChrome: IconSource
+    val browserMicrosoftEdge: IconSource
+    val browserOpera: IconSource
 
     val next: IconSource
     val back: IconSource
