@@ -32,6 +32,7 @@ import com.abdownloadmanager.desktop.utils.isInDebugMode
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.utils.compose.ProvideDebugInfo
 import kotlinx.coroutines.CoroutineScope
@@ -136,7 +137,10 @@ private fun HomeWindow(
     onCLoseRequest: () -> Unit,
 ) {
     val size by homeComponent.windowSize.collectAsState()
-    val windowState = rememberWindowState(size = size)
+    val windowState = rememberWindowState(
+        size = size,
+        position = WindowPosition.Aligned(Alignment.Center)
+    )
     val onCloseRequest = onCLoseRequest
     val windowTitle = "AB Download Manager"
     val windowIcon = MyIcons.appIcon
