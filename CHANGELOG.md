@@ -12,6 +12,8 @@
 
 ### Fixed
 
+- App is now open in center of screen
+
 ### Security
 
 ## 1.0.6
