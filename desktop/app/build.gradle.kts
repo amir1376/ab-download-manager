@@ -13,7 +13,9 @@ plugins {
     id(Plugins.aboutLibraries)
 //    id(MyPlugins.proguardDesktop)
 }
-
+repositories{
+    maven("https://jitpack.io")
+}
 dependencies {
     implementation(libs.decompose)
     implementation(libs.decompose.jbCompose)
@@ -41,8 +43,12 @@ dependencies {
     implementation(libs.arrow.core)
     implementation(libs.arrow.optics)
     ksp(libs.arrow.opticKsp)
+
     implementation(libs.androidx.datastore)
+
     implementation(libs.aboutLibraries.core)
+
+    implementation(libs.osThemeDetector)
 
     implementation(project(":downloader:core"))
     implementation(project(":downloader:monitor"))

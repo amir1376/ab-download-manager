@@ -1,5 +1,8 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable
 
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.Color
+import com.abdownloadmanager.desktop.pages.settings.ThemeInfo
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable.RenderMode
 import com.abdownloadmanager.desktop.ui.theme.MyColors
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -230,12 +233,12 @@ open class EnumConfigurable<T>(
 class ThemeConfigurable(
     title: String,
     description: String,
-    backedBy: MutableStateFlow<MyColors>,
-    describe: (MyColors) -> String,
-    possibleValues: List<MyColors>,
+    backedBy: MutableStateFlow<ThemeInfo>,
+    describe: (ThemeInfo) -> String,
+    possibleValues: List<ThemeInfo>,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
-) : BaseEnumConfigurable<MyColors>(
+) : BaseEnumConfigurable<ThemeInfo>(
     title = title,
     description = description,
     backedBy = backedBy,

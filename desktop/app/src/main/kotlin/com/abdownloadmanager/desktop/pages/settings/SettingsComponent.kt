@@ -6,16 +6,14 @@ import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.ui.icon.IconSource
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.darkColors
-import com.abdownloadmanager.desktop.ui.theme.lightColors
 import com.abdownloadmanager.desktop.utils.BaseComponent
 import com.abdownloadmanager.desktop.utils.convertSpeedToHumanReadable
-import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import androidx.compose.runtime.*
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.FileUtils
+import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -25,7 +23,8 @@ sealed class SettingSections(
     val name: String,
 ) {
     data object Appearance : SettingSections(MyIcons.appearance, "Appearance")
-//    TODO ADD Network section (proxy , etc..)
+
+    //    TODO ADD Network section (proxy , etc..)
     //    data object Network : SettingSections(MyIcons.network, "Network")
     data object DownloadEngine : SettingSections(MyIcons.downloadEngine, "Download Engine")
     data object BrowserIntegration : SettingSections(MyIcons.network, "Browser Integration")
@@ -47,6 +46,7 @@ fun threadCountConfig(appRepository: AppRepository): IntConfigurable {
         },
     )
 }
+
 fun dynamicPartDownloadConfig(appRepository: AppRepository): BooleanConfigurable {
     return BooleanConfigurable(
         title = "Dynamic part creation",
@@ -55,7 +55,7 @@ fun dynamicPartDownloadConfig(appRepository: AppRepository): BooleanConfigurable
         describe = {
             if (it) {
                 "Enabled"
-            }else{
+            } else {
                 "Disabled"
             }
         },
@@ -131,23 +131,26 @@ fun uiScaleConfig(appSettings: AppSettings): EnumConfigurable<Float?> {
 }
 */
 
-fun themeConfig(appSettings: AppSettingsStorage, scope: CoroutineScope): ThemeConfigurable {
-    val defaultTheme = "dark"
-    val themes = mapOf(
-        "dark" to darkColors,
-        "light" to lightColors
-    )
+fun themeConfig(
+    themeManager: ThemeManager,
+    scope: CoroutineScope,
+): ThemeConfigurable {
+    val currentThemeName = themeManager.currentThemeInfo
+    val themes = themeManager.possibleThemesToSelect
     return ThemeConfigurable(
         title = "Theme",
         description = "Select theme",
-        //maybe try a better way?
-        backedBy = appSettings.theme.mapTwoWayStateFlow({
-            themes[it]?:themes[defaultTheme]!!
-        }, { myColors ->
-            themes.entries.firstOrNull() { it.value == myColors }?.key ?: defaultTheme
-        }),
-        possibleValues = listOf(darkColors, lightColors),
-        describe = { it.name },
+        backedBy = createMutableStateFlowFromStateFlow(
+            flow = currentThemeName,
+            updater = {
+                themeManager.setTheme(it.id)
+            },
+            scope = scope,
+        ),
+        possibleValues = themes.value,
+        describe = {
+            it.name
+        },
     )
 }
 
@@ -166,6 +169,7 @@ fun autoStartConfig(appSettings: AppSettingsStorage): BooleanConfigurable {
         }
     )
 }
+
 fun playSoundNotification(appSettings: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = "Notification Sound",
@@ -221,11 +225,12 @@ class SettingsComponent(
     ContainsEffects<SettingPageEffects> by supportEffects() {
     val appSettings by inject<AppSettingsStorage>()
     val appRepository by inject<AppRepository>()
+    val themeManager by inject<ThemeManager>()
     val allConfigs = object : SettingSectionGetter {
         override operator fun get(key: SettingSections): List<Configurable<*>> {
             return when (key) {
                 Appearance -> listOf(
-                    themeConfig(appSettings, scope),
+                    themeConfig(themeManager, scope),
 //                    uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
                     playSoundNotification(appSettings),

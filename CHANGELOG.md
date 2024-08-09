@@ -4,6 +4,8 @@
 
 ### Added
 
+- support follow system Dark/Light mode
+
 ### Changed
 
 ### Deprecated

@@ -105,6 +105,7 @@ arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
 arrow-opticKsp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref = "arrow" }
 
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+osThemeDetector = "com.github.Dansoftowner:jSystemThemeDetector:3.9.1"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

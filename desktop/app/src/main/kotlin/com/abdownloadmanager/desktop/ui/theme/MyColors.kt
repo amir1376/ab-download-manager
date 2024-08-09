@@ -20,6 +20,7 @@ val myColors
 
 @Stable
 class MyColors(
+    val id:String,
     val name:String,
 
 
@@ -163,5 +164,6 @@ fun AnimatedColors(
         onInfo=onInfo,
         isLight = isLight,
         name = toBeAnimated.name,
+        id = toBeAnimated.id,
     )
 }

@@ -1,10 +1,8 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.EnumConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.ThemeConfigurable
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -18,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun RenderThemeConfig(cfg: ThemeConfigurable, modifier: Modifier) {
@@ -49,7 +46,7 @@ fun RenderThemeConfig(cfg: ThemeConfigurable, modifier: Modifier) {
                                 )
                                 .padding(1.dp)
                                 .background(
-                                    it.surface,
+                                    it.color,
                                 )
                                 .size(16.dp)
                         )
