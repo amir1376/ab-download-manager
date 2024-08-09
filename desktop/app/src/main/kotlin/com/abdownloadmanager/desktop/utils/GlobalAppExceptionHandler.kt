@@ -8,6 +8,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.*
+import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import java.awt.Window
@@ -67,7 +68,7 @@ private class GlobalExceptionHandlerImpl : GlobalAppExceptionHandler {
                     }
                 }
                 ABDownloaderTheme(
-                    "dark",
+                    ThemeManager.DefaultTheme,
                 ) {
                     ErrorWindow(throwable, close)
                 }

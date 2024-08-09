@@ -26,6 +26,7 @@ import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
+import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import com.abdownloadmanager.utils.compose.ProvideDebugInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -41,14 +42,17 @@ object Ui : KoinComponent {
         globalAppExceptionHandler: GlobalAppExceptionHandler,
     ) {
         val appComponent: AppComponent = get()
+        val themeManager: ThemeManager = get()
+        themeManager.boot()
         if (!appArguments.startSilent) {
             appComponent.openHome()
         }
         application {
+            val theme by themeManager.currentThemeColor.collectAsState()
             ProvideDebugInfo(AppInfo.isInDebugMode()) {
                 ProvideNotificationManager {
                     ABDownloaderTheme(
-                        theme = appComponent.theme.collectAsState().value,
+                        myColors = theme,
 //                    uiScale = appComponent.uiScale.collectAsState().value
                     ) {
                         ProvideGlobalExceptionHandler(globalAppExceptionHandler) {

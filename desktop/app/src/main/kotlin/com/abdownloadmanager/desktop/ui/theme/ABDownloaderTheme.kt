@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberPopupPositionProviderAtPosition
+import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 
 /*
 fun MyColors.asMaterial2Colors(): Colors {
@@ -67,6 +68,7 @@ val darkColors = MyColors(
     onInfo = Color.White,
     isLight = false,
     name = "Dark",
+    id = "dark",
 )
 val lightColors = MyColors(
     primary = Color(0xFF4791BF),
@@ -91,6 +93,7 @@ val lightColors = MyColors(
     onInfo = Color.White,
     isLight = true,
     name = "Light",
+    id = "light",
 )
 
 private val textSizes = TextSizes(
@@ -103,16 +106,10 @@ private val textSizes = TextSizes(
 
 @Composable
 fun ABDownloaderTheme(
-    theme: String,
+    myColors: MyColors,
 //    uiScale: Float? = null,
     content: @Composable () -> Unit,
 ) {
-    val myColors = if (theme == "light") {
-        lightColors
-    } else {
-        darkColors
-    }
-
     CompositionLocalProvider(
         LocalMyColors provides AnimatedColors(myColors, tween(500)),
 //        LocalUiScale provides uiScale,

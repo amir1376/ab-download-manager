@@ -4,6 +4,7 @@ import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.integration.IntegrationHandlerImp
+import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import ir.amirab.downloader.queue.QueueManager
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.*
@@ -156,6 +157,9 @@ val appModule = module {
 //    }
     single {
         AppRepository()
+    }
+    single {
+        ThemeManager(get(),get())
     }
     single {
         AppSettingsStorage(
