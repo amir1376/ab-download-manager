@@ -13,9 +13,7 @@ plugins {
     id(Plugins.aboutLibraries)
 //    id(MyPlugins.proguardDesktop)
 }
-repositories{
-    maven("https://jitpack.io")
-}
+
 dependencies {
     implementation(libs.decompose)
     implementation(libs.decompose.jbCompose)
