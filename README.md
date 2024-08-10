@@ -91,7 +91,7 @@ If you see bugs in the source code! please report them in the `GitHub Issues` se
 ## Build From Source
 
 to compile and test desktop app on your local machine
-fallow these steps.
+follow these steps.
 
 1. Clone the project
 2. Install the [JBR](https://github.com/JetBrains/JetBrainsRuntime/releases)
@@ -132,7 +132,7 @@ It will create an output folder
 The output will be created in
 
 ```
-<project_dir>/desktop/build/compose/binaries/main-release/app/
+<project_dir>/desktop/app/build/compose/binaries/main-release/
 ```
 
 
