@@ -6,15 +6,13 @@ package com.abdownloadmanager.desktop
 import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.singleInstance.*
 import com.abdownloadmanager.integration.Integration
+import ir.amirab.util.platform.Platform
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
-import okio.Path.Companion.toPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.math.log
 import kotlin.system.exitProcess
 
 
@@ -150,7 +148,13 @@ private fun defaultApp(
         println("it seems we are in ide")
     }
     if (System.getProperty("skiko.renderApi")==null){
-        System.setProperty("skiko.renderApi","OPENGL")
+        if (Platform.getCurrentPlatform()==Platform.Desktop.Windows){
+            // At the moment default render api have some problems on windows!
+            // - when I resize a window, the contents of the window will be stretched
+            // - sometimes when I close a window, the window flashes on exiting
+            // it seems OPENGL does not have these problems
+            System.setProperty("skiko.renderApi","OPENGL")
+        }
     }
     val globalExceptionHandler = createAndSetGlobalExceptionHandler()
     App().use {
