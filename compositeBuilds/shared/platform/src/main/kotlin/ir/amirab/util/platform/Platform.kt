@@ -48,8 +48,8 @@ private class JvmPlatformFinder : PlatformFInder {
             osString.contains("android") -> Android
             osString.contains("windows") -> Desktop.Windows
             osString.contains("linux") -> Desktop.Linux
-            osString.contains("darwin") -> Desktop.MacOS
-            else -> error("unknown platform")
+            osString.contains("mac") || osString.contains("darwin") -> Desktop.MacOS
+            else -> error("this platform is not detected: $osString")
         }
     }
 }
