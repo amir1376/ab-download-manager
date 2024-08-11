@@ -11,6 +11,7 @@ sealed class Platform(val name: String) {
         data object Linux : Desktop("Linux")
         data object MacOS : Desktop("Mac")
     }
+
     override fun toString(): String {
         return name
     }
@@ -25,12 +26,13 @@ sealed class Platform(val name: String) {
                 else -> null
             }
         }
-        fun fromExecutableFileExtension(fileExtension:String): Platform?{
-            return when(fileExtension.lowercase()){
-                "exe","msi"-> Desktop.Windows
-                "deb","rpm"-> Desktop.Linux
+
+        fun fromExecutableFileExtension(fileExtension: String): Platform? {
+            return when (fileExtension.lowercase()) {
+                "exe", "msi" -> Desktop.Windows
+                "deb", "rpm" -> Desktop.Linux
                 "dmg", "pkg" -> Desktop.MacOS
-                "apk"-> Android
+                "apk" -> Android
                 else -> null
             }
         }
