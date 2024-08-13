@@ -2,6 +2,7 @@ import buildlogic.*
 import buildlogic.versioning.*
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import ir.amirab.util.platform.Platform
 
 plugins {
     id(MyPlugins.kotlin)
@@ -192,27 +193,75 @@ changelog {
 // ======= begin of GitHub action stuff
 val ciDir = CiDirs(rootProject.layout.buildDirectory)
 
+val appPackageNameByComposePlugin
+    get() = requireNotNull(compose.desktop.application.nativeDistributions.packageName) {
+        "compose.desktop.application.nativeDistributions.packageName must not be null!"
+    }
+
+val distributableAppArchiveDir: Provider<Directory> = project.layout.buildDirectory.dir("dist/archives")
+fun AbstractArchiveTask.fromAppImagePath() {
+    from(tasks.named("createReleaseDistributable"))
+    destinationDirectory.set(distributableAppArchiveDir)
+}
+
+val createDistributableAppArchiveTar by tasks.registering(Tar::class) {
+    archiveFileName.set("app.tar.gz")
+    compression = Compression.GZIP
+    fromAppImagePath()
+}
+val createDistributableAppArchiveZip by tasks.registering(Zip::class) {
+    archiveFileName.set("app.zip")
+    fromAppImagePath()
+}
+val createDistributableAppArchive by tasks.registering {
+    when (Platform.getCurrentPlatform()) {
+        Platform.Desktop.Linux,
+        Platform.Desktop.MacOS -> dependsOn(createDistributableAppArchiveTar)
+
+        Platform.Desktop.Windows -> dependsOn(createDistributableAppArchiveZip)
+        Platform.Android -> error("this task is used for desktop only")
+    }
+}
+
 val createBinariesForCi by tasks.registering {
     val nativeDistributions = compose.desktop.application.nativeDistributions
     val mainRelease = nativeDistributions.outputBaseDir.dir("main-release")
     dependsOn("packageReleaseDistributionForCurrentOS")
+    dependsOn(createDistributableAppArchive)
     inputs.property("appVersion", getAppVersionString())
     inputs.dir(mainRelease)
+    inputs.dir(distributableAppArchiveDir)
     outputs.dir(ciDir.binariesDir)
     doLast {
         val output = ciDir.binariesDir.get().asFile
+        val packageName = appPackageNameByComposePlugin
         output.deleteRecursively()
         val allowedTarget = nativeDistributions.targetFormats.filter { it.isCompatibleWithCurrentOS }
         for (target in allowedTarget) {
-            CiUtils.moveAndCreateSignature(
+            CiUtils.movePackagedAndCreateSignature(
                 getAppVersion(),
-                nativeDistributions,
+                packageName,
                 target,
                 mainRelease.get().asFile,
                 output,
             )
         }
         logger.lifecycle("app packages for '${allowedTarget.joinToString(", ") { it.name }}' written in $output")
+        val appArchiveDistributableDir = distributableAppArchiveDir.get().asFile
+        CiUtils.copyAndHashToDestination(
+            distributableAppArchiveDir.get().asFile.resolve(
+                CiUtils.getFileOfDistributedArchivedTarget(
+                    appArchiveDistributableDir,
+                )
+            ),
+            output,
+            CiUtils.getTargetFileName(
+                packageName,
+                getAppVersion(),
+                TargetFormat.AppImage,
+            )
+        )
+        logger.lifecycle("distributable app archive written in ${output}")
     }
 }
 
