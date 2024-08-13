@@ -69,6 +69,7 @@ data class AppSettingsModel(
             return source.apply {
                 put(Keys.theme, focus.theme)
                 put(Keys.threadCount, focus.threadCount)
+                put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
                 put(Keys.useAverageSpeed, focus.useAverageSpeed)
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
