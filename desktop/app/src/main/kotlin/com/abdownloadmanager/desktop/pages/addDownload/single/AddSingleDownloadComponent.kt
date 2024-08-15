@@ -81,9 +81,17 @@ class AddSingleDownloadComponent(
     val canAddResult = downloadChecker.canAddToDownloadResult.asStateFlow()
     private val canAdd = downloadChecker.canAdd
     private val isDuplicate = downloadChecker.isDuplicate
+
+    val isLinkLoading = downloadChecker.gettingResponseInfo
+    val linkResponseInfo = downloadChecker.responseInfo
+
     val canAddToDownloads = combineStateFlows(
-        canAdd, isDuplicate, onDuplicateStrategy
-    ) { canAdd, isDuplicate, onDuplicateStrategy ->
+        canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading
+    ) { canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading ->
+        if (isLinkLoading){
+            // link is loading wait for it...
+            return@combineStateFlows false
+        }
         if (canAdd) {
             true
         } else if (isDuplicate && onDuplicateStrategy != null) {
@@ -92,9 +100,6 @@ class AddSingleDownloadComponent(
             false
         }
     }
-
-    val isLinkLoading = downloadChecker.gettingResponseInfo
-    val linkResponseInfo = downloadChecker.responseInfo
 
     //extra settings
     private var threadCount = MutableStateFlow(null as Int?)
