@@ -5,6 +5,7 @@
 ### Added
 
 - support follow system Dark/Light mode
+- auto paste link (if any) from clipboard when opening add url page
 
 ### Changed
 

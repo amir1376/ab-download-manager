@@ -8,6 +8,9 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigura
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.runtime.*
+import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
+import com.abdownloadmanager.desktop.utils.mvi.supportEffects
+import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
@@ -18,9 +21,16 @@ import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.downloader.utils.orDefault
 import ir.amirab.util.flow.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+
+sealed interface AddSingleDownloadPageEffects {
+    data class SuggestUrl(val link: String) : AddSingleDownloadPageEffects
+}
 
 class AddSingleDownloadComponent(
     ctx: ComponentContext,
@@ -30,7 +40,8 @@ class AddSingleDownloadComponent(
     val openExistingDownload: (Long) -> Unit,
     id: String,
 ) : AddDownloadComponent(ctx, id),
-    KoinComponent {
+    KoinComponent,
+    ContainsEffects<AddSingleDownloadPageEffects> by supportEffects() {
 
     private val appSettings: AppRepository by inject()
     private val client: DownloaderClient by inject()
@@ -76,6 +87,28 @@ class AddSingleDownloadComponent(
             .launchIn(scope)
     }
 
+    private var wasOpened = false
+    fun onPageOpen() {
+        if (wasOpened) return
+        scope.launch {
+            withContext(Dispatchers.Default) {
+                // don't paste of link already exists
+                // maybe a link already added by browser extension etc.
+                if (credentials.value == DownloadCredentials.empty()) {
+                    fillLinkIfThereIsALinkInClipboard()
+                }
+            }
+        }
+        wasOpened = true
+    }
+
+    private fun fillLinkIfThereIsALinkInClipboard() {
+        val possibleLinks = ClipboardUtil.read() ?: return
+        val downloadLinks = DownloadCredentialFromStringExtractor.extract(possibleLinks)
+        if (downloadLinks.size == 1) {
+            sendEffect(AddSingleDownloadPageEffects.SuggestUrl(downloadLinks[0].link))
+        }
+    }
 
     private val length: StateFlow<Long?> = downloadChecker.length
     val canAddResult = downloadChecker.canAddToDownloadResult.asStateFlow()
@@ -88,7 +121,7 @@ class AddSingleDownloadComponent(
     val canAddToDownloads = combineStateFlows(
         canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading
     ) { canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading ->
-        if (isLinkLoading){
+        if (isLinkLoading) {
             // link is loading wait for it...
             return@combineStateFlows false
         }

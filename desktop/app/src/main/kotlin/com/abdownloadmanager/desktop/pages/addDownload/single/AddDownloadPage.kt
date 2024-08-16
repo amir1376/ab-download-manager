@@ -26,12 +26,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
+import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import java.awt.MouseInfo
@@ -47,13 +50,30 @@ fun AddDownloadPage(
             .padding(top = 8.dp, bottom = 16.dp)
     ) {
         val credentials by component.credentials.collectAsState()
+        fun setLink(link: String) {
+            component.setCredentials(
+                credentials.copy(link = link)
+            )
+        }
+
+        val linkFocus = remember { FocusRequester() }
+        LaunchedEffect(Unit) {
+            component.onPageOpen()
+            linkFocus.requestFocus()
+        }
+        HandleEffects(component) {
+            when (it) {
+                is AddSingleDownloadPageEffects.SuggestUrl -> {
+                    setLink(it.link)
+                }
+            }
+        }
         UrlTextField(
             text = credentials.link,
             setText = {
-                component.setCredentials(
-                    credentials.copy(link = it)
-                )
+                setLink(it)
             },
+            modifier = Modifier.focusRequester(linkFocus)
         )
         Row(
         ) {
@@ -144,7 +164,7 @@ private fun ShowSolutionsOnDuplicateDownload(component: AddSingleDownloadCompone
         state = state,
         resizeable = false,
     ) {
-        LaunchedEffect(window){
+        LaunchedEffect(window) {
             window.moveSafe(
                 MouseInfo.getPointerInfo().location.run {
                     DpOffset(
@@ -381,7 +401,7 @@ fun ConfigActionsButtons(component: AddSingleDownloadComponent) {
             MyIcons.settings,
             "Settings",
             indicateActive = component.showMoreSettings,
-            requiresAttention =responseInfo?.requireBasicAuth?:false
+            requiresAttention = responseInfo?.requireBasicAuth ?: false
         ) {
             component.showMoreSettings = true
         }
@@ -476,7 +496,7 @@ fun RenderFileTypeAndSize(
                     ) {
                         WithContentAlpha(1f) {
                             if (fileInfo != null) {
-                                if (fileInfo.requiresAuth){
+                                if (fileInfo.requiresAuth) {
                                     MyIcon(
                                         MyIcons.lock,
                                         null,
@@ -540,12 +560,13 @@ private fun UrlTextField(
     text: String,
     setText: (String) -> Unit,
     errorText: String? = null,
+    modifier: Modifier = Modifier,
 ) {
     AddDownloadPageTextField(
         text,
         setText,
         "Download link",
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         end = {
             MyTextFieldIcon(MyIcons.paste) {
                 setText(ClipboardUtil.read()
