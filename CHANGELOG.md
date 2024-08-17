@@ -4,9 +4,6 @@
 
 ### Added
 
-- support follow system Dark/Light mode
-- auto paste link (if any) from clipboard when opening add url page
-
 ### Changed
 
 ### Deprecated
@@ -15,12 +12,21 @@
 
 ### Fixed
 
+### Security
+
+## 1.0.7
+
+### Added
+
+- support follow system Dark/Light mode
+- auto paste link (if any) from clipboard when opening add url page
+
+### Fixed
+
 - App is now open in center of screen
 - Some settings doesn't persist after app restart
 - Download speed shows a high value incorrectly when we reopen the app window after a while
 - Some files not downloaded correctly now fixed
-
-### Security
 
 ## 1.0.6
 
