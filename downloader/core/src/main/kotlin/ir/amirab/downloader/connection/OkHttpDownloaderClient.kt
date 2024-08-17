@@ -19,7 +19,7 @@ class OkHttpDownloaderClient(
             Request.Builder()
                 .url(downloadCredentials.link)
                 .apply {
-                    defaultHeaders().forEach { (k, v) ->
+                    defaultHeadersInFirst().forEach { (k, v) ->
                         header(k, v)
                     }
                     downloadCredentials.headers
@@ -31,6 +31,9 @@ class OkHttpDownloaderClient(
                         ?.forEach { (k, v) ->
                             header(k, v)
                         }
+                    defaultHeadersInLast().forEach { (k, v) ->
+                        header(k, v)
+                    }
                     val username = downloadCredentials.username
                     val password = downloadCredentials.password
                     if (username?.isNotBlank() == true && password?.isNotBlank() == true) {

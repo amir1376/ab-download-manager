@@ -18,6 +18,7 @@
 - App is now open in center of screen
 - Some settings doesn't persist after app restart
 - Download speed shows a high value incorrectly when we reopen the app window after a while
+- Some files not downloaded correctly now fixed
 
 ### Security
 
