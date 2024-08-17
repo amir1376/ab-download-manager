@@ -95,8 +95,16 @@ class DownloadMonitor(
                     it.id to it.getDownloadedSize()
                 }
                 downloadSpeedFlow.value = newWrites.mapValues { (id, newWrite) ->
-                    val lastWrittenData = lastWrites.getOrElse(id) { 0L }
-                    val newSpeed = newWrite - lastWrittenData
+                    val lastWrittenData = lastWrites.getOrElse(id) { null }
+                    val newSpeed = when {
+                        lastWrittenData != null -> {
+                            newWrite - lastWrittenData
+                        }
+                        else -> {
+                            // this item seen for the first time
+                            0
+                        }
+                    }
                     newSpeed
                 }
                 lastWrites = newWrites
