@@ -4,10 +4,10 @@ import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.utils.AutoStartManager
 import com.abdownloadmanager.desktop.utils.DownloadSystem
 import ir.amirab.downloader.DownloadSettings
-import ir.amirab.downloader.monitor.DownloadMonitor
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
 import ir.amirab.downloader.DownloadManager
+import ir.amirab.downloader.monitor.IDownloadMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
@@ -25,7 +25,7 @@ class AppRepository : KoinComponent {
     private val downloadSystem : DownloadSystem by inject()
     private val downloadSettings: DownloadSettings by inject()
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
-    private val downloadMonitor: DownloadMonitor = downloadSystem.downloadMonitor
+    private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor
     private val integration: Integration by inject()
 
     val speedLimiter = appSettings.speedLimit

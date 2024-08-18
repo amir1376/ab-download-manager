@@ -41,7 +41,7 @@ class SingleDownloadComponent(
     ContainsEffects<SingleDownloadEffects> by supportEffects(),
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
-    private val downloadMonitor: DownloadMonitor = downloadSystem.downloadMonitor
+    private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
     val itemStateFlow = downloadMonitor.downloadListFlow.map {
         it.firstOrNull { it.id == downloadId }

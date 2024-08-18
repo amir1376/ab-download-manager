@@ -16,11 +16,11 @@ import kotlinx.coroutines.launch
 
 class DownloadMonitor(
     private val downloadManager: DownloadManager,
-) {
+) : IDownloadMonitor {
     private val scope = CoroutineScope(SupervisorJob())
 
     private var avSpeedCollectorJob: Job? = null
-    var useAverageSpeed = false
+    override var useAverageSpeed = false
         set(value) {
             if (value == field) return
             field = value
@@ -35,9 +35,9 @@ class DownloadMonitor(
                 null
             }
         }
-    val activeDownloadListFlow = MutableStateFlow<List<ProcessingDownloadItemState>>(emptyList())
-    val completedDownloadListFlow = MutableStateFlow<List<CompletedDownloadItemState>>(emptyList())
-    val downloadListFlow: Flow<List<IDownloadItemState>> =
+    override val activeDownloadListFlow = MutableStateFlow<List<ProcessingDownloadItemState>>(emptyList())
+    override val completedDownloadListFlow = MutableStateFlow<List<CompletedDownloadItemState>>(emptyList())
+    override val downloadListFlow: Flow<List<IDownloadItemState>> =
             combine(activeDownloadListFlow, completedDownloadListFlow) { a, b -> a + b }
 
     init {
@@ -72,9 +72,9 @@ class DownloadMonitor(
     }
 
 
-    val downloadSpeedFlow = MutableStateFlow<Map<Long, Long>>(emptyMap())
+    private val downloadSpeedFlow = MutableStateFlow<Map<Long, Long>>(emptyMap())
 
-    val averageDownloadSpeedFlow = downloadSpeedFlow
+    private val averageDownloadSpeedFlow = downloadSpeedFlow
         .saved(5)
         .map { lastStats ->
             val last = lastStats.lastOrNull() ?: return@map emptyMap()
@@ -85,7 +85,7 @@ class DownloadMonitor(
             }
         }.stateIn(scope, SharingStarted.WhileSubscribed(), emptyMap())
 
-    var speedMeterJob: Job? = null
+    private var speedMeterJob: Job? = null
     private fun startSpeedMeter() {
         speedMeterJob?.cancel()
         speedMeterJob = scope.launch {
@@ -119,7 +119,7 @@ class DownloadMonitor(
     }
 
 
-    fun getPreferedSpeedFlow(): StateFlow<Map<Long, Long>> {
+    private fun getPreferedSpeedFlow(): StateFlow<Map<Long, Long>> {
         return when {
             useAverageSpeed -> averageDownloadSpeedFlow
             else -> downloadSpeedFlow
@@ -127,7 +127,7 @@ class DownloadMonitor(
 
     }
 
-    fun getSpeedOf(id: Long): Long {
+    private fun getSpeedOf(id: Long): Long {
         val speed = getPreferedSpeedFlow().value.getOrElse(id) { -1 }
 //        println("speed of $id is $speed")
         return speed
@@ -250,7 +250,7 @@ class DownloadMonitor(
     }
 
 
-    val activeDownloadCount = downloadManager.listOfJobsEvents.map {
+    override val activeDownloadCount = downloadManager.listOfJobsEvents.map {
         downloadManager.getActiveCount()
     }.stateIn(
         scope,
@@ -258,7 +258,7 @@ class DownloadMonitor(
         downloadManager.getActiveCount()
     )
 
-    suspend fun waitForDownloadToFinishOrCancel(
+    override suspend fun waitForDownloadToFinishOrCancel(
         id: Long
     ): Boolean {
         val event = downloadManager

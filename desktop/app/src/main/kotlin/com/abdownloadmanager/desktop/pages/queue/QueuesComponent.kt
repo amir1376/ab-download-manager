@@ -9,7 +9,6 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.router.slot.navigate
-import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.queue.QueueManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,7 +24,6 @@ class QueuesComponent(
     ContainsEffects<QueuesComponentEffects> by supportEffects(),
     KoinComponent {
     val queueManager: QueueManager by inject()
-    val downloadMonitor: DownloadMonitor by inject()
     private val queues = queueManager.queues
 
 

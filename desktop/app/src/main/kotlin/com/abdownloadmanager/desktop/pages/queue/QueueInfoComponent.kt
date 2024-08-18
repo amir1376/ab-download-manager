@@ -8,8 +8,8 @@ import ir.amirab.util.flow.mapStateFlow
 import com.abdownloadmanager.desktop.utils.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.monitor.IDownloadItemState
+import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +22,7 @@ class QueueInfoComponent(
     id: Long,
 ) : BaseComponent(ctx),
     KoinComponent {
-    private val downloadMonitor: DownloadMonitor by inject()
+    private val downloadMonitor: IDownloadMonitor by inject()
     private val queueManager: QueueManager by inject()
     val downloadQueue = queueManager.queues.value.find {
         it.id == id

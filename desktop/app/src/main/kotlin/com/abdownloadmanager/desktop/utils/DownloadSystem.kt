@@ -10,7 +10,7 @@ import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.StoppedBy
 import ir.amirab.downloader.downloaditem.contexts.User
-import ir.amirab.downloader.monitor.DownloadMonitor
+import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +26,7 @@ import java.io.File
 class DownloadSystem(
     val downloadManager: DownloadManager,
     val queueManager: QueueManager,
-    val downloadMonitor: DownloadMonitor,
+    val downloadMonitor: IDownloadMonitor,
     private val scope: CoroutineScope,
     private val downloadListDB: IDownloadListDb,
     private val foldersRegistry: DownloadFoldersRegistry,

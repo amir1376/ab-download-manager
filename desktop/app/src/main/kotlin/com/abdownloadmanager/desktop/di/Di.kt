@@ -34,6 +34,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import com.abdownloadmanager.updatechecker.DummyUpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateChecker
+import ir.amirab.downloader.monitor.IDownloadMonitor
 
 val downloaderModule = module {
     single<IDownloadQueueDatabase> {
@@ -93,7 +94,7 @@ val downloaderModule = module {
     single {
         DownloadManager(get(), get(), get(), get(), get())
     }.bind(DownloadManagerMinimalControl::class)
-    single {
+    single<IDownloadMonitor> {
         DownloadMonitor(get())
     }
     single {
