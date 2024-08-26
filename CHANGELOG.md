@@ -12,6 +12,8 @@
 
 ### Fixed
 
+- some URLEncoded filenames are not decoded properly
+
 ### Security
 
 ## 1.0.7

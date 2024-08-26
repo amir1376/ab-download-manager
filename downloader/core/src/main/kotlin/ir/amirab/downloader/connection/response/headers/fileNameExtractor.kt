@@ -1,4 +1,5 @@
 package ir.amirab.downloader.connection.response.headers
+
 import java.net.URLDecoder
 
 fun extractFileNameFromContentDisposition(contentDispositionValue: String): String? {
@@ -16,6 +17,9 @@ fun extractFileNameFromContentDisposition(contentDispositionValue: String): Stri
         ?.groups
         ?.get("fileName")
         ?.value?.let {
+            runCatching { URLDecoder.decode(it, Charsets.UTF_8) }
+                .getOrNull()
+        }?.let {
             return it
         }
     return null
