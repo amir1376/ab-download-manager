@@ -11,7 +11,9 @@ import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.window.WindowDraggableArea
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.*
@@ -19,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.key.KeyEvent
@@ -29,6 +32,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowState
+import com.abdownloadmanager.desktop.ui.util.ifThen
 import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.customwindow.HitSpots
 import ir.amirab.util.customwindow.util.CustomWindowDecorationAccessing
@@ -53,6 +57,10 @@ private fun FrameWindowScope.CustomWindowFrame(
         Column(
             Modifier
                 .fillMaxSize()
+                .ifThen(!CustomWindowDecorationAccessing.isSupported) {
+                    border(1.dp, Color.Gray.copy(0.25f), RectangleShape)
+                        .padding(1.dp)
+                }
                 .background(background)
         ) {
             SnapDraggableToolbar(
@@ -96,7 +104,14 @@ fun FrameWindowScope.SnapDraggableToolbar(
         if (CustomWindowDecorationAccessing.isSupported) {
             FrameContent(title, windowIcon, center, onRequestMinimize, onRequestToggleMaximize, onRequestClose)
         } else {
-            WindowDraggableArea {
+            WindowDraggableArea(
+                Modifier.onClick(
+                    onDoubleClick = {
+                        onRequestToggleMaximize?.invoke()
+                    },
+                    onClick = {}
+                )
+            ) {
                 FrameContent(title, windowIcon, center, onRequestMinimize, onRequestToggleMaximize, onRequestClose)
             }
         }
@@ -126,10 +141,10 @@ private fun FrameWindowScope.FrameContent(
                     .fillMaxHeight()
                     .windowFrameItem("icon", HitSpots.MENU_BAR),
                 verticalAlignment = Alignment.CenterVertically,
-            ){
+            ) {
                 Spacer(Modifier.width(16.dp))
                 windowIcon?.let {
-                    WithContentAlpha(1f){
+                    WithContentAlpha(1f) {
                         Image(it, null, Modifier.size(16.dp))
                     }
                     Spacer(Modifier.width(8.dp))
