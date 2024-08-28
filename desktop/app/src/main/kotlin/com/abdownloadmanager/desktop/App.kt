@@ -20,6 +20,7 @@ class App : AutoCloseable,
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
     private val integration: Integration by inject()
+
     //TODO Setup Native Messaging Feature
     //private val browserNativeMessaging: NativeMessaging by inject()
     fun start(
@@ -69,7 +70,7 @@ fun main(args: Array<String>) {
             singleInstance = singleInstance,
             appArguments = appArguments,
         )
-    } catch (e:Throwable){
+    } catch (e: Throwable) {
         System.err.println("Fail to start the ${AppInfo.name} app because:")
         e.printStackTrace()
         exitProcess(-1)
@@ -147,13 +148,17 @@ private fun defaultApp(
         println("app version ${AppVersion.get()} is started")
         println("it seems we are in ide")
     }
-    if (System.getProperty("skiko.renderApi")==null){
-        if (Platform.getCurrentPlatform()==Platform.Desktop.Windows){
+
+    val customRenderApiRequested = System.getenv("SKIKO_RENDER_API") != null ||
+            System.getProperty("skiko.renderApi") != null
+
+    if (!customRenderApiRequested) {
+        if (Platform.getCurrentPlatform() == Platform.Desktop.Windows) {
             // At the moment default render api have some problems on windows!
             // - when I resize a window, the contents of the window will be stretched
             // - sometimes when I close a window, the window flashes on exiting
             // it seems OPENGL does not have these problems
-            System.setProperty("skiko.renderApi","OPENGL")
+            System.setProperty("skiko.renderApi", "OPENGL")
         }
     }
     val globalExceptionHandler = createAndSetGlobalExceptionHandler()
