@@ -100,6 +100,7 @@ compose {
                 vendor = "abdownloadmanager.com"
                 appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
                 val menuGroupName = getPrettifiedAppName()
+                licenseFile.set(rootProject.file("LICENSE"))
                 linux {
                     debPackageVersion = getAppVersionStringForPackaging(TargetFormat.Deb)
                     rpmPackageVersion = getAppVersionStringForPackaging(TargetFormat.Rpm)
