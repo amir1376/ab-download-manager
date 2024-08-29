@@ -12,9 +12,20 @@
 
 ### Fixed
 
-- some URLEncoded filenames are not decoded properly
-
 ### Security
+
+## 1.0.8
+
+### Added
+
+- Use server Last-Modified time option in settings
+- Show Open File button if new download already exists and completed
+
+### Fixed
+
+- Improved custom window decoration in linux
+- When we click on open folder in linux it opens the file instead!
+- Some URLEncoded filenames are not decoded properly
 
 ## 1.0.7
 
