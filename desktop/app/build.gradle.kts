@@ -103,6 +103,7 @@ compose {
                 linux {
                     debPackageVersion = getAppVersionStringForPackaging(TargetFormat.Deb)
                     rpmPackageVersion = getAppVersionStringForPackaging(TargetFormat.Rpm)
+                    appCategory = "Network"
                     iconFile = project.file("icons/icon.png")
                     menuGroup = menuGroupName
                     shortcut = true
