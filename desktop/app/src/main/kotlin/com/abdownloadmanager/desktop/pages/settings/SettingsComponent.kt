@@ -77,6 +77,21 @@ fun useServerLastModified(appRepository: AppRepository): BooleanConfigurable {
     )
 }
 
+fun useSparseFileAllocation(appRepository: AppRepository): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = "Sparse File Allocation",
+        description = "Create files more efficiently, especially on SSDs, by reducing unnecessary data writing. This can speed up download starts and save disk space. If downloads start slowly, consider disabling this option, as it may not be properly supported on some devices.",
+        backedBy = appRepository.useSparseFileAllocation,
+        describe = {
+            if (it) {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        },
+    )
+}
+
 fun speedLimitConfig(appRepository: AppRepository): SpeedLimitConfigurable {
     return SpeedLimitConfigurable(
         title = "Global Speed Limiter",
@@ -263,7 +278,8 @@ class SettingsComponent(
                     speedLimitConfig(appRepository),
                     threadCountConfig(appRepository),
                     dynamicPartDownloadConfig(appRepository),
-                    useServerLastModified(appRepository)
+                    useServerLastModified(appRepository),
+                    useSparseFileAllocation(appRepository)
                 )
             }
         }

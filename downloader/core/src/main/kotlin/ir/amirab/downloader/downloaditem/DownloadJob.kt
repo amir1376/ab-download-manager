@@ -10,10 +10,7 @@ import ir.amirab.downloader.exception.DownloadValidationException
 import ir.amirab.downloader.exception.FileChangedException
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.part.*
-import ir.amirab.downloader.utils.ExceptionUtils
-import ir.amirab.downloader.utils.TimeUtils
-import ir.amirab.downloader.utils.printStackIfNOtUsual
-import ir.amirab.downloader.utils.splitToRange
+import ir.amirab.downloader.utils.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,7 +56,11 @@ class DownloadJob(
     suspend fun boot() {
         if (!booted) {
             val outFile = downloadManager.calculateOutputFile(downloadItem)
-            destination = SimpleDownloadDestination(outFile, downloadManager.diskStat)
+            destination = SimpleDownloadDestination(
+                file = outFile,
+                diskStat = downloadManager.diskStat,
+                emptyFileCreator = downloadManager.emptyFileCreator
+            )
             loadPartState()
             supportsConcurrent = when (getParts().size) {
                 in 2..Int.MAX_VALUE -> true
@@ -172,7 +173,7 @@ class DownloadJob(
 
 
     private suspend fun prepareDestination(
-        onProgressUpdate: (Int) -> Unit,
+        onProgressUpdate: (Int?) -> Unit,
     ) {
         withContext(Dispatchers.IO) {
             destination.outputSize = downloadItem.contentLength
@@ -655,7 +656,7 @@ sealed class DownloadJobStatus(
     data object Resuming : DownloadJobStatus(0, DownloadStatus.Downloading),
         IsActive
 
-    data class PreparingFile(val percent: Int) : DownloadJobStatus(1, DownloadStatus.Downloading),
+    data class PreparingFile(val percent: Int?) : DownloadJobStatus(1, DownloadStatus.Downloading),
         IsActive
 
     data class Canceled(val e: Throwable) : DownloadJobStatus(

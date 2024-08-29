@@ -32,6 +32,7 @@ class AppRepository : KoinComponent {
     val threadCount = appSettings.threadCount
     val dynamicPartCreation = appSettings.dynamicPartCreation
     val useServerLastModifiedTime = appSettings.useServerLastModifiedTime
+    val useSparseFileAllocation = appSettings.useSparseFileAllocation
     val useAverageSpeed = appSettings.useAverageSpeed
     val saveLocation = appSettings.defaultDownloadFolder
     val integrationEnabled = appSettings.browserIntegrationEnabled
@@ -71,6 +72,12 @@ class AppRepository : KoinComponent {
             .debounce(500)
             .onEach {
                 downloadSettings.useServerLastModifiedTime = it
+                downloadManager.reloadSetting()
+            }.launchIn(scope)
+        useSparseFileAllocation
+            .debounce(500)
+            .onEach {
+                downloadSettings.useSparseFileAllocation = it
                 downloadManager.reloadSetting()
             }.launchIn(scope)
         integrationPort

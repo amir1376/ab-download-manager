@@ -57,7 +57,7 @@ abstract class DownloadDestination(
         outputFile.delete()
     }
 
-    abstract suspend fun prepareFile(onProgressUpdate: (Int) -> Unit)
+    abstract suspend fun prepareFile(onProgressUpdate: (Int?) -> Unit)
     abstract suspend fun isDownloadedPartsIsValid(): Boolean
     abstract fun flush()
     open fun onPartCancelled(part: Part){
