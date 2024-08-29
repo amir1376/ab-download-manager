@@ -38,6 +38,7 @@ class AddSingleDownloadComponent(
     val onRequestDownload: (DownloadItem, OnDuplicateStrategy) -> Unit,
     val onRequestAddToQueue: (DownloadItem, queueId: Long?, OnDuplicateStrategy) -> Unit,
     val openExistingDownload: (Long) -> Unit,
+    private val downloadItemOpener:DownloadItemOpener,
     id: String,
 ) : AddDownloadComponent(ctx, id),
     KoinComponent,
@@ -271,4 +272,25 @@ class AddSingleDownloadComponent(
 
     var shouldShowAddToQueue by mutableStateOf(false)
 
+    val shouldShowOpenFile = combine(
+        onDuplicateStrategy,canAddResult,
+    ){onDuplicateStrategy, result ->
+        if (result is CanAddResult.DownloadAlreadyExists && onDuplicateStrategy==null){
+            val item = downloadSystem.getDownloadItemById(result.itemId) ?: return@combine false
+            if (item.status!=DownloadStatus.Completed){
+                return@combine false
+            }
+            downloadSystem.getDownloadFile(item).exists()
+        }else false
+    }.stateIn(scope, SharingStarted.WhileSubscribed(),false)
+
+    fun openExistingFile(){
+        val itemId= (canAddResult.value as? CanAddResult.DownloadAlreadyExists)?.itemId?:return
+        consumeDialog {
+            scope.launch {
+                downloadItemOpener.openDownloadItem(itemId)
+                onRequestClose()
+            }
+        }
+    }
 }

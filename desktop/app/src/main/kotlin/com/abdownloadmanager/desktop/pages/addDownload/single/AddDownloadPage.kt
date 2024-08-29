@@ -419,6 +419,14 @@ private fun MainActionButtons(component: AddSingleDownloadComponent) {
                 modifier = Modifier,
                 onClick = { component.showSolutionsOnDuplicateDownloadUi = true },
             )
+            if(component.shouldShowOpenFile.collectAsState().value){
+                Spacer(Modifier.width(8.dp))
+                MainConfigActionButton(
+                    text = "Open File",
+                    modifier = Modifier,
+                    onClick = { component.openExistingFile() },
+                )
+            }
         } else {
             val canAddToDownloads by component.canAddToDownloads.collectAsState()
             MainConfigActionButton(

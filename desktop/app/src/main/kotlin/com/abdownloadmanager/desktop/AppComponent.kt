@@ -181,6 +181,7 @@ class AppComponent(
                             openDownloadDialog(it)
                             closeAddDownloadDialog(config.id)
                         },
+                        downloadItemOpener = this,
                         id = config.id
                     ).also {
                         it.setCredentials(config.credentials)
