@@ -35,6 +35,7 @@ import ir.amirab.downloader.utils.OnDuplicateStrategy
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
 import ir.amirab.downloader.exception.TooManyErrorException
+import ir.amirab.util.FileUtils
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -60,6 +61,7 @@ class AppComponent(
     DownloadDialogManager,
     AddDownloadDialogManager,
     NotificationSender,
+    DownloadItemOpener,
     ContainsEffects<AppEffects> by supportEffects(),
     KoinComponent {
     private val appRepository: AppRepository by inject()
@@ -93,7 +95,13 @@ class AppComponent(
         serializer = null,
         key = "home",
         childFactory = { _: HomePageConfig, componentContext: ComponentContext ->
-            HomeComponent(componentContext, this, this,this)
+            HomeComponent(
+                ctx = componentContext,
+                downloadItemOpener = this,
+                downloadDialogManager = this,
+                addDownloadDialogManager = this,
+                notificationSender = this
+            )
         }
     ).subscribeAsStateFlow()
 
@@ -218,6 +226,7 @@ class AppComponent(
         childFactory = { cfg, ctx ->
             SingleDownloadComponent(
                 ctx = ctx,
+                downloadItemOpener = this,
                 onDismiss = {
                     closeDownloadDialog(cfg.id)
                 },
@@ -354,6 +363,61 @@ class AppComponent(
                 description = "Finished",
                 type = NotificationType.Success,
             )
+        }
+    }
+
+    override suspend fun openDownloadItem(id: Long) {
+        val item = downloadSystem.getDownloadItemById(id)
+        if (item==null){
+            sendNotification(
+                "Open File",
+                "Can't open file",
+                "Download Item not found",
+                NotificationType.Error,
+            )
+            return
+        }
+        openDownloadItem(item)
+    }
+    override fun openDownloadItem(downloadItem: DownloadItem) {
+        runCatching {
+            FileUtils.openFile(downloadSystem.getDownloadFile(downloadItem))
+        }.onFailure {
+            sendNotification(
+                "Open File",
+                "Can't open file",
+                it.localizedMessage ?: "Unknown Error",
+                NotificationType.Error,
+            )
+            println("Can't open file:${it.message}")
+        }
+    }
+
+    override suspend fun openDownloadItemFolder(id: Long) {
+        val item = downloadSystem.getDownloadItemById(id)
+        if (item==null){
+            sendNotification(
+                "Open Folder",
+                "Can't open folder",
+                "Download Item not found",
+                NotificationType.Error,
+            )
+            return
+        }
+        openDownloadItemFolder(item)
+    }
+
+    override fun openDownloadItemFolder(downloadItem: DownloadItem) {
+        runCatching {
+            FileUtils.openFolderOfFile(downloadSystem.getDownloadFile(downloadItem))
+        }.onFailure {
+            sendNotification(
+                "Open Folder",
+                "Can't open folder",
+                it.localizedMessage ?: "Unknown Error",
+                NotificationType.Error,
+            )
+            println("Can't open folder:${it.message}")
         }
     }
 

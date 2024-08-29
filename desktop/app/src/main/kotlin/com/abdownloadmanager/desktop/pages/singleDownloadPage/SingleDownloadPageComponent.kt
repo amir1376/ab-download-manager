@@ -35,6 +35,7 @@ data class SingleDownloadPagePropertyItem(
 }
 class SingleDownloadComponent(
     ctx: ComponentContext,
+    val downloadItemOpener: DownloadItemOpener,
     val onDismiss: () -> Unit,
     val downloadId: Long,
 ) : BaseComponent(ctx),
@@ -108,9 +109,7 @@ class SingleDownloadComponent(
         val itemState = itemStateFlow.value
         scope.launch {
             if (itemState is CompletedDownloadItemState) {
-                runCatching {
-                    FileUtils.openFolderOfFile(File(itemState.folder, itemState.name))
-                }
+                downloadItemOpener.openDownloadItemFolder(downloadId)
             }
             onDismiss()
         }
@@ -121,7 +120,7 @@ class SingleDownloadComponent(
         scope.launch {
             if (itemState is CompletedDownloadItemState) {
                 runCatching {
-                    FileUtils.openFile(File(itemState.folder, itemState.name))
+                    downloadItemOpener.openDownloadItem(downloadId)
                 }
             }
             onDismiss()

@@ -26,7 +26,6 @@ import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.queue.QueueManager
-import ir.amirab.util.FileUtils
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
@@ -233,6 +232,7 @@ class DownloadActions(
 
 class HomeComponent(
     ctx: ComponentContext,
+    private val downloadItemOpener: DownloadItemOpener,
     private val downloadDialogManager: DownloadDialogManager,
     private val addDownloadDialogManager: AddDownloadDialogManager,
     private val notificationSender: NotificationSender,
@@ -585,17 +585,7 @@ class HomeComponent(
                 downloadDialogManager.openDownloadDialog(id)
                 return@launch
             }
-            runCatching {
-                FileUtils.openFile(File(dItem.folder, dItem.name))
-            }.onFailure {
-                notificationSender.sendNotification(
-                    "Open File",
-                    "Can't open file",
-                    it.localizedMessage ?: "Unknown Error",
-                    NotificationType.Error,
-                )
-                println("Can't open file:${it.message}")
-            }
+            downloadItemOpener.openDownloadItem(dItem)
         }
     }
 
@@ -611,17 +601,7 @@ class HomeComponent(
                 )
                 return@launch
             }
-            runCatching {
-                FileUtils.openFile(File(dItem.folder, dItem.name))
-            }.onFailure {
-                notificationSender.sendNotification(
-                    "Open File",
-                    "Can't open file",
-                    it.localizedMessage ?: "Unknown Error",
-                    NotificationType.Error,
-                )
-                println("Can't open file:${it.message}")
-            }
+            downloadItemOpener.openDownloadItem(dItem)
         }
     }
 
@@ -631,17 +611,7 @@ class HomeComponent(
             if (dItem.status != DownloadStatus.Completed) {
                 return@launch
             }
-            runCatching {
-                FileUtils.openFolderOfFile(File(dItem.folder, dItem.name))
-            }.onFailure {
-                notificationSender.sendNotification(
-                    "Open Folder",
-                    "Can't open folder",
-                    it.localizedMessage ?: "Unknown Error",
-                    NotificationType.Error,
-                )
-                println("Can't open folder:${it.message}")
-            }
+            downloadItemOpener.openDownloadItemFolder(dItem)
         }
     }
 
