@@ -1,8 +1,10 @@
 package ir.amirab.downloader.destination
 
+import ir.amirab.downloader.DownloadSettings
 import ir.amirab.downloader.anntation.HeavyCall
 import ir.amirab.downloader.exception.NoSpaceInStorageException
 import ir.amirab.downloader.part.Part
+import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.downloader.utils.calcPercent
 import kotlinx.coroutines.Dispatchers
@@ -13,11 +15,11 @@ import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import java.io.File
 import java.io.FileOutputStream
-import java.io.RandomAccessFile
 
 class SimpleDownloadDestination(
     file: File,
     private val diskStat: IDiskStat,
+    private val emptyFileCreator: EmptyFileCreator,
 ) : DownloadDestination(file) {
 
     private var _fileHandle: FileHandle? = null
@@ -83,7 +85,7 @@ class SimpleDownloadDestination(
     }
 
     @HeavyCall
-    override suspend fun prepareFile(onProgressUpdate: (Int) -> Unit) {
+    override suspend fun prepareFile(onProgressUpdate: (Int?) -> Unit) {
 //        println("preparing file ")
 //        println("file info path=$outputFile size=${outputFile.runCatching { length() }.getOrNull()}")
         outputFile.parentFile.let {
@@ -96,38 +98,8 @@ class SimpleDownloadDestination(
                 error("${outputFile.parentFile} is not a directory")
             }
         }
-        onProgressUpdate(0)
-        if (!outputFile.exists()) {
-//            println("file not exist creating...")
-            outputFile.createNewFile()
-        }
-//        println("file size before modification ${outputFile.length()}")
-//        println("currentFileSize: " + outputFile.length())
-        if (outputSize==-1L){
-            withContext(Dispatchers.IO){
-                RandomAccessFile(outputFile, "rw").use {
-                    it.channel.use {
-                        //clear
-                        it.truncate(0)
-                    }
-                }
-            }
-        }else if (outputFile.length() > outputSize) {
-//            println("current file size bigger that output size truncating fSize:${outputFile.length()} oSize:${outputSize}")
-            withContext(Dispatchers.IO) {
-                RandomAccessFile(outputFile, "rw").use {
-                    it.channel.use {
-                        it.truncate(outputSize)
-                    }
-                }
-            }
-            onProgressUpdate(100)
-        } else if (outputFile.length() < outputSize) {
-//            println("current file size smaller than output size filling ${outputFile.length()} to reach ${outputSize}")
-//            println("filling output")
-            fillOutput(onProgressUpdate)
-        }
-//        println("length of prepared file ${outputFile.length()}")
+        emptyFileCreator
+            .prepareFile(outputFile, outputSize,onProgressUpdate)
     }
 
     /**

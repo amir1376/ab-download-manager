@@ -7,6 +7,7 @@ import ir.amirab.downloader.downloaditem.*
 import ir.amirab.downloader.downloaditem.contexts.DuplicateRemoval
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.part.Part
+import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.downloader.utils.FileNameUtil
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.downloader.utils.OnDuplicateStrategy
@@ -30,6 +31,7 @@ class DownloadManager(
     val partListDb: IDownloadPartListDb,
     val settings: DownloadSettings,
     val diskStat: IDiskStat,
+    val emptyFileCreator: EmptyFileCreator,
     val client: DownloaderClient,
 ) : DownloadManagerMinimalControl {
 

@@ -6,5 +6,6 @@ data class DownloadSettings(
     var dynamicPartCreationMode: Boolean = true,
     var useServerLastModifiedTime: Boolean = false,
     var globalSpeedLimit: Long = 0,//unlimited
+    var useSparseFileAllocation: Boolean = true,
     val minPartSize: Long = 2048,//2kB
 )

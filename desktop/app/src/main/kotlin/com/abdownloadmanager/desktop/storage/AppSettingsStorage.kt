@@ -19,6 +19,7 @@ data class AppSettingsModel(
     val threadCount: Int = 5,
     val dynamicPartCreation: Boolean = true,
     val useServerLastModifiedTime: Boolean = false,
+    val useSparseFileAllocation: Boolean = true,
     val useAverageSpeed: Boolean = true,
     val speedLimit: Long = 0,
     val autoStartOnBoot: Boolean = true,
@@ -39,6 +40,7 @@ data class AppSettingsModel(
             val threadCount = intKeyOf("threadCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
+            val useSparseFileAllocation = booleanKeyOf("useSparseFileAllocation")
             val useAverageSpeed = booleanKeyOf("useAverageSpeed")
             val speedLimit = longKeyOf("speedLimit")
             val autoStartOnBoot = booleanKeyOf("autoStartOnBoot")
@@ -57,6 +59,7 @@ data class AppSettingsModel(
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
                 useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime) ?: default.useServerLastModifiedTime,
+                useSparseFileAllocation = source.get(Keys.useSparseFileAllocation) ?: default.useSparseFileAllocation,
                 useAverageSpeed = source.get(Keys.useAverageSpeed) ?: default.useAverageSpeed,
                 speedLimit = source.get(Keys.speedLimit) ?: default.speedLimit,
                 autoStartOnBoot = source.get(Keys.autoStartOnBoot) ?: default.autoStartOnBoot,
@@ -74,6 +77,7 @@ data class AppSettingsModel(
                 put(Keys.threadCount, focus.threadCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
+                put(Keys.useSparseFileAllocation, focus.useSparseFileAllocation)
                 put(Keys.useAverageSpeed, focus.useAverageSpeed)
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
@@ -93,6 +97,7 @@ class AppSettingsStorage(
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
+    val useSparseFileAllocation = from(AppSettingsModel.useSparseFileAllocation)
     val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
     val speedLimit = from(AppSettingsModel.speedLimit)
     val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)

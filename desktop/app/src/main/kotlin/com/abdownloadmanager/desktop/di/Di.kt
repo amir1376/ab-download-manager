@@ -35,6 +35,7 @@ import org.koin.dsl.module
 import com.abdownloadmanager.updatechecker.DummyUpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateChecker
 import ir.amirab.downloader.monitor.IDownloadMonitor
+import ir.amirab.downloader.utils.EmptyFileCreator
 
 val downloaderModule = module {
     single<IDownloadQueueDatabase> {
@@ -90,9 +91,15 @@ val downloaderModule = module {
         )
 
     }
-
     single {
-        DownloadManager(get(), get(), get(), get(), get())
+        val downloadSettings:DownloadSettings = get()
+        EmptyFileCreator(
+            diskStat = get(),
+            useSparseFile = { downloadSettings.useSparseFileAllocation }
+        )
+    }
+    single {
+        DownloadManager(get(), get(), get(), get(), get(), get())
     }.bind(DownloadManagerMinimalControl::class)
     single<IDownloadMonitor> {
         DownloadMonitor(get())
