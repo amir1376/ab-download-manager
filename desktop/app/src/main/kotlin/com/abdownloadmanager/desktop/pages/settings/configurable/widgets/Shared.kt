@@ -22,10 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
@@ -181,34 +184,7 @@ fun <T> TitleAndDescription(
             )
             if (cfg.description.isNotBlank()) {
                 Spacer(Modifier.size(4.dp))
-                TooltipArea(
-                    {
-                        Box(
-                            Modifier
-                                .clip(RoundedCornerShape(5))
-                                .background(myColors.surface)
-                                .padding(8.dp)
-                        ) {
-                            WithContentColor(myColors.onSurface) {
-                                Text(
-                                    cfg.description,
-                                    fontSize = myTextSizes.base,
-                                )
-                            }
-                        }
-                    }
-                ) {
-                    MyIcon(
-                        MyIcons.question,
-                        "Hint",
-                        Modifier
-                            .clip(CircleShape)
-                            .background(myColors.surface)
-                            .padding(4.dp)
-                            .size(12.dp),
-                        tint = myColors.onSurface,
-                    )
-                }
+                Help(cfg)
             }
         }
         if (describe) {
@@ -316,3 +292,62 @@ fun ConfigTemplate(
 //val LocalConfigurableStyle = compositionLocalOf<ConfigurationStyle> {
 //    ConfigurationStyle.normal
 //}
+
+@Composable
+private fun Help(
+    cfg: Configurable<*>,
+){
+    var showHelpContent by remember { mutableStateOf(false) }
+    val onRequestCloseShowHelpContent = {
+        showHelpContent = false
+    }
+    Column {
+        MyIcon(
+            MyIcons.question,
+            "Hint",
+            Modifier
+                .clip(CircleShape)
+                .clickable{
+                    showHelpContent = !showHelpContent
+                }
+                .border(
+                    1.dp,
+                    if (showHelpContent) myColors.primary
+                    else Color.Transparent,
+                    CircleShape
+                )
+                .background(myColors.surface)
+                .padding(4.dp)
+                .size(12.dp),
+            tint = myColors.onSurface,
+        )
+        if (showHelpContent){
+            Popup(
+                popupPositionProvider = rememberComponentRectPositionProvider(
+                    anchor = Alignment.TopCenter,
+                    alignment = Alignment.TopCenter,
+                ),
+                onDismissRequest = onRequestCloseShowHelpContent
+            ) {
+                val shape = RoundedCornerShape(6.dp)
+                Box(
+                    Modifier
+                        .padding(vertical = 4.dp)
+                        .widthIn(max = 240.dp)
+                        .shadow(24.dp)
+                        .clip(shape)
+                        .border(1.dp, myColors.surface, shape)
+                        .background(myColors.menuGradientBackground)
+                        .padding(8.dp)
+                ) {
+                    WithContentColor(myColors.onSurface) {
+                        Text(
+                            cfg.description,
+                            fontSize = myTextSizes.base,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
