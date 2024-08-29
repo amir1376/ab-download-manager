@@ -11,7 +11,12 @@ abstract class DownloadDestination(
 
     protected val fileParts = mutableListOf<DestWriter>()
     protected var allPartsDownloaded = false
-    protected open fun onAllFilePartsRemoved(){}
+    protected var requestedToChangeLastModified:Long?=null
+
+    protected open fun onAllFilePartsRemoved(){
+        updateLastModified()
+    }
+
     open fun onAllPartsCompleted() {
         allPartsDownloaded = true
         cleanUpJunkFiles()
@@ -64,6 +69,22 @@ abstract class DownloadDestination(
                 if (fileParts.isEmpty()){
                     onAllFilePartsRemoved()
                 }
+            }
+        }
+    }
+
+    /**
+     * specify last modified time to be used when this destination finish its work
+     * for example file paused / finished
+     */
+    fun setLastModified(timestamp: Long?) {
+        requestedToChangeLastModified=timestamp
+    }
+
+    protected fun updateLastModified(){
+        kotlin.runCatching {
+            requestedToChangeLastModified?.let {
+                outputFile.setLastModified(it)
             }
         }
     }

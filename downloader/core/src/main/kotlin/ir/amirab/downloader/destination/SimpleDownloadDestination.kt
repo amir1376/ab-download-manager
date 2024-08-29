@@ -48,6 +48,7 @@ class SimpleDownloadDestination(
     }
 
     override fun onAllFilePartsRemoved() {
+        super.onAllFilePartsRemoved()
 //        println("release handle")
         removeFileHandle()
     }
