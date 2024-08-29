@@ -4,6 +4,8 @@
 
 ### Added
 
+- Sparse File Allocation
+
 ### Changed
 
 ### Deprecated
@@ -11,6 +13,8 @@
 ### Removed
 
 ### Fixed
+
+- Improve show help UX in settings
 
 ### Security
 
