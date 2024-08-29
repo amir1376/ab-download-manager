@@ -18,6 +18,7 @@ data class AppSettingsModel(
     val theme: String = "dark",
     val threadCount: Int = 5,
     val dynamicPartCreation: Boolean = true,
+    val useServerLastModifiedTime: Boolean = false,
     val useAverageSpeed: Boolean = true,
     val speedLimit: Long = 0,
     val autoStartOnBoot: Boolean = true,
@@ -37,6 +38,7 @@ data class AppSettingsModel(
             val theme = stringKeyOf("theme")
             val threadCount = intKeyOf("threadCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
+            val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
             val useAverageSpeed = booleanKeyOf("useAverageSpeed")
             val speedLimit = longKeyOf("speedLimit")
             val autoStartOnBoot = booleanKeyOf("autoStartOnBoot")
@@ -54,6 +56,7 @@ data class AppSettingsModel(
                 theme = source.get(Keys.theme) ?: default.theme,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
+                useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime) ?: default.useServerLastModifiedTime,
                 useAverageSpeed = source.get(Keys.useAverageSpeed) ?: default.useAverageSpeed,
                 speedLimit = source.get(Keys.speedLimit) ?: default.speedLimit,
                 autoStartOnBoot = source.get(Keys.autoStartOnBoot) ?: default.autoStartOnBoot,
@@ -70,6 +73,7 @@ data class AppSettingsModel(
                 put(Keys.theme, focus.theme)
                 put(Keys.threadCount, focus.threadCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
+                put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
                 put(Keys.useAverageSpeed, focus.useAverageSpeed)
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
@@ -88,6 +92,7 @@ class AppSettingsStorage(
     var theme = from(AppSettingsModel.theme)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
+    val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
     val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
     val speedLimit = from(AppSettingsModel.speedLimit)
     val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)

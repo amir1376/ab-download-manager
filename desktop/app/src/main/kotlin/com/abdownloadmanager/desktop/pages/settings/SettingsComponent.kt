@@ -62,6 +62,21 @@ fun dynamicPartDownloadConfig(appRepository: AppRepository): BooleanConfigurable
     )
 }
 
+fun useServerLastModified(appRepository: AppRepository): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = "Server's Last-Modified Time",
+        description = "When downloading a file, use server's last modified time for the local file",
+        backedBy = appRepository.useServerLastModifiedTime,
+        describe = {
+            if (it) {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        },
+    )
+}
+
 fun speedLimitConfig(appRepository: AppRepository): SpeedLimitConfigurable {
     return SpeedLimitConfigurable(
         title = "Global Speed Limiter",
@@ -247,7 +262,8 @@ class SettingsComponent(
                     useAverageSpeedConfig(appRepository),
                     speedLimitConfig(appRepository),
                     threadCountConfig(appRepository),
-                    dynamicPartDownloadConfig(appRepository)
+                    dynamicPartDownloadConfig(appRepository),
+                    useServerLastModified(appRepository)
                 )
             }
         }

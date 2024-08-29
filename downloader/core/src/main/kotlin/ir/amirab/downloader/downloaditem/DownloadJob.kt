@@ -11,6 +11,7 @@ import ir.amirab.downloader.exception.FileChangedException
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.part.*
 import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.downloader.utils.TimeUtils
 import ir.amirab.downloader.utils.printStackIfNOtUsual
 import ir.amirab.downloader.utils.splitToRange
 import kotlinx.coroutines.*
@@ -47,6 +48,9 @@ class DownloadJob(
 
 
     var supportsConcurrent: Boolean? = null
+        private set
+
+    var serverLastModified: Long? = null
         private set
 
     private val _isDownloadActive = MutableStateFlow(false)
@@ -188,7 +192,8 @@ class DownloadJob(
             }
 //          thisLogger().info("preparing file")
             destination.prepareFile(onProgressUpdate)
-
+            val lastModified = serverLastModified.takeIf { downloadManager.settings.useServerLastModifiedTime }
+            destination.setLastModified(lastModified)
 //            thisLogger().info("file prepared")
         }
     }
@@ -538,6 +543,9 @@ class DownloadJob(
 //        thisLogger().info("fetchDownloadInfoAndValidate")
         val response = client.head(downloadItem).expectSuccess()
         supportsConcurrent = response.resumeSupport
+        serverLastModified = kotlin.runCatching {
+            response.lastModified?.let(TimeUtils::convertLastModifiedHeaderToTimestamp)
+        }.getOrNull()
         if (response.isWebPage()) {
             if (isDownloadItemIsAWebpage()) {
                 // don't strict if it's a webpage let it download without checks
