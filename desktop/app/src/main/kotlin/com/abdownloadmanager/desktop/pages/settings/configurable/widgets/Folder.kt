@@ -12,25 +12,31 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
+import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
+import io.github.vinceglb.filekit.core.FileKitPlatformSettings
+import ir.amirab.util.desktop.LocalWindow
+import java.io.File
 
 @Composable
 fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
-    var showFolderPicker by remember(cfg) {
-        mutableStateOf(false)
-    }
-    DirectoryPicker(
-        show = showFolderPicker,
-        initialDirectory = value,
-        onFileSelected = { newValue ->
-            if (newValue != null) {
-                setValue(newValue)
-            }
-            showFolderPicker = false
+
+    val pickFolderLauncher = rememberDirectoryPickerLauncher(
+        title = cfg.title,
+        initialDirectory = remember(value) {
+            runCatching {
+                File(value).canonicalPath
+            }.getOrNull()
         },
-    )
+        platformSettings = FileKitPlatformSettings(
+            parentWindow = LocalWindow.current
+        )
+    ) { directory ->
+        directory?.path?.let(setValue)
+    }
+
+
     ConfigTemplate(
         modifier = modifier,
         title = {
@@ -53,7 +59,7 @@ fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
                         modifier = Modifier
                             .pointerHoverIcon(PointerIcon.Default)
                             .fillMaxHeight()
-                            .clickable { showFolderPicker=true }
+                            .clickable { pickFolderLauncher.launch() }
                             .wrapContentHeight()
                             .padding(horizontal = 8.dp)
                             .size(16.dp))

@@ -31,9 +31,6 @@ dependencies {
 
     implementation(libs.kotlin.datetime)
 
-    implementation(libs.composeFilePicker) {
-        exclude("org.jetbrains.compose.material")
-    }
     implementation(libs.compose.reorderable)
 
     implementation(libs.http4k.core)
@@ -47,7 +44,18 @@ dependencies {
 
     implementation(libs.aboutLibraries.core)
 
-    implementation(libs.osThemeDetector)
+    implementation(libs.composeFileKit) {
+        exclude(group = "net.java.dev.jna")
+    }
+    implementation(libs.osThemeDetector) {
+        exclude(group = "net.java.dev.jna")
+    }
+
+    // at the moment I don't use jna but some libraries does
+    // filekit and osThemeDetector both use jna but with different versions
+    // I excluded jna from both of them and add it here!
+    implementation(libs.jna.core)
+    implementation(libs.jna.platform)
 
     implementation(project(":downloader:core"))
     implementation(project(":downloader:monitor"))

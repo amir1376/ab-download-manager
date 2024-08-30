@@ -18,6 +18,7 @@ http4k = "5.14.1.0"
 arrow = "1.2.4"
 datastore = "1.1.1"
 aboutLibraries = "11.2.0"
+jna = "5.14.0"
 
 [libraries]
 
@@ -57,7 +58,7 @@ kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines
 kotlin-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 kotlin-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.1"
-composeFilePicker = "com.darkrockstudios:mpfilepicker:3.1.0"
+composeFileKit = "io.github.vinceglb:filekit-compose:0.8.2"
 
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktorVersion" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" }
@@ -90,6 +91,9 @@ jgit = "org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r"
 
 aboutLibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
+
+jna-core = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 
 pluginComposeMultiplatform = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
 pluginComposeCopmiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
