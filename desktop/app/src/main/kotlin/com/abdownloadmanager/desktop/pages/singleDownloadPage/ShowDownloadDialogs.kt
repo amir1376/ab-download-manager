@@ -7,8 +7,10 @@ import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
@@ -33,7 +35,7 @@ import java.awt.Window
 @Composable
 fun getDownloadTitle(itemState: IDownloadItemState): String {
     return buildString {
-        if (itemState is ProcessingDownloadItemState && itemState.percent!=null) {
+        if (itemState is ProcessingDownloadItemState && itemState.percent != null) {
             append("${itemState.percent}%")
             append("-")
         }
@@ -62,7 +64,8 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
         val itemState by singleDownloadComponent.itemStateFlow.collectAsState()
         val state = rememberWindowState(
             height = defaultHeight.dp,
-            width = defaultWidth.dp
+            width = defaultWidth.dp,
+            position = WindowPosition(Alignment.Center)
         )
         CustomWindow(
             state = state,
@@ -70,10 +73,10 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
             resizable = false,
             onCloseRequest = onRequestClose,
         ) {
-            HandleEffects(singleDownloadComponent){
-                when(it){
+            HandleEffects(singleDownloadComponent) {
+                when (it) {
                     SingleDownloadEffects.BringToFront -> {
-                        state.isMinimized=false
+                        state.isMinimized = false
                         window.toFront()
                     }
                 }
@@ -134,9 +137,9 @@ private fun UpdateTaskBar(
                     }
 
                     DownloadJobStatus.Downloading -> {
-                        if (percent!=null){
+                        if (percent != null) {
                             Taskbar.State.NORMAL
-                        }else{
+                        } else {
                             Taskbar.State.INDETERMINATE
                         }
                     }
