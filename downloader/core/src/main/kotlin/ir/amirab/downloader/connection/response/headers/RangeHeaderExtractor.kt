@@ -7,37 +7,42 @@ data class ContentRangeValue(
     val fullSize: Long?,
 )
 
-fun ResponseInfo.getContentRange(): ContentRangeValue?{
-    val value=responseHeaders["content-range"]?:return null
-    val actualValue=runCatching {
+fun ResponseInfo.getContentRange(): ContentRangeValue? {
+    val value = responseHeaders["content-range"] ?: return null
+    val actualValue = runCatching {
         value.substring("bytes ".length)
-    }.getOrNull()?:return null
-    if (actualValue.isBlank()){
+    }.getOrNull() ?: return null
+    if (actualValue.isBlank()) {
         return null
     }
-    var from:Long?=null
-    var to:Long?=null
-    var size:Long?=null
-    val (rangeString,sizeString)=actualValue.split("/")
-    if (rangeString!="*"){
-        rangeString.split("-").map {
-            it.toLong()
-        }.let {
-            from=it[0]
-            to=it[1]
+
+    val (rangeString, sizeString) = actualValue
+        .split("/")
+        .takeIf { it.size >= 2 } ?: return null
+
+    val range = try {
+        if (rangeString != "*") {
+            rangeString.split("-").map {
+                it.toLong()
+            }.let {
+                it[0]..it[1]
+            }
+        } else {
+            null
         }
-    }
-    if (sizeString!="*"){
-        size=sizeString.toLong()
+    } catch (e: Exception) {
+        // NumberFormatException or IndexOutOfBoundException
+        return null
     }
 
+    val size: Long? = if (sizeString != "*") {
+        // some servers not returning * nor integer value.
+        sizeString.toLongOrNull() ?: return null
+    } else null
+
     return ContentRangeValue(
-        range = from?.let {f->
-            to?.let {t->
-                f..t
-            }
-        },
-        fullSize=size
+        range = range,
+        fullSize = size,
     )
 
 }

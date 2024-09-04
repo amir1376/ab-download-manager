@@ -22,12 +22,16 @@ data class ResponseInfo(
         responseHeaders["content-length"]?.toLongOrNull()?.takeIf { it >= 0L }
     }
 
+    val contentRange by lazy {
+        getContentRange()
+    }
+
     //total length of whole file even if it is partial content
     val totalLength by lazy {
         val responseLength = contentLength ?: return@lazy null
         // partial length only valid when we have content-length header
         if (isPartial) {
-            getContentRange()?.fullSize
+            contentRange?.fullSize ?: responseLength
         } else responseLength
     }
     val requiresAuth by lazy {
@@ -43,8 +47,8 @@ data class ResponseInfo(
     }
 
     val resumeSupport by lazy {
-        // maybe server does not give us content-length, so we ignore resume support
-        isPartial && contentLength != null
+        // maybe server does not give us content-length or content-range, so we ignore resume support
+        isPartial && contentLength != null && contentRange?.fullSize!=null
     }
 
     val fileName: String? by lazy {
