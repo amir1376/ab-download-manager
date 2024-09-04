@@ -16,6 +16,7 @@
 
 - Improve directory picker
 - Improve show help UX in settings
+- Improve download engine
 
 ### Security
 
