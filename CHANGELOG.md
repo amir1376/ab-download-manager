@@ -14,6 +14,7 @@
 
 ### Fixed
 
+- Improve directory picker
 - Improve show help UX in settings
 
 ### Security
