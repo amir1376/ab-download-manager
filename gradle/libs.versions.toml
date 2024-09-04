@@ -19,6 +19,12 @@ arrow = "1.2.4"
 datastore = "1.1.1"
 aboutLibraries = "11.2.0"
 jna = "5.14.0"
+datetime = "0.4.1"
+fileKit = "0.8.2"
+composeReorderable = "0.9.6"
+semver = "2.0.0"
+jgit = "6.9.0.202403050737-r"
+osThemeDetector = "3.9.1"
 
 [libraries]
 
@@ -57,8 +63,8 @@ kotlin-coroutines-debug = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-d
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
-kotlin-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.1"
-composeFileKit = "io.github.vinceglb:filekit-compose:0.8.2"
+kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
+composeFileKit = { module = "io.github.vinceglb:filekit-compose", version.ref = "fileKit" }
 
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktorVersion" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" }
@@ -84,10 +90,10 @@ http4k-server-jetty = { module = "org.http4k:http4k-server-jetty", version.ref =
 http4k-client-okhttp = { module = "org.http4k:http4k-client-okhttp", version.ref = "http4k" }
 
 compose-material-rippleEffect = { module = "org.jetbrains.compose.material:material-ripple", version.ref = "compose" }
-compose-reorderable = "org.burnoutcrew.composereorderable:reorderable:0.9.6"
+compose-reorderable = { module = "org.burnoutcrew.composereorderable:reorderable", version.ref = "composeReorderable" }
 
-semver = "io.github.z4kn4fein:semver:2.0.0"
-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r"
+semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 
 aboutLibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
@@ -109,7 +115,7 @@ arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
 arrow-opticKsp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref = "arrow" }
 
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
-osThemeDetector = "com.github.Dansoftowner:jSystemThemeDetector:3.9.1"
+osThemeDetector = { module = "com.github.Dansoftowner:jSystemThemeDetector", version.ref = "osThemeDetector" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
