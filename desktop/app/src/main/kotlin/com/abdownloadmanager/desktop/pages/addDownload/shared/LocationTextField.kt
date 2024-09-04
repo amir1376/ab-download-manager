@@ -20,7 +20,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
+import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
+import io.github.vinceglb.filekit.core.FileKitPlatformSettings
+import ir.amirab.util.desktop.LocalWindow
+import java.io.File
 
 @Composable
 fun LocationTextField(
@@ -30,18 +33,22 @@ fun LocationTextField(
     errorText: String? = null,
     lastUsedLocations: List<String> = emptyList(),
 ) {
-    var showFolderDialog by remember { mutableStateOf(false) }
     var showLastUsedLocations by remember { mutableStateOf(false) }
-    DirectoryPicker(
-        showFolderDialog,
-        initialDirectory = text,
-        onFileSelected = {
-            showFolderDialog = false
-            it?.let {
-                setText(it)
-            }
-        }
-    )
+
+    val downloadLauncherFolderPickerLauncher = rememberDirectoryPickerLauncher(
+        title = "Download Location",
+        initialDirectory = remember(text) {
+            runCatching {
+                File(text).canonicalPath
+            }.getOrNull()
+        },
+        platformSettings = FileKitPlatformSettings(
+            parentWindow = LocalWindow.current
+        )
+    ) { directory ->
+        directory?.path?.let(setText)
+    }
+
     var widthForDropDown by remember {
         mutableStateOf(0.dp)
     }
@@ -62,7 +69,7 @@ fun LocationTextField(
             end = {
                 Row {
                     MyTextFieldIcon(MyIcons.folder) {
-                        showFolderDialog = true
+                        downloadLauncherFolderPickerLauncher.launch()
                     }
                     MyTextFieldIcon(MyIcons.down) {
                         showLastUsedLocations = !showLastUsedLocations
