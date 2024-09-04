@@ -4,8 +4,6 @@
 
 ### Added
 
-- Sparse File Allocation
-
 ### Changed
 
 ### Deprecated
@@ -14,11 +12,19 @@
 
 ### Fixed
 
+### Security
+
+## 1.0.9
+
+### Added
+
+- Sparse File Allocation
+
+### Fixed
+
 - Improve directory picker
 - Improve show help UX in settings
-- Improve download engine
-
-### Security
+- Improve Download Engine
 
 ## 1.0.8
 
