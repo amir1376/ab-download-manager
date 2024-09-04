@@ -11,7 +11,6 @@ import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.utils.ExceptionUtils
-import ir.amirab.util.FileUtils
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.monitor.*
 import kotlinx.coroutines.flow.*
@@ -19,7 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.File
 
 sealed interface SingleDownloadEffects {
     data object BringToFront : SingleDownloadEffects
@@ -160,7 +158,7 @@ class SingleDownloadComponent(
         }
     }
 
-    fun bringToFromt() {
+    fun bringToFront() {
         sendEffect(SingleDownloadEffects.BringToFront)
     }
 

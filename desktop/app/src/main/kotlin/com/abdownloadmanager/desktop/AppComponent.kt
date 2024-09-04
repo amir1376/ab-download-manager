@@ -463,7 +463,7 @@ class AppComponent(
                 it.downloadId == id
             }
             if (component != null) {
-                component.bringToFromt()
+                component.bringToFront()
             } else {
                 downloadDialogControl.navigate {
                     val newItems = (it.items.toSet() + SingleDownloadComponent.Config(id)).toList()
