@@ -105,7 +105,7 @@ follow these steps.
 
 1. Clone the project
 2. Install the [JBR](https://github.com/JetBrains/JetBrainsRuntime/releases)
-3. cd into the project, open your terminal and execute the fallowing commands
+3. cd into the project, open your terminal and execute the following commands
 4. select which way you want to compile the app
 <details>
 <summary>Packaged (msi,deb at the moment)</summary>
@@ -152,5 +152,7 @@ The output will be created in
 ## Contribution
 
 Contributions to this project are very welcome!
+
+If you want to contribute to this project, please read [Contributing Guide](CONTRIBUTING.md) first.
 
 Let's make a better Download Manager together ❤️
