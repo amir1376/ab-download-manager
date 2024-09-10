@@ -103,6 +103,10 @@ compose {
             nativeDistributions {
                 modules("java.instrument", "jdk.unsupported")
                 targetFormats(TargetFormat.Msi, TargetFormat.Deb)
+                if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
+                    // filekit library requires this module in linux.
+                    modules("jdk.security.auth")
+                }
                 packageVersion = getAppVersionStringForPackaging()
                 packageName = getAppName()
                 vendor = "abdownloadmanager.com"
