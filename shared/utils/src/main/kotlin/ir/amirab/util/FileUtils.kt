@@ -4,6 +4,7 @@ import ir.amirab.util.platform.Platform
 import java.awt.Desktop
 import java.io.File
 import java.io.FileNotFoundException
+import java.util.concurrent.TimeUnit
 
 interface FileUtils {
     fun openFile(file: File)
@@ -31,7 +32,7 @@ private open class DefaultFileUtils : FileUtils {
         if (!file.exists()) {
             throw FileNotFoundException("$file not found")
         }
-        val desktop = Desktop.getDesktop() ?: return;
+        val desktop = Desktop.getDesktop() ?: return
         desktop.open(file)
     }
 
@@ -74,50 +75,56 @@ private open class DefaultFileUtils : FileUtils {
 
 private class WindowsFileUtils : DefaultFileUtils() {
     override fun fallBackOpenFolderOfFile(file: File): Boolean {
-        return kotlin.runCatching {
-            Runtime.getRuntime()
-                .exec(
-                    arrayOf(
-                        "cmd", "/c",
-                        "explorer.exe",
-                        "/select,",
-                        file.path
-                    )
-                ).exitValue() == 0
-        }.getOrElse { false }
+        return execAndWait(arrayOf("cmd", "/c", "explorer.exe", "/select,", file.path))
     }
 }
 
 private class LinuxFileUtils : DefaultFileUtils() {
     override fun fallBackOpenFolderOfFile(file: File): Boolean {
-        val dbusSendResult = kotlin.runCatching {
-            Runtime.getRuntime().exec(
-                arrayOf(
-                    "dbus-send",
-                    "--print-reply",
-                    "--dest=org.freedesktop.FileManager1",
-                    "/org/freedesktop/FileManager1",
-                    "org.freedesktop.FileManager1.ShowItems",
-                    "array:string:file://${file.path}",
-                    "string:"
-                )
-            ).exitValue() == 0
-        }.getOrElse { false }
+        val dbusSendResult = execAndWait(
+            arrayOf(
+                "dbus-send",
+                "--print-reply",
+                "--dest=org.freedesktop.FileManager1",
+                "/org/freedesktop/FileManager1",
+                "org.freedesktop.FileManager1.ShowItems",
+                "array:string:file://${file.path}",
+                "string:"
+            )
+        )
         if (dbusSendResult) {
             return true
         }
-        val xdgOpenResult = kotlin.runCatching {
-            Runtime.getRuntime().exec(arrayOf("xdg-open", file.parent)).exitValue() == 0
-        }.getOrElse { false }
+        val xdgOpenResult = execAndWait(
+            arrayOf("xdg-open", file.parent)
+        )
         return xdgOpenResult
     }
 }
 
 private class MacOsFileUtils : DefaultFileUtils() {
     override fun fallBackOpenFolderOfFile(file: File): Boolean {
-        return kotlin.runCatching {
-            Runtime.getRuntime()
-                .exec(arrayOf("open", "-R", file.path)).exitValue() == 0
-        }.getOrElse { false }
+        return execAndWait(arrayOf("open", "-R", file.path))
     }
+}
+
+/**
+ * this helper function is here to execute a command and waits for the process to finish and return the result based on exit code
+ * @param command the command
+ * @param waitFor maximum time allowed process finish ( in milliseconds )
+ * @return `true` when process exits with `0` exit code, `false` if the process fails with non-zero exit code or execution time exceeds the [waitFor]
+ */
+private fun execAndWait(
+    command: Array<String>,
+    waitFor: Long = 2_000,
+): Boolean {
+    return runCatching {
+        val p = Runtime.getRuntime().exec(command)
+        val exited = p.waitFor(waitFor, TimeUnit.MILLISECONDS)
+        if (exited) {
+            p.exitValue() == 0
+        } else {
+            false
+        }
+    }.getOrElse { false }
 }
