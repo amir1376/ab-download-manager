@@ -56,7 +56,8 @@ private val tabs = SingleDownloadPageSections.entries.toList()
 fun SingleDownloadPage(singleDownloadComponent: SingleDownloadComponent) {
     val itemState = singleDownloadComponent.itemStateFlow.collectAsState().value
     var selectedTab by remember { mutableStateOf(Info) }
-    val (showPartInfo, setShowPartInfo) = singleDownloadComponent.showPartInfo
+    val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
+    val setShowPartInfo = singleDownloadComponent::setShowPartInfo
     if (itemState != null) {
         Column(
             Modifier.padding(horizontal = 16.dp)

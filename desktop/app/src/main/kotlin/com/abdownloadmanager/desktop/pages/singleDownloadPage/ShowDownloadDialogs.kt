@@ -60,7 +60,7 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
         val defaultHeight = 290f
         val defaultWidth = 450f
 
-        val showPartInfo by singleDownloadComponent.showPartInfo
+        val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
         val itemState by singleDownloadComponent.itemStateFlow.collectAsState()
         val state = rememberWindowState(
             height = defaultHeight.dp,
@@ -92,10 +92,12 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
             if (showPartInfo && itemState is ProcessingDownloadItemState) {
                 h += singleDownloadPageSizing.partInfoHeight.value
             }
-            state.size = DpSize(
-                width = w.dp,
-                height = h.dp
-            )
+            LaunchedEffect(w, h) {
+                state.size = DpSize(
+                    width = w.dp,
+                    height = h.dp
+                )
+            }
             itemState?.let { itemState ->
                 UpdateTaskBar(window, itemState)
             }

@@ -5,6 +5,7 @@ import com.abdownloadmanager.desktop.utils.*
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
+import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageStateToPersist
 import ir.amirab.util.config.getDecoded
 import ir.amirab.util.config.keyOfEncoded
 import ir.amirab.util.config.putEncoded
@@ -48,6 +49,7 @@ data class CommonData(
 @Serializable
 data class PageStatesModel(
     val home: HomePageStateToPersist = HomePageStateToPersist(),
+    val downloadPage: SingleDownloadPageStateToPersist = SingleDownloadPageStateToPersist(),
     val global: CommonData = CommonData(),
 ) {
     companion object {
@@ -59,23 +61,22 @@ data class PageStatesModel(
 
         object Child {
             val common = CommonData.ConfigLens("global.")
+            val downloadPage = SingleDownloadPageStateToPersist.ConfigLens("downloadPage.")
             val home = HomePageStateToPersist.ConfigLens("home.")
         }
 
         override fun get(source: MapConfig): PageStatesModel {
-            return with(json) {
-                PageStatesModel(
-                    home = Child.home.get(source),
-                    global = Child.common.get(source)
-                )
-            }
+            return PageStatesModel(
+                home = Child.home.get(source),
+                downloadPage = Child.downloadPage.get(source),
+                global = Child.common.get(source)
+            )
         }
 
         override fun set(source: MapConfig, focus: PageStatesModel): MapConfig {
-            with(json) {
-                Child.home.set(source, focus.home)
-                Child.common.set(source, focus.global)
-            }
+            Child.home.set(source, focus.home)
+            Child.downloadPage.set(source, focus.downloadPage)
+            Child.common.set(source, focus.global)
             return source
         }
     }
@@ -85,6 +86,6 @@ class PageStatesStorage(
     settings: DataStore<MapConfig>,
 ) : ConfigBaseSettings<PageStatesModel>(settings, PageStatesModel.ConfigLens) {
     val lastUsedSaveLocations = from(PageStatesModel.global.lastSavedLocations)
-
+    val downloadPage = from(PageStatesModel.downloadPage)
     val homePageStorage = from(PageStatesModel.home)
 }
