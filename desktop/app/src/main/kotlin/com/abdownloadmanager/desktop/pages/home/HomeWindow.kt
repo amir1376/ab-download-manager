@@ -3,6 +3,7 @@ package com.abdownloadmanager.desktop.pages.home
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.actions.LocalShortCutManager
@@ -43,7 +44,9 @@ fun HomeWindow(
             }
         ) {
             LaunchedEffect(windowState.size) {
-                homeComponent.setWindowSize(windowState.size)
+                if (!windowState.isMinimized && windowState.placement == WindowPlacement.Floating) {
+                    homeComponent.setWindowSize(windowState.size)
+                }
             }
             window.minimumSize = Dimension(
                 400, 400
