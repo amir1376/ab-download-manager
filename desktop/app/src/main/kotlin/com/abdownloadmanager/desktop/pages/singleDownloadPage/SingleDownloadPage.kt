@@ -18,6 +18,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -56,7 +57,8 @@ private val tabs = SingleDownloadPageSections.entries.toList()
 fun SingleDownloadPage(singleDownloadComponent: SingleDownloadComponent) {
     val itemState = singleDownloadComponent.itemStateFlow.collectAsState().value
     var selectedTab by remember { mutableStateOf(Info) }
-    val (showPartInfo, setShowPartInfo) = singleDownloadComponent.showPartInfo
+    val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
+    val setShowPartInfo = singleDownloadComponent::setShowPartInfo
     if (itemState != null) {
         Column(
             Modifier.padding(horizontal = 16.dp)
@@ -116,6 +118,12 @@ fun SingleDownloadPage(singleDownloadComponent: SingleDownloadComponent) {
                 RenderActions(itemState, singleDownloadComponent, showPartInfo, setShowPartInfo)
                 Spacer(Modifier.size(8.dp))
             }
+            val resizingState = LocalSingleDownloadPageSizing.current
+            LaunchedEffect(resizingState.resizingPartInfo){
+                if (resizingState.partInfoHeight<=0.dp){
+                    setShowPartInfo(false)
+                }
+            }
             if (showPartInfo && itemState is ProcessingDownloadItemState) {
                 RenderPartInfo(itemState)
             }
@@ -160,7 +168,7 @@ fun RenderProgressBar(itemState: IDownloadItemState) {
         is DownloadJobStatus.PreparingFile -> myColors.infoGradient
         DownloadJobStatus.Resuming,
         DownloadJobStatus.Downloading,
-        -> myColors.primaryGradient
+            -> myColors.primaryGradient
     }
 
     Box(
@@ -182,7 +190,7 @@ fun RenderProgressBar(itemState: IDownloadItemState) {
                         ).value
                     )
             ) {
-                if(progress==1f){
+                if (progress == 1f) {
                     MyIcon(
                         MyIcons.check,
                         null,
@@ -206,26 +214,28 @@ fun RenderProgressBar(itemState: IDownloadItemState) {
                 1f,
                 infiniteRepeatable(tween(l), RepeatMode.Restart)
             )
-            val width by anim.animateFloat(6f, 16f, infiniteRepeatable(
-                keyframes {
-                    durationMillis = l
-                    0f atFraction 0f
-                    0.75f atFraction 0.25f
-                    0f atFraction 1f
-                },
-                repeatMode = RepeatMode.Restart
-            )
+            val width by anim.animateFloat(
+                6f, 16f, infiniteRepeatable(
+                    keyframes {
+                        durationMillis = l
+                        0f atFraction 0f
+                        0.75f atFraction 0.25f
+                        0f atFraction 1f
+                    },
+                    repeatMode = RepeatMode.Restart
+                )
             )
             Box(
                 Modifier
                     .fillMaxHeight()
                     .fillMaxWidth(endPos)
             ) {
-                Box(Modifier
-                    .background(background)
-                    .fillMaxHeight()
-                    .align(Alignment.CenterEnd)
-                    .fillMaxWidth(width)
+                Box(
+                    Modifier
+                        .background(background)
+                        .fillMaxHeight()
+                        .align(Alignment.CenterEnd)
+                        .fillMaxWidth(width)
                 )
             }
         }
@@ -256,7 +266,7 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                         .let { parts ->
                             if (onlyActiveParts) {
                                 parts.filter {
-                                    when(it.status){
+                                    when (it.status) {
                                         is PartDownloadStatus.Canceled -> true
                                         PartDownloadStatus.Completed -> false
                                         PartDownloadStatus.IDLE -> false
@@ -331,7 +341,8 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                             SimpleCellText(
                                 "${
                                     it.value.length?.let { length ->
-                                        convertSizeToHumanReadable(length
+                                        convertSizeToHumanReadable(
+                                            length
                                         )
                                     } ?: "Unknown"
                                 }",
@@ -354,15 +365,24 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                 }
             }
         }
-        val singleDownloadPageSizing = LocalSingleBoxSizing.current
-        Handle(Modifier.fillMaxWidth().height(8.dp), orientation = Orientation.Vertical) {
+        val singleDownloadPageSizing = LocalSingleDownloadPageSizing.current
+        val mutableInteractionSource = remember { MutableInteractionSource() }
+        val isDraggingHandle by mutableInteractionSource.collectIsDraggedAsState()
+        LaunchedEffect(isDraggingHandle){
+            singleDownloadPageSizing.resizingPartInfo = isDraggingHandle
+        }
+        Handle(
+            Modifier.fillMaxWidth().height(8.dp),
+            orientation = Orientation.Vertical,
+            interactionSource = mutableInteractionSource
+        ) {
             singleDownloadPageSizing.partInfoHeight += it
         }
     }
 }
 
 fun prettifyStatus(status: PartDownloadStatus): String {
-    return when(status){
+    return when (status) {
         is PartDownloadStatus.Canceled -> "Disconnected"
         PartDownloadStatus.IDLE -> "IDLE"
         PartDownloadStatus.Completed -> "Completed"
@@ -412,8 +432,8 @@ sealed class PartInfoCells : TableCell<IndexedValue<UiPart>> {
 
 @Composable
 fun RenderPropertyItem(propertyItem: SingleDownloadPagePropertyItem) {
-    val title= propertyItem.name
-    val value= propertyItem.value
+    val title = propertyItem.name
+    val value = propertyItem.value
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
@@ -434,7 +454,7 @@ fun RenderPropertyItem(propertyItem: SingleDownloadPagePropertyItem) {
                     .weight(0.7f),
                 maxLines = 1,
                 fontSize = myTextSizes.base,
-                color = when(propertyItem.valueState){
+                color = when (propertyItem.valueState) {
                     SingleDownloadPagePropertyItem.ValueType.Normal -> LocalContentColor.current
                     SingleDownloadPagePropertyItem.ValueType.Error -> myColors.error
                     SingleDownloadPagePropertyItem.ValueType.Success -> myColors.success
@@ -489,7 +509,8 @@ fun RenderActions(
                 is ProcessingDownloadItemState -> {
                     PartInfoButton(showingPartInfo, onRequestShowPartInfo)
                     Spacer(Modifier.weight(1f))
-                    ToggleButton(it,
+                    ToggleButton(
+                        it,
                         singleDownloadComponent::toggle,
                         singleDownloadComponent::resume,
                         singleDownloadComponent::pause,
@@ -597,29 +618,29 @@ private fun ToggleButton(
     Box {
         SingleDownloadPageButton(
             {
-                if (isResumeSupported){
+                if (isResumeSupported) {
                     toggle()
-                }else{
-                    if (itemState.status is DownloadJobStatus.IsActive){
-                        showPromptOnNonePresumablePause=true
-                    }else{
+                } else {
+                    if (itemState.status is DownloadJobStatus.IsActive) {
+                        showPromptOnNonePresumablePause = true
+                    } else {
                         toggle()
                     }
                 }
             },
             icon = icon,
             text = text,
-            color = if (isResumeSupported){
+            color = if (isResumeSupported) {
                 LocalContentColor.current
-            }else{
-                if (itemState.status is DownloadJobStatus.IsActive){
+            } else {
+                if (itemState.status is DownloadJobStatus.IsActive) {
                     myColors.error
-                }else{
+                } else {
                     LocalContentColor.current
                 }
             },
         )
-        if (showPromptOnNonePresumablePause){
+        if (showPromptOnNonePresumablePause) {
             val shape = RoundedCornerShape(6.dp)
             val closePopup = {
                 showPromptOnNonePresumablePause = false
@@ -648,7 +669,7 @@ private fun ToggleButton(
                         .widthIn(max = 140.dp)
                 ) {
                     Text(buildAnnotatedString {
-                        withStyle(SpanStyle(color = myColors.warning)){
+                        withStyle(SpanStyle(color = myColors.warning)) {
                             append("WARNING:\n")
                         }
                         append("This download doesn't support resuming! You may have to RESTART it later in the Download List")

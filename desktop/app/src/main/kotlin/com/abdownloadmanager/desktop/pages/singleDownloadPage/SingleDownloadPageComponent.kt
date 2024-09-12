@@ -6,7 +6,8 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfi
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
-import androidx.compose.runtime.mutableStateOf
+import arrow.optics.copy
+import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.component.inject
 
 sealed interface SingleDownloadEffects {
@@ -31,6 +33,7 @@ data class SingleDownloadPagePropertyItem(
 ) {
     enum class ValueType { Normal, Error, Success }
 }
+
 class SingleDownloadComponent(
     ctx: ComponentContext,
     val downloadItemOpener: DownloadItemOpener,
@@ -40,14 +43,25 @@ class SingleDownloadComponent(
     ContainsEffects<SingleDownloadEffects> by supportEffects(),
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
+    private val singleDownloadPageStateToPersist by lazy {
+        get<PageStatesStorage>().downloadPage
+    }
     private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
     val itemStateFlow = downloadMonitor.downloadListFlow.map {
         it.firstOrNull { it.id == downloadId }
     }.stateIn(scope, SharingStarted.Eagerly, null)
 
-    val showPartInfo = mutableStateOf(false)
-
+    private val _showPartInfo = MutableStateFlow(singleDownloadPageStateToPersist.value.showPartInfo)
+    val showPartInfo = _showPartInfo.asStateFlow()
+    fun setShowPartInfo(value: Boolean) {
+        _showPartInfo.value = value
+        singleDownloadPageStateToPersist.update {
+            it.copy {
+                SingleDownloadPageStateToPersist.showPartInfo.set(value)
+            }
+        }
+    }
 
     val extraDownloadInfo: StateFlow<List<SingleDownloadPagePropertyItem>> = itemStateFlow
         .filterNotNull()
@@ -61,24 +75,31 @@ class SingleDownloadComponent(
                     }
 
                     is ProcessingDownloadItemState -> {
-                        add(SingleDownloadPagePropertyItem("Downloaded" , convertBytesToHumanReadable(it.progress).orEmpty()))
-                        add(SingleDownloadPagePropertyItem("Speed" , convertSpeedToHumanReadable(it.speed)))
-                        add(SingleDownloadPagePropertyItem("Remaining Time" , (it.remainingTime?.let { remainingTime ->
+                        add(
+                            SingleDownloadPagePropertyItem(
+                                "Downloaded",
+                                convertBytesToHumanReadable(it.progress).orEmpty()
+                            )
+                        )
+                        add(SingleDownloadPagePropertyItem("Speed", convertSpeedToHumanReadable(it.speed)))
+                        add(SingleDownloadPagePropertyItem("Remaining Time", (it.remainingTime?.let { remainingTime ->
                             convertTimeRemainingToHumanReadable(remainingTime, TimeNames.ShortNames)
                         }.orEmpty())))
-                        add(SingleDownloadPagePropertyItem(
-                            "Resume Support",
-                            when (it.supportResume) {
-                                true -> "Yes"
-                                false -> "No"
-                                null -> "Unknown"
-                            },
-                            when (it.supportResume) {
-                                true -> SingleDownloadPagePropertyItem.ValueType.Success
-                                false -> SingleDownloadPagePropertyItem.ValueType.Error
-                                null -> SingleDownloadPagePropertyItem.ValueType.Normal
-                            }
-                        ))
+                        add(
+                            SingleDownloadPagePropertyItem(
+                                "Resume Support",
+                                when (it.supportResume) {
+                                    true -> "Yes"
+                                    false -> "No"
+                                    null -> "Unknown"
+                                },
+                                when (it.supportResume) {
+                                    true -> SingleDownloadPagePropertyItem.ValueType.Success
+                                    false -> SingleDownloadPagePropertyItem.ValueType.Error
+                                    null -> SingleDownloadPagePropertyItem.ValueType.Normal
+                                }
+                            )
+                        )
                     }
                 }
             }
@@ -135,6 +156,7 @@ class SingleDownloadComponent(
             }
         }
     }
+
     fun resume() {
         val state = itemStateFlow.value as ProcessingDownloadItemState ?: return
         scope.launch {
@@ -143,6 +165,7 @@ class SingleDownloadComponent(
             }
         }
     }
+
     fun pause() {
         val state = itemStateFlow.value as ProcessingDownloadItemState ?: return
         scope.launch {
@@ -170,14 +193,14 @@ class SingleDownloadComponent(
             downloadManager.dlListDb.getById(downloadId)
         }
         threadCount = MutableStateFlow(
-            dItem?.preferredConnectionCount ?:0
+            dItem?.preferredConnectionCount ?: 0
         )
         speedLimit = MutableStateFlow(dItem?.speedLimit ?: 0)
         downloadManager.listOfJobsEvents
             .filterIsInstance<DownloadManagerEvents.OnJobChanged>()
             .onEach { event ->
                 threadCount.update {
-                    event.downloadItem.preferredConnectionCount?:0
+                    event.downloadItem.preferredConnectionCount ?: 0
                 }
                 speedLimit.update {
                     event.downloadItem.speedLimit
@@ -190,7 +213,7 @@ class SingleDownloadComponent(
             .debounce(500)
             .onEach { count ->
                 downloadManager.updateDownloadItem(downloadId) {
-                    it.preferredConnectionCount = count.takeIf { it>0 }
+                    it.preferredConnectionCount = count.takeIf { it > 0 }
                 }
             }.launchIn(scope)
         speedLimit
@@ -211,9 +234,9 @@ class SingleDownloadComponent(
                 description = "How much thread used to download this item 0 for default",
                 backedBy = threadCount,
                 describe = {
-                    if (it==0){
+                    if (it == 0) {
                         "uses global setting"
-                    }else{
+                    } else {
                         "$it threads"
                     }
                 },
