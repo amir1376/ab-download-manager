@@ -43,10 +43,11 @@ fun getDownloadTitle(itemState: IDownloadItemState): String {
     }
 }
 
-val LocalSingleBoxSizing = compositionLocalOf<SingleDownloadPageSizing> { error("LocalSingleBoxSizing not provided") }
+val LocalSingleDownloadPageSizing = compositionLocalOf<SingleDownloadPageSizing> { error("LocalSingleBoxSizing not provided") }
 
 @Stable
 class SingleDownloadPageSizing {
+    var resizingPartInfo by mutableStateOf(false)
     var partInfoHeight by mutableStateOf(150.dp)
 }
 
@@ -102,7 +103,7 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
                 UpdateTaskBar(window, itemState)
             }
             CompositionLocalProvider(
-                LocalSingleBoxSizing provides singleDownloadPageSizing
+                LocalSingleDownloadPageSizing provides singleDownloadPageSizing
             ) {
                 SingleDownloadPage(singleDownloadComponent)
             }
