@@ -271,7 +271,7 @@ class HomeComponent(
     )
     val windowSize = _windowSize.asStateFlow()
     fun setWindowSize(dpSize: DpSize) {
-        _windowSize.update { dpSize }
+        _windowSize.value = dpSize
     }
 
     private val _categoriesWidth = homePageStateToPersist.mapTwoWayStateFlow(
