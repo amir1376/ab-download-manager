@@ -17,6 +17,7 @@ import org.koin.core.component.inject
 data class HomePageStateToPersist(
     val downloadListState: TableState.SerializableTableState? = null,
     val windowSize: Pair<Float, Float> = 1000f to 500f,
+    val categoriesWidth: Float = 170f,
 ) {
     class ConfigLens(prefix: String) : Lens<MapConfig, HomePageStateToPersist>,
         KoinComponent {
@@ -25,6 +26,7 @@ data class HomePageStateToPersist(
         class Keys(prefix: String) {
             val windowWidth = floatKeyOf("${prefix}window.width")
             val windowHeight = floatKeyOf("${prefix}window.height")
+            val categoriesWidth = floatKeyOf("${prefix}categories.width")
             val downloadListTableState = keyOfEncoded<TableState.SerializableTableState>("${prefix}downloadListState")
         }
 
@@ -34,6 +36,7 @@ data class HomePageStateToPersist(
             return with(json) {
                 HomePageStateToPersist(
                     downloadListState = source.getDecoded(keys.downloadListTableState),
+                    categoriesWidth = source.get(keys.categoriesWidth) ?: default.categoriesWidth,
                     windowSize = run {
                         val width = source.get(keys.windowWidth)
                         val height = source.get(keys.windowHeight)
@@ -51,6 +54,7 @@ data class HomePageStateToPersist(
             with(json) {
                 source.put(keys.windowWidth, focus.windowSize.first)
                 source.put(keys.windowHeight, focus.windowSize.second)
+                source.put(keys.categoriesWidth, focus.categoriesWidth)
                 source.putEncodedNullable(keys.downloadListTableState, focus.downloadListState)
             }
             return source

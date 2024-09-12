@@ -18,7 +18,9 @@ import com.abdownloadmanager.desktop.utils.action.simpleAction
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.downloaditem.DownloadCredentials
@@ -49,7 +51,7 @@ sealed interface HomeEffects {
     data object BringToFront : HomeEffects
 
     data class DeleteItems(
-        val list: List<Long>
+        val list: List<Long>,
     ) : HomeEffects
 }
 
@@ -269,12 +271,25 @@ class HomeComponent(
     )
     val windowSize = _windowSize.asStateFlow()
     fun setWindowSize(dpSize: DpSize) {
-        _windowSize.update { dpSize }
+        _windowSize.value = dpSize
+    }
+
+    private val _categoriesWidth = homePageStateToPersist.mapTwoWayStateFlow(
+        map = {
+            it.categoriesWidth.dp.coerceIn(CATEGORIES_SIZE_RANGE)
+        },
+        unMap = {
+            copy(categoriesWidth = it.coerceIn(CATEGORIES_SIZE_RANGE).value)
+        }
+    )
+    val categoriesWidth = _categoriesWidth.asStateFlow()
+    fun setCategoriesWidth(updater: (Dp) -> Dp) {
+        _categoriesWidth.value = updater(_categoriesWidth.value)
     }
 
 
     private fun requestDelete(
-        downloadList: List<Long>
+        downloadList: List<Long>,
     ) {
         sendEffect(HomeEffects.DeleteItems(downloadList))
     }
@@ -644,5 +659,9 @@ class HomeComponent(
         "ctrl R" to downloadActions.resumeAction
         "DELETE" to downloadActions.deleteAction
         "ctrl I" to downloadActions.openDownloadDialogAction
+    }
+
+    companion object {
+        val CATEGORIES_SIZE_RANGE = 0.dp..500.dp
     }
 }
