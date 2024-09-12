@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.*
-import com.abdownloadmanager.desktop.utils.externaldraggable.*
 import com.abdownloadmanager.desktop.utils.externaldraggable.onExternalDrag
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.alpha
@@ -111,21 +110,24 @@ fun HomePage(component: HomeComponent) {
             Spacer(Modifier.height(4.dp))
             TopBar(component)
             Spacer(Modifier.height(6.dp))
-            Spacer(Modifier.fillMaxWidth()
-                .height(1.dp)
-                .background(myColors.surface)
+            Spacer(
+                Modifier.fillMaxWidth()
+                    .height(1.dp)
+                    .background(myColors.surface)
             )
             Row() {
-                var width by remember { mutableStateOf(170.dp) }
-                Categories(Modifier.padding(top = 8.dp)
-                    .width(width), component
+                val categoriesWidth by component.categoriesWidth.collectAsState()
+                Categories(
+                    Modifier.padding(top = 8.dp)
+                        .width(categoriesWidth), component
                 )
                 Spacer(Modifier.size(8.dp))
                 //split pane
-                Handle(Modifier.width(5.dp)
-                    .fillMaxHeight()
-                ) {
-                    width += it
+                Handle(
+                    Modifier.width(5.dp)
+                        .fillMaxHeight()
+                ) { delta ->
+                    component.setCategoriesWidth { it + delta }
                 }
                 Column(Modifier.weight(1f)) {
                     Row(
@@ -262,7 +264,7 @@ private fun ShowDeletePrompts(
                 ActionButton(
                     text = "Delete",
                     onClick = onConfirm,
-                    borderColor = SolidColor(myColors.error ),
+                    borderColor = SolidColor(myColors.error),
                     contentColor = myColors.error,
                 )
                 Spacer(Modifier.width(8.dp))
@@ -274,7 +276,7 @@ private fun ShowDeletePrompts(
 
 @Stable
 class DeletePromptState(
-    val downloadList: List<Long>
+    val downloadList: List<Long>,
 ) {
     var alsoDeleteFile by mutableStateOf(false)
 }
