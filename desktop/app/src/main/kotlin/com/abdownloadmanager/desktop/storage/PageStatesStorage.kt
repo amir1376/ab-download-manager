@@ -17,27 +17,27 @@ import org.koin.core.component.inject
 @optics
 @Serializable
 data class CommonData(
-    val lastSavedLocations:List<String> = emptyList(),
-){
+    val lastSavedLocations: List<String> = emptyList(),
+) {
     companion object
-    class ConfigLens(prefix:String):Lens<MapConfig,CommonData> ,KoinComponent{
+    class ConfigLens(prefix: String) : Lens<MapConfig, CommonData>, KoinComponent {
         class Keys(prefix: String) {
             val lastSavedLocations = keyOfEncoded<List<String>>("${prefix}lastSavedLocations")
         }
 
-        private val json:Json by inject()
+        private val json: Json by inject()
         private val keys = Keys(prefix)
         override fun get(source: MapConfig): CommonData {
-            return with(json){
+            return with(json) {
                 CommonData(
-                    lastSavedLocations = source.getDecoded(keys.lastSavedLocations)?: emptyList()
+                    lastSavedLocations = source.getDecoded(keys.lastSavedLocations) ?: emptyList()
                 )
             }
         }
 
         override fun set(source: MapConfig, focus: CommonData): MapConfig {
-            return with(json){
-                source.putEncoded(keys.lastSavedLocations,focus.lastSavedLocations)
+            return with(json) {
+                source.putEncoded(keys.lastSavedLocations, focus.lastSavedLocations)
                 source
             }
         }
@@ -47,32 +47,34 @@ data class CommonData(
 @optics
 @Serializable
 data class PageStatesModel(
-    val home:HomePageStateToPersist = HomePageStateToPersist(),
-    val global:CommonData = CommonData(),
-){
-    companion object{
-        val default get() =  PageStatesModel()
+    val home: HomePageStateToPersist = HomePageStateToPersist(),
+    val global: CommonData = CommonData(),
+) {
+    companion object {
+        val default get() = PageStatesModel()
     }
-    object ConfigLens:Lens<MapConfig,PageStatesModel>,KoinComponent{
-        private val json :Json by inject()
-        private val commonDataMapper= CommonData.ConfigLens("global.")
-        private val homeDataMapper= HomePageStateToPersist.ConfigLens("home.")
-        object Keys {
-            val home = keyOfEncoded<HomePageStateToPersist>("home")
+
+    object ConfigLens : Lens<MapConfig, PageStatesModel>, KoinComponent {
+        private val json: Json by inject()
+
+        object Child {
+            val common = CommonData.ConfigLens("global.")
+            val home = HomePageStateToPersist.ConfigLens("home.")
         }
+
         override fun get(source: MapConfig): PageStatesModel {
-            return with(json){
+            return with(json) {
                 PageStatesModel(
-                    home = source.getDecoded(Keys.home)?:HomePageStateToPersist(),
-                    global = commonDataMapper.get(source)
+                    home = Child.home.get(source),
+                    global = Child.common.get(source)
                 )
             }
         }
 
         override fun set(source: MapConfig, focus: PageStatesModel): MapConfig {
-            with(json){
-                source.putEncoded(Keys.home,focus.home)
-                commonDataMapper.set(source,focus.global)
+            with(json) {
+                Child.home.set(source, focus.home)
+                Child.common.set(source, focus.global)
             }
             return source
         }
@@ -81,7 +83,7 @@ data class PageStatesModel(
 
 class PageStatesStorage(
     settings: DataStore<MapConfig>,
-) : ConfigBaseSettings<PageStatesModel>(settings,PageStatesModel.ConfigLens) {
+) : ConfigBaseSettings<PageStatesModel>(settings, PageStatesModel.ConfigLens) {
     val lastUsedSaveLocations = from(PageStatesModel.global.lastSavedLocations)
 
     val homePageStorage = from(PageStatesModel.home)
