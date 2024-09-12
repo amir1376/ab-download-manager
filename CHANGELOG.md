@@ -14,6 +14,15 @@
 
 ### Security
 
+## 1.0.10
+
+### Fixed
+
+- Improve home page
+- Improve download page
+- Opening Directory Picker cause the app to crash in Linux
+- Folder opened two times when clicking on open folder in Linux
+
 ## 1.0.9
 
 ### Added
