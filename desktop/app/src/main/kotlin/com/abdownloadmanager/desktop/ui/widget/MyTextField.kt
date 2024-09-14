@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.desktop.ui.LocalContentColor
-import com.abdownloadmanager.desktop.ui.LocalTextStyle
+import com.abdownloadmanager.utils.compose.LocalContentColor
+import com.abdownloadmanager.utils.compose.LocalTextStyle
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.utils.div

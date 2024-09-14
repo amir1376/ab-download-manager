@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.ui.widget.customtable.styled
 
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.widget.customtable.TableScope
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding

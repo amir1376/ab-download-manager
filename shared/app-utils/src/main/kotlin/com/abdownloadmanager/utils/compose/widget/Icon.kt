@@ -1,7 +1,8 @@
-package com.abdownloadmanager.desktop.ui.widget
+package com.abdownloadmanager.utils.compose.widget
 
-import com.abdownloadmanager.desktop.ui.LocalContentAlpha
-import com.abdownloadmanager.desktop.ui.LocalContentColor
+import androidx.compose.foundation.Image
+import com.abdownloadmanager.utils.compose.LocalContentAlpha
+import com.abdownloadmanager.utils.compose.LocalContentColor
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import ir.amirab.util.compose.IconSource
 
 @Composable
 @NonRestartableComposable
@@ -98,3 +100,27 @@ private fun Size.isInfinite() = width.isInfinite() && height.isInfinite()
 
 // Default icon size, for icons with no intrinsic size information
 private val DefaultIconSizeModifier = Modifier.size(24.dp)
+
+@Composable
+fun MyIcon(
+    icon: IconSource,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+) {
+    val painter = icon.rememberPainter()
+    if (icon.requiredTint) {
+        Icon(
+            painter = painter,
+            contentDescription = contentDescription,
+            modifier = modifier,
+            tint = tint,
+        )
+    } else {
+        Image(
+            painter = painter,
+            contentDescription = contentDescription,
+            modifier = modifier,
+        )
+    }
+}

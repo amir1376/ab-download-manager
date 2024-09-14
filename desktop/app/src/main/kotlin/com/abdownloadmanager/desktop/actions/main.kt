@@ -7,10 +7,10 @@ import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.widget.menu.SubMenu
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
-import com.abdownloadmanager.desktop.utils.action.AnAction
-import com.abdownloadmanager.desktop.utils.action.MenuItem
-import com.abdownloadmanager.desktop.utils.action.buildMenu
-import com.abdownloadmanager.desktop.utils.action.simpleAction
+import ir.amirab.util.compose.action.AnAction
+import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.action.buildMenu
+import ir.amirab.util.compose.action.simpleAction
 import com.abdownloadmanager.desktop.utils.getIcon
 import com.abdownloadmanager.desktop.utils.getName
 import ir.amirab.downloader.downloaditem.DownloadCredentials

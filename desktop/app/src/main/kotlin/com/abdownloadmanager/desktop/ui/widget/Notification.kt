@@ -1,10 +1,10 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +21,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.*
 
 private val LocalNotification = compositionLocalOf<NotificationManager> {

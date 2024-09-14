@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.pages.extenallibs
 
 import com.abdownloadmanager.desktop.pages.about.MaybeLinkText
-import com.abdownloadmanager.desktop.ui.ProvideTextStyle
+import com.abdownloadmanager.utils.compose.ProvideTextStyle
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

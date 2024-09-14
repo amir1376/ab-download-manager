@@ -4,9 +4,9 @@ import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.widget.MessageDialogType
-import com.abdownloadmanager.desktop.utils.action.AnAction
-import com.abdownloadmanager.desktop.utils.action.MenuItem
-import com.abdownloadmanager.desktop.utils.action.simpleAction
+import ir.amirab.util.compose.action.AnAction
+import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.action.simpleAction
 import org.koin.core.component.get
 
 private val appComponent = Di.get<AppComponent>()

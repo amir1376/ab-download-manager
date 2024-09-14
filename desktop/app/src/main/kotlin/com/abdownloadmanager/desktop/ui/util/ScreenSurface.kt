@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.ui.util
 
 import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.WithContentColor
+import com.abdownloadmanager.utils.compose.WithContentColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable

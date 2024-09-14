@@ -1,22 +1,20 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.desktop.ui.icon.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import ir.amirab.util.compose.IconSource
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 
 @Composable

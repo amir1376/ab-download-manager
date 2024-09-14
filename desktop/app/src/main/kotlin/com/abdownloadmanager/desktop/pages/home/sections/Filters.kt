@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.MyTextField
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable

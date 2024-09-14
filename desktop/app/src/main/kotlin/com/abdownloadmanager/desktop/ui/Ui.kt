@@ -20,7 +20,7 @@ import com.abdownloadmanager.desktop.ui.widget.useNotification
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
 import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
-import com.abdownloadmanager.desktop.utils.action.buildMenu
+import ir.amirab.util.compose.action.buildMenu
 import com.abdownloadmanager.desktop.utils.isInDebugMode
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.runtime.*

@@ -5,7 +5,7 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderC
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.ui.WithContentColor
+import com.abdownloadmanager.utils.compose.WithContentColor
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
 import androidx.compose.foundation.*

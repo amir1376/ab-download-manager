@@ -1,8 +1,8 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.desktop.ui.LocalContentAlpha
-import com.abdownloadmanager.desktop.ui.LocalContentColor
-import com.abdownloadmanager.desktop.ui.LocalTextStyle
+import com.abdownloadmanager.utils.compose.LocalContentAlpha
+import com.abdownloadmanager.utils.compose.LocalContentColor
+import com.abdownloadmanager.utils.compose.LocalTextStyle
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable

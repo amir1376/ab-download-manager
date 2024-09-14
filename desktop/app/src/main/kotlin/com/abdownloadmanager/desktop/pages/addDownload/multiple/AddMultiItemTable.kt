@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.addDownload.multiple
 
 import com.abdownloadmanager.desktop.pages.addDownload.DownloadUiChecker
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.*

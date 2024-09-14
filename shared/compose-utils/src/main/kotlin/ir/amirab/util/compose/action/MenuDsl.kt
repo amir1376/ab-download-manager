@@ -1,6 +1,6 @@
-package com.abdownloadmanager.desktop.utils.action
+package ir.amirab.util.compose.action
 
-import com.abdownloadmanager.desktop.ui.icon.IconSource
+import ir.amirab.util.compose.IconSource
 
 @DslMarker
 private annotation class MenuDsl
@@ -13,7 +13,7 @@ class MenuScope {
         icon: IconSource? = null,
         onClick: AnAction.() -> Unit,
     ) {
-        val action=simpleAction(title, icon, onClick)
+        val action= simpleAction(title, icon, onClick)
         list.add(action)
     }
 
@@ -22,7 +22,7 @@ class MenuScope {
         icon: IconSource? = null,
         block: MenuScope.() -> Unit,
     ) {
-        val subMenu=MenuItem.SubMenu(
+        val subMenu= MenuItem.SubMenu(
             title = title,
             icon = icon,
             items = MenuScope().apply(block).build()

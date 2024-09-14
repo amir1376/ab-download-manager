@@ -1,10 +1,10 @@
 package com.abdownloadmanager.desktop.pages.extenallibs
 
-import com.abdownloadmanager.desktop.ui.ProvideTextStyle
+import com.abdownloadmanager.utils.compose.ProvideTextStyle
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.customtable.Table
 import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState

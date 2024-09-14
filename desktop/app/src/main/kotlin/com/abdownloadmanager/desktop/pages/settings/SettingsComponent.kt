@@ -4,7 +4,7 @@ import com.abdownloadmanager.desktop.pages.settings.SettingSections.*
 import com.abdownloadmanager.desktop.pages.settings.configurable.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
-import com.abdownloadmanager.desktop.ui.icon.IconSource
+import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.BaseComponent
 import com.abdownloadmanager.desktop.utils.convertSpeedToHumanReadable

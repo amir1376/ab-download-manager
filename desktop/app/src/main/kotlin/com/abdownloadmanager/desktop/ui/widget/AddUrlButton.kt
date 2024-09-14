@@ -1,10 +1,10 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

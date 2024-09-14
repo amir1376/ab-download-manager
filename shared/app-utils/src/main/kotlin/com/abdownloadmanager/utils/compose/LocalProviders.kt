@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.ui
+package com.abdownloadmanager.utils.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider

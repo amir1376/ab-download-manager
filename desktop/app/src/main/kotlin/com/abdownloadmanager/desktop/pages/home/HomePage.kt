@@ -3,10 +3,10 @@ package com.abdownloadmanager.desktop.pages.home
 import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.desktop.pages.home.sections.category.*
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import ir.amirab.util.compose.IconSource
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes

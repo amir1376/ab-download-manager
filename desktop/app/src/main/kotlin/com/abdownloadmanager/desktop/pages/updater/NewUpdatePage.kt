@@ -6,7 +6,7 @@ import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

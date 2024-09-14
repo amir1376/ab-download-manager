@@ -1,5 +1,9 @@
 package com.abdownloadmanager.desktop.ui.icon
 
+import com.abdownloadmanager.utils.compose.IMyIcons
+import ir.amirab.util.compose.IconSource
+import com.abdownloadmanager.utils.compose.asIconSource
+
 object MyIcons : IMyIcons {
     override val appIcon: IconSource get() = "icons/app_icon.svg".asIconSource(false)
 

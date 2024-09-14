@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
 import DOUBLE_CLICK_DELAY
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.widget.CheckBox
 import com.abdownloadmanager.desktop.ui.widget.Text
@@ -11,7 +11,7 @@ import com.abdownloadmanager.desktop.ui.widget.customtable.styled.MyStyledTableH
 import com.abdownloadmanager.desktop.ui.widget.menu.LocalMenuDisabledItemBehavior
 import com.abdownloadmanager.desktop.ui.widget.menu.MenuDisabledItemBehavior
 import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
-import com.abdownloadmanager.desktop.utils.action.MenuItem
+import ir.amirab.util.compose.action.MenuItem
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*

@@ -2,11 +2,11 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurable
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageSections.*
-import com.abdownloadmanager.desktop.ui.LocalContentColor
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
-import com.abdownloadmanager.desktop.ui.WithContentColor
-import com.abdownloadmanager.desktop.ui.icon.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.LocalContentColor
+import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentColor
+import ir.amirab.util.compose.IconSource
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes

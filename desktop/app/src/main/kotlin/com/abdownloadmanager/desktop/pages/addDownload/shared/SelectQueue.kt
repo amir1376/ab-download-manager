@@ -8,7 +8,7 @@ import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
 import com.abdownloadmanager.desktop.ui.widget.IconActionButton
 import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.ui.WithContentColor
+import com.abdownloadmanager.utils.compose.WithContentColor
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
 import androidx.compose.foundation.*
@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.rememberDialogState
 import ir.amirab.downloader.queue.DownloadQueue
 import java.awt.MouseInfo

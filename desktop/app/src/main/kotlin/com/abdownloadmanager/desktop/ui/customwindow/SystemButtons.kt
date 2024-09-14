@@ -1,8 +1,8 @@
 package com.abdownloadmanager.desktop.ui.customwindow
 
-import com.abdownloadmanager.desktop.ui.LocalContentColor
-import com.abdownloadmanager.desktop.ui.icon.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.LocalContentColor
+import ir.amirab.util.compose.IconSource
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import androidx.compose.animation.animateColorAsState

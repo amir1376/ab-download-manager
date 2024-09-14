@@ -1,6 +1,6 @@
-package com.abdownloadmanager.desktop.utils.action
+package ir.amirab.util.compose.action
 
-import com.abdownloadmanager.desktop.ui.icon.IconSource
+import ir.amirab.util.compose.IconSource
 import ir.amirab.util.flow.mapStateFlow
 import androidx.compose.runtime.*
 import kotlinx.coroutines.flow.*
@@ -16,7 +16,7 @@ sealed interface MenuItem {
     }
 
     interface CanBeModified{
-        fun setIcon(icon:IconSource?)
+        fun setIcon(icon: IconSource?)
         fun setTitle(title:String)
     }
 

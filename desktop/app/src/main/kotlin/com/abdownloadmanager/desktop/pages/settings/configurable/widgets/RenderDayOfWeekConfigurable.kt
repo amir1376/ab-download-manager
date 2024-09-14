@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.DayOfWeekConfigurable
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes

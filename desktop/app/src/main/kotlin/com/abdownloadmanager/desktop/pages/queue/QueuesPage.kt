@@ -2,11 +2,11 @@ package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.ConfigurableGroup
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurableGroup
-import com.abdownloadmanager.desktop.ui.LocalContentAlpha
-import com.abdownloadmanager.desktop.ui.LocalContentColor
+import com.abdownloadmanager.utils.compose.LocalContentAlpha
+import com.abdownloadmanager.utils.compose.LocalContentColor
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import ir.amirab.util.compose.IconSource
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes

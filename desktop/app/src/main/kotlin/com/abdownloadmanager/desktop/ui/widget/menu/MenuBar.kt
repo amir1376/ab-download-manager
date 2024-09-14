@@ -1,16 +1,16 @@
 package com.abdownloadmanager.desktop.ui.widget.menu
 
 import com.abdownloadmanager.desktop.actions.LocalShortCutManager
-import com.abdownloadmanager.desktop.ui.ProvideTextStyle
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.ProvideTextStyle
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.utils.KeyUtil
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
-import com.abdownloadmanager.desktop.ui.WithContentColor
-import com.abdownloadmanager.desktop.utils.action.MenuItem
+import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentColor
+import ir.amirab.util.compose.action.MenuItem
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource

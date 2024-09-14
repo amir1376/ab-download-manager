@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.utils
 
 import androidx.compose.runtime.Immutable
-import com.abdownloadmanager.desktop.ui.icon.IconSource
+import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 
 sealed class BrowserType(
@@ -20,7 +20,7 @@ fun BrowserType.getName():String{
         BrowserType.Opera -> "Opera"
     }
 }
-fun BrowserType.getIcon():IconSource{
+fun BrowserType.getIcon(): IconSource {
     return when(this){
         BrowserType.Chrome -> MyIcons.browserGoogleChrome
         BrowserType.Edge -> MyIcons.browserMicrosoftEdge

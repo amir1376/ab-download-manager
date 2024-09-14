@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.ui.widget.menu
 
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.utils.action.MenuItem
+import ir.amirab.util.compose.action.MenuItem
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee

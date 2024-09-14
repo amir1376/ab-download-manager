@@ -3,8 +3,8 @@ package com.abdownloadmanager.desktop.ui.widget.customtable
 import com.abdownloadmanager.desktop.pages.home.sections.SortIndicatorMode
 import com.abdownloadmanager.desktop.pages.home.sections.isAscending
 import com.abdownloadmanager.desktop.pages.home.sections.isDescending
-import com.abdownloadmanager.desktop.ui.LocalContentColor
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.LocalContentColor
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes

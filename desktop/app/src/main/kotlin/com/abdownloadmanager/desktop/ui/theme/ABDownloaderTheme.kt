@@ -1,10 +1,10 @@
 package com.abdownloadmanager.desktop.ui.theme
 
-import com.abdownloadmanager.desktop.ui.LocalContentAlpha
-import com.abdownloadmanager.desktop.ui.LocalContentColor
-import com.abdownloadmanager.desktop.ui.LocalTextStyle
+import com.abdownloadmanager.utils.compose.LocalContentAlpha
+import com.abdownloadmanager.utils.compose.LocalContentColor
+import com.abdownloadmanager.utils.compose.LocalTextStyle
 import com.abdownloadmanager.desktop.ui.widget.menu.SubMenu
-import com.abdownloadmanager.desktop.utils.action.buildMenu
+import ir.amirab.util.compose.action.buildMenu
 import com.abdownloadmanager.desktop.utils.darker
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.animation.core.tween
@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberPopupPositionProviderAtPosition
-import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 
 /*
 fun MyColors.asMaterial2Colors(): Colors {

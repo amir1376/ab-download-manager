@@ -12,9 +12,9 @@ import com.abdownloadmanager.desktop.ui.widget.NotificationType
 import com.abdownloadmanager.desktop.ui.widget.customtable.Sort
 import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
 import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.action.MenuItem
-import com.abdownloadmanager.desktop.utils.action.buildMenu
-import com.abdownloadmanager.desktop.utils.action.simpleAction
+import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.action.buildMenu
+import ir.amirab.util.compose.action.simpleAction
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import androidx.compose.runtime.*

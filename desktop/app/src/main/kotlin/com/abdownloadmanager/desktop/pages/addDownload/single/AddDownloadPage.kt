@@ -4,11 +4,11 @@ import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.pages.addDownload.shared.LocationTextField
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ShowAddToQueueDialog
 import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedTypeCategories
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
-import com.abdownloadmanager.desktop.ui.WithContentColor
+import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentColor
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
-import com.abdownloadmanager.desktop.ui.icon.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import ir.amirab.util.compose.IconSource
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes

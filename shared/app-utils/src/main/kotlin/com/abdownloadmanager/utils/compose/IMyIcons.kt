@@ -1,76 +1,13 @@
-package com.abdownloadmanager.desktop.ui.icon
+package com.abdownloadmanager.utils.compose
 
-import androidx.compose.foundation.Image
-import com.abdownloadmanager.desktop.ui.LocalContentAlpha
-import com.abdownloadmanager.desktop.ui.LocalContentColor
-import com.abdownloadmanager.desktop.ui.widget.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
-
-@Immutable
-sealed interface IconSource {
-    val value: Any
-    val requiredTint: Boolean
-
-    @Composable
-    fun rememberPainter(): Painter
-
-    @Immutable
-    data class StorageIconSource(
-        override val value: String,
-        override val requiredTint: Boolean,
-    ) : IconSource {
-        @Composable
-        override fun rememberPainter(): Painter = painterResource(value)
-    }
-
-    @Immutable
-    data class VectorIconSource(
-        override val value: ImageVector,
-        override val requiredTint: Boolean,
-    ) : IconSource {
-        @Composable
-        override fun rememberPainter(): Painter = rememberVectorPainter(value)
-    }
-}
+import ir.amirab.util.compose.IconSource
 
 context (IMyIcons)
 fun ImageVector.asIconSource(requiredTint: Boolean = true) = IconSource.VectorIconSource(this, requiredTint)
 
 context (IMyIcons)
 fun String.asIconSource(requiredTint: Boolean = true) = IconSource.StorageIconSource(this, requiredTint)
-
-
-@Composable
-fun MyIcon(
-    icon: IconSource,
-    contentDescription: String?,
-    modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
-) {
-    val painter = icon.rememberPainter()
-    if (icon.requiredTint) {
-        Icon(
-            painter = painter,
-            contentDescription = contentDescription,
-            modifier = modifier,
-            tint = tint,
-        )
-    } else {
-        Image(
-            painter = painter,
-            contentDescription = contentDescription,
-            modifier = modifier,
-        )
-    }
-}
-
 
 interface IMyIcons {
     val appIcon: IconSource

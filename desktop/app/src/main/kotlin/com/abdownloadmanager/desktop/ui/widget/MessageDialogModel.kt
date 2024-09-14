@@ -3,14 +3,13 @@ package com.abdownloadmanager.desktop.ui.widget
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState

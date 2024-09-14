@@ -5,7 +5,7 @@ import com.abdownloadmanager.desktop.pages.addDownload.shared.LocationTextField
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
 import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState

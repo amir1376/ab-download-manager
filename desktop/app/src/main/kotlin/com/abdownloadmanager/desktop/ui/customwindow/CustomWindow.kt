@@ -1,9 +1,9 @@
 package com.abdownloadmanager.desktop.ui.customwindow
 
 import ir.amirab.util.customwindow.ProvideWindowSpotContainer
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
-import com.abdownloadmanager.desktop.ui.WithContentColor
-import com.abdownloadmanager.desktop.ui.icon.IconSource
+import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentColor
+import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 //import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import com.abdownloadmanager.desktop.ui.theme.myColors

@@ -1,14 +1,14 @@
 package com.abdownloadmanager.desktop.pages.about
 
-import com.abdownloadmanager.desktop.ui.LocalTextStyle
-import com.abdownloadmanager.desktop.ui.ProvideTextStyle
+import com.abdownloadmanager.utils.compose.LocalTextStyle
+import com.abdownloadmanager.utils.compose.ProvideTextStyle
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
 import com.abdownloadmanager.desktop.ui.widget.Text
 import com.abdownloadmanager.desktop.utils.AppInfo
-import com.abdownloadmanager.desktop.ui.WithContentAlpha
+import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.ui.icon.MyIcon
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.util.ifThen
 
 @Composable

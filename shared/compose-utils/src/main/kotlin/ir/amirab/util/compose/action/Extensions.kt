@@ -1,10 +1,6 @@
-package com.abdownloadmanager.desktop.utils.action
+package ir.amirab.util.compose.action
 
-import com.abdownloadmanager.desktop.ui.icon.IconSource
-import com.abdownloadmanager.desktop.utils.asState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import kotlinx.coroutines.CoroutineScope
+import ir.amirab.util.compose.IconSource
 import kotlinx.coroutines.flow.*
 
 inline fun simpleAction(

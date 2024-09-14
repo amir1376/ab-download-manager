@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.ui.widget.tray
 
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
 import com.abdownloadmanager.desktop.ui.widget.menu.SubMenu
-import com.abdownloadmanager.desktop.utils.action.MenuItem
+import ir.amirab.util.compose.action.MenuItem
 import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.painter.Painter
