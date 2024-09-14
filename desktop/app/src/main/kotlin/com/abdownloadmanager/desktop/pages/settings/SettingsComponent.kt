@@ -184,6 +184,21 @@ fun themeConfig(
     )
 }
 
+fun mergeTopBarWithTitleBarConfig(appSettings: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = "Compact Top Bar",
+        description = "Merge top bar with title bar when the main window has enough width",
+        backedBy = appSettings.mergeTopBarWithTitleBar,
+        describe = {
+            if (it) {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
+        },
+    )
+}
+
 fun autoStartConfig(appSettings: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = "Start On Boot",
@@ -263,6 +278,7 @@ class SettingsComponent(
                     themeConfig(themeManager, scope),
 //                    uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
+                    mergeTopBarWithTitleBarConfig(appSettings),
                     playSoundNotification(appSettings),
                 )
 

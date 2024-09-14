@@ -46,10 +46,12 @@ private fun FrameWindowScope.CustomWindowFrame(
     onRequestClose: () -> Unit,
     onRequestToggleMaximize: (() -> Unit)?,
     title: String,
+    titlePosition: TitlePosition,
     windowIcon: Painter? = null,
     background: Color,
     onBackground: Color,
-    center: @Composable () -> Unit,
+    start: (@Composable () -> Unit)?,
+    end: (@Composable () -> Unit)?,
     content: @Composable () -> Unit,
 ) {
 //    val borderColor = MaterialTheme.colors.surface
@@ -66,7 +68,9 @@ private fun FrameWindowScope.CustomWindowFrame(
             SnapDraggableToolbar(
                 title = title,
                 windowIcon = windowIcon,
-                center = center,
+                titlePosition = titlePosition,
+                start = start,
+                end = end,
                 onRequestMinimize = onRequestMinimize,
                 onRequestClose = onRequestClose,
                 onRequestToggleMaximize = onRequestToggleMaximize
@@ -95,14 +99,25 @@ fun isWindowFloating(): Boolean {
 fun FrameWindowScope.SnapDraggableToolbar(
     title: String,
     windowIcon: Painter? = null,
-    center: @Composable () -> Unit,
+    titlePosition: TitlePosition,
+    start: (@Composable () -> Unit)?,
+    end: (@Composable () -> Unit)?,
     onRequestMinimize: (() -> Unit)?,
     onRequestToggleMaximize: (() -> Unit)?,
     onRequestClose: () -> Unit,
 ) {
     ProvideWindowSpotContainer {
         if (CustomWindowDecorationAccessing.isSupported) {
-            FrameContent(title, windowIcon, center, onRequestMinimize, onRequestToggleMaximize, onRequestClose)
+            FrameContent(
+                title = title,
+                windowIcon = windowIcon,
+                titlePosition = titlePosition,
+                start = start,
+                end = end,
+                onRequestMinimize = onRequestMinimize,
+                onRequestToggleMaximize = onRequestToggleMaximize,
+                onRequestClose = onRequestClose
+            )
         } else {
             WindowDraggableArea(
                 Modifier.onClick(
@@ -112,7 +127,16 @@ fun FrameWindowScope.SnapDraggableToolbar(
                     onClick = {}
                 )
             ) {
-                FrameContent(title, windowIcon, center, onRequestMinimize, onRequestToggleMaximize, onRequestClose)
+                FrameContent(
+                    title = title,
+                    windowIcon = windowIcon,
+                    titlePosition = titlePosition,
+                    start = start,
+                    end = end,
+                    onRequestMinimize = onRequestMinimize,
+                    onRequestToggleMaximize = onRequestToggleMaximize,
+                    onRequestClose = onRequestClose
+                )
             }
         }
     }
@@ -122,7 +146,9 @@ fun FrameWindowScope.SnapDraggableToolbar(
 private fun FrameWindowScope.FrameContent(
     title: String,
     windowIcon: Painter? = null,
-    center: @Composable () -> Unit,
+    titlePosition: TitlePosition,
+    start: (@Composable () -> Unit)?,
+    end: (@Composable () -> Unit)?,
     onRequestMinimize: (() -> Unit)?,
     onRequestToggleMaximize: (() -> Unit)?,
     onRequestClose: () -> Unit,
@@ -150,20 +176,48 @@ private fun FrameWindowScope.FrameContent(
                     Spacer(Modifier.width(8.dp))
                 }
             }
-            WithContentColor(myColors.onBackground) {
-                WithContentAlpha(1f) {
-                    Text(
-                        title,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = myTextSizes.base,
-                        modifier = Modifier
-                            .windowFrameItem("title", HitSpots.DRAGGABLE_AREA)
-                    )
+            if (!titlePosition.afterStart) {
+                Title(
+                    modifier = Modifier
+                        .ifThen(titlePosition.centered) {
+                            weight(1f)
+                                .ifThen(start == null) {
+                                    wrapContentWidth()
+                                }
+                        }
+                        .padding(titlePosition.padding),
+                    title = title
+                )
+            }
+            start?.let {
+                Row(
+                    Modifier.windowFrameItem("start", HitSpots.OTHER_HIT_SPOT)
+                ) {
+                    start()
+                    Spacer(Modifier.width(8.dp))
                 }
             }
-            Box(Modifier.weight(1f)) {
-                center()
+            if (titlePosition.afterStart) {
+                Title(
+                    modifier = Modifier
+                        .weight(1f)
+                        .ifThen(titlePosition.centered) {
+                            wrapContentWidth()
+                        }
+                        .padding(titlePosition.padding),
+                    title = title
+                )
+            }
+            if (!titlePosition.centered && !titlePosition.afterStart) {
+                Spacer(Modifier.weight(1f))
+            }
+            end?.let {
+                Row(
+                    Modifier.windowFrameItem("end", HitSpots.OTHER_HIT_SPOT)
+                ) {
+                    end()
+                    Spacer(Modifier.width(8.dp))
+                }
             }
         }
         WindowsActionButtons(
@@ -171,6 +225,25 @@ private fun FrameWindowScope.FrameContent(
             onRequestMinimize,
             onRequestToggleMaximize,
         )
+    }
+}
+
+@Composable
+private fun FrameWindowScope.Title(
+    modifier: Modifier, title: String,
+) {
+    WithContentColor(myColors.onBackground) {
+        WithContentAlpha(1f) {
+            Text(
+                title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = myTextSizes.base,
+                modifier = Modifier
+                    .windowFrameItem("title", HitSpots.DRAGGABLE_AREA)
+                    .then(modifier)
+            )
+        }
     }
 }
 
@@ -207,8 +280,10 @@ fun CustomWindow(
     preventMinimize: Boolean = onRequestMinimize == null,
     content: @Composable FrameWindowScope.() -> Unit,
 ) {
-    val center = windowController.center ?: {}
+    val start = windowController.start
+    val end = windowController.end
     val title = windowController.title.orEmpty()
+    val titlePosition = windowController.titlePosition
     val icon = windowController.icon ?: defaultAppIcon.rememberPainter()
 
 
@@ -258,10 +333,12 @@ fun CustomWindow(
                 onRequestClose = onCloseRequest,
                 onRequestToggleMaximize = onRequestToggleMaximize,
                 title = title,
+                titlePosition = titlePosition,
                 windowIcon = icon,
                 background = background,
                 onBackground = myColors.onBackground,
-                center = { center() }
+                start = start,
+                end = end,
             ) {
 //                val defaultDensity = LocalDensity.current
 //                val uiScale = LocalUiScale.current
@@ -318,8 +395,21 @@ class WindowController(
     icon: Painter? = null,
 ) {
     var title by mutableStateOf(title)
+    var titlePosition by mutableStateOf(TitlePosition.default())
     var icon by mutableStateOf(icon)
-    var center: (@Composable () -> Unit)? by mutableStateOf(null)
+    var start: (@Composable () -> Unit)? by mutableStateOf(null)
+    var end: (@Composable () -> Unit)? by mutableStateOf(null)
+}
+
+@Immutable
+data class TitlePosition(
+    val centered: Boolean = false,
+    val afterStart: Boolean = false,
+    val padding: PaddingValues = PaddingValues(0.dp),
+) {
+    companion object {
+        fun default() = TitlePosition()
+    }
 }
 
 @Composable
@@ -345,12 +435,23 @@ private val LocalWindowController = compositionLocalOf<WindowController> { error
 private val LocalWindowState = compositionLocalOf<WindowState> { error("window controller not provided") }
 
 @Composable
-fun WindowCenter(content: @Composable () -> Unit) {
+fun WindowStart(content: @Composable () -> Unit) {
     val c = LocalWindowController.current
-    c.center = content
+    c.start = content
     DisposableEffect(Unit) {
         onDispose {
-            c.center = null
+            c.start = null
+        }
+    }
+}
+
+@Composable
+fun WindowEnd(content: @Composable () -> Unit) {
+    val c = LocalWindowController.current
+    c.end = content
+    DisposableEffect(Unit) {
+        onDispose {
+            c.end = null
         }
     }
 }
@@ -364,6 +465,19 @@ fun WindowTitle(title: String) {
     DisposableEffect(Unit) {
         onDispose {
             c.title = null
+        }
+    }
+}
+
+@Composable
+fun WindowTitlePosition(titlePosition: TitlePosition) {
+    val c = LocalWindowController.current
+    LaunchedEffect(titlePosition) {
+        c.titlePosition = titlePosition
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            c.titlePosition = TitlePosition.default()
         }
     }
 }

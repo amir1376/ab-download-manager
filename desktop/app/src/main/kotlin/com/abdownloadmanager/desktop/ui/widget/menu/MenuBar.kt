@@ -50,6 +50,7 @@ val LocalMenuBoxClip = compositionLocalOf<Shape> {
 
 @Composable
 fun MenuBar(
+    modifier: Modifier = Modifier,
     subMenuList: List<MenuItem.SubMenu>,
 ) {
     var openedItem: MenuItem.SubMenu? by remember {
@@ -65,7 +66,7 @@ fun MenuBar(
             val isSelected = openedItem == subMenu
             Column {
                 Column(
-                    Modifier
+                    modifier
                         .clickable {
                             openedItem = subMenu
                         }
@@ -73,6 +74,7 @@ fun MenuBar(
                             background(myColors.surface)
                         }
                         .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
                 ) {
                     val text = subMenu.title.collectAsState().value
                     val (firstChar, leadingText) = remember(text) {

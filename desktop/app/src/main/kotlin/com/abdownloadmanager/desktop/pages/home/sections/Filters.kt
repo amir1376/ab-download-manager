@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 fun SearchBox(
     text: String,
     onTextChange: (String) -> Unit,
+    textPadding: PaddingValues = PaddingValues(horizontal = 8.dp),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     placeholder: String = "Search in the List",
     modifier: Modifier,
@@ -36,6 +37,7 @@ fun SearchBox(
         fontSize = textSize,
         onTextChange = onTextChange,
         shape = shape,
+        textPadding = textPadding,
         interactionSource = interactionSource,
         start = {
             WithContentAlpha(

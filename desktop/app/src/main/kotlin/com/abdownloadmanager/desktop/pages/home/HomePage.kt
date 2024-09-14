@@ -4,7 +4,6 @@ import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.desktop.pages.home.sections.category.*
 import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
@@ -37,7 +36,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.window.Dialog
+import com.abdownloadmanager.desktop.ui.customwindow.*
 import com.abdownloadmanager.desktop.utils.externaldraggable.DragData
 
 
@@ -76,6 +78,31 @@ fun HomePage(component: HomeComponent) {
                 component.confirmDelete(it)
             })
     }
+    val mergeTopBar = shouldMergeTopBarWithTitleBar(component)
+    if (mergeTopBar) {
+        WindowTitlePosition(
+            TitlePosition(
+                centered = true,
+                afterStart = true,
+                padding = PaddingValues(end = 32.dp)
+            )
+        )
+        WindowStart {
+            HomeMenuBar(component, Modifier.fillMaxHeight())
+        }
+        WindowEnd {
+            HomeSearch(
+                component = component,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(vertical = 2.dp)
+            )
+        }
+    } else {
+        WindowTitlePosition(
+            TitlePosition(centered = false, afterStart = false)
+        )
+    }
 
     Box(
         Modifier
@@ -107,9 +134,11 @@ fun HomePage(component: HomeComponent) {
                 animateFloatAsState(if (isDragging) 0.2f else 1f).value
             )
         ) {
-            Spacer(Modifier.height(4.dp))
-            TopBar(component)
-            Spacer(Modifier.height(6.dp))
+            if (!mergeTopBar) {
+                Spacer(Modifier.height(4.dp))
+                TopBar(component)
+                Spacer(Modifier.height(6.dp))
+            }
             Spacer(
                 Modifier.fillMaxWidth()
                     .height(1.dp)
@@ -198,6 +227,18 @@ fun HomePage(component: HomeComponent) {
         }
     }
 }
+
+@Composable
+private fun shouldMergeTopBarWithTitleBar(component: HomeComponent): Boolean {
+    val mergeTopBarWithTitleBarInSettings = component.mergeTopBarWithTitleBar.collectAsState().value
+    if (!mergeTopBarWithTitleBarInSettings) return false
+    val density = LocalDensity.current
+    val widthDp = density.run {
+        LocalWindowInfo.current.containerSize.width.toDp()
+    }
+    return widthDp > 700.dp
+}
+
 
 @Composable
 private fun ShowDeletePrompts(
@@ -370,9 +411,15 @@ private fun Categories(
 }
 
 @Composable
-private fun HomeMenuBar(component: HomeComponent) {
+private fun HomeMenuBar(
+    component: HomeComponent,
+    modifier: Modifier,
+) {
     val menu = component.menu
-    MenuBar(menu)
+    MenuBar(
+        modifier,
+        menu
+    )
 }
 
 @Composable
@@ -421,26 +468,39 @@ private fun TopBar(component: HomeComponent) {
         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HomeMenuBar(component)
+        HomeMenuBar(component, Modifier)
         Box(Modifier.weight(1f))
-        val searchBoxInteractionSource = remember { MutableInteractionSource() }
-
-        val isFocused by searchBoxInteractionSource.collectIsFocusedAsState()
-        SearchBox(
-            text = component.filterState.textToSearch,
-            onTextChange = {
-                component.filterState.textToSearch = it
-            },
-            interactionSource = searchBoxInteractionSource,
-            modifier = Modifier
-                .width(
-                    animateDpAsState(
-                        if (isFocused) 220.dp else 180.dp
-                    ).value
-                )
-
+        HomeSearch(
+            component = component,
+            modifier = Modifier,
+            textPadding = PaddingValues(8.dp),
         )
     }
+}
+
+@Composable
+fun HomeSearch(
+    component: HomeComponent,
+    modifier: Modifier,
+    textPadding: PaddingValues = PaddingValues(horizontal = 8.dp),
+) {
+    val searchBoxInteractionSource = remember { MutableInteractionSource() }
+
+    val isFocused by searchBoxInteractionSource.collectIsFocusedAsState()
+    SearchBox(
+        text = component.filterState.textToSearch,
+        onTextChange = {
+            component.filterState.textToSearch = it
+        },
+        textPadding = textPadding,
+        interactionSource = searchBoxInteractionSource,
+        modifier = modifier
+            .width(
+                animateDpAsState(
+                    if (isFocused) 220.dp else 180.dp
+                ).value
+            )
+    )
 }
 
 
