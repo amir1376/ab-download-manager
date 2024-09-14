@@ -156,3 +156,7 @@ Contributions to this project are very welcome!
 If you want to contribute to this project, please read [Contributing Guide](CONTRIBUTING.md) first.
 
 Let's make a better Download Manager together ❤️
+
+## Support the Project
+
+If you'd like to support the project, you can find details on how to donate in the [DONATE.md](DONATE.md) file.
