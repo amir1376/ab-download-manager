@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.channels.ticker
 
 @Composable
 private fun SideBar(
@@ -114,22 +115,33 @@ fun SettingsPage(
             sideBarWidth = (sideBarWidth + it).coerceIn(150.dp..300.dp)
         }
         AnimatedContent(currentConfigurables) { configurables ->
-            Column(
-                Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                for (cfg in configurables) {
-                    Box(
-                        Modifier
-                            .background(myColors.surface / 50)
-                    ) {
-                        RenderConfigurable(cfg, Modifier.padding(vertical = 16.dp, horizontal = 32.dp))
-                    }
-                    Spacer(Modifier.height(1.dp))
+            val scrollState = rememberScrollState()
+            val scrollbarAdapter = rememberScrollbarAdapter(scrollState)
+            Box {
+                Column(
+                    Modifier
+                        .verticalScroll(scrollState)
+                        .padding(16.dp)
+                ) {
+                    for (cfg in configurables) {
+                        Box(
+                            Modifier
+                                .background(myColors.surface / 50)
+                        ) {
+                            RenderConfigurable(cfg, Modifier.padding(vertical = 16.dp, horizontal = 32.dp))
+                        }
+                        Spacer(Modifier.height(1.dp))
 
 //                    Divider()
+                    }
                 }
+                VerticalScrollbar(
+                    adapter = scrollbarAdapter,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(vertical = 16.dp)
+                        .padding(end = 2.dp),
+                )
             }
         }
 
