@@ -20,8 +20,8 @@ import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
@@ -245,7 +245,9 @@ class HomeComponent(
     private val downloadSystem: DownloadSystem by inject()
     private val queueManager: QueueManager by inject()
     private val pageStorage: PageStatesStorage by inject()
+    private val appSettings: AppSettingsStorage by inject()
     val filterState = FilterState()
+    val mergeTopBarWithTitleBar = appSettings.mergeTopBarWithTitleBar
 
     private val homePageStateToPersist = MutableStateFlow(pageStorage.homePageStorage.value)
 

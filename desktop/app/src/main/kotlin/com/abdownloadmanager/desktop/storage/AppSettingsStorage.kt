@@ -16,6 +16,7 @@ import java.io.File
 @Serializable
 data class AppSettingsModel(
     val theme: String = "dark",
+    val mergeTopBarWithTitleBar: Boolean = false,
     val threadCount: Int = 5,
     val dynamicPartCreation: Boolean = true,
     val useServerLastModifiedTime: Boolean = false,
@@ -37,6 +38,7 @@ data class AppSettingsModel(
     object ConfigLens : Lens<MapConfig, AppSettingsModel> {
         object Keys {
             val theme = stringKeyOf("theme")
+            val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
             val threadCount = intKeyOf("threadCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
@@ -56,6 +58,7 @@ data class AppSettingsModel(
             val default by lazy { AppSettingsModel.default }
             return AppSettingsModel(
                 theme = source.get(Keys.theme) ?: default.theme,
+                mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
                 useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime) ?: default.useServerLastModifiedTime,
@@ -74,6 +77,7 @@ data class AppSettingsModel(
         override fun set(source: MapConfig, focus: AppSettingsModel): MapConfig {
             return source.apply {
                 put(Keys.theme, focus.theme)
+                put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
                 put(Keys.threadCount, focus.threadCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
@@ -94,6 +98,7 @@ class AppSettingsStorage(
     settings: DataStore<MapConfig>,
 ) : ConfigBaseSettings<AppSettingsModel>(settings, AppSettingsModel.ConfigLens) {
     var theme = from(AppSettingsModel.theme)
+    var mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
