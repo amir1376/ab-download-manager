@@ -35,7 +35,7 @@ import ir.amirab.downloader.utils.OnDuplicateStrategy
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
 import ir.amirab.downloader.exception.TooManyErrorException
-import ir.amirab.util.FileUtils
+import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable

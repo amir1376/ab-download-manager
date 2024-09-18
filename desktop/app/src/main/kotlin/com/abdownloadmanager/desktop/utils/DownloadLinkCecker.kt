@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.utils
 
-import ir.amirab.util.FileUtils
+import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.mapStateFlow
 import com.abdownloadmanager.utils.isValidUrl
 import kotlinx.coroutines.CoroutineScope

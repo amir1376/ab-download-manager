@@ -12,7 +12,7 @@ import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import androidx.compose.runtime.*
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.FileUtils
+import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.component.KoinComponent

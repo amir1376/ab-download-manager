@@ -1,6 +1,6 @@
 package com.abdownloadmanager.updateapplier;
 
-import ir.amirab.util.FileUtils
+import ir.amirab.util.osfileutil.FileUtils
 import com.abdownloadmanager.updatechecker.VersionData
 import java.io.File
 interface UpdateDownloader{
