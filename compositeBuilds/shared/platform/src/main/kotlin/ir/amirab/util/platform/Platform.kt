@@ -44,7 +44,11 @@ interface PlatformFInder {
 }
 
 private class JvmPlatformFinder : PlatformFInder {
-    override fun getCurrentPlatform(): Platform {
+    private val _platform by lazy {
+        getCurrentPlatformFromJVMProperty()
+    }
+
+    private fun getCurrentPlatformFromJVMProperty(): Platform {
         val osString = System.getProperty("os.name").lowercase()
         return when {
             osString.contains("android") -> Android
@@ -53,6 +57,10 @@ private class JvmPlatformFinder : PlatformFInder {
             osString.contains("mac") || osString.contains("darwin") -> Desktop.MacOS
             else -> error("this platform is not detected: $osString")
         }
+    }
+
+    override fun getCurrentPlatform(): Platform {
+        return _platform
     }
 }
 
