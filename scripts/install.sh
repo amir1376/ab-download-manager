@@ -33,9 +33,19 @@ get_download_url() {
     echo "https://github.com/amir1376/ab-download-manager/releases/download/${LATEST_VERSION}/$ASSET_NAME"
 }
 
+close_if_running() {
+    pid=$(pidof -s "$APP_NAME")
+
+    if [ -n "$pid" ]; then
+        kill -9 "$pid"
+        echo "Closed running instance of AB Download Manager before updating."
+    fi
+}
+
 # Delete the old version of the app if it exists
 delete_old_version() {
     local installed_dir
+    close_if_running
     installed_dir=$(find "$HOME/.local" -maxdepth 1 -type d -name "ABDownloadManager_*" | head -n 1)
     if [ -n "$installed_dir" ]; then
         rm -rf "$installed_dir"
