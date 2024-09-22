@@ -4,6 +4,7 @@ import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadConfig
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
+import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadComponent
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.SettingsComponent
@@ -46,13 +47,13 @@ import kotlin.system.exitProcess
 
 sealed interface AppEffects {
     data class SimpleNotificationNotification(
-        val notificationModel: NotificationModel
+        val notificationModel: NotificationModel,
     ) : AppEffects
 }
 
-interface NotificationSender{
-    fun sendDialogNotification(title: String,description: String,type: MessageDialogType)
-    fun sendNotification(tag: Any,title:String,description: String,type: NotificationType)
+interface NotificationSender {
+    fun sendDialogNotification(title: String, description: String, type: MessageDialogType)
+    fun sendNotification(tag: Any, title: String, description: String, type: NotificationType)
 }
 
 class AppComponent(
@@ -114,6 +115,28 @@ class AppComponent(
         key = "queues",
         childFactory = { _: QueuePageConfig, componentContext: ComponentContext ->
             QueuesComponent(componentContext, this::closeQueues)
+        }
+    ).subscribeAsStateFlow()
+
+    class BatchDownloadConfig
+
+    private val batchDownload = SlotNavigation<BatchDownloadConfig>()
+    val batchDownloadSlot = childSlot(
+        batchDownload,
+        serializer = null,
+        key = "batchDownload",
+        childFactory = { _: BatchDownloadConfig, componentContext: ComponentContext ->
+            BatchDownloadComponent(
+                ctx = componentContext,
+                onClose = this::closeBatchDownload,
+                importLinks = {
+                    openAddDownloadDialog(it.map {
+                        DownloadCredentials(
+                            link = it
+                        )
+                    })
+                }
+            )
         }
     ).subscribeAsStateFlow()
 
@@ -259,11 +282,11 @@ class AppComponent(
         type: MessageDialogType,
     ) {
         beep()
-        newDialogMessage(MessageDialogModel(title = title, description = description, type = type,))
+        newDialogMessage(MessageDialogModel(title = title, description = description, type = type))
     }
 
     private fun beep() {
-        if (appSettings.notificationSound.value){
+        if (appSettings.notificationSound.value) {
             Toolkit.getDefaultToolkit().beep()
         }
     }
@@ -285,6 +308,7 @@ class AppComponent(
             )
         )
     }
+
     init {
         downloadSystem
             .downloadEvents
@@ -309,6 +333,7 @@ class AppComponent(
                     IntegrationResult.Inactive -> {
                         IntegrationPortBroadcaster.setIntegrationPortInFile(null)
                     }
+
                     is IntegrationResult.Success -> {
                         IntegrationPortBroadcaster.setIntegrationPortInFile(it.port)
                     }
@@ -317,7 +342,7 @@ class AppComponent(
     }
 
     private fun onNewDownloadEvent(it: DownloadManagerEvents) {
-        if (it.context[ResumedBy]?.by !is User){
+        if (it.context[ResumedBy]?.by !is User) {
             //only notify events that is started by user
             return
         }
@@ -337,19 +362,19 @@ class AppComponent(
                 return
             }
             var isMaxTryReachedError = false
-            val actualCause = if (exception is TooManyErrorException){
-                isMaxTryReachedError=true
+            val actualCause = if (exception is TooManyErrorException) {
+                isMaxTryReachedError = true
                 exception.findActualDownloadErrorCause()
-            }else exception
+            } else exception
             if (ExceptionUtils.isNormalCancellation(actualCause)) {
                 return
             }
             val prefix = if (isMaxTryReachedError) {
                 "Too Many Error: "
-            }else{
+            } else {
                 "Error: "
             }
-            val reason = actualCause.message?:"Unknown"
+            val reason = actualCause.message ?: "Unknown"
             sendNotification(
                 "downloadId=${it.downloadItem.id}",
                 title = it.downloadItem.name,
@@ -369,7 +394,7 @@ class AppComponent(
 
     override suspend fun openDownloadItem(id: Long) {
         val item = downloadSystem.getDownloadItemById(id)
-        if (item==null){
+        if (item == null) {
             sendNotification(
                 "Open File",
                 "Can't open file",
@@ -380,6 +405,7 @@ class AppComponent(
         }
         openDownloadItem(item)
     }
+
     override fun openDownloadItem(downloadItem: DownloadItem) {
         runCatching {
             FileUtils.openFile(downloadSystem.getDownloadFile(downloadItem))
@@ -396,7 +422,7 @@ class AppComponent(
 
     override suspend fun openDownloadItemFolder(id: Long) {
         val item = downloadSystem.getDownloadItemById(id)
-        if (item==null){
+        if (item == null) {
             sendNotification(
                 "Open Folder",
                 "Can't open folder",
@@ -423,7 +449,7 @@ class AppComponent(
     }
 
     override fun openAddDownloadDialog(
-        links: List<DownloadCredentials>
+        links: List<DownloadCredentials>,
     ) {
         scope.launch {
             //remove duplicates
@@ -548,22 +574,23 @@ class AppComponent(
     }
 
     fun closeAbout() {
-        showAboutPage .update { false }
+        showAboutPage.update { false }
     }
 
     fun openOpenSourceLibraries() {
-        showOpenSourceLibraries .update { true }
+        showOpenSourceLibraries.update { true }
     }
+
     fun closeOpenSourceLibraries() {
-        showOpenSourceLibraries .update { false }
+        showOpenSourceLibraries.update { false }
     }
 
     fun openQueues() {
         scope.launch {
             showQueuesSlot.value.child?.instance.let {
-                if (it!=null){
+                if (it != null) {
                     it.bringToFront()
-                }else{
+                } else {
                     showQueues.activate(QueuePageConfig())
                 }
             }
@@ -572,6 +599,23 @@ class AppComponent(
 
     fun closeQueues() {
         showQueues.dismiss()
+    }
+
+    fun openBatchDownload() {
+        scope.launch {
+
+            batchDownloadSlot.value.child?.instance.let {
+                if (it != null) {
+                    it.bringToFront()
+                } else {
+                    batchDownload.activate(BatchDownloadConfig())
+                }
+            }
+        }
+    }
+
+    fun closeBatchDownload() {
+        batchDownload.dismiss()
     }
 
     var showCreateQueueDialog = MutableStateFlow(false)
@@ -613,10 +657,11 @@ class AppComponent(
             IntegrationPortBroadcaster.isInitialized(),
         ).all { it }
     }
-//    TODO enable updater
+
+    //    TODO enable updater
 //    val updater = UpdateComponent(childContext("updater"))
-    val showAboutPage=MutableStateFlow(false)
-    val showOpenSourceLibraries=MutableStateFlow(false)
+    val showAboutPage = MutableStateFlow(false)
+    val showOpenSourceLibraries = MutableStateFlow(false)
     val theme = appRepository.theme
 //    val uiScale = appRepository.uiScale
 }
