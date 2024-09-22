@@ -322,6 +322,7 @@ class HomeComponent(
         subMenu("File") {
             +newDownloadAction
             +newDownloadFromClipboardAction
+            +batchDownloadAction
             separator()
             +exitAction
 
