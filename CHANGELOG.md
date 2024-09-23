@@ -14,6 +14,21 @@
 
 ### Security
 
+## 1.1.0
+
+### Added
+
+- Added Batch Download
+- Added an option to merge TitleBar with MenuBar (disabled by default)
+- Added two cli options --version, --exit
+
+### Fixed
+
+- Fixed Opening downloaded file creates a subprocess in Windows
+- Fixed that some non-standard links not imported correctly
+- Improved window custom decoration logic and title bar position
+- Improved settings page
+
 ## 1.0.10
 
 ### Fixed
