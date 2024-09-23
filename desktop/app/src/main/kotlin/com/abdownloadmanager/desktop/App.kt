@@ -58,6 +58,9 @@ fun main(args: Array<String>) {
         AppArguments.init(args)
         AppProperties.boot()
         val appArguments = AppArguments.get()
+        if (appArguments.version) {
+            dispatchVersionAndExit()
+        }
         val singleInstance = SingleInstanceUtil(AppInfo.configDir.toOkioPath())
         if (appArguments.startIfNotStarted && !AppInfo.isInIDE()) {
             startAndWaitForRunIfNotRunning(singleInstance)
@@ -86,6 +89,11 @@ private fun startAppInAnotherProcess() {
 //        println("executing $it")
     }
     Runtime.getRuntime().exec(cmd)
+}
+
+private fun dispatchVersionAndExit(): Nothing {
+    print(AppInfo.version)
+    exitProcess(0)
 }
 
 private fun dispatchIntegrationPortAndExit(singleInstance: SingleInstanceUtil): Nothing {
