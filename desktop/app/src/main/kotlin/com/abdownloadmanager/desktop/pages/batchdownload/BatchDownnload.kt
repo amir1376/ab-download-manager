@@ -104,23 +104,23 @@ fun BatchDownload(
                             BatchDownloadPageTextField(
                                 text = start,
                                 onTextChange = setStart,
-                                placeholder = "Start",
-                                modifier = Modifier.width(80.dp),
+                                placeholder = "",
+                                modifier = Modifier.width(90.dp),
                                 start = {
-                                    Text("A", Modifier.padding(horizontal = 8.dp))
+                                    Text("From:", Modifier.padding(horizontal = 8.dp))
                                 }
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text("To")
+                            Text("...")
                             Spacer(Modifier.width(8.dp))
 
                             BatchDownloadPageTextField(
                                 text = end,
                                 onTextChange = setEnd,
-                                placeholder = "End",
-                                modifier = Modifier.width(80.dp),
+                                placeholder = "",
+                                modifier = Modifier.width(90.dp),
                                 start = {
-                                    Text("B", Modifier.padding(horizontal = 8.dp))
+                                    Text("To:", Modifier.padding(horizontal = 8.dp))
                                 }
                             )
                         }
@@ -155,13 +155,7 @@ fun BatchDownload(
                         Text("First Link")
                     },
                     content = {
-                        Text(
-                            component.startLinkResult.collectAsState().value,
-                            Modifier
-                                .fillMaxWidth()
-                                .background(myColors.surface)
-                                .padding(2.dp)
-                        )
+                        LinkPreview(component.startLinkResult.collectAsState().value)
                     }
                 )
                 Spacer(Modifier.height(8.dp))
@@ -170,13 +164,7 @@ fun BatchDownload(
                         Text("Last Link")
                     },
                     content = {
-                        Text(
-                            component.endLinkResult.collectAsState().value,
-                            Modifier
-                                .fillMaxWidth()
-                                .background(myColors.surface)
-                                .padding(2.dp)
-                        )
+                        LinkPreview(component.endLinkResult.collectAsState().value)
                     }
                 )
             }
@@ -195,6 +183,18 @@ fun BatchDownload(
             ActionButton("Cancel", onClick = component.onClose)
         }
     }
+}
+
+@Composable
+fun LinkPreview(link: String) {
+    Text(
+        link,
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(6.dp))
+            .background(myColors.surface)
+            .padding(vertical = 4.dp, horizontal = 6.dp)
+    )
 }
 
 enum class WildcardSelect {
