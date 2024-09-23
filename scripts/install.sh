@@ -5,16 +5,6 @@
 
 set -euo pipefail
 
-# Check if curl, jq, and tar are installed
-check_dependencies() {
-    for cmd in curl jq tar; do
-        if ! command -v "$cmd" &>/dev/null; then
-            print_message "Error: $cmd is not installed. Please install it and try again."
-            exit 1
-        fi
-    done
-}
-
 # Get the latest version of the app from the GitHub API
 get_latest_version() {
     curl -s https://api.github.com/repos/amir1376/ab-download-manager/releases/latest | jq -r '.tag_name'
@@ -25,8 +15,17 @@ PLATFORM="linux"
 EXT="tar.gz"
 LATEST_VERSION=$(get_latest_version)
 ASSET_NAME=${APP_NAME}_${LATEST_VERSION:1}_${PLATFORM}.${EXT}
-FOLDER_NAME=${APP_NAME}_${LATEST_VERSION}
-BINARY_PATH=$HOME/.local/$FOLDER_NAME/$APP_NAME/bin/$APP_NAME
+BINARY_PATH=$HOME/.local/$APP_NAME/bin/$APP_NAME
+
+# Check if curl, jq, and tar are installed
+check_dependencies() {
+    for cmd in curl jq tar; do
+        if ! command -v "$cmd" &>/dev/null; then
+            print_message "Error: $cmd is not installed. Please install it and try again."
+            exit 1
+        fi
+    done
+}
 
 # Get the download URL for the latest version of the app
 get_download_url() {
@@ -44,34 +43,16 @@ close_if_running() {
 
 # Delete the old version of the app if it exists
 delete_old_version() {
-    local installed_dir
     close_if_running
-    installed_dir=$(find "$HOME/.local" -maxdepth 1 -type d -name "ABDownloadManager_*" | head -n 1)
-    if [ -n "$installed_dir" ]; then
-        rm -rf "$installed_dir"
-        rm -rf "$HOME/.local/bin/$APP_NAME"
-        echo "Old version of AB Download Manager deleted"
-    fi
-}
-
-# Get the installed version of the app if it exists
-get_installed_version() {
-    local installed_dir
-    installed_dir=$(find "$HOME/.local" -maxdepth 1 -type d -name "ABDownloadManager_*" | head -n 1)
-    if [ -n "$installed_dir" ]; then
-        version=$(basename "$installed_dir" | sed -n 's/ABDownloadManager_v\(.*\)/\1/p')
-        echo "$version"
-        return 0
-    else
-        echo ""
-        return 1
-    fi
+    rm -rf "$HOME/.local/$APP_NAME"
+    rm -rf "$HOME/.local/bin/$APP_NAME"
+    echo "Old version of AB Download Manager deleted"
 }
 
 # Check if the app is installed
 check_if_installed() {
     local installed_version
-    installed_version=$(get_installed_version)
+    installed_version=$($APP_NAME --version 2>/dev/null)
     if [ -n "$installed_version" ]; then
         echo "$installed_version"
     else
@@ -87,7 +68,7 @@ Comment=Manage and organize your download files better than before
 GenericName=Downloader
 Categories=Utility;Network;
 Exec=$BINARY_PATH
-Icon=$HOME/.local/$FOLDER_NAME/$APP_NAME/lib/$APP_NAME.png
+Icon=$HOME/.local/$APP_NAME/lib/$APP_NAME.png
 Terminal=false
 Type=Application
 StartupWMClass=com-abdownloadmanager-desktop-AppKt"
@@ -106,8 +87,8 @@ download_zip() {
 # Install the app
 install_app() {
     echo "Installing AB Download Manager ..."
-    mkdir -p "$HOME/.local/$FOLDER_NAME"
-    tar -xzf "/tmp/$ASSET_NAME" -C "$HOME/.local/$FOLDER_NAME"
+    mkdir -p "$HOME/.local"
+    tar -xzf "/tmp/$ASSET_NAME" -C "$HOME/.local"
 
     # Setup ~/.local directories
     mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications"
@@ -128,8 +109,8 @@ update_app() {
     echo "Checking update..."
     if [ "$1" != "${LATEST_VERSION:1}" ]; then
         echo "An update is available: v${LATEST_VERSION:1}. Updating..."
-        delete_old_version
         download_zip
+        delete_old_version
         install_app
     else
         echo "You have the latest version installed."
