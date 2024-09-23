@@ -36,16 +36,27 @@ Please visit [Project Website](https://abdownloadmanager.com) for more info
 in order to download and install the app
 
 - You can visit [Project Website](https://abdownloadmanager.com) for Download Instructions
-- Or you can find download links for your OS from [GitHub Releases](https://github.com/amir1376/ab-download-manager/releases/latest)
-- Or use a package manager
+- using an installation script
+  - <details>
+    <summary>bash script (Linux)</summary>
+
+    you can run this to install or update existing installed version
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh | bash
+    ```
+
+    </details>
+- using a package manager
   - <details>
     <summary>scoop (for Windows)</summary>
-    
+
     ```bash
     scoop install extras/abdownloadmanager
     ```
-    
+
     </details>
+- Or you can find download links for your OS
+  from [GitHub Releases](https://github.com/amir1376/ab-download-manager/releases/latest)
 
 
 ## Screenshots
