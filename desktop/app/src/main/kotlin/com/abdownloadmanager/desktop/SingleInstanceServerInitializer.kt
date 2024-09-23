@@ -1,20 +1,16 @@
 package com.abdownloadmanager.desktop
 
-import com.abdownloadmanager.desktop.Commands.GET_INTEGRATION_PORT
-import com.abdownloadmanager.desktop.Commands.IS_READY
-import com.abdownloadmanager.desktop.Commands.SHOW_USER_THAT_APP_IS_RUNNING
+import com.abdownloadmanager.desktop.actions.exitAction
 import com.abdownloadmanager.desktop.utils.IntegrationPortBroadcaster
 import com.abdownloadmanager.desktop.utils.singleInstance.Command
 import com.abdownloadmanager.desktop.utils.singleInstance.MutableSingleInstanceServerHandler
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 object Commands {
-    const val IS_READY = "IS_READY"
-    const val SHOW_USER_THAT_APP_IS_RUNNING = "SHOW_USER_THAT_APP_IS_RUNNING"
-    const val GET_INTEGRATION_PORT = "GET_INTEGRATION_PORT"
     val isReady = Command<Boolean>("isReady")
     val showUserThatAppIsRunning = Command<Unit>("showUserThatAppIsRunning")
     val getIntegrationPort = Command<Int>("getIntegrationPort")
+    val exit = Command<Unit>("exit")
 }
 object SingleInstanceServerInitializer:KoinComponent {
     private val appComponent by inject<AppComponent> ()
@@ -28,6 +24,9 @@ object SingleInstanceServerInitializer:KoinComponent {
         }
         mutableHandler.add(Commands.isReady){
             appComponent.isReady()
+        }
+        mutableHandler.add(Commands.exit) {
+            exitAction()
         }
     }
 }

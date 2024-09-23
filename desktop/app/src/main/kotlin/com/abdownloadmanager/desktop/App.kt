@@ -62,6 +62,9 @@ fun main(args: Array<String>) {
             dispatchVersionAndExit()
         }
         val singleInstance = SingleInstanceUtil(AppInfo.configDir.toOkioPath())
+        if (appArguments.exit) {
+            exitExistingProcessAndExit(singleInstance)
+        }
         if (appArguments.startIfNotStarted && !AppInfo.isInIDE()) {
             startAndWaitForRunIfNotRunning(singleInstance)
         }
@@ -96,10 +99,15 @@ private fun dispatchVersionAndExit(): Nothing {
     exitProcess(0)
 }
 
+private fun exitExistingProcessAndExit(singleInstance: SingleInstanceUtil): Nothing {
+    singleInstance.sendToInstance(Commands.exit)
+    exitProcess(0)
+}
+
 private fun dispatchIntegrationPortAndExit(singleInstance: SingleInstanceUtil): Nothing {
     val port =
-            singleInstance.sendToInstance(Commands.getIntegrationPort)
-                .orElse { IntegrationPortBroadcaster.INTEGRATION_UNKNOWN }
+        singleInstance.sendToInstance(Commands.getIntegrationPort)
+            .orElse { IntegrationPortBroadcaster.INTEGRATION_UNKNOWN }
     print(port)
     exitProcess(0)
 }
