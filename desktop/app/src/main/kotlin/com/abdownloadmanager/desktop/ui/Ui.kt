@@ -25,6 +25,7 @@ import com.abdownloadmanager.desktop.utils.isInDebugMode
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.*
+import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import com.abdownloadmanager.utils.compose.ProvideDebugInfo
@@ -70,6 +71,10 @@ object Ui : KoinComponent {
                             val showQueuesSlot = appComponent.showQueuesSlot.collectAsState().value
                             showQueuesSlot.child?.instance?.let {
                                 QueuesWindow(it)
+                            }
+                            val batchDownloadSlot = appComponent.batchDownloadSlot.collectAsState().value
+                            batchDownloadSlot.child?.instance?.let {
+                                BatchDownloadWindow(it)
                             }
                             ShowAddDownloadDialogs(appComponent)
                             ShowDownloadDialogs(appComponent)

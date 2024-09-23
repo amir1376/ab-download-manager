@@ -58,7 +58,13 @@ fun main(args: Array<String>) {
         AppArguments.init(args)
         AppProperties.boot()
         val appArguments = AppArguments.get()
+        if (appArguments.version) {
+            dispatchVersionAndExit()
+        }
         val singleInstance = SingleInstanceUtil(AppInfo.configDir.toOkioPath())
+        if (appArguments.exit) {
+            exitExistingProcessAndExit(singleInstance)
+        }
         if (appArguments.startIfNotStarted && !AppInfo.isInIDE()) {
             startAndWaitForRunIfNotRunning(singleInstance)
         }
@@ -88,10 +94,20 @@ private fun startAppInAnotherProcess() {
     Runtime.getRuntime().exec(cmd)
 }
 
+private fun dispatchVersionAndExit(): Nothing {
+    print(AppInfo.version)
+    exitProcess(0)
+}
+
+private fun exitExistingProcessAndExit(singleInstance: SingleInstanceUtil): Nothing {
+    singleInstance.sendToInstance(Commands.exit)
+    exitProcess(0)
+}
+
 private fun dispatchIntegrationPortAndExit(singleInstance: SingleInstanceUtil): Nothing {
     val port =
-            singleInstance.sendToInstance(Commands.getIntegrationPort)
-                .orElse { IntegrationPortBroadcaster.INTEGRATION_UNKNOWN }
+        singleInstance.sendToInstance(Commands.getIntegrationPort)
+            .orElse { IntegrationPortBroadcaster.INTEGRATION_UNKNOWN }
     print(port)
     exitProcess(0)
 }

@@ -50,7 +50,12 @@ val newDownloadFromClipboardAction = simpleAction(
     }
     appComponent.openAddDownloadDialog(items)
 }
-
+val batchDownloadAction = simpleAction(
+    title = "Batch Download",
+    icon = MyIcons.download
+) {
+    appComponent.openBatchDownload()
+}
 val stopQueueGroupAction = MenuItem.SubMenu(
     icon = MyIcons.stop,
     title = "Stop Queue",

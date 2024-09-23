@@ -5,6 +5,8 @@ data class AppArguments(
     val startIfNotStarted: Boolean,
     val startSilent: Boolean,
     val debug: Boolean,
+    val version: Boolean,
+    val exit: Boolean,
 ) {
     companion object {
         private lateinit var instance: AppArguments
@@ -23,6 +25,8 @@ data class AppArguments(
                 startIfNotStarted = args.contains(Args.START_IF_NOT_STARTED),
                 startSilent = args.contains(Args.BACKGROUND),
                 debug = args.contains(Args.DEBUG),
+                version = args.contains(Args.VERSION),
+                exit = args.contains(Args.EXIT),
             )
         }
     }
@@ -32,5 +36,7 @@ data class AppArguments(
         const val BACKGROUND = "--background"
         const val GET_INTEGRATION_PORT = "--get-integration-port"
         const val DEBUG = "--debug"
+        const val VERSION = "--version"
+        const val EXIT = "--exit"
     }
 }
