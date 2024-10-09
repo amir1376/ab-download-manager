@@ -91,6 +91,7 @@ jobs:
         with:
           prerelease: ${{ !steps.version.outputs.is_stable }}
           make_latest: legacy
+          draft: true
           files: |
             release/binaries/*
           body_path: release/release-notes.md
