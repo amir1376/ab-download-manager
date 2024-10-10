@@ -15,16 +15,17 @@ sealed interface MenuItem {
         val title: StateFlow<String>
     }
 
-    interface CanBeModified{
+    interface CanBeModified {
         fun setIcon(icon: IconSource?)
-        fun setTitle(title:String)
+        fun setTitle(title: String)
     }
 
     interface HasEnable {
         //compose aware property
         val isEnabled: StateFlow<Boolean>
     }
-    interface CanChangeEnabled{
+
+    interface CanChangeEnabled {
         fun setEnabled(boolean: Boolean)
     }
 
@@ -34,7 +35,7 @@ sealed interface MenuItem {
 
     abstract class SingleItem(
         title: String,
-        icon: IconSource?=null,
+        icon: IconSource? = null,
     ) : MenuItem,
         ClickableItem,
         ReadableItem,
@@ -44,14 +45,13 @@ sealed interface MenuItem {
         var shouldDismissOnClick: Boolean = true
 
 
-
         private val _title: MutableStateFlow<String> = MutableStateFlow(title)
         private val _icon: MutableStateFlow<IconSource?> = MutableStateFlow(icon)
         private val _isEnabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
         override val title: StateFlow<String> = _title.asStateFlow()
-        override val icon: StateFlow<IconSource?> = MutableStateFlow(icon)
-        override val isEnabled: StateFlow<Boolean> = MutableStateFlow(true)
+        override val icon: StateFlow<IconSource?> = _icon.asStateFlow()
+        override val isEnabled: StateFlow<Boolean> = _isEnabled.asStateFlow()
 
         override fun setEnabled(boolean: Boolean) {
             _isEnabled.update { boolean }
@@ -88,8 +88,8 @@ sealed interface MenuItem {
         override var icon: StateFlow<IconSource?> = _icon.asStateFlow()
         override var title: StateFlow<String> = _title.asStateFlow()
 
-        val items:StateFlow<List<MenuItem>> = _items.asStateFlow()
-        fun setItems(newItems:List<MenuItem>){
+        val items: StateFlow<List<MenuItem>> = _items.asStateFlow()
+        fun setItems(newItems: List<MenuItem>) {
             _items.update { newItems }
         }
 
