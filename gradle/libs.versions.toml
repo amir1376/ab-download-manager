@@ -117,6 +117,8 @@ arrow-opticKsp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref =
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 osThemeDetector = { module = "com.github.Dansoftowner:jSystemThemeDetector", version.ref = "osThemeDetector" }
 
+handlebarsJava = "com.github.jknack:handlebars:4.4.0"
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
