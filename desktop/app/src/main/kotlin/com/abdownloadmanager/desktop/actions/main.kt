@@ -4,7 +4,6 @@ import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.widget.menu.SubMenu
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
 import ir.amirab.util.compose.action.AnAction
@@ -87,7 +86,7 @@ val startQueueGroupAction = MenuItem.SubMenu(
 }
 
 
-val stopAction = simpleAction("Stop All", MyIcons.stop) {
+val stopAllAction = simpleAction("Stop All", MyIcons.stop) {
     scope.launch {
         downloadSystem.stopAnything()
     }
