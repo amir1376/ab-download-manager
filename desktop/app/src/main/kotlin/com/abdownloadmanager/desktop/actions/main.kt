@@ -18,6 +18,7 @@ import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.inactiveQueuesFlow
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import ir.amirab.util.UrlUtils
+import ir.amirab.util.flow.combineStateFlows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,6 +27,15 @@ import org.koin.core.component.get
 private val appComponent = Di.get<AppComponent>()
 private val scope = Di.get<CoroutineScope>()
 private val downloadSystem = appComponent.downloadSystem
+
+private val activeQueuesFlow = downloadSystem
+    .queueManager
+    .activeQueuesFlow(scope)
+    .stateIn(
+        scope,
+        SharingStarted.WhileSubscribed(),
+        emptyList()
+    )
 
 val newDownloadAction = simpleAction(
     "New Download",
@@ -60,8 +70,7 @@ val stopQueueGroupAction = MenuItem.SubMenu(
     title = "Stop Queue",
     items = emptyList()
 ).apply {
-    appComponent.downloadSystem.queueManager
-        .activeQueuesFlow(scope)
+    activeQueuesFlow
         .onEach {
             setItems(it.map {
                 stopQueueAction(it)
@@ -86,15 +95,20 @@ val startQueueGroupAction = MenuItem.SubMenu(
 }
 
 
-val stopAllAction = simpleAction("Stop All", MyIcons.stop) {
+val stopAllAction = simpleAction(
+    "Stop All",
+    MyIcons.stop,
+    checkEnable = combineStateFlows(
+        downloadSystem.downloadMonitor.activeDownloadCount,
+        activeQueuesFlow
+    ) { downloadCount, activeQueues ->
+        downloadCount > 0 || activeQueues.isNotEmpty()
+    }
+) {
     scope.launch {
         downloadSystem.stopAnything()
     }
 }.apply {
-    downloadSystem.downloadMonitor.activeDownloadCount
-        .onEach {
-            setEnabled( it > 0)
-        }.launchIn(scope)
 }
 
 val exitAction = simpleAction(
@@ -108,7 +122,7 @@ val browserIntegrations = MenuItem.SubMenu(
     title = "Download Browser Integration",
     icon = MyIcons.download,
     items = buildMenu {
-        for (browserExtension in SharedConstants.browserIntegrations){
+        for (browserExtension in SharedConstants.browserIntegrations) {
             item(
                 title = browserExtension.type.getName(),
                 icon = browserExtension.type.getIcon(),
@@ -130,6 +144,7 @@ val showDownloadList = simpleAction(
 ) {
     appComponent.openHome()
 }
+
 /*val checkForUpdateAction = simpleAction(
     title = "Check For Update",
     icon = MyIcons.refresh,
@@ -153,17 +168,17 @@ val supportActionGroup = MenuItem.SubMenu(
     title = "Support & Community",
     icon = MyIcons.group,
     items = buildMenu {
-        item("Website",MyIcons.appIcon){
+        item("Website", MyIcons.appIcon) {
             UrlUtils.openUrl(AppInfo.website)
         }
-        item("Source Code",MyIcons.openSource){
+        item("Source Code", MyIcons.openSource) {
             UrlUtils.openUrl(AppInfo.sourceCode)
         }
-        subMenu("Telegram",MyIcons.telegram){
-            item("Channel",MyIcons.speaker){
+        subMenu("Telegram", MyIcons.telegram) {
+            item("Channel", MyIcons.speaker) {
                 UrlUtils.openUrl(SharedConstants.telegramChannelUrl)
             }
-            item("Group",MyIcons.group){
+            item("Group", MyIcons.group) {
                 UrlUtils.openUrl(SharedConstants.telegramGroupUrl)
             }
         }
