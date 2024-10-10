@@ -1,0 +1,14 @@
+name: Publish to Winget
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: vedantmgoyal9/winget-releaser@main
+        with:
+          identifier: amir1376.ABDownloadManager
+          token: ${{ secrets.WINGET_TOKEN }}
