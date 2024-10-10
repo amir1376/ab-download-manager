@@ -332,7 +332,7 @@ class HomeComponent(
             +startQueueGroupAction
             +stopQueueGroupAction
             separator()
-            +stopAction
+            +stopAllAction
             separator()
             subMenu(
                 title = "Remove",
@@ -370,15 +370,6 @@ class HomeComponent(
     }.filterIsInstance<MenuItem.SubMenu>()
 
 
-    val headerActions = buildMenu {
-        separator()
-        +startQueueGroupAction
-        +stopQueueGroupAction
-        +stopAction
-        separator()
-        +openQueuesAction
-        +gotoSettingsAction
-    }
 
     private val shouldShowOptions = MutableStateFlow(false)
     val downloadOptions = combineStateFlows(
@@ -662,6 +653,18 @@ class HomeComponent(
         "ctrl R" to downloadActions.resumeAction
         "DELETE" to downloadActions.deleteAction
         "ctrl I" to downloadActions.openDownloadDialogAction
+    }
+    val headerActions = buildMenu {
+        separator()
+        +downloadActions.resumeAction
+        +downloadActions.pauseAction
+        separator()
+        +startQueueGroupAction
+        +stopQueueGroupAction
+        +stopAllAction
+        separator()
+        +openQueuesAction
+        +gotoSettingsAction
     }
 
     companion object {
