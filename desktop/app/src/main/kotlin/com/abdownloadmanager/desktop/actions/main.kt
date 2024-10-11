@@ -12,6 +12,7 @@ import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.action.simpleAction
 import com.abdownloadmanager.desktop.utils.getIcon
 import com.abdownloadmanager.desktop.utils.getName
+import com.abdownloadmanager.utils.category.Category
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.activeQueuesFlow
@@ -203,6 +204,21 @@ fun moveToQueueAction(
                 .addToQueue(
                     queueId = queue.id,
                     downloadIds = itemId,
+                )
+        }
+    }
+}
+fun createMoveToCategoryAction(
+    category: Category,
+    itemIds: List<Long>,
+): AnAction {
+    return simpleAction(category.name) {
+        scope.launch {
+            downloadSystem
+                .categoryManager
+                .addItemsToCategory(
+                    categoryId = category.id,
+                    itemIds = itemIds,
                 )
         }
     }

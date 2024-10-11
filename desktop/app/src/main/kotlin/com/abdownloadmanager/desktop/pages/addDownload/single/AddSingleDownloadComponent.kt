@@ -27,6 +27,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.CategoryManager
 
 sealed interface AddSingleDownloadPageEffects {
     data class SuggestUrl(val link: String) : AddSingleDownloadPageEffects
@@ -35,10 +38,11 @@ sealed interface AddSingleDownloadPageEffects {
 class AddSingleDownloadComponent(
     ctx: ComponentContext,
     val onRequestClose: () -> Unit,
-    val onRequestDownload: (DownloadItem, OnDuplicateStrategy) -> Unit,
-    val onRequestAddToQueue: (DownloadItem, queueId: Long?, OnDuplicateStrategy) -> Unit,
+    val onRequestDownload: OnRequestDownloadSingleItem,
+    val onRequestAddToQueue: OnRequestAddSingleItem,
+    val onRequestAddCategory: () -> Unit,
     val openExistingDownload: (Long) -> Unit,
-    private val downloadItemOpener:DownloadItemOpener,
+    private val downloadItemOpener: DownloadItemOpener,
     id: String,
 ) : AddDownloadComponent(ctx, id),
     KoinComponent,
@@ -47,6 +51,44 @@ class AddSingleDownloadComponent(
     private val appSettings: AppRepository by inject()
     private val client: DownloaderClient by inject()
     val downloadSystem: DownloadSystem by inject()
+    val iconProvider: FileIconProvider by inject()
+
+    private val categoryManager: CategoryManager by inject()
+
+    val categories = categoryManager.categoriesFlow
+    private val _selectedCategory: MutableStateFlow<Category?> = MutableStateFlow(categories.value.firstOrNull())
+    val selectedCategory = _selectedCategory.asStateFlow()
+
+    private val _useCategory = MutableStateFlow(false)
+    val useCategory = _useCategory.asStateFlow()
+    fun setUseCategory(value: Boolean) {
+        _useCategory.update { value }
+        if (value) {
+            useCategoryFolder()
+        } else {
+            useDefaultFolder()
+        }
+    }
+
+    private fun useCategoryFolder() {
+        val category = selectedCategory.value
+        if (useCategory.value && category != null) {
+            setFolder(category.path)
+        }
+    }
+
+    private fun useDefaultFolder() {
+        setFolder(appSettings.saveLocation.value)
+    }
+
+
+    fun setSelectedCategory(category: Category) {
+        _selectedCategory.update { category }
+        if (useCategory.value) {
+            useCategoryFolder()
+        }
+    }
+
 
     private val downloadChecker = DownloadUiChecker(
         initialFolder = appSettings.saveLocation.value,
@@ -86,6 +128,16 @@ class AddSingleDownloadComponent(
         )
             .onEachLatest { onDuplicateStrategy.update { null } }
             .launchIn(scope)
+
+        name.onEach {
+            val category = categoryManager.getCategoryOfFileName(it)
+            if (category == null) {
+                setUseCategory(false)
+            } else {
+                setUseCategory(true)
+                setSelectedCategory(category)
+            }
+        }.launchIn(scope)
     }
 
     private var wasOpened = false
@@ -147,12 +199,14 @@ class AddSingleDownloadComponent(
         this.length,
         this.speedLimit,
         this.threadCount
-    ) { credentials,
-        folder,
-        name,
-        length,
-        speedLimit,
-        threadCount ->
+    ) {
+            credentials,
+            folder,
+            name,
+            length,
+            speedLimit,
+            threadCount,
+        ->
         DownloadItem(
             id = -1,
             folder = folder,
@@ -245,18 +299,44 @@ class AddSingleDownloadComponent(
     fun onRequestDownload() {
         val item = downloadItem.value
         consumeDialog {
-            addToLastUsedLocations(item.folder)
-            onRequestDownload(item, onDuplicateStrategy.value.orDefault())
+            saveLocationIfNecessary(item.folder)
+            onRequestDownload(
+                item,
+                onDuplicateStrategy.value.orDefault(),
+                selectedCategory.value?.id
+            )
         }
     }
+
+    private fun saveLocationIfNecessary(folder: String) {
+        val category = selectedCategory.value?.takeIf {
+            useCategory.value
+        }
+        val shouldAdd = if (category == null) {
+            // always add if user don't use category
+            true
+        } else {
+            // only add if category path is not the same as provided path
+            category.path != folder
+        }
+        if (shouldAdd) {
+            addToLastUsedLocations(folder)
+        }
+    }
+
 
     fun onRequestAddToQueue(
         queueId: Long?,
     ) {
         val downloadItem = downloadItem.value
         consumeDialog {
-            addToLastUsedLocations(downloadItem.folder)
-            onRequestAddToQueue(downloadItem, queueId, onDuplicateStrategy.value.orDefault())
+            saveLocationIfNecessary(downloadItem.folder)
+            onRequestAddToQueue(
+                downloadItem,
+                queueId,
+                onDuplicateStrategy.value.orDefault(),
+                selectedCategory.value?.id
+            )
         }
     }
 
@@ -273,19 +353,19 @@ class AddSingleDownloadComponent(
     var shouldShowAddToQueue by mutableStateOf(false)
 
     val shouldShowOpenFile = combine(
-        onDuplicateStrategy,canAddResult,
-    ){onDuplicateStrategy, result ->
-        if (result is CanAddResult.DownloadAlreadyExists && onDuplicateStrategy==null){
+        onDuplicateStrategy, canAddResult,
+    ) { onDuplicateStrategy, result ->
+        if (result is CanAddResult.DownloadAlreadyExists && onDuplicateStrategy == null) {
             val item = downloadSystem.getDownloadItemById(result.itemId) ?: return@combine false
-            if (item.status!=DownloadStatus.Completed){
+            if (item.status != DownloadStatus.Completed) {
                 return@combine false
             }
             downloadSystem.getDownloadFile(item).exists()
-        }else false
-    }.stateIn(scope, SharingStarted.WhileSubscribed(),false)
+        } else false
+    }.stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
-    fun openExistingFile(){
-        val itemId= (canAddResult.value as? CanAddResult.DownloadAlreadyExists)?.itemId?:return
+    fun openExistingFile() {
+        val itemId = (canAddResult.value as? CanAddResult.DownloadAlreadyExists)?.itemId ?: return
         consumeDialog {
             scope.launch {
                 downloadItemOpener.openDownloadItem(itemId)
@@ -293,4 +373,25 @@ class AddSingleDownloadComponent(
             }
         }
     }
+
+    fun addNewCategory() {
+        onRequestAddCategory()
+    }
+}
+
+fun interface OnRequestAddSingleItem {
+    operator fun invoke(
+        item: DownloadItem,
+        queueId: Long?,
+        onDuplicateStrategy: OnDuplicateStrategy,
+        categoryId: Long?,
+    )
+}
+
+fun interface OnRequestDownloadSingleItem {
+    operator fun invoke(
+        item: DownloadItem,
+        onDuplicateStrategy: OnDuplicateStrategy,
+        categoryId: Long?,
+    )
 }

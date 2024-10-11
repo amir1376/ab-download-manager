@@ -1,5 +1,7 @@
 package com.abdownloadmanager.desktop.utils
 
+import com.abdownloadmanager.utils.category.CategoryManager
+import com.abdownloadmanager.utils.category.CategorySelectionMode
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.db.IDownloadListDb
 import ir.amirab.downloader.downloaditem.DownloadItem
@@ -26,6 +28,7 @@ import java.io.File
 class DownloadSystem(
     val downloadManager: DownloadManager,
     val queueManager: QueueManager,
+    val categoryManager: CategoryManager,
     val downloadMonitor: IDownloadMonitor,
     private val scope: CoroutineScope,
     private val downloadListDB: IDownloadListDb,
@@ -40,6 +43,7 @@ class DownloadSystem(
         foldersRegistry.boot()
         queueManager.boot()
         downloadManager.boot()
+        categoryManager.boot()
         booted.update { true }
     }
 
@@ -47,33 +51,62 @@ class DownloadSystem(
         newItemsToAdd: List<DownloadItem>,
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
         queueId: Long? = null,
+        categorySelectionMode: CategorySelectionMode? = null,
     ): List<Long> {
-        return newItemsToAdd.map {
+        val createdIds = newItemsToAdd.map {
             downloadManager.addDownload(it, onDuplicateStrategy(it))
-        }.also { ids ->
+        }
+        createdIds.also { ids ->
             queueId?.let {
                 queueManager.addToQueue(
                     it, ids
                 )
             }
         }
+        categorySelectionMode?.let {
+            when (it) {
+                CategorySelectionMode.Auto -> {
+                    categoryManager.autoAddItemsToCategoriesBasedOnFileNames(
+                        createdIds.mapIndexed { index: Int, id: Long ->
+                            id to newItemsToAdd.get(index).name
+                        }
+                    )
+                }
+
+                is CategorySelectionMode.Fixed -> {
+                    categoryManager.addItemsToCategory(
+                        it.categoryId,
+                        createdIds,
+                    )
+                }
+            }
+        }
+        return createdIds
     }
 
     suspend fun addDownload(
         downloadItem: DownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
         queueId: Long?,
+        categoryId: Long?,
         context: DownloadItemContext = EmptyContext,
     ): Long {
         val downloadId = downloadManager.addDownload(downloadItem, onDuplicateStrategy, context)
         queueId?.let {
             queueManager.addToQueue(queueId, downloadId)
         }
+        categoryId?.let {
+            categoryManager.addItemsToCategory(
+                categoryId = categoryId,
+                itemIds = listOf(downloadId)
+            )
+        }
         return downloadId
     }
 
     suspend fun removeDownload(id: Long, alsoRemoveFile: Boolean) {
         downloadManager.deleteDownload(id, alsoRemoveFile,RemovedBy(User))
+        categoryManager.removeItemInCategories(listOf(id))
     }
 
     suspend fun manualResume(id: Long): Boolean {
@@ -144,7 +177,12 @@ class DownloadSystem(
             val id = items.sortedByDescending { it.dateAdded }.first().id
             return id
         }
-        val id = addDownload(downloadItem, OnDuplicateStrategy.AddNumbered, null)
+        val id = addDownload(
+            downloadItem = downloadItem,
+            onDuplicateStrategy = OnDuplicateStrategy.AddNumbered,
+            queueId = null,
+            categoryId = null,
+        )
         return id
     }
 

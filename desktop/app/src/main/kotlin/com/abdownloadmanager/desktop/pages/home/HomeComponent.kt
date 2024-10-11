@@ -5,7 +5,6 @@ import com.abdownloadmanager.desktop.actions.*
 import com.abdownloadmanager.desktop.pages.home.sections.DownloadListCells
 import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
 import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadStatusCategoryFilter
-import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadTypeCategoryFilter
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.widget.NotificationType
@@ -21,7 +20,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.CategoryManager
+import com.abdownloadmanager.utils.category.DefaultCategories
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
@@ -32,6 +36,7 @@ import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -43,7 +48,7 @@ import java.net.URI
 @Stable
 class FilterState {
     var textToSearch by mutableStateOf("")
-    var typeCategoryFilter by mutableStateOf(null as DownloadTypeCategoryFilter?)
+    var typeCategoryFilter by mutableStateOf(null as Category?)
     var statusFilter by mutableStateOf<DownloadStatusCategoryFilter>(DefinedStatusCategories.All)
 }
 
@@ -53,6 +58,13 @@ sealed interface HomeEffects {
     data class DeleteItems(
         val list: List<Long>,
     ) : HomeEffects
+
+    data class DeleteCategory(
+        val category: Category,
+    ) : HomeEffects
+
+    data object ResetCategoriesToDefault : HomeEffects
+    data object AutoCategorize : HomeEffects
 }
 
 
@@ -63,6 +75,7 @@ class DownloadActions(
     val selections: StateFlow<List<IDownloadItemState>>,
     private val mainItem: StateFlow<Long?>,
     private val queueManager: QueueManager,
+    private val categoryManager: CategoryManager,
     private val openFile: (Long) -> Unit,
     private val openFolder: (Long) -> Unit,
     private val requestDelete: (List<Long>) -> Unit,
@@ -214,6 +227,28 @@ class DownloadActions(
             setItems(list)
         }.launchIn(scope)
     }
+    private val moveToCategoryAction = MenuItem.SubMenu(
+        title = "Move To Category",
+        items = emptyList()
+    ).apply {
+        merge(
+            categoryManager.categoriesFlow.mapStateFlow {
+                it.map(Category::id)
+            },
+            selections
+        ).onEach {
+            val categories = categoryManager.categoriesFlow.value
+            val list = categories.map { category ->
+                createMoveToCategoryAction(
+                    category = category,
+                    itemIds = selections.value.map { iDownloadItemState ->
+                        iDownloadItemState.id
+                    }
+                )
+            }
+            setItems(list)
+        }.launchIn(scope)
+    }
 
 
     val menu: List<MenuItem> = buildMenu {
@@ -226,9 +261,114 @@ class DownloadActions(
         +(reDownloadAction)
         separator()
         +moveToQueueItems
+        +moveToCategoryAction
         separator()
         +(copyDownloadLinkAction)
         +(openDownloadDialogAction)
+    }
+}
+
+@Stable
+class CategoryActions(
+    private val scope: CoroutineScope,
+    private val categoryManager: CategoryManager,
+    private val defaultCategories: DefaultCategories,
+
+    val categoryItem: Category?,
+
+    private val openFolder: (Category) -> Unit,
+    private val requestDelete: (Category) -> Unit,
+    private val requestEdit: (Category) -> Unit,
+
+    private val onRequestResetToDefaults: () -> Unit,
+    private val onRequestCategorizeItems: () -> Unit,
+    private val onRequestAddCategory: () -> Unit,
+) {
+    private val mainItemExists = MutableStateFlow(categoryItem != null)
+    private inline fun useItem(
+        block: (Category) -> Unit,
+    ) {
+        categoryItem?.let(block)
+    }
+
+    val openCategoryFolderAction = simpleAction(
+        title = "Open Folder",
+        icon = MyIcons.folderOpen,
+        checkEnable = mainItemExists,
+        onActionPerformed = {
+            scope.launch {
+                useItem {
+                    openFolder(it)
+                }
+            }
+        }
+    )
+
+    val deleteAction = simpleAction(
+        title = "Delete Category",
+        icon = MyIcons.remove,
+        checkEnable = mainItemExists,
+        onActionPerformed = {
+            scope.launch {
+                useItem {
+                    requestDelete(it)
+                }
+            }
+        },
+    )
+    val editAction = simpleAction(
+        title = "Edit Category",
+        icon = MyIcons.settings,
+        checkEnable = mainItemExists,
+        onActionPerformed = {
+            scope.launch {
+                useItem {
+                    requestEdit(it)
+                }
+            }
+        },
+    )
+
+    val addCategoryAction = simpleAction(
+        title = "Add Category",
+        icon = MyIcons.add,
+        onActionPerformed = {
+            scope.launch {
+                onRequestAddCategory()
+            }
+        },
+    )
+    val categorizeItemsAction = simpleAction(
+        title = "Auto Categorise Items",
+        icon = MyIcons.refresh,
+        onActionPerformed = {
+            scope.launch {
+                onRequestCategorizeItems()
+            }
+        },
+    )
+    val resetToDefaultAction = simpleAction(
+        title = "Restore Defaults",
+        icon = MyIcons.undo,
+        checkEnable = categoryManager
+            .categoriesFlow
+            .mapStateFlow { !defaultCategories.isDefault(it) },
+        onActionPerformed = {
+            scope.launch {
+                onRequestResetToDefaults()
+            }
+        },
+    )
+
+    val menu: List<MenuItem> = buildMenu {
+        +editAction
+        +openCategoryFolderAction
+        +deleteAction
+        separator()
+        +addCategoryAction
+        separator()
+        +categorizeItemsAction
+        +resetToDefaultAction
     }
 }
 
@@ -237,6 +377,7 @@ class HomeComponent(
     private val downloadItemOpener: DownloadItemOpener,
     private val downloadDialogManager: DownloadDialogManager,
     private val addDownloadDialogManager: AddDownloadDialogManager,
+    private val categoryDialogManager: CategoryDialogManager,
     private val notificationSender: NotificationSender,
 ) : BaseComponent(ctx),
     ContainsShortcuts,
@@ -250,6 +391,10 @@ class HomeComponent(
     val mergeTopBarWithTitleBar = appSettings.mergeTopBarWithTitleBar
 
     private val homePageStateToPersist = MutableStateFlow(pageStorage.homePageStorage.value)
+
+    val categoryManager: CategoryManager by inject()
+    private val defaultCategories: DefaultCategories by inject()
+    val fileIconProvider: FileIconProvider by inject()
 
     init {
         homePageStateToPersist
@@ -296,12 +441,37 @@ class HomeComponent(
         sendEffect(HomeEffects.DeleteItems(downloadList))
     }
 
+    fun onConfirmDeleteCategory(promptState: CategoryDeletePromptState) {
+        scope.launch {
+            categoryManager.deleteCategory(promptState.category)
+        }
+    }
+
     fun confirmDelete(promptState: DeletePromptState) {
         scope.launch {
             val selectionList = promptState.downloadList
             for (id in selectionList) {
                 downloadSystem.removeDownload(id, promptState.alsoDeleteFile)
             }
+        }
+    }
+
+    fun onConfirmAutoCategorize() {
+        val categorizedItems = categoryManager.getCategories()
+            .flatMap { it.items }
+        val allDownloads = activeDownloadList.value + completedList.value
+        val unCategorizedItems = allDownloads.filterNot {
+            it.id in categorizedItems
+        }
+        categoryManager
+            .autoAddItemsToCategoriesBasedOnFileNames(
+                unCategorizedItems.map { it.id to it.name }
+            )
+    }
+
+    fun onConfirmResetCategories() {
+        scope.launch {
+            categoryManager.reset()
         }
     }
 
@@ -368,7 +538,6 @@ class HomeComponent(
             +openAboutAction
         }
     }.filterIsInstance<MenuItem.SubMenu>()
-
 
 
     private val shouldShowOptions = MutableStateFlow(false)
@@ -465,7 +634,7 @@ class HomeComponent(
 
     fun onFilterChange(
         statusCategoryFilter: DownloadStatusCategoryFilter,
-        typeCategoryFilter: DownloadTypeCategoryFilter?,
+        typeCategoryFilter: Category?,
     ) {
         this.filterState.statusFilter = statusCategoryFilter
         this.filterState.typeCategoryFilter = typeCategoryFilter
@@ -546,6 +715,14 @@ class HomeComponent(
             emptyList()
         )
 
+    init {
+        categoryManager.categoriesFlow.onEach { categories ->
+            val currentCategory = filterState.typeCategoryFilter ?: return@onEach
+            filterState.typeCategoryFilter = categories.find {
+                it.id == currentCategory.id
+            }
+        }.launchIn(scope)
+    }
 
     val downloadList = merge(
         snapshotFlow { filterState.textToSearch },
@@ -558,7 +735,8 @@ class HomeComponent(
             (activeDownloadList.value + completedList.value)
                 .filter {
                     val statusAccepted = filterState.statusFilter.accept(it)
-                    val typeAccepted = filterState.typeCategoryFilter?.accept(it) ?: true
+//                    val typeAccepted = filterState.typeCategoryFilter?.accept(it.name) ?: true
+                    val typeAccepted = filterState.typeCategoryFilter?.items?.contains(it.id) ?: true
                     val searchAccepted = it.name.contains(filterState.textToSearch, ignoreCase = true)
                     typeAccepted && statusAccepted && searchAccepted
                 }
@@ -630,16 +808,54 @@ class HomeComponent(
 
 
     private val downloadActions = DownloadActions(
-        scope,
-        downloadSystem,
-        downloadDialogManager,
-        selectionListItems,
-        mainItem,
-        queueManager,
-        this::openFile,
-        this::openFolder,
-        this::requestDelete,
+        scope = scope,
+        downloadSystem = downloadSystem,
+        downloadDialogManager = downloadDialogManager,
+        selections = selectionListItems,
+        mainItem = mainItem,
+        queueManager = queueManager,
+        categoryManager = categoryManager,
+        openFile = this::openFile,
+        openFolder = this::openFolder,
+        requestDelete = this::requestDelete,
     )
+    val categoryActions = MutableStateFlow(null as CategoryActions?)
+
+    fun showCategoryOptions(categoryItem: Category?) {
+        categoryActions.value = CategoryActions(
+            scope = scope,
+            categoryManager = categoryManager,
+            defaultCategories = defaultCategories,
+            categoryItem = categoryItem,
+            openFolder = {
+                runCatching {
+                    FileUtils.openFolder(File(it.path))
+                }
+            },
+            onRequestAddCategory = {
+                categoryDialogManager.openCategoryDialog(-1)
+            },
+            requestDelete = {
+                sendEffect(
+                    HomeEffects.DeleteCategory(it)
+                )
+            },
+            requestEdit = {
+                categoryDialogManager.openCategoryDialog(it.id)
+            },
+            onRequestCategorizeItems = {
+                sendEffect(HomeEffects.AutoCategorize)
+            },
+            onRequestResetToDefaults = {
+                sendEffect(HomeEffects.ResetCategoriesToDefault)
+            }
+        )
+    }
+
+    fun closeCategoryOptions() {
+        categoryActions.value = null
+    }
+
     override val shortcutManager = ShortcutManager().apply {
         "ctrl N" to newDownloadAction
         "ctrl V" to newDownloadFromClipboardAction

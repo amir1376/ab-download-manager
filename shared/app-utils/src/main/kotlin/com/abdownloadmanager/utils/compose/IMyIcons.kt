@@ -7,7 +7,7 @@ context (IMyIcons)
 fun ImageVector.asIconSource(requiredTint: Boolean = true) = IconSource.VectorIconSource(this, requiredTint)
 
 context (IMyIcons)
-fun String.asIconSource(requiredTint: Boolean = true) = IconSource.StorageIconSource(this, requiredTint)
+fun String.asIconSource(requiredTint: Boolean = true) = IconSource.ResourceIconSource(this, requiredTint)
 
 interface IMyIcons {
     val appIcon: IconSource
@@ -71,7 +71,7 @@ interface IMyIcons {
     val question: IconSource
     val sortUp: IconSource
     val sortDown: IconSource
-    val verticalDirection: IconSource.StorageIconSource
+    val verticalDirection: IconSource
     val appearance: IconSource
     val downloadEngine: IconSource
     val browserIntegration: IconSource

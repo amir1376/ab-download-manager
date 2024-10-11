@@ -1,9 +1,5 @@
 package com.abdownloadmanager.desktop.pages.addDownload.single
 
-import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
-import com.abdownloadmanager.desktop.pages.addDownload.shared.LocationTextField
-import com.abdownloadmanager.desktop.pages.addDownload.shared.ShowAddToQueueDialog
-import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedTypeCategories
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.WithContentColor
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
@@ -34,8 +30,9 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
+import com.abdownloadmanager.desktop.pages.addDownload.shared.*
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
-import ir.amirab.downloader.monitor.ProcessingDownloadItemState
+import com.abdownloadmanager.utils.category.rememberIconPainter
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import java.awt.MouseInfo
 
@@ -79,6 +76,47 @@ fun AddDownloadPage(
         ) {
             val canAddResult by component.canAddResult.collectAsState()
             Column(Modifier.weight(1f)) {
+                val useCategory by component.useCategory.collectAsState()
+                Spacer(Modifier.size(8.dp))
+                Row(
+                    modifier = Modifier.height(IntrinsicSize.Max),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .onClick {
+                                component.setUseCategory(!useCategory)
+                            }
+                            .padding(vertical = 4.dp)
+                    ) {
+                        CheckBox(
+                            size = 16.dp,
+                            value = useCategory,
+                            onValueChange = { component.setUseCategory(it) }
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text("Use Category")
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    CategorySelect(
+                        modifier = Modifier.weight(1f),
+                        enabled = useCategory,
+                        categories = component.categories.collectAsState().value,
+                        selectedCategory = component.selectedCategory.collectAsState().value,
+                        onCategorySelected = {
+                            component.setSelectedCategory(it)
+                        },
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    CategoryAddButton(
+                        enabled = useCategory,
+                        modifier = Modifier.fillMaxHeight(),
+                        onClick = {
+                            component.addNewCategory()
+                        },
+                    )
+                }
                 Spacer(Modifier.size(8.dp))
                 LocationTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -273,7 +311,8 @@ private fun OnDuplicateStrategySolutionItem(
         }
         Spacer(Modifier.width(8.dp))
         Column {
-            Text(title,
+            Text(
+                title,
                 fontSize = myTextSizes.base,
                 fontWeight = FontWeight.Bold
             )
@@ -419,7 +458,7 @@ private fun MainActionButtons(component: AddSingleDownloadComponent) {
                 modifier = Modifier,
                 onClick = { component.showSolutionsOnDuplicateDownloadUi = true },
             )
-            if(component.shouldShowOpenFile.collectAsState().value){
+            if (component.shouldShowOpenFile.collectAsState().value) {
                 Spacer(Modifier.width(8.dp))
                 MainConfigActionButton(
                     text = "Open File",
@@ -475,6 +514,7 @@ fun RenderFileTypeAndSize(
 ) {
     val isLinkLoading by component.isLinkLoading.collectAsState()
     val fileInfo by component.linkResponseInfo.collectAsState()
+    val fileIconProvider = component.iconProvider
     val iconModifier = Modifier.size(16.dp)
     Box(Modifier.padding(top = 16.dp)) {
         AnimatedContent(
@@ -488,11 +528,7 @@ fun RenderFileTypeAndSize(
             } else {
 //                val extension = getExtension(fileInfo?.fileName ?: usersSetFileName) ?: "unknown"
                 val downloadItem by component.downloadItem.collectAsState()
-                val category = remember(downloadItem) {
-                    DefinedTypeCategories.resolveCategoryForDownloadItem(
-                        ProcessingDownloadItemState.onlyDownloadItem(downloadItem)
-                    )
-                }
+                val icon = fileIconProvider.rememberIcon(downloadItem.name)
 
 //                val bitmap = FileIconProvider.getIconOfFileExtension(extension)
 
@@ -513,7 +549,7 @@ fun RenderFileTypeAndSize(
                                     )
                                 }
                                 MyIcon(
-                                    category.icon,
+                                    icon,
                                     null,
                                     iconModifier
                                 )
@@ -577,8 +613,9 @@ private fun UrlTextField(
         modifier = modifier.fillMaxWidth(),
         end = {
             MyTextFieldIcon(MyIcons.paste) {
-                setText(ClipboardUtil.read()
-                    .orEmpty()
+                setText(
+                    ClipboardUtil.read()
+                        .orEmpty()
                 )
             }
         },
@@ -590,7 +627,7 @@ private fun UrlTextField(
 private fun NameTextField(
     text: String,
     setText: (String) -> Unit,
-    errorText: String? = null
+    errorText: String? = null,
 ) {
     AddDownloadPageTextField(
         text,

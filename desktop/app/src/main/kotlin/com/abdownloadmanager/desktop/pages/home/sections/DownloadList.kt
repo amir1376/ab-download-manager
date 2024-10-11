@@ -25,6 +25,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.category.CategoryManager
+import com.abdownloadmanager.utils.category.rememberCategoryOf
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.remainingOrNull
 import ir.amirab.downloader.monitor.speedOrNull
@@ -63,6 +66,8 @@ fun DownloadList(
     onRequestOpenDownload: (Long) -> Unit,
     onNewSelection: (List<Long>) -> Unit,
     lastSelectedId: Long?,
+    fileIconProvider: FileIconProvider,
+    categoryManager: CategoryManager,
 ) {
     val state = rememberLazyListState()
     ShowDownloadOptions(
@@ -249,7 +254,11 @@ fun DownloadList(
                 }
 
                 DownloadListCells.Name -> {
-                    NameCell(item)
+                    NameCell(
+                        itemState = item,
+                        category = categoryManager.rememberCategoryOf(item.id),
+                        fileIconProvider = fileIconProvider,
+                    )
                 }
 
                 DownloadListCells.DateAdded -> {
