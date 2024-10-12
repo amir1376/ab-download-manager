@@ -10,4 +10,8 @@ internal class WindowsFileUtils : FileUtilsBase() {
     override fun openFolderOfFileInternal(file: File): Boolean {
         return execAndWait(arrayOf("cmd", "/c", "explorer.exe", "/select,", file.path))
     }
+
+    override fun openFolderInternal(folder: File): Boolean {
+        return execAndWait(arrayOf("cmd", "/c", "explorer.exe", folder.path))
+    }
 }

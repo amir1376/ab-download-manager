@@ -28,4 +28,7 @@ internal class LinuxFileUtils : FileUtilsBase() {
         return xdgOpenResult
     }
 
+    override fun openFolderInternal(folder: File): Boolean {
+        return execAndWait(arrayOf("xdg-open", folder.parent))
+    }
 }

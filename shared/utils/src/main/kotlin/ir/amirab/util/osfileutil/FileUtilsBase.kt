@@ -5,15 +5,21 @@ import java.io.FileNotFoundException
 
 abstract class FileUtilsBase : FileUtils {
     override fun openFile(file: File): Boolean {
-        if (!file.exists()) {
-            throw FileNotFoundException("$file not found")
-        }
-        return openFileInternal(file)
+        return openFileInternal(
+            file = preparedFile(file)
+        )
     }
 
     override fun openFolderOfFile(file: File): Boolean {
-        val file = file.canonicalFile.absoluteFile
-        return openFolderOfFileInternal(file)
+        return openFolderOfFileInternal(
+            file = preparedFile(file)
+        )
+    }
+
+    override fun openFolder(folder: File): Boolean {
+        return openFolderInternal(
+            folder = preparedFile(folder)
+        )
     }
 
     override fun canWriteInThisFolder(folder: String): Boolean {
@@ -34,6 +40,15 @@ abstract class FileUtilsBase : FileUtils {
         return false
     }
 
+    private fun preparedFile(file: File): File {
+        val file = file.canonicalFile.absoluteFile
+        if (!file.exists()) {
+            throw FileNotFoundException("$file not found")
+        }
+        return file
+    }
+
     protected abstract fun openFileInternal(file: File): Boolean
     protected abstract fun openFolderOfFileInternal(file: File): Boolean
+    protected abstract fun openFolderInternal(folder: File): Boolean
 }

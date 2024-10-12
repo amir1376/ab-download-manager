@@ -10,4 +10,9 @@ internal class MacOsFileUtils : FileUtilsBase() {
     override fun openFolderOfFileInternal(file: File): Boolean {
         return execAndWait(arrayOf("open", "-R", file.path))
     }
+
+    override fun openFolderInternal(folder: File): Boolean {
+        return execAndWait(arrayOf("open", folder.path))
+    }
+
 }
