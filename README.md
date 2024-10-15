@@ -48,6 +48,14 @@ in order to download and install the app
     </details>
 - using a package manager
   - <details>
+    <summary>winget (for Windows)</summary>
+
+    ```bash
+    winget install amir1376.ABDownloadManager
+    ```
+
+    </details>
+  - <details>
     <summary>scoop (for Windows)</summary>
 
     ```bash
