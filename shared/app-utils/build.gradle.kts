@@ -1,9 +1,11 @@
 plugins {
     id(MyPlugins.kotlin)
     id(MyPlugins.composeBase)
+    id(Plugins.Kotlin.serialization)
 }
 dependencies {
     implementation(project(":downloader:core"))
+    implementation(project(":downloader:monitor"))
     api(project(":shared:config"))
     api(project(":shared:utils"))
     api(project(":shared:compose-utils"))

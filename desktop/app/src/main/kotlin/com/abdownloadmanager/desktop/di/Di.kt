@@ -8,6 +8,7 @@ import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import ir.amirab.downloader.queue.QueueManager
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.*
+import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
@@ -34,6 +35,10 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import com.abdownloadmanager.updatechecker.DummyUpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateChecker
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.FileIconProviderUsingCategoryIcons
+import com.abdownloadmanager.utils.category.*
+import com.abdownloadmanager.utils.compose.IMyIcons
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.utils.EmptyFileCreator
 
@@ -92,7 +97,7 @@ val downloaderModule = module {
 
     }
     single {
-        val downloadSettings:DownloadSettings = get()
+        val downloadSettings: DownloadSettings = get()
         EmptyFileCreator(
             diskStat = get(),
             useSparseFile = { downloadSettings.useSparseFileAllocation }
@@ -104,8 +109,42 @@ val downloaderModule = module {
     single<IDownloadMonitor> {
         DownloadMonitor(get())
     }
+}
+val downloadSystemModule = module {
     single {
-        DownloadSystem(get(), get(), get(), get(), get(), get())
+        CategoryFileStorage(
+            file = get<DownloadFoldersRegistry>().registerAndGet(
+                AppInfo.downloadDbDir.resolve("categories")
+            ).resolve("categories.json"),
+            fileSaver = get()
+        )
+    }.bind<CategoryStorage>()
+    single {
+        FileIconProviderUsingCategoryIcons(
+            get(),
+            get(),
+            MyIcons,
+        )
+    }.bind<FileIconProvider>()
+    single {
+        DefaultCategories(
+            icons = get(),
+            getDefaultDownloadFolder = {
+                get<AppSettingsStorage>().defaultDownloadFolder.value
+            }
+        )
+    }
+    single {
+        CategoryManager(
+            categoryStorage = get(),
+            scope = get(),
+            defaultCategoriesFactory = get(),
+            downloadManager = get(),
+        )
+    }
+
+    single {
+        DownloadSystem(get(), get(), get(), get(), get(), get(), get())
     }
 }
 val coroutineModule = module {
@@ -154,6 +193,7 @@ val nativeMessagingModule = module {
 
 val appModule = module {
     includes(downloaderModule)
+    includes(downloadSystemModule)
     includes(coroutineModule)
     includes(jsonModule)
     includes(integrationModule)
@@ -167,8 +207,11 @@ val appModule = module {
         AppRepository()
     }
     single {
-        ThemeManager(get(),get())
+        ThemeManager(get(), get())
     }
+    single {
+        MyIcons
+    }.bind<IMyIcons>()
     single {
         AppSettingsStorage(
             createMyConfigPreferences(

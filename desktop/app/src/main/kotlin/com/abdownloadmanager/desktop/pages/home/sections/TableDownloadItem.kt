@@ -1,7 +1,6 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
 import com.abdownloadmanager.desktop.pages.home.sections.SortIndicatorMode.*
-import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedTypeCategories
 import com.abdownloadmanager.utils.compose.LocalContentColor
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.theme.myColors
@@ -20,6 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.category.Category
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
@@ -30,7 +31,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.datetime.*
 
 val LocalDownloadItemProperties =
-        compositionLocalOf<DownloadItemProperties> { error("not provided download properties") }
+    compositionLocalOf<DownloadItemProperties> { error("not provided download properties") }
 
 
 data class DownloadItemProperties(
@@ -91,16 +92,16 @@ fun CheckCell(
 
 @Composable
 fun NameCell(
-    itemState: IDownloadItemState
+    itemState: IDownloadItemState,
+    category: Category?,
+    fileIconProvider: FileIconProvider,
 ) {
-    val typeCategoryFilter = remember(itemState.id) {
-        DefinedTypeCategories.resolveCategoryForDownloadItem(itemState)
-    }
+    val fileIcon = fileIconProvider.rememberIcon(itemState.name)
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         MyIcon(
-            icon = typeCategoryFilter.icon,
+            icon = fileIcon,
             modifier = Modifier.size(16.dp),
             contentDescription = null,
 //            tint = LocalContentColor.current / 75
@@ -113,7 +114,8 @@ fun NameCell(
                 fontSize = myTextSizes.base,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(typeCategoryFilter.name, maxLines = 1, fontSize = myTextSizes.xs,
+            Text(
+                category?.name ?: "General", maxLines = 1, fontSize = myTextSizes.xs,
                 color = LocalContentColor.current / 50
             )
         }
@@ -203,9 +205,9 @@ fun StatusCell(
                     ProgressAndPercent(
                         itemState.percent,
                         if (ExceptionUtils.isNormalCancellation(status.e)) {
-                            if (!itemState.gotAnyProgress){
+                            if (!itemState.gotAnyProgress) {
                                 DownloadProgressStatus.Added
-                            }else{
+                            } else {
                                 DownloadProgressStatus.Paused
                             }
                         } else {
@@ -218,9 +220,9 @@ fun StatusCell(
                 DownloadJobStatus.IDLE -> {
                     ProgressAndPercent(
                         itemState.percent,
-                        if (!itemState.gotAnyProgress){
+                        if (!itemState.gotAnyProgress) {
                             DownloadProgressStatus.Added
-                        }else{
+                        } else {
                             DownloadProgressStatus.Paused
                         },
                         itemState.gotAnyProgress
@@ -245,7 +247,7 @@ fun StatusCell(
 
                 DownloadJobStatus.Finished,
                 DownloadJobStatus.Resuming,
-                -> SimpleStatus(itemState.status.toString())
+                    -> SimpleStatus(itemState.status.toString())
             }
         }
 
@@ -275,22 +277,22 @@ private enum class DownloadProgressStatus {
 private fun ProgressAndPercent(
     percent: Int?,
     status: DownloadProgressStatus,
-    gotAnyProgress:Boolean,
+    gotAnyProgress: Boolean,
 ) {
     val background = when (status) {
         DownloadProgressStatus.Error -> myColors.errorGradient
-        DownloadProgressStatus.Paused,DownloadProgressStatus.Added -> myColors.warningGradient
+        DownloadProgressStatus.Paused, DownloadProgressStatus.Added -> myColors.warningGradient
         DownloadProgressStatus.CreatingFile -> myColors.infoGradient
         DownloadProgressStatus.Downloading -> myColors.primaryGradient
     }
     Column {
-        val statusText = if (gotAnyProgress){
+        val statusText = if (gotAnyProgress) {
             "${percent ?: "."}% $status"
-        }else{
+        } else {
             "$status"
         }
         SimpleStatus(statusText)
-        if (status != DownloadProgressStatus.Added){
+        if (status != DownloadProgressStatus.Added) {
             Spacer(Modifier.height(2.5.dp))
             ProgressStatus(
                 percent, background

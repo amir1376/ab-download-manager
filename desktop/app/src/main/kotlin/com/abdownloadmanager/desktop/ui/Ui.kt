@@ -26,6 +26,7 @@ import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
+import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import com.abdownloadmanager.utils.compose.ProvideDebugInfo
@@ -78,6 +79,7 @@ object Ui : KoinComponent {
                             }
                             ShowAddDownloadDialogs(appComponent)
                             ShowDownloadDialogs(appComponent)
+                            ShowCategoryDialogs(appComponent)
                             //TODO Enable Updater
                             //ShowUpdaterDialog(appComponent.updater)
                             ShowAboutDialog(appComponent)

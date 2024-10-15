@@ -40,7 +40,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.window.Dialog
 import com.abdownloadmanager.desktop.ui.customwindow.*
+import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
 import com.abdownloadmanager.desktop.utils.externaldraggable.DragData
+import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.rememberIconPainter
+import ir.amirab.util.compose.action.MenuItem
 
 
 @Composable
@@ -53,6 +57,14 @@ fun HomePage(component: HomeComponent) {
         mutableStateOf(null as DeletePromptState?)
     }
 
+    var showDeleteCategoryPromptState by remember {
+        mutableStateOf(null as CategoryDeletePromptState?)
+    }
+
+    var showConfirmPrompt by remember {
+        mutableStateOf(null as ConfirmPromptState?)
+    }
+
     LaunchedEffect(Unit) {
         component.effects.onEach {
             when (it) {
@@ -60,6 +72,26 @@ fun HomePage(component: HomeComponent) {
                     if (it.list.isNotEmpty()) {
                         showDeletePromptState = DeletePromptState(it.list)
                     }
+                }
+
+                is HomeEffects.DeleteCategory -> {
+                    showDeleteCategoryPromptState = CategoryDeletePromptState(it.category)
+                }
+
+                is HomeEffects.AutoCategorize -> {
+                    showConfirmPrompt = ConfirmPromptState(
+                        title = "Auto categorize downloads",
+                        description = "Any uncategorized item will be automatically added to it's related category.",
+                        onConfirm = component::onConfirmAutoCategorize
+                    )
+                }
+
+                is HomeEffects.ResetCategoriesToDefault -> {
+                    showConfirmPrompt = ConfirmPromptState(
+                        title = "Reset to Default Categories",
+                        description = "this will REMOVE all categories and brings backs default categories",
+                        onConfirm = component::onConfirmResetCategories
+                    )
                 }
 
                 else -> {}
@@ -77,6 +109,29 @@ fun HomePage(component: HomeComponent) {
                 showDeletePromptState = null
                 component.confirmDelete(it)
             })
+    }
+    showDeleteCategoryPromptState?.let {
+        ShowDeleteCategoryPrompt(
+            deletePromptState = it,
+            onCancel = {
+                showDeleteCategoryPromptState = null
+            },
+            onConfirm = {
+                showDeleteCategoryPromptState = null
+                component.onConfirmDeleteCategory(it)
+            })
+    }
+    showConfirmPrompt?.let {
+        ShowConfirmPrompt(
+            promptState = it,
+            onCancel = {
+                showConfirmPrompt = null
+            },
+            onConfirm = {
+                showConfirmPrompt?.onConfirm?.invoke()
+                showConfirmPrompt = null
+            }
+        )
     }
     val mergeTopBar = shouldMergeTopBarWithTitleBar(component)
     if (mergeTopBar) {
@@ -147,8 +202,9 @@ fun HomePage(component: HomeComponent) {
             Row() {
                 val categoriesWidth by component.categoriesWidth.collectAsState()
                 Categories(
-                    Modifier.padding(top = 8.dp)
-                        .width(categoriesWidth), component
+                    modifier = Modifier.padding(top = 8.dp)
+                        .width(categoriesWidth),
+                    component = component
                 )
                 Spacer(Modifier.size(8.dp))
                 //split pane
@@ -195,6 +251,8 @@ fun HomePage(component: HomeComponent) {
                         },
                         lastSelectedId = lastSelected,
                         tableState = component.tableState,
+                        fileIconProvider = component.fileIconProvider,
+                        categoryManager = component.categoryManager,
                     )
                     Spacer(
                         Modifier
@@ -315,12 +373,140 @@ private fun ShowDeletePrompts(
     }
 }
 
+@Composable
+private fun ShowConfirmPrompt(
+    promptState: ConfirmPromptState,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    val shape = RoundedCornerShape(6.dp)
+    Dialog(onDismissRequest = onCancel) {
+        Column(
+            Modifier
+                .clip(shape)
+                .border(2.dp, myColors.onBackground / 10, shape)
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            myColors.surface,
+                            myColors.background,
+                        )
+                    )
+                )
+                .padding(16.dp)
+                .width(IntrinsicSize.Max)
+                .widthIn(max = 260.dp)
+        ) {
+            Text(
+                text = promptState.title,
+                fontWeight = FontWeight.Bold,
+                fontSize = myTextSizes.xl,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = promptState.description,
+                fontSize = myTextSizes.base,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Spacer(Modifier.weight(1f))
+                ActionButton(
+                    text = "Delete",
+                    onClick = onConfirm,
+                    borderColor = SolidColor(myColors.error),
+                    contentColor = myColors.error,
+                )
+                Spacer(Modifier.width(8.dp))
+                ActionButton(text = "Cancel", onClick = onCancel)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShowDeleteCategoryPrompt(
+    deletePromptState: CategoryDeletePromptState,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    val shape = RoundedCornerShape(6.dp)
+    Dialog(onDismissRequest = onCancel) {
+        Column(
+            Modifier
+                .clip(shape)
+                .border(2.dp, myColors.onBackground / 10, shape)
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            myColors.surface,
+                            myColors.background,
+                        )
+                    )
+                )
+                .padding(16.dp)
+                .width(IntrinsicSize.Max)
+                .widthIn(max = 260.dp)
+        ) {
+            Text(
+                """Removing "${deletePromptState.category.name}" Category""",
+                fontWeight = FontWeight.Bold,
+                fontSize = myTextSizes.xl,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                """Are you sure you want to delete "${deletePromptState.category.name}" Category ?""",
+                fontSize = myTextSizes.base,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Your downloads won't be deleted",
+                fontSize = myTextSizes.base,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Spacer(Modifier.weight(1f))
+                ActionButton(
+                    text = "Delete",
+                    onClick = onConfirm,
+                    borderColor = SolidColor(myColors.error),
+                    contentColor = myColors.error,
+                )
+                Spacer(Modifier.width(8.dp))
+                ActionButton(text = "Cancel", onClick = onCancel)
+            }
+        }
+    }
+}
+
 @Stable
 class DeletePromptState(
     val downloadList: List<Long>,
 ) {
     var alsoDeleteFile by mutableStateOf(false)
 }
+
+@Immutable
+data class CategoryDeletePromptState(
+    val category: Category,
+)
+
+@Immutable
+data class ConfirmPromptState(
+    val title: String,
+    val description: String,
+    val onConfirm: () -> Unit,
+)
 
 @Composable
 fun DragWidget(
@@ -375,15 +561,26 @@ fun DragWidget(
 
 }
 
+
 @Composable
 private fun Categories(
     modifier: Modifier,
     component: HomeComponent,
 ) {
+
     val currentTypeFilter = component.filterState.typeCategoryFilter
     val currentStatusFilter = component.filterState.statusFilter
-
+    val categories by component.categoryManager.categoriesFlow.collectAsState()
     val clipShape = RoundedCornerShape(12.dp)
+    val showCategoryOption by component.categoryActions.collectAsState()
+
+    fun showCategoryOption(item: Category?) {
+        component.showCategoryOptions(item)
+    }
+
+    fun closeCategoryOptions() {
+        component.closeCategoryOptions()
+    }
     Column(
         modifier
             .padding(start = 16.dp)
@@ -398,16 +595,42 @@ private fun Categories(
                 currentTypeCategoryFilter = currentTypeFilter,
                 currentStatusCategoryFilter = currentStatusFilter,
                 statusFilter = statusCategoryFilter,
-                typeFilter = DefinedTypeCategories.values(),
+                categories = categories,
                 onFilterChange = {
                     component.onFilterChange(statusCategoryFilter, it)
                 },
                 onRequestExpand = { expand ->
                     expendedItem = statusCategoryFilter.takeIf { expand }
+                },
+                onRequestOpenOptionMenu = {
+                    showCategoryOption(it)
                 }
             )
         }
     }
+    showCategoryOption?.let {
+        CategoryOption(
+            categoryOptionMenuState = it,
+            onDismiss = {
+                closeCategoryOptions()
+            }
+        )
+    }
+}
+
+@Composable
+fun CategoryOption(
+    categoryOptionMenuState: CategoryActions,
+    onDismiss: () -> Unit,
+) {
+    ShowOptionsInDropDown(
+        MenuItem.SubMenu(
+            icon = categoryOptionMenuState.categoryItem?.rememberIconPainter(),
+            title = categoryOptionMenuState.categoryItem?.name.orEmpty(),
+            categoryOptionMenuState.menu,
+        ),
+        onDismiss
+    )
 }
 
 @Composable

@@ -31,7 +31,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
         }
         when (addDownloadComponent) {
             is AddSingleDownloadComponent -> {
-                val h = 220
+                val h = 265
                 val w = 500
                 val size = remember {
                     DpSize(
@@ -61,7 +61,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
 
             is AddMultiDownloadComponent -> {
                 val h = 400
-                val w = 600
+                val w = 700
                 val state = rememberWindowState(
                     height = h.dp,
                     width = w.dp,

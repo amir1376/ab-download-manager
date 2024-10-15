@@ -5,6 +5,8 @@ import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadConfig
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadComponent
+import com.abdownloadmanager.desktop.pages.category.CategoryComponent
+import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.SettingsComponent
@@ -35,6 +37,8 @@ import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
+import com.abdownloadmanager.utils.category.CategoryManager
+import com.abdownloadmanager.utils.category.CategorySelectionMode
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.flow.*
@@ -61,6 +65,7 @@ class AppComponent(
 ) : BaseComponent(ctx),
     DownloadDialogManager,
     AddDownloadDialogManager,
+    CategoryDialogManager,
     NotificationSender,
     DownloadItemOpener,
     ContainsEffects<AppEffects> by supportEffects(),
@@ -101,7 +106,8 @@ class AppComponent(
                 downloadItemOpener = this,
                 downloadDialogManager = this,
                 addDownloadDialogManager = this,
-                notificationSender = this
+                categoryDialogManager = this,
+                notificationSender = this,
             )
         }
     ).subscribeAsStateFlow()
@@ -192,12 +198,25 @@ class AppComponent(
                         onRequestClose = {
                             closeAddDownloadDialog(config.id)
                         },
-                        onRequestAddToQueue = { item, queueId, onDuplicate ->
-                            addDownload(item = item, queueId = queueId, onDuplicateStrategy = onDuplicate)
+                        onRequestAddToQueue = { item, queueId, onDuplicate, categoryId ->
+                            addDownload(
+                                item = item,
+                                queueId = queueId,
+                                categoryId = categoryId,
+                                onDuplicateStrategy = onDuplicate,
+                            )
                             closeAddDownloadDialog(dialogId = config.id)
                         },
-                        onRequestDownload = { item, onDuplicate ->
-                            startNewDownload(item, onDuplicate, true)
+                        onRequestAddCategory = {
+                            openCategoryDialog(-1)
+                        },
+                        onRequestDownload = { item, onDuplicate, categoryId ->
+                            startNewDownload(
+                                item = item,
+                                onDuplicateStrategy = onDuplicate,
+                                openDownloadDialog = true,
+                                categoryId = categoryId,
+                            )
                             closeAddDownloadDialog(config.id)
                         },
                         openExistingDownload = {
@@ -213,16 +232,20 @@ class AppComponent(
 
                 is AddDownloadConfig.MultipleAddConfig -> {
                     AddMultiDownloadComponent(
-                        ctx,
-                        config.id,
-                        { closeAddDownloadDialog(config.id) },
-                        { items, strategy, queueId ->
+                        ctx = ctx,
+                        id = config.id,
+                        onRequestClose = { closeAddDownloadDialog(config.id) },
+                        onRequestAdd = { items, strategy, queueId, categorySelectionMode ->
                             addDownload(
                                 items = items,
                                 onDuplicateStrategy = strategy,
                                 queueId = queueId,
+                                categorySelectionMode = categorySelectionMode
                             )
                             closeAddDownloadDialog(config.id)
+                        },
+                        onRequestAddCategory = {
+                            openCategoryDialog(-1)
                         }
                     ).apply { addItems(config.links) }
                 }
@@ -262,6 +285,77 @@ class AppComponent(
     override val openedDownloadDialogs = _openedDownloadDialogs
         .map { it.items.mapNotNull { it.instance } }
         .stateIn(scope, SharingStarted.Eagerly, emptyList())
+
+    private val categoryManager: CategoryManager by inject()
+
+    private val categoryPageControl = PagesNavigation<Long>()
+    private val _openedCategoryDialogs = childPages(
+        key = "openedCategoryDialogs",
+        source = categoryPageControl,
+        serializer = null,
+        initialPages = { Pages() },
+        pageStatus = { _, _ ->
+            ChildNavState.Status.RESUMED
+        },
+        childFactory = { cfg, ctx ->
+            CategoryComponent(
+                ctx = ctx,
+                close = {
+                    closeCategoryDialog(cfg)
+                },
+                submit = { submittedCategory ->
+                    if (submittedCategory.id < 0) {
+                        categoryManager.addCustomCategory(submittedCategory)
+                    } else {
+                        categoryManager.updateCategory(
+                            submittedCategory.id
+                        ) {
+                            submittedCategory.copy(
+                                items = it.items
+                            )
+                        }
+                    }
+                    closeCategoryDialog(cfg)
+                },
+                id = cfg
+            )
+        }
+    ).subscribeAsStateFlow()
+    override val openedCategoryDialogs: StateFlow<List<CategoryComponent>> = _openedCategoryDialogs
+        .map {
+            it.items.mapNotNull { it.instance }
+        }.stateIn(scope, SharingStarted.Eagerly, emptyList())
+
+    override fun openCategoryDialog(categoryId: Long) {
+        scope.launch {
+            val component = openedCategoryDialogs.value.find {
+                it.id == categoryId
+            }
+            if (component != null) {
+//                component.bringToFront()
+            } else {
+                categoryPageControl.navigate {
+                    val newItems = (it.items.toSet() + categoryId).toList()
+                    val copy = it.copy(
+                        items = newItems,
+                        selectedIndex = newItems.lastIndex
+                    )
+                    copy
+                }
+            }
+        }
+    }
+
+    override fun closeCategoryDialog(categoryId: Long) {
+        scope.launch {
+            categoryPageControl.navigate {
+                val newItems = it.items.filter { config ->
+                    config != categoryId
+                }
+                it.copy(items = newItems, selectedIndex = newItems.lastIndex)
+            }
+        }
+    }
 
     init {
         downloadSystem.downloadEvents
@@ -518,6 +612,7 @@ class AppComponent(
     fun addDownload(
         items: List<DownloadItem>,
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
+        categorySelectionMode: CategorySelectionMode?,
         queueId: Long?,
     ) {
         scope.launch {
@@ -525,6 +620,7 @@ class AppComponent(
                 newItemsToAdd = items,
                 onDuplicateStrategy = onDuplicateStrategy,
                 queueId = queueId,
+                categorySelectionMode = categorySelectionMode,
             )
         }
     }
@@ -532,6 +628,7 @@ class AppComponent(
     fun addDownload(
         item: DownloadItem,
         queueId: Long?,
+        categoryId: Long?,
         onDuplicateStrategy: OnDuplicateStrategy,
     ) {
         scope.launch {
@@ -539,6 +636,7 @@ class AppComponent(
                 downloadItem = item,
                 onDuplicateStrategy = onDuplicateStrategy,
                 queueId = queueId,
+                categoryId = categoryId,
             )
         }
     }
@@ -547,12 +645,14 @@ class AppComponent(
         item: DownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
         openDownloadDialog: Boolean,
+        categoryId: Long?,
     ) {
         scope.launch {
             val id = downloadSystem.addDownload(
-                item,
-                onDuplicateStrategy,
-                DefaultQueueInfo.ID,
+                downloadItem = item,
+                onDuplicateStrategy = onDuplicateStrategy,
+                queueId = DefaultQueueInfo.ID,
+                categoryId = categoryId,
             )
             launch {
                 downloadSystem.manualResume(id)
