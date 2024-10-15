@@ -14,6 +14,23 @@
 
 ### Security
 
+## 1.2.0
+
+- in this version we replaced Wix installer with Nsis for better customization and more control over the installation
+  process in Windows.
+- if you use Windows in order to install this version please first uninstall the previous msi version (your settings and
+  downloads will be safe)
+
+### Added
+
+- You can now create and customize categories
+- Pause/Resume in header actions
+
+### Changed
+
+- Change installer in Windows from Wix to Nsis
+- Improved import link page
+
 ## 1.1.0
 
 ### Added
