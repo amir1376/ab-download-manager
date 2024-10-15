@@ -13,7 +13,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
@@ -23,6 +25,8 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.compose.widget.MyIcon
 
 @Composable
 fun AddMultiDownloadTable(
@@ -33,6 +37,7 @@ fun AddMultiDownloadTable(
 
     val lastSelectedId = component.lastSelectedId
     val context = AddMultiItemListContext(component, component.isAllSelected)
+    val iconProvider = component.fileIconProvider
     CompositionLocalProvider(
         LocalAddMultiItemListContext provides context,
     ) {
@@ -129,7 +134,7 @@ fun AddMultiDownloadTable(
                                         it.border(1.dp, Color.Transparent)
                                     }
                                 }
-                                .padding(vertical = 2.dp, horizontal = itemHorizontalPadding)
+                                .padding(vertical = 8.dp, horizontal = itemHorizontalPadding)
                         ) {
                             content()
                         }
@@ -148,7 +153,10 @@ fun AddMultiDownloadTable(
                 }
 
                 AddMultiItemTableCells.Name -> {
-                    NameCell(item)
+                    NameCell(
+                        downloadUiChecker = item,
+                        iconProvider = iconProvider,
+                    )
                 }
 
                 AddMultiItemTableCells.Link -> {
@@ -194,8 +202,8 @@ sealed class AddMultiItemTableCells : TableCell<DownloadUiChecker> {
             return listOf(
                 Check,
                 Name,
-                Link,
                 SizeCell,
+                Link,
             )
         }
     }
@@ -218,17 +226,17 @@ sealed class AddMultiItemTableCells : TableCell<DownloadUiChecker> {
 
     data object Name : AddMultiItemTableCells() {
         override val name: String = "Name"
-        override val size: CellSize = CellSize.Resizeable(120.dp..300.dp, 160.dp)
+        override val size: CellSize = CellSize.Resizeable(120.dp..1000.dp, 350.dp)
     }
 
     data object Link : AddMultiItemTableCells() {
         override val name: String = "Link"
-        override val size: CellSize = CellSize.Resizeable(120.dp..300.dp, 120.dp)
+        override val size: CellSize = CellSize.Resizeable(120.dp..2000.dp, 240.dp)
     }
 
     data object SizeCell : AddMultiItemTableCells() {
         override val name: String = "Size"
-        override val size: CellSize = CellSize.Resizeable(120.dp..180.dp)
+        override val size: CellSize = CellSize.Resizeable(100.dp..180.dp, 100.dp)
     }
 }
 
@@ -247,15 +255,28 @@ private fun CellText(
 
 @Composable
 private fun NameCell(
-    it: DownloadUiChecker
+    downloadUiChecker: DownloadUiChecker,
+    iconProvider: FileIconProvider,
 ) {
-    val name by it.name.collectAsState()
-    CellText(name)
+    val name by downloadUiChecker.name.collectAsState()
+    val icon = iconProvider.rememberIcon(name)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MyIcon(
+            icon = icon,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp).alpha(0.75f)
+        )
+        Spacer(Modifier.width(8.dp))
+        CellText(name)
+    }
+
 }
 
 @Composable
 private fun LinkCell(
-    downloadChecker: DownloadUiChecker
+    downloadChecker: DownloadUiChecker,
 ) {
     val credentials by downloadChecker.credentials.collectAsState()
     CellText(credentials.link)
@@ -263,7 +284,7 @@ private fun LinkCell(
 
 @Composable
 private fun SizeCell(
-    downloadChecker: DownloadUiChecker
+    downloadChecker: DownloadUiChecker,
 ) {
     val length by downloadChecker.length.collectAsState()
     CellText(

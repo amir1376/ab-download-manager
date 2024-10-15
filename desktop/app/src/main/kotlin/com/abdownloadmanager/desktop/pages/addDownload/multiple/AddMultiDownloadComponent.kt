@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemSaveMode.*
 import com.abdownloadmanager.desktop.utils.asState
+import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.CategorySelectionMode
@@ -44,6 +45,9 @@ class AddMultiDownloadComponent(
     private val appSettings by inject<AppRepository>()
     private val client by inject<DownloaderClient>()
     val downloadSystem by inject<DownloadSystem>()
+    val fileIconProvider: FileIconProvider by inject()
+
+
     private val _folder = MutableStateFlow(appSettings.saveLocation.value)
     val folder = _folder.asStateFlow()
     fun setFolder(folder: String) {
