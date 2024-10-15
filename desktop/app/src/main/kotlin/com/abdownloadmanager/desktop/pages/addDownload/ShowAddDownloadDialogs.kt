@@ -60,8 +60,8 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
             }
 
             is AddMultiDownloadComponent -> {
-                val h = 400
-                val w = 700
+                val h = 450
+                val w = 800
                 val state = rememberWindowState(
                     height = h.dp,
                     width = w.dp,
