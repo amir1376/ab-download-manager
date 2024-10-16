@@ -571,7 +571,7 @@ private fun Categories(
     val currentTypeFilter = component.filterState.typeCategoryFilter
     val currentStatusFilter = component.filterState.statusFilter
     val categories by component.categoryManager.categoriesFlow.collectAsState()
-    val clipShape = RoundedCornerShape(12.dp)
+    val clipShape = RoundedCornerShape(6.dp)
     val showCategoryOption by component.categoryActions.collectAsState()
 
     fun showCategoryOption(item: Category?) {
@@ -586,6 +586,7 @@ private fun Categories(
             .padding(start = 16.dp)
             .clip(clipShape)
             .border(1.dp, myColors.surface, clipShape)
+            .padding(1.dp)
             .verticalScroll(rememberScrollState())
     ) {
         var expendedItem: DownloadStatusCategoryFilter? by remember { mutableStateOf(currentStatusFilter) }
