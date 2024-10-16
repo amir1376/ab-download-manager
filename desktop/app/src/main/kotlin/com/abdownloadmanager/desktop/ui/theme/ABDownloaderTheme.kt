@@ -10,12 +10,6 @@ import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material.ripple.RippleAlpha
-import androidx.compose.material.ripple.RippleTheme
-import androidx.compose.material.ripple.RippleTheme.Companion.defaultRippleAlpha
-import androidx.compose.material.ripple.RippleTheme.Companion.defaultRippleColor
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
@@ -116,10 +110,7 @@ fun ABDownloaderTheme(
         CompositionLocalProvider(
             LocalContextMenuRepresentation provides myContextMenuRepresentation(),
             LocalScrollbarStyle provides myDefaultScrollBarStyle(),
-            // there is a modification in newer version of compose that change line height
-            // I want to remove material design for good but for now I override this
-            LocalRippleTheme provides remember { MyRippleTheme() },
-            LocalIndication provides rememberRipple(),
+            LocalIndication provides ripple(),
             LocalContentColor provides myColors.onBackground,
             LocalContentAlpha provides 1f,
             LocalTextSizes provides textSizes,
@@ -130,24 +121,6 @@ fun ABDownloaderTheme(
         ) {
             content()
         }
-    }
-}
-
-private class MyRippleTheme:RippleTheme{
-    @Composable
-    override fun defaultColor():Color {
-        return defaultRippleColor(
-            contentColor = LocalContentColor.current,
-            lightTheme = myColors.isLight
-        )
-    }
-
-    @Composable
-    override fun rippleAlpha(): RippleAlpha {
-        return defaultRippleAlpha(
-            contentColor = LocalContentColor.current,
-            lightTheme = myColors.isLight
-        )
     }
 }
 
