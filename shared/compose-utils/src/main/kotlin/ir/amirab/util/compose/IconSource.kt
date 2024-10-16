@@ -5,7 +5,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.ClassLoaderResourceLoader
 import androidx.compose.ui.res.painterResource
 import okio.FileSystem
 import okio.Path.Companion.toPath

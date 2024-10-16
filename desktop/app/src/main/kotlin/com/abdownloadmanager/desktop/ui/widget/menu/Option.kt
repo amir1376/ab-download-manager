@@ -52,7 +52,7 @@ fun ShowOptions(
                     .then(itemPadding)
                     .basicMarquee(
                         iterations = Int.MAX_VALUE,
-                        delayMillis = 0
+                        initialDelayMillis = 0
                     ),
                 fontSize = myTextSizes.base,
                 maxLines = 1,
