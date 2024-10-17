@@ -1,8 +1,14 @@
 package com.abdownloadmanager.desktop.pages.home.sections.category
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
@@ -10,6 +16,8 @@ import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.ExpandableItem
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
+import androidx.compose.foundation.gestures.onDrag
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.selection.selectable
@@ -17,8 +25,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -26,9 +44,11 @@ import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.pages.home.DownloadItemListDataFlavor
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.widget.TooltipPopup
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.rememberIconPainter
 import ir.amirab.downloader.downloaditem.DownloadStatus
@@ -36,6 +56,8 @@ import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.ifThen
 
 class DownloadStatusCategoryFilterByList(
     name: StringSource,
@@ -89,20 +111,45 @@ private fun CategoryFilterItem(
     modifier: Modifier,
     category: Category,
     isSelected: Boolean,
+    onItemsDropped: (ids: List<Long>) -> Unit,
     onClick: () -> Unit,
 ) {
+    var isDraggingOnMe by remember { mutableStateOf(false) }
     Box(
         modifier
+            .dropDownloadItemsHere(
+                onDragIn = { isDraggingOnMe = true },
+                onDragDone = { isDraggingOnMe = false },
+                onItemsDropped = onItemsDropped,
+            )
             .background(
                 if (isSelected) {
                     myColors.onBackground / 0.05f
                 } else Color.Transparent
             )
+            .ifThen(isDraggingOnMe) {
+                val infiniteTransition = rememberInfiniteTransition()
+                val color by infiniteTransition.animateColor(
+                    initialValue = myColors.primary,
+                    targetValue = myColors.secondary,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1000, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    )
+                )
+                border(1.dp, color)
+            }
             .selectable(
                 selected = isSelected,
                 onClick = onClick
             ),
     ) {
+        if (isDraggingOnMe) {
+            TooltipPopup(
+                {},
+                myStringResource(Res.string.move_to_this_category),
+            )
+        }
         Row(
             modifier = Modifier
                 .padding(start = 24.dp)
@@ -159,6 +206,7 @@ fun StatusFilterItem(
     currentStatusCategoryFilter: DownloadStatusCategoryFilter?,
     statusFilter: DownloadStatusCategoryFilter,
     categories: List<Category>,
+    onItemsDroppedInCategory: (category: Category, downloadIds: List<Long>) -> Unit,
     onFilterChange: (
         typeFilter: Category?,
     ) -> Unit,
@@ -252,22 +300,64 @@ fun StatusFilterItem(
         },
         body = {
             Column(Modifier) {
-                categories.forEach {
-                    CategoryFilterItem(
-                        modifier = Modifier.onClick(
-                            matcher = PointerMatcher.mouse(PointerButton.Secondary),
-                        ) {
-                            onRequestOpenOptionMenu(it)
-                        },
-                        category = it,
-                        isSelected = isStatusSelected && currentTypeCategoryFilter == it,
-                        onClick = {
-                            onFilterChange(it)
-                        }
-                    )
-                    Spacer(Modifier.height(2.dp))
+                categories.forEach { category ->
+                    key(category.id) {
+                        CategoryFilterItem(
+                            modifier = Modifier
+                                .onClick(
+                                    matcher = PointerMatcher.mouse(PointerButton.Secondary),
+                                ) {
+                                    onRequestOpenOptionMenu(category)
+                                },
+                            category = category,
+                            isSelected = isStatusSelected && currentTypeCategoryFilter == category,
+                            onItemsDropped = {
+                                onItemsDroppedInCategory(category, it)
+                            },
+                            onClick = {
+                                onFilterChange(category)
+                            }
+                        )
+                        Spacer(Modifier.height(2.dp))
+                    }
                 }
             }
         }
     )
+}
+
+private fun Modifier.dropDownloadItemsHere(
+    onDragIn: () -> Unit,
+    onDragDone: () -> Unit,
+    onItemsDropped: (ids: List<Long>) -> Unit,
+): Modifier {
+    return composed {
+        val onDragIn by rememberUpdatedState(onDragIn)
+        val onDragDone by rememberUpdatedState(onDragDone)
+        val onItemsDropped by rememberUpdatedState(onItemsDropped)
+        dragAndDropTarget(
+            shouldStartDragAndDrop = {
+                it.awtTransferable.isDataFlavorSupported(DownloadItemListDataFlavor)
+            },
+            target = remember {
+                object : DragAndDropTarget {
+                    override fun onEntered(event: DragAndDropEvent) {
+                        onDragIn()
+                    }
+
+                    override fun onExited(event: DragAndDropEvent) {
+                        onDragDone()
+                    }
+
+                    override fun onDrop(event: DragAndDropEvent): Boolean {
+                        onDragDone()
+                        val items = (event.awtTransferable.getTransferData(DownloadItemListDataFlavor) as List<*>)
+                            .filterIsInstance<IDownloadItemState>()
+                        onItemsDropped(items.map { it.id })
+                        return true
+                    }
+                }
+            }
+        )
+    }
 }

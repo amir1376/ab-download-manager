@@ -84,4 +84,5 @@ interface IMyIcons {
 
     val earth: IconSource
     val hearth: IconSource
+    val dragAndDrop: IconSource
 }
