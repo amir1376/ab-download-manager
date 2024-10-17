@@ -65,7 +65,6 @@ dependencies {
     implementation(project(":integration:server"))
     implementation(project(":desktop:shared"))
     implementation(project(":desktop:tray"))
-    implementation(project(":desktop:external-draggable"))
     implementation(project(":desktop:custom-window-frame"))
     implementation(project(":shared:app-utils"))
     implementation(project(":shared:utils"))

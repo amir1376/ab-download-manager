@@ -674,16 +674,14 @@ class HomeComponent(
         currentActiveDrops.update { parsedLinks }
     }
 
-    fun onExternalFilesDraggedIn(getFilePaths: () -> List<String>) {
-        val filePaths = getFilePaths().map {
-            URI.create(it)
-        }
-            .mapNotNull {
-                runCatching { File(it.path) }.getOrNull()
-            }
+    fun onExternalFilesDraggedIn(getFilePaths: () -> List<File>) {
+        val filePaths = kotlin.runCatching { getFilePaths() }
+            .getOrNull()?.filter { it.length() <= 1024 * 1024 } ?: return
         onExternalTextDraggedIn {
-            filePaths.first()
-                .readText()
+            filePaths
+                .firstOrNull()
+                ?.readText()
+                .orEmpty()
         }
     }
 
