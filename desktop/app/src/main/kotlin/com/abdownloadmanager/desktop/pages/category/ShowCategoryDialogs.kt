@@ -12,17 +12,7 @@ import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 fun ShowCategoryDialogs(dialogManager: CategoryDialogManager) {
     val dialogs by dialogManager.openedCategoryDialogs.collectAsState()
     for (d in dialogs) {
-        CustomWindow(
-            onCloseRequest = {
-                d.close()
-            },
-            alwaysOnTop = true,
-            state = rememberWindowState(
-                size = DpSize(350.dp, 350.dp)
-            )
-        ) {
-            CategoryDialog(d)
-        }
+        CategoryDialog(d)
     }
 }
 
@@ -30,5 +20,15 @@ fun ShowCategoryDialogs(dialogManager: CategoryDialogManager) {
 private fun CategoryDialog(
     component: CategoryComponent,
 ) {
-    NewCategory(component)
+    CustomWindow(
+        onCloseRequest = {
+            component.close()
+        },
+        alwaysOnTop = true,
+        state = rememberWindowState(
+            size = DpSize(350.dp, 400.dp)
+        )
+    ) {
+        NewCategory(component)
+    }
 }

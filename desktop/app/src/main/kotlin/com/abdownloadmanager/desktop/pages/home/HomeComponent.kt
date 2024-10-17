@@ -24,6 +24,7 @@ import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.CategoryItemWithId
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.DefaultCategories
 import com.arkivanov.decompose.ComponentContext
@@ -465,7 +466,13 @@ class HomeComponent(
         }
         categoryManager
             .autoAddItemsToCategoriesBasedOnFileNames(
-                unCategorizedItems.map { it.id to it.name }
+                unCategorizedItems.map {
+                    CategoryItemWithId(
+                        id = it.id,
+                        fileName = it.name,
+                        url = it.downloadLink,
+                    )
+                }
             )
     }
 

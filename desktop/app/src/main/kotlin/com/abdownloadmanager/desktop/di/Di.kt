@@ -135,11 +135,14 @@ val downloadSystemModule = module {
         )
     }
     single {
+        DownloadManagerCategoryItemProvider(get())
+    }.bind<ICategoryItemProvider>()
+    single {
         CategoryManager(
             categoryStorage = get(),
             scope = get(),
             defaultCategoriesFactory = get(),
-            downloadManager = get(),
+            categoryItemProvider = get(),
         )
     }
 

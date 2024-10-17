@@ -29,6 +29,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.CategoryItem
 import com.abdownloadmanager.utils.category.CategoryManager
 
 sealed interface AddSingleDownloadPageEffects {
@@ -128,9 +129,15 @@ class AddSingleDownloadComponent(
         )
             .onEachLatest { onDuplicateStrategy.update { null } }
             .launchIn(scope)
-
-        name.onEach {
-            val category = categoryManager.getCategoryOfFileName(it)
+        combine(
+            name, credentials.map { it.link }
+        ) { name, link ->
+            val category = categoryManager.getCategoryOf(
+                CategoryItem(
+                    fileName = name,
+                    url = link,
+                )
+            )
             if (category == null) {
                 setUseCategory(false)
             } else {

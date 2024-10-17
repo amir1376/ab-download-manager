@@ -64,6 +64,13 @@ fun NewCategory(
                 onTypesChanged = categoryComponent::setTypes
             )
             Spacer(Modifier.height(12.dp))
+            CategoryAutoUrls(
+                urlPatterns = categoryComponent.urlPatterns.collectAsState().value,
+                onUrlPatternChanged = categoryComponent::setUrlPatterns,
+                enabled = categoryComponent.urlPatternsEnabled.collectAsState().value,
+                setEnabled = categoryComponent::setUrlPatternsEnabled
+            )
+            Spacer(Modifier.height(12.dp))
             CategoryDefaultPath(
                 path = categoryComponent.path.collectAsState().value,
                 onPathChanged = categoryComponent::setPath,
@@ -152,8 +159,30 @@ fun CategoryAutoTypes(
             modifier = Modifier.fillMaxWidth(),
             placeholder = "ext1 ext2 ext3 (separate with space)",
             singleLine = false,
-            minLines = 2,
-            maxLines = 2,
+        )
+    }
+}
+
+@Composable
+fun CategoryAutoUrls(
+    enabled: Boolean,
+    setEnabled: (Boolean) -> Unit,
+    urlPatterns: String,
+    onUrlPatternChanged: (String) -> Unit,
+) {
+    OptionalWithLabel(
+        label = "URL patterns",
+        helpText = "Automatically put download from these URLs to this category. (when you add new download)\nSeparate URLs with space, you can also use * for wildcard",
+        enabled = enabled,
+        setEnabled = setEnabled
+    ) {
+        CategoryPageTextField(
+            text = urlPatterns,
+            onTextChange = onUrlPatternChanged,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = "dl.example.com/pics example.com/*/path",
+            enabled = enabled,
+            singleLine = false,
         )
     }
 }
@@ -187,6 +216,37 @@ private fun WithLabel(
     Column(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(label)
+            helpText?.let {
+                Spacer(Modifier.width(8.dp))
+                Help(helpText)
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        content()
+    }
+}
+
+@Composable
+private fun OptionalWithLabel(
+    label: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean,
+    setEnabled: (Boolean) -> Unit,
+    helpText: String? = null,
+    content: @Composable () -> Unit,
+) {
+    Column(modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.onClick {
+                    setEnabled(!enabled)
+                },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CheckBox(enabled, setEnabled, size = 16.dp)
+                Spacer(Modifier.width(8.dp))
+                Text(label)
+            }
             helpText?.let {
                 Spacer(Modifier.width(8.dp))
                 Help(helpText)
@@ -328,6 +388,7 @@ private fun CategoryPageTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
+    enabled: Boolean = true,
     start: @Composable (() -> Unit)? = null,
     end: @Composable (() -> Unit)? = null,
 ) {
@@ -351,6 +412,7 @@ private fun CategoryPageTextField(
             background = myColors.surface / 50,
             interactionSource = interactionSource,
             shape = RoundedCornerShape(6.dp),
+            enabled = enabled,
             start = start?.let {
                 {
                     WithContentAlpha(0.5f) {

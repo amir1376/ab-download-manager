@@ -1,6 +1,5 @@
 package com.abdownloadmanager.utils.category
 
-import ir.amirab.downloader.DownloadManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -12,7 +11,7 @@ class CategoryManager(
     private val categoryStorage: CategoryStorage,
     private val scope: CoroutineScope,
     private val defaultCategoriesFactory: DefaultCategories,
-    private val downloadManager: DownloadManager,
+    private val categoryItemProvider: ICategoryItemProvider,
 ) {
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categoriesFlow = _categories.asStateFlow()
@@ -45,9 +44,8 @@ class CategoryManager(
                 prepareCategory(it)
             }
             autoAddItemsToCategoriesBasedOnFileNames(
-                downloadManager
-                    .getDownloadList()
-                    .map { it.id to it.name }
+                categoryItemProvider
+                    .getAll()
             )
         }
     }
@@ -78,6 +76,20 @@ class CategoryManager(
             .firstOrNull {
                 it.acceptFileName(fileName)
             }
+    }
+
+    fun getCategoryOf(categoryItem: ICategoryItem): Category? {
+        val url = categoryItem.url
+        val fileName = categoryItem.fileName
+        return getCategories()
+            .filter {
+                it.acceptFileName(fileName)
+            }.sortedByDescending {
+                it.hasUrlPattern
+            }.firstOrNull {
+                it.acceptUrl(url)
+            }
+
     }
 
     fun getCategoryOfItem(id: Long): Category? {
@@ -119,7 +131,7 @@ class CategoryManager(
         prepareCategory(newCategory)
     }
 
-    fun createDirectoryIfNecessary(category: Category) {
+    private fun createDirectoryIfNecessary(category: Category) {
         kotlin.runCatching {
             val folder = File(category.path)
             if (folder.exists()) {
@@ -169,15 +181,15 @@ class CategoryManager(
     }
 
     fun autoAddItemsToCategoriesBasedOnFileNames(
-        unCategorizedItems: List<Pair<Long, String>>,
+        unCategorizedItems: List<CategoryItemWithId>,
     ) {
         val newItemsMap = mutableMapOf<Long, MutableList<Long>>()
         var count = 0
-        for ((id, name) in unCategorizedItems) {
-            val categoryToUpdate = getCategoryOfFileName(name) ?: continue
+        for (item in unCategorizedItems) {
+            val categoryToUpdate = getCategoryOf(item) ?: continue
             newItemsMap
                 .getOrPut(categoryToUpdate.id) { mutableListOf() }
-                .add(id)
+                .add(item.id)
             count++
         }
         for ((categoryId, itemsToAdd) in newItemsMap) {
