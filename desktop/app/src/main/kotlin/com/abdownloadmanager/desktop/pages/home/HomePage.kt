@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.*
-import com.abdownloadmanager.desktop.utils.externaldraggable.onExternalDrag
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -32,8 +31,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
@@ -41,10 +44,11 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.window.Dialog
 import com.abdownloadmanager.desktop.ui.customwindow.*
 import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
-import com.abdownloadmanager.desktop.utils.externaldraggable.DragData
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.rememberIconPainter
 import ir.amirab.util.compose.action.MenuItem
+import java.awt.datatransfer.DataFlavor
+import java.io.File
 
 
 @Composable
@@ -162,27 +166,40 @@ fun HomePage(component: HomeComponent) {
     Box(
         Modifier
             .fillMaxSize()
-            .onExternalDrag(
-                onDragStart = {
-                    isDragging = true
-                    it.availableDragData.get<DragData.Text>()?.also {
-                        component.onExternalTextDraggedIn { it.readText() }
-                        return@onExternalDrag
-                    }
-                    it.availableDragData.get<DragData.FilesList>()?.also {
-                        //Caution FileList::readFiles sometimes throws exception
-                        component.onExternalFilesDraggedIn { it.readFiles() }
-                        return@onExternalDrag
-                    }
+            .dragAndDropTarget(
+                shouldStartDragAndDrop = {
+                    it.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor) ||
+                            it.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)
                 },
-                onDragExit = {
-                    isDragging = false
-                    component.onDragExit()
+                target = remember {
+                    object : DragAndDropTarget {
+                        override fun onStarted(event: DragAndDropEvent) {
+                            isDragging = true
+                            if (event.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                                component.onExternalTextDraggedIn { (event.awtTransferable.getTransferData(DataFlavor.stringFlavor) as String) }
+                                return
+                            }
+                            if (event.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                                component.onExternalFilesDraggedIn {
+                                    (event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>)
+                                }
+                                return
+                            }
+                        }
+
+                        override fun onEnded(event: DragAndDropEvent) {
+                            isDragging = false
+                            component.onDragExit()
+                        }
+
+                        override fun onDrop(event: DragAndDropEvent): Boolean {
+                            isDragging = false
+                            component.onDropped()
+                            return true
+                        }
+                    }
                 }
-            ) {
-                isDragging = false
-                component.onDropped()
-            }
+            )
     ) {
         Column(
             Modifier.alpha(
