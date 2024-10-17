@@ -185,7 +185,10 @@ fun HomePage(component: HomeComponent) {
             .fillMaxSize()
             .dragAndDropTarget(
                 shouldStartDragAndDrop = {
-                    it.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor) ||
+                    if (it.awtTransferable.isDataFlavorSupported(DownloadItemListDataFlavor)) {
+                        // this item is ours we don't want to use our download item for import list usage
+                        return@dragAndDropTarget false
+                    } else it.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor) ||
                             it.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)
                 },
                 target = remember {
@@ -693,6 +696,9 @@ private fun Categories(
                 },
                 onRequestExpand = { expand ->
                     expendedItem = statusCategoryFilter.takeIf { expand }
+                },
+                onItemsDroppedInCategory = { category, ids ->
+                    component.moveItemsToCategory(category, ids)
                 },
                 onRequestOpenOptionMenu = {
                     showCategoryOption(it)
