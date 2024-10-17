@@ -1,6 +1,8 @@
 package com.abdownloadmanager.desktop.pages.home.sections.category
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.PointerMatcher
+import androidx.compose.foundation.background
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -19,9 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.theme.myColors
+import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.rememberIconPainter
 import ir.amirab.downloader.downloaditem.DownloadStatus
@@ -82,30 +88,60 @@ private fun CategoryFilterItem(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    Row(
+    Box(
         modifier
+            .background(
+                if (isSelected) {
+                    myColors.onBackground / 0.05f
+                } else Color.Transparent
+            )
             .selectable(
                 selected = isSelected,
                 onClick = onClick
-            )
-            .padding(start = 24.dp)
-            .padding(horizontal = 4.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            ),
     ) {
-        WithContentAlpha(if (isSelected) 1f else 0.75f) {
-            val iconPainter = category.rememberIconPainter()
-            MyIcon(
-                iconPainter ?: MyIcons.folder,
-                null,
-                Modifier.size(16.dp),
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(
-                category.name,
-                Modifier.weight(1f),
-                maxLines = 1,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                fontSize = myTextSizes.base
+        Row(
+            modifier = Modifier
+                .padding(start = 24.dp)
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            WithContentAlpha(if (isSelected) 1f else 0.75f) {
+                val iconPainter = category.rememberIconPainter()
+                MyIcon(
+                    iconPainter ?: MyIcons.folder,
+                    null,
+                    Modifier.size(16.dp),
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    category.name,
+                    Modifier.weight(1f),
+                    maxLines = 1,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    fontSize = myTextSizes.base
+                )
+            }
+        }
+        AnimatedVisibility(
+            isSelected,
+            modifier = Modifier.align(Alignment.CenterStart),
+            enter = scaleIn(),
+            exit = scaleOut(),
+        ) {
+            Spacer(
+                Modifier
+                    .height(16.dp)
+                    .width(3.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 0.dp,
+                            bottomStart = 0.dp,
+                            bottomEnd = 12.dp,
+                            topEnd = 12.dp,
+                        )
+                    )
+                    .background(myColors.primary)
             )
         }
     }
@@ -135,9 +171,14 @@ fun StatusFilterItem(
             },
         isExpanded = isExpanded,
         header = {
-            Row(
+            Box(
                 Modifier
                     .height(IntrinsicSize.Max)
+                    .background(
+                        if (isSelected) {
+                            myColors.onBackground / 0.05f
+                        } else Color.Transparent
+                    )
                     .selectable(
                         selected = isSelected,
                         onClick = {
@@ -146,37 +187,62 @@ fun StatusFilterItem(
                             }
                             onFilterChange(null)
                         }
-                    ).padding(vertical = 4.dp)
-                    .padding(start = 16.dp)
-                    .padding(end = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    )
             ) {
-                WithContentAlpha(if (isSelected) 1f else 0.75f) {
-                    MyIcon(
-                        statusFilter.icon,
-                        null,
-                        Modifier.size(16.dp)
+                Row(
+                    Modifier.padding(vertical = 4.dp)
+                        .padding(start = 16.dp)
+                        .padding(end = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    WithContentAlpha(if (isSelected) 1f else 0.75f) {
+                        MyIcon(
+                            statusFilter.icon,
+                            null,
+                            Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            statusFilter.name,
+                            Modifier.weight(1f),
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            fontSize = myTextSizes.lg,
+                            maxLines = 1,
+                        )
+                        MyIcon(MyIcons.up, null, Modifier
+                            .fillMaxHeight().wrapContentHeight()
+                            .clip(CircleShape)
+                            .size(24.dp)
+                            .clickable {
+                                onRequestExpand(!isExpanded)
+                            }
+                            .padding(6.dp)
+                            .width(16.dp)
+                            .let {
+                                it.rotate(if (isExpanded) 180f else 0f)
+                            })
+                    }
+                }
+                AnimatedVisibility(
+                    isSelected,
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    enter = scaleIn(),
+                    exit = scaleOut(),
+                ) {
+                    Spacer(
+                        Modifier
+                            .height(16.dp)
+                            .width(3.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    bottomStart = 0.dp,
+                                    bottomEnd = 12.dp,
+                                    topEnd = 12.dp,
+                                )
+                            )
+                            .background(myColors.primary)
                     )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        statusFilter.name,
-                        Modifier.weight(1f),
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        fontSize = myTextSizes.lg,
-                        maxLines = 1,
-                    )
-                    MyIcon(MyIcons.up, null, Modifier
-                        .fillMaxHeight().wrapContentHeight()
-                        .clip(CircleShape)
-                        .size(24.dp)
-                        .clickable {
-                            onRequestExpand(!isExpanded)
-                        }
-                        .padding(6.dp)
-                        .width(16.dp)
-                        .let {
-                            it.rotate(if (isExpanded) 180f else 0f)
-                        })
                 }
             }
         },
