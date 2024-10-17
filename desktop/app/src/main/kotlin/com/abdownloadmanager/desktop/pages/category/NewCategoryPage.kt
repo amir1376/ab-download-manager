@@ -151,7 +151,7 @@ fun CategoryAutoTypes(
 ) {
     WithLabel(
         label = "Category file types",
-        helpText = "Automatically put download to these file types to this category. (when you add new download)\n Separate file extensions with space (ext1 ext2 ...) "
+        helpText = "Automatically put these file types to this category. (when you add new download)\nSeparate file extensions with space (ext1 ext2 ...) "
     ) {
         CategoryPageTextField(
             text = types,
