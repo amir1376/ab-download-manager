@@ -1,5 +1,6 @@
 package com.abdownloadmanager.desktop.utils
 
+import com.abdownloadmanager.utils.category.CategoryItemWithId
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.CategorySelectionMode
 import ir.amirab.downloader.DownloadManager
@@ -68,7 +69,12 @@ class DownloadSystem(
                 CategorySelectionMode.Auto -> {
                     categoryManager.autoAddItemsToCategoriesBasedOnFileNames(
                         createdIds.mapIndexed { index: Int, id: Long ->
-                            id to newItemsToAdd.get(index).name
+                            val downloadItem = newItemsToAdd[index]
+                            CategoryItemWithId(
+                                id = id,
+                                fileName = downloadItem.name,
+                                url = downloadItem.link,
+                            )
                         }
                     )
                 }
@@ -105,7 +111,7 @@ class DownloadSystem(
     }
 
     suspend fun removeDownload(id: Long, alsoRemoveFile: Boolean) {
-        downloadManager.deleteDownload(id, alsoRemoveFile,RemovedBy(User))
+        downloadManager.deleteDownload(id, alsoRemoveFile, RemovedBy(User))
         categoryManager.removeItemInCategories(listOf(id))
     }
 
@@ -113,7 +119,7 @@ class DownloadSystem(
 //        if (mainDownloadQueue.isQueueActive) {
 //            return false
 //        }
-        downloadManager.resume(id,ResumedBy(User))
+        downloadManager.resume(id, ResumedBy(User))
         return true
     }
 
@@ -131,7 +137,7 @@ class DownloadSystem(
     }
 
     suspend fun startQueue(
-        queueId: Long
+        queueId: Long,
     ) {
         val queue = queueManager.getQueue(queueId)
         if (queue.isQueueActive) {
@@ -149,7 +155,7 @@ class DownloadSystem(
     }
 
     suspend fun stopQueue(
-        queueId: Long
+        queueId: Long,
     ) {
         queueManager.getQueue(queueId)
             .stop()

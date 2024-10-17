@@ -13,6 +13,7 @@ import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemSave
 import com.abdownloadmanager.desktop.utils.asState
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.CategoryItem
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.CategorySelectionMode
 import com.arkivanov.decompose.ComponentContext
@@ -179,13 +180,19 @@ class AddMultiDownloadComponent(
 
     private fun getFolderForItem(
         categorySelectionMode: CategorySelectionMode?,
+        url: String,
         fleName: String,
         defaultFolder: String,
     ): String {
         return when (categorySelectionMode) {
             CategorySelectionMode.Auto -> {
                 downloadSystem.categoryManager
-                    .getCategoryOfFileName(fleName)?.path
+                    .getCategoryOf(
+                        CategoryItem(
+                            url = url,
+                            fileName = fleName,
+                        )
+                    )?.path
                     ?: defaultFolder
             }
 
@@ -224,6 +231,7 @@ class AddMultiDownloadComponent(
                     id = -1,
                     folder = getFolderForItem(
                         categorySelectionMode = categorySelectionMode,
+                        url = it.credentials.value.link,
                         fleName = it.name.value,
                         defaultFolder = it.folder.value
                     ),

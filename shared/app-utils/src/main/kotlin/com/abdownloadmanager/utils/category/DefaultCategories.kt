@@ -43,7 +43,6 @@ class DefaultCategories(
                 "dmg",
                 "tgz",
             ),
-            items = emptyList(),
         )
 
         val programs = Category(
@@ -63,7 +62,6 @@ class DefaultCategories(
                 "rpm",
                 "bin",
             ),
-            items = emptyList(),
         )
         val videos = Category(
             id = 2,
@@ -82,7 +80,6 @@ class DefaultCategories(
                 "3gp",
                 "mpeg",
             ),
-            items = emptyList(),
         )
 
         val music = Category(
@@ -100,7 +97,6 @@ class DefaultCategories(
                 "wma",
                 "m4a",
             ),
-            items = emptyList(),
         )
 
         val pictures = Category(
@@ -123,7 +119,6 @@ class DefaultCategories(
                 "raw",
                 "psd",
             ),
-            items = emptyList(),
         )
         val documents = Category(
             id = 5,
@@ -145,7 +140,6 @@ class DefaultCategories(
                 "epub",
                 "pages",
             ),
-            items = emptyList(),
         )
         return listOf(
             compressed,

@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.pages.category
 
-import arrow.core.split
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.BaseComponent
 import com.abdownloadmanager.utils.category.Category
@@ -40,6 +39,8 @@ class CategoryComponent(
             setIcon(category.iconSource())
             setName(category.name)
             setTypes(category.acceptedFileTypes.joinToString(" "))
+            setUrlPatternsEnabled(category.acceptedUrlPatterns.isNotEmpty())
+            setUrlPatterns(category.acceptedUrlPatterns.joinToString(" "))
             setPath(category.path)
         }
     }
@@ -60,6 +61,18 @@ class CategoryComponent(
     val types = _types.asStateFlow()
     fun setTypes(types: String) {
         _types.value = types
+    }
+
+    private val _urlPatternsEnabled = MutableStateFlow(false)
+    val urlPatternsEnabled = _urlPatternsEnabled.asStateFlow()
+    fun setUrlPatternsEnabled(urlPatterns: Boolean) {
+        _urlPatternsEnabled.value = urlPatterns
+    }
+
+    private val _urlPatterns = MutableStateFlow("")
+    val urlPatterns = _urlPatterns.asStateFlow()
+    fun setUrlPatterns(urlPatterns: String) {
+        _urlPatterns.value = urlPatterns
     }
 
     private val _path = MutableStateFlow("")
@@ -101,6 +114,10 @@ class CategoryComponent(
                     .value!!
                     .uriOrNull()!!,
                 path = path,
+                acceptedUrlPatterns = urlPatterns.value
+                    .split(" ")
+                    .filterNot { it.isBlank() }
+                    .distinct(),
                 items = emptyList() // ignored!
             )
         )

@@ -18,11 +18,15 @@ import kotlinx.serialization.Serializable
 data class Category(
     val id: Long,
     val name: String,
-    val path: String,
-    val acceptedFileTypes: List<String>,
     val icon: String,
-    val items: List<Long>,
+    val path: String,
+    val acceptedFileTypes: List<String> = emptyList(),
+    // this is optional if nothing provided it means that every url is acceptable
+    val acceptedUrlPatterns: List<String> = emptyList(),
+    val items: List<Long> = emptyList(),
 ) {
+    val hasUrlPattern = acceptedUrlPatterns.isNotEmpty()
+
     fun acceptFileName(fileName: String): Boolean {
         return acceptedFileTypes.any { ext ->
             fileName.endsWith(
@@ -37,6 +41,29 @@ data class Category(
             items = items.plus(newItems).distinct()
         )
     }
+
+    fun acceptUrl(url: String): Boolean {
+        if (!hasUrlPattern) {
+            return true
+        }
+        return acceptedUrlPatterns.any {
+            test(
+                patten = it,
+                input = url
+            )
+        }
+    }
+}
+
+private fun test(
+    patten: String,
+    input: String,
+): Boolean {
+    return patten
+        .split("*")
+        .joinToString(".*") { Regex.escape(it) }
+        .toRegex()
+        .containsMatchIn(input)
 }
 
 fun Category.iconSource(): IconSource? {
