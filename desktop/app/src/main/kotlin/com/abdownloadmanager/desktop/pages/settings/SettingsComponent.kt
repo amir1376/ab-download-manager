@@ -11,6 +11,8 @@ import com.abdownloadmanager.desktop.utils.convertSpeedToHumanReadable
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import androidx.compose.runtime.*
+import com.abdownloadmanager.utils.proxy.ProxyManager
+import com.abdownloadmanager.utils.proxy.ProxyMode
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
@@ -129,6 +131,28 @@ fun defaultDownloadFolderConfig(appSettings: AppSettingsStorage): FolderConfigur
         },
         describe = {
             "\"$it\" will be used"
+        }
+    )
+}
+
+fun proxyConfig(proxyManager: ProxyManager, scope: CoroutineScope): ProxyConfigurable {
+    return ProxyConfigurable(
+        title = "Use Proxy",
+        description = "Use proxy for downloading files",
+        backedBy = proxyManager.proxyData,
+
+        validate = {
+            true
+        },
+        describe = {
+            val str = when (it.proxyMode) {
+                ProxyMode.Direct -> "No proxy"
+                ProxyMode.UseSystem -> "System proxy"
+                ProxyMode.Manual -> it.proxyWithRules.proxy.run {
+                    "$type $host:$port"
+                }
+            }
+            "$str will be used"
         }
     )
 }
@@ -270,6 +294,7 @@ class SettingsComponent(
     ContainsEffects<SettingPageEffects> by supportEffects() {
     val appSettings by inject<AppSettingsStorage>()
     val appRepository by inject<AppRepository>()
+    val proxyManager by inject<ProxyManager>()
     val themeManager by inject<ThemeManager>()
     val allConfigs = object : SettingSectionGetter {
         override operator fun get(key: SettingSections): List<Configurable<*>> {
@@ -290,6 +315,7 @@ class SettingsComponent(
 
                 DownloadEngine -> listOf(
                     defaultDownloadFolderConfig(appSettings),
+                    proxyConfig(proxyManager, scope),
                     useAverageSpeedConfig(appRepository),
                     speedLimitConfig(appRepository),
                     threadCountConfig(appRepository),

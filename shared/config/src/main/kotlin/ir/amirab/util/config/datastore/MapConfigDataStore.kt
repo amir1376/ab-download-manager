@@ -46,7 +46,7 @@ class MyConfigSerializer(
     }
 }
 
-fun createMyConfigPreferences(
+fun createMapConfigDatastore(
     file: File,
     json: Json,
 ): DataStore<MapConfig> {

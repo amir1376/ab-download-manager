@@ -6,6 +6,7 @@ import com.abdownloadmanager.desktop.utils.DownloadSystem
 import ir.amirab.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
+import com.abdownloadmanager.utils.proxy.ProxyManager
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +20,7 @@ import org.koin.core.component.inject
 class AppRepository : KoinComponent {
     private val scope: CoroutineScope by inject()
     private val appSettings: AppSettingsStorage by inject()
+    private val proxyManager: ProxyManager by inject()
     val theme = appSettings.theme
 
     //    val uiScale = appSettings.uiScale
@@ -37,6 +39,7 @@ class AppRepository : KoinComponent {
     val saveLocation = appSettings.defaultDownloadFolder
     val integrationEnabled = appSettings.browserIntegrationEnabled
     val integrationPort = appSettings.browserIntegrationPort
+
 
     init {
         //maybe its better to move this to another place

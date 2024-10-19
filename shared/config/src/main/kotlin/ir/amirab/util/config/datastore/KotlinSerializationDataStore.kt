@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.storage.base
+package ir.amirab.util.config.datastore
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
