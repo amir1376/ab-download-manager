@@ -96,7 +96,7 @@ data class AppSettingsModel(
 
 class AppSettingsStorage(
     settings: DataStore<MapConfig>,
-) : ConfigBaseSettings<AppSettingsModel>(settings, AppSettingsModel.ConfigLens) {
+) : ConfigBaseSettingsByMapConfig<AppSettingsModel>(settings, AppSettingsModel.ConfigLens) {
     var theme = from(AppSettingsModel.theme)
     var mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
     val threadCount = from(AppSettingsModel.threadCount)

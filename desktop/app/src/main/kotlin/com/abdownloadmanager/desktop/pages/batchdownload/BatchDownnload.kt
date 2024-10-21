@@ -223,7 +223,7 @@ private fun WildcardLengthUi(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Multiselect(
-            selections = WildcardSelect.entries,
+            selections = entries,
             selectedItem = WildcardSelect.fromWildcardLength(wildcardLength),
             onSelectionChange = {
                 onChangeWildcardLength(
@@ -253,48 +253,6 @@ private fun WildcardLengthUi(
                     keyboardOptions = KeyboardOptions.Default,
                     modifier = Modifier.width(72.dp)
                 )
-            }
-        }
-    }
-}
-
-@Composable
-private fun <T> Multiselect(
-    selections: List<T>,
-    selectedItem: T,
-    onSelectionChange: (T) -> Unit,
-    render: @Composable (T) -> Unit,
-) {
-    val shape = RoundedCornerShape(6.dp)
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clip(shape)
-            .background(myColors.surface)
-    ) {
-        for (item in selections) {
-            val isSelected = item == selectedItem
-            Box(
-                Modifier
-                    .padding(vertical = 4.dp, horizontal = 4.dp)
-                    .clip(shape)
-                    .ifThen(isSelected) {
-                        background(LocalContentColor.current / 10)
-                    }
-                    .clickable {
-                        onSelectionChange(item)
-                    }
-                    .padding(vertical = 2.dp, horizontal = 4.dp)
-            ) {
-                WithContentAlpha(
-                    if (isSelected) {
-                        1f
-                    } else {
-                        0.5f
-                    }
-                ) {
-                    render(item)
-                }
             }
         }
     }

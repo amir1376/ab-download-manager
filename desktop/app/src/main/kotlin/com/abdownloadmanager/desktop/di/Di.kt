@@ -24,7 +24,7 @@ import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.util.startup.Startup
 import com.abdownloadmanager.integration.Integration
 import ir.amirab.downloader.DownloadManager
-import ir.amirab.util.config.datastore.createMyConfigPreferences
+import ir.amirab.util.config.datastore.createMapConfigDatastore
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import okhttp3.Dispatcher
@@ -39,8 +39,13 @@ import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.FileIconProviderUsingCategoryIcons
 import com.abdownloadmanager.utils.category.*
 import com.abdownloadmanager.utils.compose.IMyIcons
+import com.abdownloadmanager.utils.proxy.IProxyStorage
+import com.abdownloadmanager.utils.proxy.ProxyData
+import com.abdownloadmanager.utils.proxy.ProxyManager
+import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.utils.EmptyFileCreator
+import ir.amirab.util.config.datastore.kotlinxSerializationDataStore
 
 val downloaderModule = module {
     single<IDownloadQueueDatabase> {
@@ -84,6 +89,11 @@ val downloaderModule = module {
             8,
         )
     }
+    single {
+        ProxyManager(
+            get()
+        )
+    }.bind<ProxyStrategyProvider>()
     single<DownloaderClient> {
         OkHttpDownloaderClient(
             OkHttpClient
@@ -92,9 +102,9 @@ val downloaderModule = module {
                     //bypass limit on concurrent connections!
                     maxRequests = Int.MAX_VALUE
                     maxRequestsPerHost = Int.MAX_VALUE
-                }).build()
+                }).build(),
+            get()
         )
-
     }
     single {
         val downloadSettings: DownloadSettings = get()
@@ -216,8 +226,17 @@ val appModule = module {
         MyIcons
     }.bind<IMyIcons>()
     single {
+        ProxyDatastoreStorage(
+            kotlinxSerializationDataStore(
+                AppInfo.optionsDir.resolve("proxySettings.json"),
+                get(),
+                ProxyData::default,
+            )
+        )
+    }.bind<IProxyStorage>()
+    single {
         AppSettingsStorage(
-            createMyConfigPreferences(
+            createMapConfigDatastore(
                 AppInfo.configDir.resolve("appSettings.json"),
                 get(),
             )
@@ -225,7 +244,7 @@ val appModule = module {
     }
     single {
         PageStatesStorage(
-            createMyConfigPreferences(
+            createMapConfigDatastore(
                 AppInfo.configDir.resolve("pageStatesStorage.json"),
                 get(),
             )

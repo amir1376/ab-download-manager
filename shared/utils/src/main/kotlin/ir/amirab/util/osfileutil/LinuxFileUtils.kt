@@ -1,5 +1,6 @@
 package ir.amirab.util.osfileutil
 
+import ir.amirab.util.execAndWait
 import java.io.File
 
 internal class LinuxFileUtils : FileUtilsBase() {

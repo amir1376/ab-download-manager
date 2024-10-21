@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.fromUri
+import ir.amirab.util.wildcardMatch
 import kotlinx.serialization.Serializable
 
 /**
@@ -47,23 +48,12 @@ data class Category(
             return true
         }
         return acceptedUrlPatterns.any {
-            test(
-                patten = it,
+            wildcardMatch(
+                pattern = it,
                 input = url
             )
         }
     }
-}
-
-private fun test(
-    patten: String,
-    input: String,
-): Boolean {
-    return patten
-        .split("*")
-        .joinToString(".*") { Regex.escape(it) }
-        .toRegex()
-        .containsMatchIn(input)
 }
 
 fun Category.iconSource(): IconSource? {

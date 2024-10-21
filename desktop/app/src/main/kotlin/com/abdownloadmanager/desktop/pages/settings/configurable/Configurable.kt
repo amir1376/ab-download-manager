@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import com.abdownloadmanager.desktop.pages.settings.ThemeInfo
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable.RenderMode
 import com.abdownloadmanager.desktop.ui.theme.MyColors
+import com.abdownloadmanager.utils.proxy.ProxyData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -290,6 +291,24 @@ class DayOfWeekConfigurable(
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : Configurable<Set<DayOfWeek>>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
+    validate = validate,
+    enabled = enabled,
+    visible = visible,
+)
+
+class ProxyConfigurable(
+    title: String,
+    description: String,
+    backedBy: MutableStateFlow<ProxyData>,
+    describe: (ProxyData) -> String,
+    validate: (ProxyData) -> Boolean,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : Configurable<ProxyData>(
     title = title,
     description = description,
     backedBy = backedBy,

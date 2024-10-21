@@ -1,4 +1,4 @@
-package ir.amirab.util.osfileutil
+package ir.amirab.util
 
 import java.util.concurrent.TimeUnit
 
@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
  * @param waitFor maximum time allowed process finish ( in milliseconds )
  * @return `true` when process exits with `0` exit code, `false` if the process fails with non-zero exit code or execution time exceeds the [waitFor]
  */
-internal fun execAndWait(
+fun execAndWait(
     command: Array<String>,
     waitFor: Long = 2_000,
 ): Boolean {
