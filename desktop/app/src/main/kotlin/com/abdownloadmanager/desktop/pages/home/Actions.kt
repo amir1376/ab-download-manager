@@ -87,7 +87,7 @@ private fun ActionButton(
                     MyIcon(it, null, Modifier.size(16.dp))
                 }
                 Spacer(Modifier.size(2.dp))
-                Text(title, maxLines = 1, fontSize = myTextSizes.sm)
+                Text(title.rememberString(), maxLines = 1, fontSize = myTextSizes.sm)
             }
         }
     }
@@ -120,7 +120,7 @@ private fun GroupActionButton(
                         MyIcon(it, null, Modifier.size(16.dp))
                     }
                     Spacer(Modifier.size(2.dp))
-                    Text(title, maxLines = 1, fontSize = myTextSizes.sm)
+                    Text(title.rememberString(), maxLines = 1, fontSize = myTextSizes.sm)
                 }
             }
         }

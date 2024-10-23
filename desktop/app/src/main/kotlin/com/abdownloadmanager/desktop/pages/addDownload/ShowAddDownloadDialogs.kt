@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 import java.awt.Dimension
 
 @Composable
@@ -53,7 +56,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
                         window.minimumSize = Dimension(w, h)
                     }
 //                    BringToFront()
-                    WindowTitle("Add download")
+                    WindowTitle(myStringResource(Res.string.add_download))
                     WindowIcon(MyIcons.appIcon)
                     AddDownloadPage(addDownloadComponent)
                 }
@@ -76,7 +79,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
                         window.minimumSize = Dimension(w, h)
                     }
 //                    BringToFront()
-                    WindowTitle("Add download")
+                    WindowTitle(myStringResource(Res.string.add_download))
                     WindowIcon(MyIcons.appIcon)
                     AddMultiItemPage(addDownloadComponent)
                 }

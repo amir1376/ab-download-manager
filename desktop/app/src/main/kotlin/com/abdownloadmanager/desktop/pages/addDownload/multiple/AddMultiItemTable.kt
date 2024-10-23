@@ -25,8 +25,11 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.compose.widget.MyIcon
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 
 @Composable
 fun AddMultiDownloadTable(
@@ -210,7 +213,8 @@ sealed class AddMultiItemTableCells : TableCell<DownloadUiChecker> {
 
     data object Check : AddMultiItemTableCells(),
         CustomCellRenderer {
-        override val name: String = "#"
+        override val id: String = "#"
+        override val name: StringSource = "#".asStringSource()
         override val size: CellSize = CellSize.Fixed(26.dp)
 
         @Composable
@@ -225,17 +229,20 @@ sealed class AddMultiItemTableCells : TableCell<DownloadUiChecker> {
     }
 
     data object Name : AddMultiItemTableCells() {
-        override val name: String = "Name"
+        override val id: String = "Name"
+        override val name: StringSource = Res.string.name.asStringSource()
         override val size: CellSize = CellSize.Resizeable(120.dp..1000.dp, 350.dp)
     }
 
     data object Link : AddMultiItemTableCells() {
-        override val name: String = "Link"
+        override val id: String = "Link"
+        override val name: StringSource = Res.string.link.asStringSource()
         override val size: CellSize = CellSize.Resizeable(120.dp..2000.dp, 240.dp)
     }
 
     data object SizeCell : AddMultiItemTableCells() {
-        override val name: String = "Size"
+        override val id: String = "Size"
+        override val name: StringSource = Res.string.size.asStringSource()
         override val size: CellSize = CellSize.Resizeable(100.dp..180.dp, 100.dp)
     }
 }
@@ -289,7 +296,7 @@ private fun SizeCell(
     val length by downloadChecker.length.collectAsState()
     CellText(
         length?.let {
-            convertSizeToHumanReadable(it)
+            convertSizeToHumanReadable(it).rememberString()
         } ?: ""
     )
 }

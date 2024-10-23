@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberCursorPositionProvider
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
 import kotlinx.coroutines.flow.*
 
 val LocalCellPadding = compositionLocalOf {
@@ -241,13 +243,13 @@ private fun <T, C : TableCell<T>> ShowColumnConfigMenu(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Customize Columns",
+                    myStringResource(Res.string.customize_columns),
                     fontSize = myTextSizes.base
                 )
                 Spacer(Modifier.width(8.dp))
                 IconActionButton(
                     MyIcons.undo,
-                    "Reset",
+                    myStringResource(Res.string.reset),
                     onClick = {
                         tableState.reset()
                     }
@@ -329,7 +331,7 @@ private fun <T, Cell : TableCell<T>> CellConfigItem(
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            cell.name,
+            cell.name.rememberString(),
             Modifier
                 .weight(1f)
                 .ifThen(!isVisible || isForceVisible) {

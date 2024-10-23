@@ -29,8 +29,11 @@ import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.ui.widget.Text
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.widget.MyIcon
+import ir.amirab.util.compose.resources.myStringResource
 import java.awt.MouseInfo
 
 @Composable
@@ -208,7 +211,7 @@ private fun <T> DropDownHeader(
             }
         } else {
             Text(
-                "No Category Selected",
+                myStringResource(Res.string.no_category_selected),
                 contentModifier
             )
         }

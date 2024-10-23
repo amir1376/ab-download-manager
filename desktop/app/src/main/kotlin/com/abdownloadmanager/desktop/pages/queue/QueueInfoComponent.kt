@@ -7,11 +7,15 @@ import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
 import com.abdownloadmanager.desktop.utils.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.QueueManager
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -69,7 +73,7 @@ class QueueInfoComponent(
 
 
     val configurations: List<ConfigurableGroup> =
-            createConfigurableList(downloadQueue, scope)
+        createConfigurableList(downloadQueue, scope)
 
 
     private fun createConfigurableList(
@@ -84,11 +88,11 @@ class QueueInfoComponent(
         }
         return listOf(
             ConfigurableGroup(
-                groupTitle = MutableStateFlow("General"),
+                groupTitle = MutableStateFlow(Res.string.general.asStringSource()),
                 nestedConfigurable = listOf(
                     StringConfigurable(
-                        "Name",
-                        "Specify A name for this queue",
+                        Res.string.name.asStringSource(),
+                        Res.string.queue_name_help.asStringSource(),
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = downloadQueue.queueModel.mapStateFlow() {
@@ -101,11 +105,18 @@ class QueueInfoComponent(
                         validate = {
                             it.length in 1..32
                         },
-                        describe = { "Queue name is $it" },
+                        describe = {
+                            Res.string.queue_name_describe
+                                .asStringSourceWithARgs(
+                                    Res.string.queue_name_describe_createArgs(
+                                        value = it
+                                    )
+                                )
+                        },
                     ),
                     IntConfigurable(
-                        "Max Concurrent",
-                        "Max download for this queue",
+                        Res.string.queue_max_concurrent_download.asStringSource(),
+                        Res.string.queue_max_concurrent_download_description.asStringSource(),
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = downloadQueue.queueModel.mapStateFlow() {
@@ -115,13 +126,13 @@ class QueueInfoComponent(
                                 downloadQueue.setMaxConcurrent(newValue)
                             },
                         ),
-                        describe = { "${it}" },
+                        describe = { "$it".asStringSource() },
                         range = 1..32,
                         renderMode = IntConfigurable.RenderMode.TextField,
                     ),
                     BooleanConfigurable(
-                        "Automatic stop",
-                        "Automatic stop queue when there is no item in it",
+                        Res.string.queue_automatic_stop.asStringSource(),
+                        Res.string.queue_automatic_stop_description.asStringSource(),
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = downloadQueue.queueModel.mapStateFlow() {
@@ -132,19 +143,19 @@ class QueueInfoComponent(
                             },
                         ),
                         describe = {
-                            if (it) "Enabled"
-                            else "Disabled"
+                            if (it) Res.string.enabled.asStringSource()
+                            else Res.string.disabled.asStringSource()
                         },
                     ),
                 ),
             ),
             ConfigurableGroup(
-                groupTitle = MutableStateFlow("Scheduler"),
+                groupTitle = MutableStateFlow(Res.string.queue_scheduler.asStringSource()),
                 nestedVisible = enabledSchedulerFlow,
                 mainConfigurable = BooleanConfigurable(
-                    "Enable Scheduler",
-                    description = "",
-                    describe = { "" },
+                    Res.string.queue_enable_scheduler.asStringSource(),
+                    description = "".asStringSource(),
+                    describe = { "".asStringSource() },
                     backedBy = createMutableStateFlowFromStateFlow(
                         flow = enabledSchedulerFlow,
                         scope = scope,
@@ -157,8 +168,8 @@ class QueueInfoComponent(
                 ),
                 nestedConfigurable = listOf(
                     DayOfWeekConfigurable(
-                        "Active days",
-                        "which days schedulers function ?",
+                        Res.string.queue_active_days.asStringSource(),
+                        Res.string.queue_active_days_description.asStringSource(),
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = downloadQueue.queueModel.mapStateFlow() {
@@ -173,11 +184,11 @@ class QueueInfoComponent(
                         validate = {
                             it.isNotEmpty()
                         },
-                        describe = { "" },
+                        describe = { "".asStringSource() },
                     ),
                     TimeConfigurable(
-                        "Auto Start download",
-                        "",
+                        Res.string.queue_scheduler_auto_start_time.asStringSource(),
+                        "".asStringSource(),
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = downloadQueue.queueModel.mapStateFlow() {
@@ -189,12 +200,12 @@ class QueueInfoComponent(
                                 }
                             },
                         ),
-                        describe = { "" },
+                        describe = { "".asStringSource() },
                     ),
                     BooleanConfigurable(
-                        "Enable Auto Stop",
-                        description = "",
-                        describe = { "" },
+                        Res.string.queue_scheduler_enable_auto_stop_time.asStringSource(),
+                        description = "".asStringSource(),
+                        describe = { "".asStringSource() },
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = enabledEndTimeFlow,
@@ -207,8 +218,8 @@ class QueueInfoComponent(
                             ),
                     ),
                     TimeConfigurable(
-                        "Auto Stop download",
-                        "",
+                        Res.string.queue_scheduler_auto_stop_time.asStringSource(),
+                        "".asStringSource(),
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = downloadQueue.queueModel.mapStateFlow() {
@@ -220,7 +231,7 @@ class QueueInfoComponent(
                                 }
                             },
                         ),
-                        describe = { "" },
+                        describe = { "".asStringSource() },
                         visible = enabledEndTimeFlow,
                     ),
                 )

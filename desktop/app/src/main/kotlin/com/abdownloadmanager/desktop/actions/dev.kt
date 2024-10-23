@@ -7,13 +7,14 @@ import com.abdownloadmanager.desktop.ui.widget.MessageDialogType
 import ir.amirab.util.compose.action.AnAction
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.simpleAction
+import ir.amirab.util.compose.asStringSource
 import org.koin.core.component.get
 
 private val appComponent = Di.get<AppComponent>()
 
 val dummyException by lazy {
     simpleAction(
-        "Dummy Exception",
+        "Dummy Exception".asStringSource(),
         MyIcons.info
     ) {
         error("This is a dummy exception that is thrown by developer")
@@ -21,7 +22,7 @@ val dummyException by lazy {
 }
 val dummyMessage by lazy {
     MenuItem.SubMenu(
-        title = "Show Dialog Message",
+        title = "Show Dialog Message".asStringSource(),
         icon = MyIcons.info,
         items = listOf(
             MessageDialogType.Info,
@@ -34,13 +35,13 @@ val dummyMessage by lazy {
 
 private fun createDummyMessage(type: MessageDialogType): AnAction {
     return simpleAction(
-        "$type Message",
+        "$type Message".asStringSource(),
         MyIcons.info,
     ) {
         appComponent.sendDialogNotification(
             type = type,
-            title = "Dummy Message",
-            description = "This is a test message"
+            title = "Dummy Message".asStringSource(),
+            description = "This is a test message".asStringSource()
         )
     }
 }

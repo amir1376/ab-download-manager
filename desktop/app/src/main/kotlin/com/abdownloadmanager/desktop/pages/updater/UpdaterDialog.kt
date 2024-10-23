@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
+import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -61,8 +62,8 @@ fun ShowUpdaterDialog(updaterComponent: UpdateComponent) {
 
     message?.let { message ->
         ShowNotification(
-            title = "Updater",
-            description = message,
+            title = "Updater".asStringSource(),
+            description = message.asStringSource(),
             type = notificationType ?: NotificationType.Info,
             tag = "Updater"
         )

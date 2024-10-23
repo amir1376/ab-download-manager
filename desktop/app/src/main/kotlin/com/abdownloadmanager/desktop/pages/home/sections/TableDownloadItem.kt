@@ -19,13 +19,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.util.compose.resources.MyStringResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.*
@@ -115,7 +119,7 @@ fun NameCell(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                category?.name ?: "General", maxLines = 1, fontSize = myTextSizes.xs,
+                category?.name ?: myStringResource(Res.string.general), maxLines = 1, fontSize = myTextSizes.xs,
                 color = LocalContentColor.current / 50
             )
         }
@@ -186,7 +190,7 @@ fun SizeCell(
 ) {
     item.contentLength.let {
         Text(
-            convertSizeToHumanReadable(it),
+            convertSizeToHumanReadable(it).rememberString(),
             maxLines = 1,
             fontSize = myTextSizes.base,
             overflow = TextOverflow.Ellipsis,
@@ -247,17 +251,69 @@ fun StatusCell(
 
                 DownloadJobStatus.Finished,
                 DownloadJobStatus.Resuming,
-                    -> SimpleStatus(itemState.status.toString())
+                    -> SimpleStatus(myStringResource(itemState.status.toStringResource()))
             }
         }
 
         is CompletedDownloadItemState -> {
-            SimpleStatus("Finished")
+            SimpleStatus(myStringResource(Res.string.finished))
         }
     }
 
 }
 
+@Composable
+private fun DownloadJobStatus.toStringResource(): MyStringResource {
+    return when (this) {
+        is DownloadJobStatus.Canceled -> {
+            Res.string.canceled
+        }
+
+        DownloadJobStatus.Downloading -> {
+            Res.string.downloading
+        }
+
+        DownloadJobStatus.Finished -> {
+            Res.string.finished
+        }
+
+        DownloadJobStatus.IDLE -> {
+            Res.string.idle
+        }
+
+        is DownloadJobStatus.PreparingFile -> {
+            Res.string.preparing_file
+        }
+
+        DownloadJobStatus.Resuming -> {
+            Res.string.resuming
+        }
+    }
+}
+
+private fun DownloadProgressStatus.toStringResource(): MyStringResource {
+    return when (this) {
+        DownloadProgressStatus.Added -> {
+            Res.string.added
+        }
+
+        DownloadProgressStatus.Error -> {
+            Res.string.error
+        }
+
+        DownloadProgressStatus.Paused -> {
+            Res.string.paused
+        }
+
+        DownloadProgressStatus.CreatingFile -> {
+            Res.string.creating_file
+        }
+
+        DownloadProgressStatus.Downloading -> {
+            Res.string.downloading
+        }
+    }
+}
 
 @Composable
 private fun SimpleStatus(string: String) {
@@ -285,11 +341,12 @@ private fun ProgressAndPercent(
         DownloadProgressStatus.CreatingFile -> myColors.infoGradient
         DownloadProgressStatus.Downloading -> myColors.primaryGradient
     }
+    val statusString = myStringResource(status.toStringResource())
     Column {
         val statusText = if (gotAnyProgress) {
-            "${percent ?: "."}% $status"
+            "${percent ?: "."}% $statusString"
         } else {
-            "$status"
+            statusString
         }
         SimpleStatus(statusText)
         if (status != DownloadProgressStatus.Added) {

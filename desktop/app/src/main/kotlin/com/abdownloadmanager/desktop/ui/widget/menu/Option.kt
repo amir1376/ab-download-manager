@@ -47,7 +47,7 @@ fun ShowOptions(
             val itemPadding = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
             val title by menu.title.collectAsState()
             Text(
-                title,
+                title.rememberString(),
                 Modifier
                     .then(itemPadding)
                     .basicMarquee(

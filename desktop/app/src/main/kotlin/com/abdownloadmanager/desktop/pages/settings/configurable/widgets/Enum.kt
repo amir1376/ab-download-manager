@@ -32,7 +32,7 @@ fun RenderEnumConfig(cfg: EnumConfigurable<Any?>, modifier: Modifier) {
                     modifier = Modifier.widthIn(min = 160.dp),
                     enabled = enabled,
                     render = {
-                        Text(cfg.describe(it))
+                        Text(cfg.describe(it).rememberString())
                     })
             }
         }

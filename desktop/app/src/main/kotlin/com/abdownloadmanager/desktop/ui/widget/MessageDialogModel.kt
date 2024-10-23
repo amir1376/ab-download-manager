@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
+import ir.amirab.util.compose.StringSource
 import java.awt.Dimension
 import java.util.UUID
 
@@ -32,8 +33,8 @@ sealed class MessageDialogType {
 
 data class MessageDialogModel(
     val id: String = UUID.randomUUID().toString(),
-    val title: String,
-    val description: String,
+    val title: StringSource,
+    val description: StringSource,
     val type: MessageDialogType = MessageDialogType.Info,
 )
 
@@ -94,13 +95,13 @@ fun MessageDialog(
             )
             Column {
                 Text(
-                    msgContent.title,
+                    msgContent.title.rememberString(),
                     fontSize = myTextSizes.xl,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    msgContent.description,
+                    msgContent.description.rememberString(),
                     fontSize = myTextSizes.base,
                     modifier = Modifier
                         .weight(1f)

@@ -4,11 +4,13 @@ import com.abdownloadmanager.desktop.utils.*
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
+import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.booleanKeyOf
 import ir.amirab.util.config.intKeyOf
 import ir.amirab.util.config.longKeyOf
 import ir.amirab.util.config.stringKeyOf
 import ir.amirab.util.config.MapConfig
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 import java.io.File
 
@@ -16,6 +18,7 @@ import java.io.File
 @Serializable
 data class AppSettingsModel(
     val theme: String = "dark",
+    val language: String = "en",
     val mergeTopBarWithTitleBar: Boolean = false,
     val threadCount: Int = 5,
     val dynamicPartCreation: Boolean = true,
@@ -38,6 +41,7 @@ data class AppSettingsModel(
     object ConfigLens : Lens<MapConfig, AppSettingsModel> {
         object Keys {
             val theme = stringKeyOf("theme")
+            val language = stringKeyOf("language")
             val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
             val threadCount = intKeyOf("threadCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
@@ -58,6 +62,7 @@ data class AppSettingsModel(
             val default by lazy { AppSettingsModel.default }
             return AppSettingsModel(
                 theme = source.get(Keys.theme) ?: default.theme,
+                language = source.get(Keys.language) ?: default.language,
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
@@ -77,6 +82,7 @@ data class AppSettingsModel(
         override fun set(source: MapConfig, focus: AppSettingsModel): MapConfig {
             return source.apply {
                 put(Keys.theme, focus.theme)
+                put(Keys.language, focus.language)
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
                 put(Keys.threadCount, focus.threadCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
@@ -96,8 +102,11 @@ data class AppSettingsModel(
 
 class AppSettingsStorage(
     settings: DataStore<MapConfig>,
-) : ConfigBaseSettingsByMapConfig<AppSettingsModel>(settings, AppSettingsModel.ConfigLens) {
+) :
+    ConfigBaseSettingsByMapConfig<AppSettingsModel>(settings, AppSettingsModel.ConfigLens),
+    LanguageStorage {
     var theme = from(AppSettingsModel.theme)
+    override val selectedLanguage = from(AppSettingsModel.language)
     var mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)

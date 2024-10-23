@@ -20,6 +20,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun SearchBox(
@@ -27,7 +30,7 @@ fun SearchBox(
     onTextChange: (String) -> Unit,
     textPadding: PaddingValues = PaddingValues(horizontal = 8.dp),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    placeholder: String = "Search in the List",
+    placeholder: String = myStringResource(Res.string.search_in_the_list),
     modifier: Modifier,
 ) {
     val shape = RoundedCornerShape(12.dp)
@@ -44,7 +47,8 @@ fun SearchBox(
                 animateFloatAsState(if (text.isBlank()) 0.9f else 1f).value
             ) {
                 MyIcon(
-                    MyIcons.search, "Search",
+                    MyIcons.search,
+                    myStringResource(Res.string.search),
                     Modifier
                         .padding(start = 8.dp)
                         .size(16.dp)
@@ -55,7 +59,7 @@ fun SearchBox(
             AnimatedContent(text.isNotBlank()) {
                 MyIcon(
                     MyIcons.clear,
-                    "Clear",
+                    myStringResource(Res.string.clear),
                     Modifier
                         .padding(end = 8.dp)
                         .clip(CircleShape)

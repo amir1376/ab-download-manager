@@ -9,6 +9,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun ShowAboutDialog(appComponent: AppComponent) {
@@ -37,7 +40,7 @@ fun AboutDialog(
         ),
         onCloseRequest = onClose
     ) {
-        WindowTitle("About")
+        WindowTitle(myStringResource(Res.string.about))
         AboutPage(
             close = onClose,
             onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries

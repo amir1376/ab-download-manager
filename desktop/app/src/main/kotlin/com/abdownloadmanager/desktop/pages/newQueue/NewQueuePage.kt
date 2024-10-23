@@ -9,13 +9,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun NewQueue(
     onQueueCreate: (String) -> Unit,
     onCloseRequest: () -> Unit,
 ) {
-    WindowTitle("New Queue")
+    WindowTitle(myStringResource(Res.string.add_new_queue))
     var name by remember {
         mutableStateOf("")
     }
@@ -34,7 +37,7 @@ fun NewQueue(
                 .focusRequester(focusRequester)
                 .padding(horizontal = 8.dp)
                 .widthIn(max = 400.dp),
-            placeholder = "Queue name...",
+            placeholder = myStringResource(Res.string.queue_name),
         )
         Spacer(Modifier.height(8.dp))
         Spacer(Modifier.weight(1f))
@@ -46,14 +49,14 @@ fun NewQueue(
             horizontalArrangement = Arrangement.End,
         ) {
             ActionButton(
-                text = "Create",
+                text = myStringResource(Res.string.add),
                 onClick = {
                     onQueueCreate(name)
                 }
             )
             Spacer(Modifier.width(4.dp))
             ActionButton(
-                text = "Cancel",
+                text = myStringResource(Res.string.cancel),
                 onClick = {
                     onCloseRequest()
                 }

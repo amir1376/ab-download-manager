@@ -30,12 +30,15 @@ import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.ui.widget.CheckBox
-import com.abdownloadmanager.desktop.ui.widget.Help
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
-import com.abdownloadmanager.utils.category.CategorySelectionMode
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.compose.WithContentColor
 import com.abdownloadmanager.utils.compose.widget.MyIcon
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import java.awt.MouseInfo
 
 @Composable
@@ -51,7 +54,7 @@ fun AddMultiItemPage(
         ) {
             WithContentAlpha(1f) {
                 Text(
-                    "Select Items you want to pick up for download",
+                    myStringResource(Res.string.add_multi_download_page_header),
                     fontSize = myTextSizes.base
                 )
             }
@@ -109,7 +112,7 @@ fun Footer(
             Spacer(Modifier.width(8.dp))
             Row(Modifier.align(Alignment.Bottom)) {
                 ActionButton(
-                    text = "Add",
+                    text = myStringResource(Res.string.add),
                     onClick = {
                         component.openAddToQueueDialog()
                     },
@@ -118,7 +121,7 @@ fun Footer(
                 )
                 Spacer(Modifier.width(8.dp))
                 ActionButton(
-                    text = "Cancel",
+                    text = myStringResource(Res.string.cancel),
                     onClick = {
                         component.requestClose()
                     },
@@ -139,7 +142,7 @@ private fun SaveSettings(
     ) {
         var dropdownOpen by remember { mutableStateOf(false) }
         val saveMode by component.saveMode.collectAsState()
-        Text("Save to:")
+        Text("${myStringResource(Res.string.save_to)}:")
         Spacer(Modifier.height(8.dp))
         SaveSolution(
             saveMode = saveMode,
@@ -275,14 +278,14 @@ private fun SaveSolutionPopup(
                             Modifier.padding(16.dp)
                         ) {
                             Text(
-                                "Where should each item saved?",
+                                myStringResource(Res.string.where_should_each_item_saved),
                                 Modifier,
                                 fontSize = myTextSizes.base
                             )
                             Spacer(Modifier.height(8.dp))
                             WithContentAlpha(0.75f) {
                                 Text(
-                                    "There are multiple items! please select a way you want to save them",
+                                    myStringResource(Res.string.there_are_multiple_items_please_select_a_way_you_want_to_save_them),
                                     Modifier,
                                     fontSize = myTextSizes.sm,
                                 )
@@ -304,8 +307,8 @@ private fun SaveSolutionPopup(
                         Column {
                             for (item in AddMultiItemSaveMode.entries) {
                                 SaveSolutionItem(
-                                    title = item.title,
-                                    description = item.description,
+                                    title = item.title.rememberString(),
+                                    description = item.description.rememberString(),
                                     isSelected = selectedItem == item,
                                     onClick = {
                                         onIteSelected(item)
@@ -348,7 +351,7 @@ private fun SaveSolutionHeader(
             .padding(vertical = 8.dp)
             .weight(1f)
         Text(
-            saveMode.title,
+            saveMode.title.rememberString(),
             contentModifier,
         )
         Spacer(
@@ -434,24 +437,24 @@ private fun AllFilesInSameDirectory(
             onValueChange = setAlsoCategorize
         )
         Spacer(Modifier.width(4.dp))
-        Text("Auto categorize")
+        Text(myStringResource(Res.string.auto_categorize_downloads))
     }
 }
 
 enum class AddMultiItemSaveMode(
-    val title: String,
-    val description: String,
+    val title: StringSource,
+    val description: StringSource,
 ) {
     EachFileInTheirOwnCategory(
-        title = "Each item on its own category",
-        description = "Each item will be placed in a category that have that file type",
+        title = Res.string.each_item_on_its_own_category.asStringSource(),
+        description = Res.string.each_item_on_its_own_category_description.asStringSource(),
     ),
     AllInOneCategory(
-        title = "All items in one Category",
-        description = "All files will be saved in the selected category location",
+        title = Res.string.all_items_in_one_category.asStringSource(),
+        description = Res.string.all_items_in_one_category_description.asStringSource(),
     ),
     InSameLocation(
-        title = "All items in one Location",
-        description = "All items will be saved in the selected directory",
+        title = Res.string.all_items_in_one_Location.asStringSource(),
+        description = Res.string.all_items_in_one_Location_description.asStringSource(),
     );
 }

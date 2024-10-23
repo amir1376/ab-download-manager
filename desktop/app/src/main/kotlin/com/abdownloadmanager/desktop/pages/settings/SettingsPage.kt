@@ -23,6 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 import kotlinx.coroutines.channels.ticker
 
 @Composable
@@ -46,7 +49,7 @@ private fun SideBar(
         for (i in settingsComponent.pages) {
             SideBarItem(
                 icon = i.icon,
-                name = i.name,
+                name = i.name.rememberString(),
                 isSelected = settingsComponent.currentPage == i,
                 onClick = {
                     settingsComponent.currentPage = i
@@ -101,7 +104,7 @@ fun SettingsPage(
     settingsComponent: SettingsComponent,
     onDismissRequest: () -> Unit,
 ) {
-    WindowTitle("Settings")
+    WindowTitle(myStringResource(Res.string.settings))
 //    WindowIcon(MyIcons.settings)
     WindowIcon(MyIcons.appIcon)
     Row {

@@ -12,12 +12,14 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.resources.Res
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.util.compose.resources.myStringResource
 import java.awt.Dimension
 import java.awt.Taskbar
 import java.awt.Window
@@ -86,7 +88,7 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
                 window.minimumSize = Dimension(defaultWidth.toInt(), defaultHeight.toInt())
             }
             val singleDownloadPageSizing = remember(showPartInfo) { SingleDownloadPageSizing() }
-            WindowTitle(itemState?.let { getDownloadTitle(it) } ?: "Download")
+            WindowTitle(itemState?.let { getDownloadTitle(it) } ?: myStringResource(Res.string.download))
             WindowIcon(MyIcons.appIcon)
             var h = defaultHeight
             var w = defaultWidth
