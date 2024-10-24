@@ -53,7 +53,7 @@ class PartDownloader(
     val part: Part,
     val client: DownloaderClient,
     val speedLimiters: List<Throttler>,
-    val strictMode:Boolean,
+    val strictMode: Boolean,
     private val partSplitLock: Any,
 ) {
     class ShouldNotHappened(msg: String?) : RuntimeException(msg)
@@ -66,7 +66,16 @@ class PartDownloader(
     ): Connection {
         val connect = client.connect(credentials, from, to)
         // make sure this is a 2xx response
-        connect.responseInfo.expectSuccess()
+        kotlin.runCatching {
+            connect.responseInfo.expectSuccess()
+        }
+            .onFailure {
+                // close connection before throwing exception
+                kotlin.runCatching {
+                    connect.closeable.close()
+                }
+            }
+            .getOrThrow()
         val source = speedLimiters.fold<Throttler, Source>(connect.source) { acc, throttler ->
             throttler.source(acc)
         }
@@ -132,7 +141,8 @@ class PartDownloader(
                         iCantRetryAnymore(
                             PartTooManyErrorException(
                                 part,
-                                lastException?:Exception("BUG : if you see me please report it to the developer! when we encounter error so it have to be a least one last exception"),
+                                lastException
+                                    ?: Exception("BUG : if you see me please report it to the developer! when we encounter error so it have to be a least one last exception"),
                             )
                         )
                     }
@@ -144,7 +154,7 @@ class PartDownloader(
                     } catch (e: Exception) {
                         tries++
                         onCanceled(e)
-                        when(canRetry(e)){
+                        when (canRetry(e)) {
                             CanRetryResult.Yes -> continue
                             CanRetryResult.No -> {}
                             CanRetryResult.NoAndStopDownloadJob -> iCantRetryAnymore(e)
@@ -160,7 +170,7 @@ class PartDownloader(
                     when (status) {
                         is PartDownloadStatus.Canceled -> {
                             tries++
-                            when(canRetry(status.e)){
+                            when (canRetry(status.e)) {
                                 CanRetryResult.Yes -> continue
                                 CanRetryResult.No -> {}
                                 CanRetryResult.NoAndStopDownloadJob -> iCantRetryAnymore(status.e)
@@ -187,10 +197,10 @@ class PartDownloader(
         }
     }
 
-    private sealed interface CanRetryResult{
-        data object Yes:CanRetryResult
-        data object No:CanRetryResult
-        data object NoAndStopDownloadJob:CanRetryResult
+    private sealed interface CanRetryResult {
+        data object Yes : CanRetryResult
+        data object No : CanRetryResult
+        data object NoAndStopDownloadJob : CanRetryResult
     }
 
     private fun canRetry(e: Throwable): CanRetryResult {
@@ -198,13 +208,15 @@ class PartDownloader(
             ExceptionUtils.isNormalCancellation(e) -> {
                 CanRetryResult.No
             }
-            e is DownloadValidationException -> if (e.isCritical()){
+
+            e is DownloadValidationException -> if (e.isCritical()) {
                 //download validation occurs, and also it is critical,
                 //so we can't proceed any further
                 CanRetryResult.NoAndStopDownloadJob
-            }else{
+            } else {
                 CanRetryResult.Yes
             }
+
             else -> {
                 CanRetryResult.Yes
             }
@@ -252,7 +264,7 @@ class PartDownloader(
             }
         }
         if (contentLength != partCopy.remainingLength) {
-            if (strictMode){
+            if (strictMode) {
                 conn.closeable.close()
                 throw ServerPartIsNotTheSameAsWeExpectException(
                     start = partCopy.current,
@@ -411,12 +423,12 @@ suspend fun PartDownloader.awaitFinishOrError(): PartDownloadStatus {
         when (it) {
             PartDownloadStatus.Completed,
             is PartDownloadStatus.Canceled,
-            -> true
+                -> true
 
             PartDownloadStatus.ReceivingData,
             PartDownloadStatus.SendGet,
             PartDownloadStatus.IDLE,
-            -> false
+                -> false
         }
     }.first()
 }
@@ -427,12 +439,12 @@ suspend fun PartDownloader.awaitToEnsureDataBeingTransferred(): Boolean {
             when (it) {
                 PartDownloadStatus.Completed,
                 PartDownloadStatus.ReceivingData,
-                -> true
+                    -> true
 
                 is PartDownloadStatus.Canceled,
                 PartDownloadStatus.SendGet,
                 PartDownloadStatus.IDLE,
-                -> false
+                    -> false
             }
         }.first().let {
             when (it) {
@@ -441,7 +453,7 @@ suspend fun PartDownloader.awaitToEnsureDataBeingTransferred(): Boolean {
                 PartDownloadStatus.ReceivingData -> true
                 PartDownloadStatus.SendGet,
                 PartDownloadStatus.IDLE,
-                -> error("should not happen")
+                    -> error("should not happen")
             }
         }
         isThatOk
@@ -454,11 +466,11 @@ suspend fun PartDownloader.awaitIdle() {
             is PartDownloadStatus.Canceled,
             PartDownloadStatus.Completed,
             PartDownloadStatus.IDLE,
-            -> true
+                -> true
 
             PartDownloadStatus.SendGet,
             PartDownloadStatus.ReceivingData,
-            -> false
+                -> false
         }
     }.first()
 }
