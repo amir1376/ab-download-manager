@@ -179,3 +179,13 @@ Let's make a better Download Manager together ❤️
 ## Support the Project
 
 If you'd like to support the project, you can find details on how to donate in the [DONATE.md](DONATE.md) file.
+
+## Switching to Chinese Interface
+
+To switch to the Chinese interface, follow these steps:
+
+1. Open the application.
+2. Go to the Settings page.
+3. Find the Language section.
+4. Select "Chinese" from the list of available languages.
+5. Restart the application to apply the changes.

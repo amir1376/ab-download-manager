@@ -18,27 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberPopupPositionProviderAtPosition
-
-/*
-fun MyColors.asMaterial2Colors(): Colors {
-    return Colors(
-        primary = primary,
-        primaryVariant = primaryVariant,
-        secondary = secondary,
-        secondaryVariant = secondaryVariant,
-        background = background,
-        surface = surface,
-        error = error,
-        onPrimary = onPrimary,
-        onSecondary = onSecondary,
-        onBackground = onBackground,
-        onSurface = onSurface,
-        onError = onError,
-        isLight = isLight
-    )
-}
-*/
-
+import java.util.*
 
 val darkColors = MyColors(
     //used
@@ -100,12 +80,11 @@ private val textSizes = TextSizes(
 @Composable
 fun ABDownloaderTheme(
     myColors: MyColors,
-//    uiScale: Float? = null,
+    language: String = "en", // Default language is English
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
         LocalMyColors provides AnimatedColors(myColors, tween(500)),
-//        LocalUiScale provides uiScale,
     ) {
         CompositionLocalProvider(
             LocalContextMenuRepresentation provides myContextMenuRepresentation(),
@@ -119,7 +98,14 @@ fun ABDownloaderTheme(
                 fontSize = textSizes.base,
             ),
         ) {
-            content()
+            val resourceBundle = remember(language) {
+                ResourceBundle.getBundle("strings/strings", Locale(language))
+            }
+            CompositionLocalProvider(
+                LocalResourceBundle provides resourceBundle,
+            ) {
+                content()
+            }
         }
     }
 }
@@ -174,4 +160,8 @@ private fun myDefaultScrollBarStyle(): ScrollbarStyle {
         unhoverColor = myColors.onBackground/10,
         hoverColor = myColors.onBackground/30
     )
+}
+
+private val LocalResourceBundle = staticCompositionLocalOf<ResourceBundle> {
+    error("No ResourceBundle provided")
 }

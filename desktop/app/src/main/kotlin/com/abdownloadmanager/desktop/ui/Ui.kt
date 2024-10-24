@@ -36,6 +36,7 @@ import kotlinx.coroutines.withTimeout
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import java.util.*
 
 object Ui : KoinComponent {
     val scope: CoroutineScope by inject()
@@ -91,6 +92,12 @@ object Ui : KoinComponent {
                 }
             }
         }
+    }
+
+    private fun loadLanguageResources(language: String) {
+        val resourceBundle = ResourceBundle.getBundle("strings/strings", Locale(language))
+        // Load the language resources from the resource bundle
+        // You can use the resource bundle to get the translated strings
     }
 }
 

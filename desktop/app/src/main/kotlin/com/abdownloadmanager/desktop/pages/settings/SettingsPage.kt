@@ -147,6 +147,3 @@ fun SettingsPage(
 
     }
 }
-
-
-

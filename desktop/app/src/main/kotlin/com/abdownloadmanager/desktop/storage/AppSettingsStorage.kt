@@ -30,6 +30,7 @@ data class AppSettingsModel(
         .canonicalFile.absolutePath,
     val browserIntegrationEnabled: Boolean = true,
     val browserIntegrationPort: Int = 15151,
+    val language: String = "en" // P3ef9
 ) {
     companion object {
         val default: AppSettingsModel get() = AppSettingsModel()
@@ -50,6 +51,7 @@ data class AppSettingsModel(
             val defaultDownloadFolder = stringKeyOf("defaultDownloadFolder")
             val browserIntegrationEnabled = booleanKeyOf("browserIntegrationEnabled")
             val browserIntegrationPort = intKeyOf("browserIntegrationPort")
+            val language = stringKeyOf("language") // P3ef9
         }
 
 
@@ -71,6 +73,7 @@ data class AppSettingsModel(
                 browserIntegrationEnabled = source.get(Keys.browserIntegrationEnabled)
                         ?: default.browserIntegrationEnabled,
                 browserIntegrationPort = source.get(Keys.browserIntegrationPort) ?: default.browserIntegrationPort,
+                language = source.get(Keys.language) ?: default.language // P3ef9
             )
         }
 
@@ -89,6 +92,7 @@ data class AppSettingsModel(
                 put(Keys.defaultDownloadFolder, focus.defaultDownloadFolder)
                 put(Keys.browserIntegrationEnabled, focus.browserIntegrationEnabled)
                 put(Keys.browserIntegrationPort, focus.browserIntegrationPort)
+                put(Keys.language, focus.language) // P3ef9
             }
         }
     }
@@ -110,4 +114,5 @@ class AppSettingsStorage(
     val defaultDownloadFolder = from(AppSettingsModel.defaultDownloadFolder)
     val browserIntegrationEnabled = from(AppSettingsModel.browserIntegrationEnabled)
     val browserIntegrationPort = from(AppSettingsModel.browserIntegrationPort)
+    val language = from(AppSettingsModel.language) // P16d8
 }

@@ -30,6 +30,7 @@ sealed class SettingSections(
     //    data object Network : SettingSections(MyIcons.network, "Network")
     data object DownloadEngine : SettingSections(MyIcons.downloadEngine, "Download Engine")
     data object BrowserIntegration : SettingSections(MyIcons.network, "Browser Integration")
+    data object Language : SettingSections(MyIcons.language, "Language")
 }
 
 interface SettingSectionGetter {
@@ -283,6 +284,22 @@ fun browserIntegrationPort(appRepository: AppRepository): IntConfigurable {
     )
 }
 
+fun languageConfig(appSettings: AppSettingsStorage): EnumConfigurable<String> {
+    return EnumConfigurable(
+        title = "Language",
+        description = "Select the language for the application",
+        backedBy = appSettings.language,
+        possibleValues = listOf("en", "zh"),
+        describe = {
+            when (it) {
+                "en" -> "English"
+                "zh" -> "Chinese"
+                else -> "Unknown"
+            }
+        }
+    )
+}
+
 sealed class SettingPageEffects {
     data object BringToFront : SettingPageEffects()
 }
@@ -323,6 +340,10 @@ class SettingsComponent(
                     useServerLastModified(appRepository),
                     useSparseFileAllocation(appRepository)
                 )
+
+                Language -> listOf(
+                    languageConfig(appSettings)
+                )
             }
         }
     }
@@ -336,6 +357,7 @@ class SettingsComponent(
 //        Network,
         DownloadEngine,
         BrowserIntegration,
+        Language,
     )
     var currentPage: SettingSections by mutableStateOf(Appearance)
     val configurables by derivedStateOf {
