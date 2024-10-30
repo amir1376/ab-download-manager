@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberPopupPositionProviderAtPosition
+import ir.amirab.util.compose.asStringSource
 
 /*
 fun MyColors.asMaterial2Colors(): Colors {
@@ -135,7 +136,7 @@ private class MyContextMenuRepresentation : ContextMenuRepresentation {
         val menuItems = remember(contextItems) {
             buildMenu {
                 contextItems.map {
-                    item(title = it.label, onClick = {
+                    item(title = it.label.asStringSource(), onClick = {
                         it.onClick()
                     })
                 }

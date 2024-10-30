@@ -29,8 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.App
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.util.ifThen
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun AboutPage(
@@ -44,7 +48,7 @@ fun AboutPage(
         Spacer(Modifier.weight(1f))
         Row(Modifier.fillMaxWidth().wrapContentWidth(Alignment.End)) {
             ActionButton(
-                "Close",
+                myStringResource(Res.string.close),
                 onClick = close
             )
         }
@@ -57,8 +61,7 @@ fun RenderAppInfo(
 ) {
     Row(
         Modifier.fillMaxWidth()
-            .padding(horizontal = 8.dp)
-        ,
+            .padding(horizontal = 8.dp),
     ) {
         ProvideTextStyle(
             TextStyle(fontSize = myTextSizes.base)
@@ -82,23 +85,30 @@ fun RenderAppInfo(
                         )
                         Spacer(Modifier.height(2.dp))
                         WithContentAlpha(0.75f) {
-                            Text("version ${AppInfo.version}", fontSize = myTextSizes.base)
+                            Text(
+                                myStringResource(
+                                    Res.string.version_n,
+                                    Res.string.version_n_createArgs(
+                                        value = AppInfo.version.toString()
+                                    )
+                                ), fontSize = myTextSizes.base
+                            )
                         }
                     }
                 }
                 Spacer(Modifier.height(16.dp))
                 WithContentAlpha(1f) {
-                    Text("Developed with ❤️ for you")
-                    LinkText("Visit the project website", AppInfo.website)
+                    Text(myStringResource(Res.string.developed_with_love_for_you))
+                    LinkText(myStringResource(Res.string.visit_the_project_website), AppInfo.website)
 
                     Spacer(Modifier.height(8.dp))
 
-                    Text("This is a free & Open Source software")
-                    LinkText("See the Source Code", AppInfo.sourceCode)
+                    Text(myStringResource(Res.string.this_is_a_free_and_open_source_software))
+                    LinkText(myStringResource(Res.string.view_the_source_code), AppInfo.sourceCode)
                     Spacer(Modifier.height(8.dp))
-                    Text("Powered by Open Source Libraries")
+                    Text(myStringResource(Res.string.powered_by_open_source_software))
                     Text(
-                        "See the Open Sources libraries",
+                        myStringResource(Res.string.view_the_open_source_licenses),
                         style = LocalTextStyle.current.merge(LinkStyle),
                         modifier = Modifier.clickable {
                             onRequestShowOpenSourceLibraries()
@@ -135,12 +145,11 @@ fun LinkText(
         Text(
             text = text,
             style = LocalTextStyle.current
-                .merge(LinkStyle).ifThen(isHovered){
+                .merge(LinkStyle).ifThen(isHovered) {
                     copy(
                         textDecoration = TextDecoration.Underline
                     )
-                }
-            ,
+                },
             overflow = overflow,
             maxLines = maxLines,
         )

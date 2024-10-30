@@ -6,11 +6,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import ir.amirab.util.compose.contants.RESOURCE_PROTOCOL
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import java.net.URI
-
-private const val RESOURCE_PROTOCOL = "app-resource"
 
 @Immutable
 sealed interface IconSource {

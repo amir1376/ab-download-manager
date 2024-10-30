@@ -1,6 +1,10 @@
 package com.abdownloadmanager.desktop.utils
 
 import androidx.compose.runtime.*
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.DateTimePeriod
@@ -81,10 +85,11 @@ fun prettifyRelativeTime(
         count = count,
         names = names,
     )
-    val leftOrAgo =
-            if (isLater) names.left
-            else names.ago
-    return "$relativeTime $leftOrAgo"
+    return (if (isLater) {
+        names.left(relativeTime)
+    } else {
+        names.ago(relativeTime)
+    }).getString()
 }
 
 private fun relativeTime(
@@ -102,8 +107,7 @@ private fun relativeTime(
     val relativeTime = buildString {
         if (years > 0) {
             used++
-            append(years)
-            append(" ${names.years}")
+            append(names.years(years).getString())
         }
         if (used == count) return@buildString
         if (months > 0) {
@@ -111,8 +115,7 @@ private fun relativeTime(
                 append(" ")
             }
             used++
-            append(months)
-            append(" ${names.months}")
+            append(names.months(months).getString())
         }
         if (used == count) return@buildString
         if (days > 0) {
@@ -120,8 +123,7 @@ private fun relativeTime(
                 append(" ")
             }
             used++
-            append(days)
-            append(" ${names.days}")
+            append(names.days(days).getString())
         }
         if (used == count) return@buildString
         if (hours > 0) {
@@ -129,8 +131,7 @@ private fun relativeTime(
                 append(" ")
             }
             used++
-            append(hours)
-            append(" ${names.hours}")
+            append(names.hours(hours).getString())
         }
         if (used == count) return@buildString
         if (minutes > 0) {
@@ -138,8 +139,7 @@ private fun relativeTime(
                 append(" ")
             }
             used++
-            append(minutes)
-            append(" ${names.minutes}")
+            append(names.minutes(minutes).getString())
         }
         if (used == count) return@buildString
         if (seconds > 0) {
@@ -147,12 +147,11 @@ private fun relativeTime(
                 append(" ")
             }
             used++
-            append(seconds)
-            append(" ${names.seconds}")
+            append(names.seconds(seconds).getString())
         }
         if (used == count) return@buildString
         if (used == 0) {
-            append("0 ${names.seconds}")
+            append(names.seconds(0).getString())
         }
     }
     return relativeTime
@@ -201,37 +200,82 @@ fun convertTimeRemainingToHumanReadable(
 
 @Stable
 interface TimeNames {
-    val years: String
-    val months: String
-    val days: String
-    val hours: String
-    val minutes: String
-    val seconds: String
-    val ago: String
-    val left: String
+    fun years(years: Int): StringSource
+    fun months(months: Int): StringSource
+    fun days(days: Int): StringSource
+    fun hours(hours: Int): StringSource
+    fun minutes(minutes: Int): StringSource
+    fun seconds(seconds: Int): StringSource
+    fun ago(time: String): StringSource
+    fun left(time: String): StringSource
 
 
     @Stable
     object SimpleNames : TimeNames {
-        override val years: String = "years"
-        override val months: String = "months"
-        override val days: String = "days"
-        override val hours: String = "hours"
-        override val minutes: String = "minutes"
-        override val seconds: String = "seconds"
-        override val left: String = "left"
-        override val ago: String = "ago"
+        override fun years(years: Int): StringSource = Res.string.relative_time_long_years.asStringSourceWithARgs(
+            Res.string.relative_time_long_years_createArgs(years = years.toString())
+        )
+
+        override fun months(months: Int): StringSource = Res.string.relative_time_long_months.asStringSourceWithARgs(
+            Res.string.relative_time_long_months_createArgs(months = months.toString())
+        )
+
+        override fun days(days: Int): StringSource =
+            Res.string.relative_time_long_days.asStringSourceWithARgs(Res.string.relative_time_long_days_createArgs(days = days.toString()))
+
+        override fun hours(hours: Int): StringSource = Res.string.relative_time_long_hours.asStringSourceWithARgs(
+            Res.string.relative_time_long_hours_createArgs(hours = hours.toString())
+        )
+
+        override fun minutes(minutes: Int): StringSource =
+            Res.string.relative_time_long_minutes.asStringSourceWithARgs(
+                Res.string.relative_time_long_minutes_createArgs(minutes = minutes.toString())
+            )
+
+        override fun seconds(seconds: Int): StringSource =
+            Res.string.relative_time_long_seconds.asStringSourceWithARgs(
+                Res.string.relative_time_long_seconds_createArgs(seconds = seconds.toString())
+            )
+
+        override fun left(time: String): StringSource =
+            Res.string.relative_time_left.asStringSourceWithARgs(Res.string.relative_time_left_createArgs(time = time))
+
+        override fun ago(time: String): StringSource =
+            Res.string.relative_time_ago.asStringSourceWithARgs(Res.string.relative_time_ago_createArgs(time = time))
     }
 
     object ShortNames : TimeNames {
-        override val years: String = "yr"
-        override val months: String = "mn"
-        override val days: String = "d"
-        override val hours: String = "hr"
-        override val minutes: String = "m"
-        override val seconds: String = "s"
-        override val left: String = "left"
-        override val ago: String = "ago"
+        override fun years(years: Int): StringSource = Res.string.relative_time_short_years.asStringSourceWithARgs(
+            Res.string.relative_time_short_years_createArgs(years = years.toString())
+        )
+
+        override fun months(months: Int): StringSource = Res.string.relative_time_short_months.asStringSourceWithARgs(
+            Res.string.relative_time_short_months_createArgs(months = months.toString())
+        )
+
+        override fun days(days: Int): StringSource = Res.string.relative_time_short_days.asStringSourceWithARgs(
+            Res.string.relative_time_short_days_createArgs(days = days.toString())
+        )
+
+        override fun hours(hours: Int): StringSource = Res.string.relative_time_short_hours.asStringSourceWithARgs(
+            Res.string.relative_time_short_hours_createArgs(hours = hours.toString())
+        )
+
+        override fun minutes(minutes: Int): StringSource =
+            Res.string.relative_time_short_minutes.asStringSourceWithARgs(
+                Res.string.relative_time_short_minutes_createArgs(minutes = minutes.toString())
+            )
+
+        override fun seconds(seconds: Int): StringSource =
+            Res.string.relative_time_short_seconds.asStringSourceWithARgs(
+                Res.string.relative_time_short_seconds_createArgs(seconds = seconds.toString())
+            )
+
+        override fun left(time: String): StringSource =
+            Res.string.relative_time_left.asStringSourceWithARgs(Res.string.relative_time_left_createArgs(time = time))
+
+        override fun ago(time: String): StringSource =
+            Res.string.relative_time_ago.asStringSourceWithARgs(Res.string.relative_time_ago_createArgs(time = time))
     }
 }
 

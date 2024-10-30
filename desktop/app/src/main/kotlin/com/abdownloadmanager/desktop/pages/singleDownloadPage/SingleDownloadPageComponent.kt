@@ -8,12 +8,17 @@ import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import arrow.optics.copy
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.monitor.*
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -27,8 +32,8 @@ sealed interface SingleDownloadEffects {
 
 @Immutable
 data class SingleDownloadPagePropertyItem(
-    val name: String,
-    val value: String,
+    val name: StringSource,
+    val value: StringSource,
     val valueState: ValueType = ValueType.Normal,
 ) {
     enum class ValueType { Normal, Error, Success }
@@ -67,9 +72,14 @@ class SingleDownloadComponent(
         .filterNotNull()
         .map {
             buildList {
-                add(SingleDownloadPagePropertyItem("Name", it.name))
-                add(SingleDownloadPagePropertyItem("Status", createStatusString(it)))
-                add(SingleDownloadPagePropertyItem("Size", convertSizeToHumanReadable(it.contentLength)))
+                add(SingleDownloadPagePropertyItem(Res.string.name.asStringSource(), it.name.asStringSource()))
+                add(SingleDownloadPagePropertyItem(Res.string.status.asStringSource(), createStatusString(it)))
+                add(
+                    SingleDownloadPagePropertyItem(
+                        Res.string.size.asStringSource(),
+                        convertSizeToHumanReadable(it.contentLength)
+                    )
+                )
                 when (it) {
                     is CompletedDownloadItemState -> {
                     }
@@ -77,21 +87,31 @@ class SingleDownloadComponent(
                     is ProcessingDownloadItemState -> {
                         add(
                             SingleDownloadPagePropertyItem(
-                                "Downloaded",
-                                convertBytesToHumanReadable(it.progress).orEmpty()
+                                Res.string.download_page_downloaded_size.asStringSource(),
+                                convertBytesToHumanReadable(it.progress).orEmpty().asStringSource()
                             )
                         )
-                        add(SingleDownloadPagePropertyItem("Speed", convertSpeedToHumanReadable(it.speed)))
-                        add(SingleDownloadPagePropertyItem("Remaining Time", (it.remainingTime?.let { remainingTime ->
-                            convertTimeRemainingToHumanReadable(remainingTime, TimeNames.ShortNames)
-                        }.orEmpty())))
                         add(
                             SingleDownloadPagePropertyItem(
-                                "Resume Support",
+                                Res.string.speed.asStringSource(),
+                                convertSpeedToHumanReadable(it.speed).asStringSource()
+                            )
+                        )
+                        add(
+                            SingleDownloadPagePropertyItem(
+                                Res.string.time_left.asStringSource(),
+                                (it.remainingTime?.let { remainingTime ->
+                            convertTimeRemainingToHumanReadable(remainingTime, TimeNames.ShortNames)
+                                }.orEmpty()).asStringSource()
+                            )
+                        )
+                        add(
+                            SingleDownloadPagePropertyItem(
+                                Res.string.resume_support.asStringSource(),
                                 when (it.supportResume) {
-                                    true -> "Yes"
-                                    false -> "No"
-                                    null -> "Unknown"
+                                    true -> Res.string.yes.asStringSource()
+                                    false -> Res.string.no.asStringSource()
+                                    null -> Res.string.unknown.asStringSource()
                                 },
                                 when (it.supportResume) {
                                     true -> SingleDownloadPagePropertyItem.ValueType.Success
@@ -105,23 +125,23 @@ class SingleDownloadComponent(
             }
         }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
-    private fun createStatusString(it: IDownloadItemState): String {
+    private fun createStatusString(it: IDownloadItemState): StringSource {
 
         return when (val status = it.statusOrFinished()) {
             is DownloadJobStatus.Canceled -> {
                 if (ExceptionUtils.isNormalCancellation(status.e)) {
-                    "Paused"
+                    Res.string.paused
                 } else {
-                    "Error"
+                    Res.string.error
                 }
             }
 
-            DownloadJobStatus.Downloading -> "Downloading"
-            DownloadJobStatus.Finished -> "Finished"
-            DownloadJobStatus.IDLE -> "IDLE"
-            is DownloadJobStatus.PreparingFile -> "PreparingFile"
-            DownloadJobStatus.Resuming -> "Resuming"
-        }
+            DownloadJobStatus.Downloading -> Res.string.downloading
+            DownloadJobStatus.Finished -> Res.string.finished
+            DownloadJobStatus.IDLE -> Res.string.idle
+            is DownloadJobStatus.PreparingFile -> Res.string.preparing_file
+            DownloadJobStatus.Resuming -> Res.string.resuming
+        }.asStringSource()
     }
 
     fun openFolder() {
@@ -230,28 +250,33 @@ class SingleDownloadComponent(
     val settings by lazy {
         listOf(
             IntConfigurable(
-                title = "Thread Count",
-                description = "How much thread used to download this item 0 for default",
+                title = Res.string.download_item_settings_thread_count.asStringSource(),
+                description = Res.string.download_item_settings_thread_count_description.asStringSource(),
                 backedBy = threadCount,
                 describe = {
                     if (it == 0) {
-                        "uses global setting"
+                        Res.string.use_global_settings.asStringSource()
                     } else {
-                        "$it threads"
+                        Res.string.download_item_settings_thread_count_describe
+                            .asStringSourceWithARgs(
+                                Res.string.download_item_settings_thread_count_describe_createArgs(
+                                    count = it.toString()
+                                )
+                            )
                     }
                 },
                 range = 0..32,
                 renderMode = IntConfigurable.RenderMode.TextField,
             ),
             SpeedLimitConfigurable(
-                title = "Speed limit",
-                description = "speed limit for this download",
+                title = Res.string.download_item_settings_speed_limit.asStringSource(),
+                description = Res.string.download_item_settings_speed_limit_description.asStringSource(),
                 backedBy = speedLimit,
                 describe = {
                     if (it == 0L) {
-                        "Unlimited"
+                        Res.string.unlimited.asStringSource()
                     } else {
-                        convertSpeedToHumanReadable(it)
+                        convertSpeedToHumanReadable(it).asStringSource()
                     }
                 },
             ),

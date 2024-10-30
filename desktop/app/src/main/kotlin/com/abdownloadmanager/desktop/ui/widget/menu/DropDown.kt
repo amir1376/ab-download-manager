@@ -34,9 +34,11 @@ fun SiblingDropDown(
     offset: DpOffset = DpOffset.Zero,
     content: @Composable () -> Unit,
 ) {
-    val positionProvider = remember {
-        SiblingMenuPositionProvider()
-    }
+    val positionProvider = rememberComponentRectPositionProvider(
+        anchor = Alignment.TopEnd,
+        alignment = Alignment.BottomEnd,
+        offset = offset,
+    )
     Popup(
         popupPositionProvider = positionProvider,
         onDismissRequest = onDismissRequest,

@@ -1,12 +1,13 @@
 package ir.amirab.util.compose.action
 
 import ir.amirab.util.compose.IconSource
+import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.*
 
 inline fun simpleAction(
-    title: String,
-    icon: IconSource?=null,
-    crossinline onActionPerformed: AnAction.() -> Unit
+    title: StringSource,
+    icon: IconSource? = null,
+    crossinline onActionPerformed: AnAction.() -> Unit,
 ): AnAction {
     return object : AnAction(
         title = title, icon = icon,
@@ -15,10 +16,10 @@ inline fun simpleAction(
     }
 }
 inline fun simpleAction(
-    title: String,
-    icon: IconSource?=null,
-    checkEnable:StateFlow<Boolean>,
-    crossinline onActionPerformed: AnAction.() -> Unit
+    title: StringSource,
+    icon: IconSource? = null,
+    checkEnable: StateFlow<Boolean>,
+    crossinline onActionPerformed: AnAction.() -> Unit,
 ): AnAction {
     return object : AnAction(
         title = title, icon = icon,

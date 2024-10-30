@@ -45,6 +45,8 @@ import com.abdownloadmanager.utils.proxy.ProxyManager
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.utils.EmptyFileCreator
+import ir.amirab.util.compose.localizationmanager.LanguageManager
+import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.datastore.kotlinxSerializationDataStore
 
 val downloaderModule = module {
@@ -223,6 +225,9 @@ val appModule = module {
         ThemeManager(get(), get())
     }
     single {
+        LanguageManager(get())
+    }
+    single {
         MyIcons
     }.bind<IMyIcons>()
     single {
@@ -241,7 +246,7 @@ val appModule = module {
                 get(),
             )
         )
-    }
+    }.bind<LanguageStorage>()
     single {
         PageStatesStorage(
             createMapConfigDatastore(

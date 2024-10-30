@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,14 +27,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.rememberIconPainter
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 
 class DownloadStatusCategoryFilterByList(
-    name: String,
+    name: StringSource,
     icon: IconSource,
     val acceptedStatus: List<DownloadStatus>,
 ) : DownloadStatusCategoryFilter(name, icon) {
@@ -47,7 +50,7 @@ class DownloadStatusCategoryFilterByList(
 }
 
 abstract class DownloadStatusCategoryFilter(
-    val name: String,
+    val name: StringSource,
     val icon: IconSource,
 ) {
     abstract fun accept(iDownloadStatus: IDownloadItemState): Boolean
@@ -58,18 +61,18 @@ object DefinedStatusCategories {
 
 
     val All = object : DownloadStatusCategoryFilter(
-        "All",
+        Res.string.all.asStringSource(),
         MyIcons.folder,
     ) {
         override fun accept(iDownloadStatus: IDownloadItemState): Boolean = true
     }
     val Finished = DownloadStatusCategoryFilterByList(
-        "Finished",
+        Res.string.finished.asStringSource(),
         MyIcons.folder,
         listOf(DownloadStatus.Completed)
     )
     val Unfinished = DownloadStatusCategoryFilterByList(
-        "Unfinished",
+        Res.string.Unfinished.asStringSource(),
         MyIcons.folder,
         listOf(
             DownloadStatus.Error,
@@ -203,7 +206,7 @@ fun StatusFilterItem(
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
-                            statusFilter.name,
+                            statusFilter.name.rememberString(),
                             Modifier.weight(1f),
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             fontSize = myTextSizes.lg,

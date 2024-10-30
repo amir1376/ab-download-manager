@@ -10,6 +10,8 @@ import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.runtime.*
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient
@@ -31,6 +33,8 @@ import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.CategoryItem
 import com.abdownloadmanager.utils.category.CategoryManager
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 
 sealed interface AddSingleDownloadPageEffects {
     data class SuggestUrl(val link: String) : AddSingleDownloadPageEffects
@@ -235,17 +239,17 @@ class AddSingleDownloadComponent(
 
     val configurables = listOf(
         SpeedLimitConfigurable(
-            "Speed Limit",
-            "Limit the speed of download for this file",
+            Res.string.download_item_settings_speed_limit.asStringSource(),
+            Res.string.download_item_settings_speed_limit_description.asStringSource(),
             backedBy = speedLimit,
             describe = {
-                if (it == 0L) "Unlimited"
-                else convertSpeedToHumanReadable(it)
+                if (it == 0L) Res.string.unlimited.asStringSource()
+                else convertSpeedToHumanReadable(it).asStringSource()
             }
         ),
         IntConfigurable(
-            "Thread count",
-            "Limit the threads of download for this file",
+            Res.string.settings_download_thread_count.asStringSource(),
+            Res.string.settings_download_thread_count_description.asStringSource(),
             backedBy = threadCount.mapTwoWayStateFlow(
                 map = {
                     it ?: 0
@@ -256,13 +260,18 @@ class AddSingleDownloadComponent(
             ),
             range = 0..32,
             describe = {
-                if (it == 0) "use Global setting"
-                else "$it thread for this download"
+                if (it == 0) Res.string.use_global_settings.asStringSource()
+                else Res.string.download_item_settings_thread_count_describe
+                    .asStringSourceWithARgs(
+                        Res.string.download_item_settings_thread_count_describe_createArgs(
+                            count = it.toString()
+                        )
+                    )
             }
         ),
         StringConfigurable(
-            "Username",
-            "username if the link is a protected resource",
+            Res.string.username.asStringSource(),
+            Res.string.download_item_settings_username_description.asStringSource(),
             backedBy = createMutableStateFlowFromStateFlow(
                 flow = credentials.mapStateFlow {
                     it.username.orEmpty()
@@ -272,12 +281,12 @@ class AddSingleDownloadComponent(
                 }, scope
             ),
             describe = {
-                ""
+                "".asStringSource()
             }
         ),
         StringConfigurable(
-            "Password",
-            "Password if the link is a protected resource",
+            Res.string.password.asStringSource(),
+            Res.string.download_item_settings_password_description.asStringSource(),
             backedBy = createMutableStateFlowFromStateFlow(
                 flow = credentials.mapStateFlow {
                     it.password.orEmpty()
@@ -287,7 +296,7 @@ class AddSingleDownloadComponent(
                 }, scope
             ),
             describe = {
-                ""
+                "".asStringSource()
             }
         ),
     )

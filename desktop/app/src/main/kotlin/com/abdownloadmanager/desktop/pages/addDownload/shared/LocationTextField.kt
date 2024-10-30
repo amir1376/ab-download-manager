@@ -20,6 +20,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import ir.amirab.util.desktop.LocalWindow
@@ -36,7 +39,7 @@ fun LocationTextField(
     var showLastUsedLocations by remember { mutableStateOf(false) }
 
     val downloadLauncherFolderPickerLauncher = rememberDirectoryPickerLauncher(
-        title = "Download Location",
+        title = myStringResource(Res.string.download_location),
         initialDirectory = remember(text) {
             runCatching {
                 File(text).canonicalPath
@@ -57,7 +60,7 @@ fun LocationTextField(
         AddDownloadPageTextField(
             text,
             setText,
-            "Location",
+            myStringResource(Res.string.location),
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned {

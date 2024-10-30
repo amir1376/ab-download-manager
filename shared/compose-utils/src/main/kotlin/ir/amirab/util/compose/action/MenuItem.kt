@@ -3,6 +3,7 @@ package ir.amirab.util.compose.action
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.flow.mapStateFlow
 import androidx.compose.runtime.*
+import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.*
 
 sealed interface MenuItem {
@@ -12,12 +13,12 @@ sealed interface MenuItem {
         val icon: StateFlow<IconSource?>
 
         //compose aware property
-        val title: StateFlow<String>
+        val title: StateFlow<StringSource>
     }
 
     interface CanBeModified {
         fun setIcon(icon: IconSource?)
-        fun setTitle(title: String)
+        fun setTitle(title: StringSource)
     }
 
     interface HasEnable {
@@ -34,7 +35,7 @@ sealed interface MenuItem {
     }
 
     abstract class SingleItem(
-        title: String,
+        title: StringSource,
         icon: IconSource? = null,
     ) : MenuItem,
         ClickableItem,
@@ -45,11 +46,11 @@ sealed interface MenuItem {
         var shouldDismissOnClick: Boolean = true
 
 
-        private val _title: MutableStateFlow<String> = MutableStateFlow(title)
+        private val _title: MutableStateFlow<StringSource> = MutableStateFlow(title)
         private val _icon: MutableStateFlow<IconSource?> = MutableStateFlow(icon)
         private val _isEnabled: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
-        override val title: StateFlow<String> = _title.asStateFlow()
+        override val title: StateFlow<StringSource> = _title.asStateFlow()
         override val icon: StateFlow<IconSource?> = _icon.asStateFlow()
         override val isEnabled: StateFlow<Boolean> = _isEnabled.asStateFlow()
 
@@ -61,7 +62,7 @@ sealed interface MenuItem {
             _icon.update { icon }
         }
 
-        override fun setTitle(title: String) {
+        override fun setTitle(title: StringSource) {
             _title.update { title }
         }
 
@@ -76,17 +77,17 @@ sealed interface MenuItem {
 
     class SubMenu(
         icon: IconSource? = null,
-        title: String,
+        title: StringSource,
         items: List<MenuItem>,
     ) : MenuItem,
         ReadableItem,
         HasEnable {
         private var _icon: MutableStateFlow<IconSource?> = MutableStateFlow(icon)
-        private var _title: MutableStateFlow<String> = MutableStateFlow(title)
+        private var _title: MutableStateFlow<StringSource> = MutableStateFlow(title)
         private val _items: MutableStateFlow<List<MenuItem>> = MutableStateFlow(items)
 
         override var icon: StateFlow<IconSource?> = _icon.asStateFlow()
-        override var title: StateFlow<String> = _title.asStateFlow()
+        override var title: StateFlow<StringSource> = _title.asStateFlow()
 
         val items: StateFlow<List<MenuItem>> = _items.asStateFlow()
         fun setItems(newItems: List<MenuItem>) {

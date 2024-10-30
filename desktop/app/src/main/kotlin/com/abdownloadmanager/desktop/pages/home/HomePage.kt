@@ -44,9 +44,15 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.window.Dialog
 import com.abdownloadmanager.desktop.ui.customwindow.*
 import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.rememberIconPainter
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
 import java.awt.datatransfer.DataFlavor
 import java.io.File
 
@@ -54,7 +60,6 @@ import java.io.File
 @Composable
 fun HomePage(component: HomeComponent) {
     val listState by component.downloadList.collectAsState()
-    WindowTitle(AppInfo.name)
     var isDragging by remember { mutableStateOf(false) }
 
     var showDeletePromptState by remember {
@@ -84,16 +89,16 @@ fun HomePage(component: HomeComponent) {
 
                 is HomeEffects.AutoCategorize -> {
                     showConfirmPrompt = ConfirmPromptState(
-                        title = "Auto categorize downloads",
-                        description = "Any uncategorized item will be automatically added to it's related category.",
+                        title = Res.string.confirm_auto_categorize_downloads_title.asStringSource(),
+                        description = Res.string.confirm_auto_categorize_downloads_description.asStringSource(),
                         onConfirm = component::onConfirmAutoCategorize
                     )
                 }
 
                 is HomeEffects.ResetCategoriesToDefault -> {
                     showConfirmPrompt = ConfirmPromptState(
-                        title = "Reset to Default Categories",
-                        description = "this will REMOVE all categories and brings backs default categories",
+                        title = Res.string.confirm_reset_to_default_categories_title.asStringSource(),
+                        description = Res.string.confirm_reset_to_default_categories_description.asStringSource(),
                         onConfirm = component::onConfirmResetCategories
                     )
                 }
@@ -207,9 +212,11 @@ fun HomePage(component: HomeComponent) {
             )
         ) {
             if (!mergeTopBar) {
-                Spacer(Modifier.height(4.dp))
-                TopBar(component)
-                Spacer(Modifier.height(6.dp))
+                WithTitleBarDirection {
+                    Spacer(Modifier.height(4.dp))
+                    TopBar(component)
+                    Spacer(Modifier.height(6.dp))
+                }
             }
             Spacer(
                 Modifier.fillMaxWidth()
@@ -340,14 +347,19 @@ private fun ShowDeletePrompts(
                 .widthIn(max = 260.dp)
         ) {
             Text(
-                "Confirm Delete",
+                myStringResource(Res.string.confirm_delete_download_items_title),
                 fontWeight = FontWeight.Bold,
                 fontSize = myTextSizes.xl,
                 color = myColors.onBackground,
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                "Are you sure you want to delete ${deletePromptState.downloadList.size} item ?",
+                myStringResource(
+                    Res.string.confirm_delete_download_items_description,
+                    Res.string.confirm_delete_download_items_description_createArgs(
+                        count = deletePromptState.downloadList.size.toString()
+                    ),
+                ),
                 fontSize = myTextSizes.base,
                 color = myColors.onBackground,
             )
@@ -366,7 +378,7 @@ private fun ShowDeletePrompts(
                 })
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "Also delete file from disk",
+                    myStringResource(Res.string.also_delete_file_from_disk),
                     fontSize = myTextSizes.base,
                     color = myColors.onBackground,
                 )
@@ -378,13 +390,13 @@ private fun ShowDeletePrompts(
             ) {
                 Spacer(Modifier.weight(1f))
                 ActionButton(
-                    text = "Delete",
+                    text = myStringResource(Res.string.delete),
                     onClick = onConfirm,
                     borderColor = SolidColor(myColors.error),
                     contentColor = myColors.error,
                 )
                 Spacer(Modifier.width(8.dp))
-                ActionButton(text = "Cancel", onClick = onCancel)
+                ActionButton(text = myStringResource(Res.string.cancel), onClick = onCancel)
             }
         }
     }
@@ -415,14 +427,14 @@ private fun ShowConfirmPrompt(
                 .widthIn(max = 260.dp)
         ) {
             Text(
-                text = promptState.title,
+                text = promptState.title.rememberString(),
                 fontWeight = FontWeight.Bold,
                 fontSize = myTextSizes.xl,
                 color = myColors.onBackground,
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                text = promptState.description,
+                text = promptState.description.rememberString(),
                 fontSize = myTextSizes.base,
                 color = myColors.onBackground,
             )
@@ -433,13 +445,12 @@ private fun ShowConfirmPrompt(
             ) {
                 Spacer(Modifier.weight(1f))
                 ActionButton(
-                    text = "Delete",
+                    text = myStringResource(Res.string.ok),
                     onClick = onConfirm,
-                    borderColor = SolidColor(myColors.error),
                     contentColor = myColors.error,
                 )
                 Spacer(Modifier.width(8.dp))
-                ActionButton(text = "Cancel", onClick = onCancel)
+                ActionButton(text = myStringResource(Res.string.cancel), onClick = onCancel)
             }
         }
     }
@@ -470,20 +481,30 @@ private fun ShowDeleteCategoryPrompt(
                 .widthIn(max = 260.dp)
         ) {
             Text(
-                """Removing "${deletePromptState.category.name}" Category""",
+                myStringResource(
+                    Res.string.confirm_delete_category_item_title,
+                    Res.string.confirm_delete_category_item_title_createArgs(
+                        name = deletePromptState.category.name
+                    ),
+                ),
                 fontWeight = FontWeight.Bold,
                 fontSize = myTextSizes.xl,
                 color = myColors.onBackground,
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                """Are you sure you want to delete "${deletePromptState.category.name}" Category ?""",
+                myStringResource(
+                    Res.string.confirm_delete_category_item_description,
+                    Res.string.confirm_delete_category_item_description_createArgs(
+                        value = deletePromptState.category.name
+                    )
+                ),
                 fontSize = myTextSizes.base,
                 color = myColors.onBackground,
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                "Your downloads won't be deleted",
+                myStringResource(Res.string.your_download_will_not_be_deleted),
                 fontSize = myTextSizes.base,
                 color = myColors.onBackground,
             )
@@ -494,13 +515,13 @@ private fun ShowDeleteCategoryPrompt(
             ) {
                 Spacer(Modifier.weight(1f))
                 ActionButton(
-                    text = "Delete",
+                    text = myStringResource(Res.string.delete),
                     onClick = onConfirm,
                     borderColor = SolidColor(myColors.error),
                     contentColor = myColors.error,
                 )
                 Spacer(Modifier.width(8.dp))
-                ActionButton(text = "Cancel", onClick = onCancel)
+                ActionButton(text = myStringResource(Res.string.cancel), onClick = onCancel)
             }
         }
     }
@@ -520,8 +541,8 @@ data class CategoryDeletePromptState(
 
 @Immutable
 data class ConfirmPromptState(
-    val title: String,
-    val description: String,
+    val title: StringSource,
+    val description: StringSource,
     val onConfirm: () -> Unit,
 )
 
@@ -553,21 +574,26 @@ fun DragWidget(
             Modifier.size(36.dp),
         )
         Text(
-            text = "Drop link or file here.",
+            text = myStringResource(Res.string.drop_link_or_file_here),
             fontSize = myTextSizes.xl
         )
         if (linkCount != null) {
             when {
                 linkCount > 0 -> {
                     Text(
-                        "$linkCount links will be imported",
+                        myStringResource(
+                            Res.string.n_links_will_be_imported,
+                            Res.string.n_links_will_be_imported_createArgs(
+                                count = linkCount.toString()
+                            )
+                        ),
                         fontSize = myTextSizes.base,
                         color = myColors.success,
                     )
                 }
 
                 linkCount == 0 -> {
-                    Text("Nothing will be imported")
+                    Text(myStringResource(Res.string.nothing_will_be_imported))
                 }
             }
 
@@ -644,7 +670,7 @@ fun CategoryOption(
     ShowOptionsInDropDown(
         MenuItem.SubMenu(
             icon = categoryOptionMenuState.categoryItem?.rememberIconPainter(),
-            title = categoryOptionMenuState.categoryItem?.name.orEmpty(),
+            title = categoryOptionMenuState.categoryItem?.name.orEmpty().asStringSource(),
             categoryOptionMenuState.menu,
         ),
         onDismiss
@@ -728,20 +754,22 @@ fun HomeSearch(
     val searchBoxInteractionSource = remember { MutableInteractionSource() }
 
     val isFocused by searchBoxInteractionSource.collectIsFocusedAsState()
-    SearchBox(
-        text = component.filterState.textToSearch,
-        onTextChange = {
-            component.filterState.textToSearch = it
-        },
-        textPadding = textPadding,
-        interactionSource = searchBoxInteractionSource,
-        modifier = modifier
-            .width(
-                animateDpAsState(
-                    if (isFocused) 220.dp else 180.dp
-                ).value
-            )
-    )
+    WithLanguageDirection {
+        SearchBox(
+            text = component.filterState.textToSearch,
+            onTextChange = {
+                component.filterState.textToSearch = it
+            },
+            textPadding = textPadding,
+            interactionSource = searchBoxInteractionSource,
+            modifier = modifier
+                .width(
+                    animateDpAsState(
+                        if (isFocused) 220.dp else 180.dp
+                    ).value
+                )
+        )
+    }
 }
 
 

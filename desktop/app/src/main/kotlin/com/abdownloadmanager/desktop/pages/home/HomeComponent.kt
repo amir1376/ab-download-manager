@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.CategoryItemWithId
@@ -37,6 +39,8 @@ import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -44,7 +48,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
-import java.net.URI
 
 @Stable
 class FilterState {
@@ -102,7 +105,7 @@ class DownloadActions(
         }
     }
     val openFileAction = simpleAction(
-        title = "Open",
+        title = Res.string.open.asStringSource(),
         icon = MyIcons.fileOpen,
         checkEnable = defaultItem.mapStateFlow {
             it?.statusOrFinished() is DownloadJobStatus.Finished
@@ -116,7 +119,7 @@ class DownloadActions(
     )
 
     val openFolderAction = simpleAction(
-        title = "Open Folder",
+        title = Res.string.open_folder.asStringSource(),
         icon = MyIcons.folderOpen,
         checkEnable = defaultItem.mapStateFlow {
             it?.statusOrFinished() is DownloadJobStatus.Finished
@@ -130,7 +133,7 @@ class DownloadActions(
     )
 
     val deleteAction = simpleAction(
-        title = "Delete",
+        title = Res.string.delete.asStringSource(),
         icon = MyIcons.remove,
         checkEnable = selections.mapStateFlow { it.isNotEmpty() },
         onActionPerformed = {
@@ -141,7 +144,7 @@ class DownloadActions(
     )
 
     val resumeAction = simpleAction(
-        title = "Resume",
+        title = Res.string.resume.asStringSource(),
         icon = MyIcons.resume,
         checkEnable = resumableSelections.mapStateFlow {
             it.isNotEmpty()
@@ -158,7 +161,7 @@ class DownloadActions(
     )
 
     val reDownloadAction = simpleAction(
-        "Restart Download",
+        Res.string.restart_download.asStringSource(),
         MyIcons.refresh
     ) {
         scope.launch {
@@ -174,7 +177,7 @@ class DownloadActions(
     }
 
     val pauseAction = simpleAction(
-        title = "Pause",
+        title = Res.string.pause.asStringSource(),
         icon = MyIcons.pause,
         checkEnable = pausableSelections.mapStateFlow {
             it.isNotEmpty()
@@ -191,7 +194,7 @@ class DownloadActions(
     )
 
     val copyDownloadLinkAction = simpleAction(
-        title = "Copy link",
+        title = Res.string.copy_link.asStringSource(),
         icon = MyIcons.copy,
         checkEnable =
         selections.mapStateFlow { it.isNotEmpty() },
@@ -206,7 +209,7 @@ class DownloadActions(
         }
     )
 
-    val openDownloadDialogAction = simpleAction("Show Properties", MyIcons.info) {
+    val openDownloadDialogAction = simpleAction(Res.string.show_properties.asStringSource(), MyIcons.info) {
         selections.value.map { it.id }
             .forEach { id ->
                 downloadDialogManager.openDownloadDialog(id)
@@ -214,7 +217,7 @@ class DownloadActions(
     }
 
     private val moveToQueueItems = MenuItem.SubMenu(
-        title = "Move To Queue",
+        title = Res.string.move_to_queue.asStringSource(),
         items = emptyList()
     ).apply {
         merge(
@@ -229,7 +232,7 @@ class DownloadActions(
         }.launchIn(scope)
     }
     private val moveToCategoryAction = MenuItem.SubMenu(
-        title = "Move To Category",
+        title = Res.string.move_to_category.asStringSource(),
         items = emptyList()
     ).apply {
         merge(
@@ -293,7 +296,7 @@ class CategoryActions(
     }
 
     val openCategoryFolderAction = simpleAction(
-        title = "Open Folder",
+        title = Res.string.open_folder.asStringSource(),
         icon = MyIcons.folderOpen,
         checkEnable = mainItemExists,
         onActionPerformed = {
@@ -306,7 +309,7 @@ class CategoryActions(
     )
 
     val deleteAction = simpleAction(
-        title = "Delete Category",
+        title = Res.string.delete_category.asStringSource(),
         icon = MyIcons.remove,
         checkEnable = mainItemExists,
         onActionPerformed = {
@@ -318,7 +321,7 @@ class CategoryActions(
         },
     )
     val editAction = simpleAction(
-        title = "Edit Category",
+        title = Res.string.edit_category.asStringSource(),
         icon = MyIcons.settings,
         checkEnable = mainItemExists,
         onActionPerformed = {
@@ -331,7 +334,7 @@ class CategoryActions(
     )
 
     val addCategoryAction = simpleAction(
-        title = "Add Category",
+        title = Res.string.add_category.asStringSource(),
         icon = MyIcons.add,
         onActionPerformed = {
             scope.launch {
@@ -340,7 +343,7 @@ class CategoryActions(
         },
     )
     val categorizeItemsAction = simpleAction(
-        title = "Auto Categorise Items",
+        title = Res.string.auto_categorize_downloads.asStringSource(),
         icon = MyIcons.refresh,
         onActionPerformed = {
             scope.launch {
@@ -349,7 +352,7 @@ class CategoryActions(
         },
     )
     val resetToDefaultAction = simpleAction(
-        title = "Restore Defaults",
+        title = Res.string.restore_defaults.asStringSource(),
         icon = MyIcons.undo,
         checkEnable = categoryManager
             .categoriesFlow
@@ -496,7 +499,7 @@ class HomeComponent(
 
 
     val menu: List<MenuItem.SubMenu> = buildMenu {
-        subMenu("File") {
+        subMenu(Res.string.file.asStringSource()) {
             +newDownloadAction
             +newDownloadFromClipboardAction
             +batchDownloadAction
@@ -504,7 +507,7 @@ class HomeComponent(
             +exitAction
 
         }
-        subMenu("Tasks") {
+        subMenu(Res.string.tasks.asStringSource()) {
 //            +toggleQueueAction
             +startQueueGroupAction
             +stopQueueGroupAction
@@ -512,21 +515,21 @@ class HomeComponent(
             +stopAllAction
             separator()
             subMenu(
-                title = "Remove",
+                title = Res.string.delete.asStringSource(),
                 icon = MyIcons.remove
             ) {
-                item("All Finished") {
+                item(Res.string.all_finished.asStringSource()) {
                     requestDelete(downloadSystem.getFinishedDownloadIds())
                 }
-                item("All Unfinished") {
+                item(Res.string.all_unfinished.asStringSource()) {
                     requestDelete(downloadSystem.getUnfinishedDownloadIds())
                 }
-                item("Entire List") {
+                item(Res.string.entire_list.asStringSource()) {
                     requestDelete(downloadSystem.getAllDownloadIds())
                 }
             }
         }
-        subMenu("Tools") {
+        subMenu(Res.string.tools.asStringSource()) {
             if (AppInfo.isInDebugMode()) {
                 +dummyException
                 +dummyMessage
@@ -536,7 +539,7 @@ class HomeComponent(
             separator()
             +gotoSettingsAction
         }
-        subMenu("Help") {
+        subMenu(Res.string.help.asStringSource()) {
             //TODO Enable Updater
 //            +checkForUpdateAction
             +supportActionGroup
@@ -558,9 +561,15 @@ class HomeComponent(
             MenuItem.SubMenu(
                 icon = null,
                 title = if (selectionList.size == 1) {
-                    downloadActions.defaultItem.value?.name ?: ""
+                    (downloadActions.defaultItem.value?.name ?: "")
+                        .asStringSource()
                 } else {
-                    "${selectionList.size} Selected"
+                    Res.string.n_items_selected
+                        .asStringSourceWithARgs(
+                            Res.string.n_items_selected_createArgs(
+                                count = selectionList.size.toString()
+                            )
+                        )
                 },
                 items = downloadActions.menu
             )
@@ -786,9 +795,9 @@ class HomeComponent(
             val dItem = downloadSystem.getDownloadItemById(id) ?: return@launch
             if (dItem.status != DownloadStatus.Completed) {
                 notificationSender.sendNotification(
-                    "Open File",
-                    "Can't open file",
-                    "Not finished",
+                    Res.string.open_file,
+                    Res.string.cant_open_file.asStringSource(),
+                    Res.string.not_finished.asStringSource(),
                     NotificationType.Error,
                 )
                 return@launch

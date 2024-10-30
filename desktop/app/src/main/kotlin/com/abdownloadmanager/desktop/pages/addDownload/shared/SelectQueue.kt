@@ -24,6 +24,9 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.queue.DownloadQueue
 import java.awt.MouseInfo
 
@@ -82,7 +85,7 @@ fun ShowAddToQueueDialog(
                 ) {
                     WindowDraggableArea(Modifier.fillMaxWidth()) {
                         Text(
-                            "Choose Queue to add",
+                            myStringResource(Res.string.select_queue),
                             modifier = Modifier
                                 .padding(vertical = 8.dp)
                                 .fillMaxWidth()
@@ -138,11 +141,11 @@ fun ShowAddToQueueDialog(
                         ){
                             IconActionButton(
                                 MyIcons.add,
-                                contentDescription = "Add new queue",
+                                contentDescription = myStringResource(Res.string.add_new_queue),
                                 onClick = newQueueAction
                             )
                             ActionButton(
-                                text = "Without Queue",
+                                text = myStringResource(Res.string.without_queue),
                                 modifier = Modifier,
                                 onClick = {
                                     onQueueSelected(null)

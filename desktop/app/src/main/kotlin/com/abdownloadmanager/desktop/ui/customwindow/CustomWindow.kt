@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -65,16 +66,19 @@ private fun FrameWindowScope.CustomWindowFrame(
                 }
                 .background(background)
         ) {
-            SnapDraggableToolbar(
-                title = title,
-                windowIcon = windowIcon,
-                titlePosition = titlePosition,
-                start = start,
-                end = end,
-                onRequestMinimize = onRequestMinimize,
-                onRequestClose = onRequestClose,
-                onRequestToggleMaximize = onRequestToggleMaximize
-            )
+            WithTitleBarDirection {
+                SnapDraggableToolbar(
+                    title = title,
+                    windowIcon = windowIcon,
+                    titlePosition = titlePosition,
+                    start = start,
+                    end = end,
+                    onRequestMinimize = onRequestMinimize,
+                    onRequestClose = onRequestClose,
+                    onRequestToggleMaximize = onRequestToggleMaximize
+                )
+            }
+
             content()
         }
     }

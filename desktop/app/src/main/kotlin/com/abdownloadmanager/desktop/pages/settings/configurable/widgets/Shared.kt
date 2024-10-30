@@ -177,20 +177,21 @@ fun <T> TitleAndDescription(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                cfg.title,
+                cfg.title.rememberString(),
                 fontSize = myTextSizes.base,
                 fontWeight = FontWeight.Bold,
             )
-            if (cfg.description.isNotBlank()) {
+            if (cfg.description.rememberString().isNotBlank()) {
                 Spacer(Modifier.size(4.dp))
                 Help(cfg)
             }
         }
         if (describe) {
             val value = cfg.backedBy.collectAsState().value
-            val describeContent = remember(value) {
+            val describedStringSource = remember(value) {
                 cfg.describe(value)
             }
+            val describeContent = describedStringSource.rememberString()
             if (describeContent.isNotBlank()) {
                 WithContentAlpha(0.75f){
                     Text(describeContent,
@@ -341,7 +342,7 @@ private fun Help(
                 ) {
                     WithContentColor(myColors.onSurface) {
                         Text(
-                            cfg.description,
+                            cfg.description.rememberString(),
                             fontSize = myTextSizes.base,
                         )
                     }

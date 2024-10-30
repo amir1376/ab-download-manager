@@ -51,7 +51,7 @@ fun RenderThemeConfig(cfg: ThemeConfigurable, modifier: Modifier) {
                                 .size(16.dp)
                         )
                         Spacer(Modifier.width(16.dp))
-                        Text(cfg.describe(it), fontSize = myTextSizes.lg)
+                        Text(cfg.describe(it).rememberString(), fontSize = myTextSizes.lg)
                     }
                 })
         }

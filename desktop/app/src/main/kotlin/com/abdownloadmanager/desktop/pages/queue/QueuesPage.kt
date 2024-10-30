@@ -35,10 +35,15 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.queue.DownloadQueue
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.*
 import org.burnoutcrew.reorderable.*
 
@@ -47,7 +52,7 @@ import org.burnoutcrew.reorderable.*
 fun QueuePage(component: QueuesComponent) {
     val queues = component.queuesState
     val activeItem: DownloadQueue = component.selectedItem
-    WindowTitle("Queues")
+    WindowTitle(myStringResource(Res.string.queues))
     val borderShape = RoundedCornerShape(6.dp)
     val borderColor = myColors.onBackground / 5
     Column {
@@ -100,11 +105,13 @@ private fun Actions(
             Spacer(Modifier.width(4.dp))
         }
         ActionButton(
-            text = if (isActive) {
-                "Stop Queue"
-            } else {
-                "Start Queue"
-            },
+            text = myStringResource(
+                if (isActive) {
+                    Res.string.stop_queue
+                } else {
+                    Res.string.start_queue
+                }
+            ),
             modifier = Modifier,
             onClick = {
                 scope.launch {
@@ -118,7 +125,7 @@ private fun Actions(
         )
         space()
         ActionButton(
-            text = "Close",
+            text = myStringResource(Res.string.close),
             modifier = Modifier,
             onClick = {
                 component.close()
@@ -127,9 +134,9 @@ private fun Actions(
     }
 }
 
-enum class QueueInfoPages(val title: String, val icon: IconSource) {
-    Config("Config", MyIcons.settings),
-    Items("Items", MyIcons.queue),
+enum class QueueInfoPages(val title: StringSource, val icon: IconSource) {
+    Config(Res.string.config.asStringSource(), MyIcons.settings),
+    Items(Res.string.items.asStringSource(), MyIcons.queue),
 }
 
 @Composable
@@ -232,7 +239,7 @@ fun RenderQueueItems(
             val space = 4.dp
             IconActionButton(
                 icon = MyIcons.remove,
-                contentDescription = "remove",
+                contentDescription = myStringResource(Res.string.remove),
                 onClick = {
                     component.deleteItems()
                 },
@@ -241,7 +248,7 @@ fun RenderQueueItems(
             Spacer(Modifier.weight(1f))
             IconActionButton(
                 icon = MyIcons.down,
-                contentDescription = "Move down",
+                contentDescription = myStringResource(Res.string.move_down),
                 onClick = {
                     component.moveDownItems()
                 },
@@ -250,7 +257,7 @@ fun RenderQueueItems(
             Spacer(Modifier.width(space))
             IconActionButton(
                 icon = MyIcons.up,
-                contentDescription = "Move up",
+                contentDescription = myStringResource(Res.string.move_up),
                 onClick = {
                     component.moveUpItems()
                 },
@@ -413,7 +420,7 @@ private fun QueueListSection(
         ) {
             IconActionButton(
                 icon = MyIcons.add,
-                contentDescription = "Add Queue",
+                contentDescription = myStringResource(Res.string.add_new_queue),
                 onClick = {
                     component.addQueue()
                 }
@@ -421,7 +428,7 @@ private fun QueueListSection(
             spacer()
             IconActionButton(
                 icon = MyIcons.remove,
-                contentDescription = "Delete Queue",
+                contentDescription = myStringResource(Res.string.remove_queue),
                 enabled = component.canDeleteThisQueue(selectedItem),
                 onClick = {
                     component.requestDeleteQueue(selectedItem)

@@ -37,9 +37,13 @@ import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.CategorySelectionMode
 import ir.amirab.downloader.exception.TooManyErrorException
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -56,8 +60,8 @@ sealed interface AppEffects {
 }
 
 interface NotificationSender {
-    fun sendDialogNotification(title: String, description: String, type: MessageDialogType)
-    fun sendNotification(tag: Any, title: String, description: String, type: NotificationType)
+    fun sendDialogNotification(title: StringSource, description: StringSource, type: MessageDialogType)
+    fun sendNotification(tag: Any, title: StringSource, description: StringSource, type: NotificationType)
 }
 
 class AppComponent(
@@ -365,14 +369,14 @@ class AppComponent(
             }.launchIn(scope)
     }
 
-    override fun sendNotification(tag: Any, title: String, description: String, type: NotificationType) {
+    override fun sendNotification(tag: Any, title: StringSource, description: StringSource, type: NotificationType) {
         beep()
         showNotification(tag = tag, title = title, description = description, type = type)
     }
 
     override fun sendDialogNotification(
-        title: String,
-        description: String,
+        title: StringSource,
+        description: StringSource,
         type: MessageDialogType,
     ) {
         beep()
@@ -387,8 +391,8 @@ class AppComponent(
 
     private fun showNotification(
         tag: Any,
-        title: String,
-        description: String,
+        title: StringSource,
+        description: StringSource,
         type: NotificationType = NotificationType.Info,
     ) {
         sendEffect(
@@ -418,9 +422,9 @@ class AppComponent(
                     is IntegrationResult.Fail -> {
                         IntegrationPortBroadcaster.setIntegrationPortInFile(null)
                         sendDialogNotification(
-                            title = "Can't run browser integration",
+                            title = Res.string.cant_run_browser_integration.asStringSource(),
                             type = MessageDialogType.Error,
-                            description = it.throwable.localizedMessage
+                            description = it.throwable.localizedMessage.asStringSource()
                         )
                     }
 
@@ -467,20 +471,20 @@ class AppComponent(
                 "Too Many Error: "
             } else {
                 "Error: "
-            }
-            val reason = actualCause.message ?: "Unknown"
+            }.asStringSource()
+            val reason = actualCause.message?.asStringSource() ?: Res.string.unknown.asStringSource()
             sendNotification(
                 "downloadId=${it.downloadItem.id}",
-                title = it.downloadItem.name,
-                description = prefix + reason,
+                title = it.downloadItem.name.asStringSource(),
+                description = listOf(prefix, reason).combineStringSources(),
                 type = NotificationType.Error,
             )
         }
         if (it is DownloadManagerEvents.OnJobCompleted) {
             sendNotification(
                 tag = "downloadId=${it.downloadItem.id}",
-                title = it.downloadItem.name,
-                description = "Finished",
+                title = it.downloadItem.name.asStringSource(),
+                description = Res.string.finished.asStringSource(),
                 type = NotificationType.Success,
             )
         }
@@ -490,9 +494,9 @@ class AppComponent(
         val item = downloadSystem.getDownloadItemById(id)
         if (item == null) {
             sendNotification(
-                "Open File",
-                "Can't open file",
-                "Download Item not found",
+                Res.string.open_file,
+                Res.string.cant_open_file.asStringSource(),
+                Res.string.download_item_not_found.asStringSource(),
                 NotificationType.Error,
             )
             return
@@ -505,9 +509,9 @@ class AppComponent(
             FileUtils.openFile(downloadSystem.getDownloadFile(downloadItem))
         }.onFailure {
             sendNotification(
-                "Open File",
-                "Can't open file",
-                it.localizedMessage ?: "Unknown Error",
+                Res.string.open_file,
+                Res.string.cant_open_file.asStringSource(),
+                it.localizedMessage?.asStringSource() ?: Res.string.unknown_error.asStringSource(),
                 NotificationType.Error,
             )
             println("Can't open file:${it.message}")
@@ -518,9 +522,9 @@ class AppComponent(
         val item = downloadSystem.getDownloadItemById(id)
         if (item == null) {
             sendNotification(
-                "Open Folder",
-                "Can't open folder",
-                "Download Item not found",
+                Res.string.open_folder,
+                Res.string.cant_open_folder.asStringSource(),
+                Res.string.download_item_not_found.asStringSource(),
                 NotificationType.Error,
             )
             return
@@ -533,9 +537,9 @@ class AppComponent(
             FileUtils.openFolderOfFile(downloadSystem.getDownloadFile(downloadItem))
         }.onFailure {
             sendNotification(
-                "Open Folder",
-                "Can't open folder",
-                it.localizedMessage ?: "Unknown Error",
+                Res.string.open_folder,
+                Res.string.cant_open_folder.asStringSource(),
+                it.localizedMessage?.asStringSource() ?: Res.string.unknown_error.asStringSource(),
                 NotificationType.Error,
             )
             println("Can't open folder:${it.message}")
