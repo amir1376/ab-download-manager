@@ -895,6 +895,27 @@ class HomeComponent(
         separator()
         +openQueuesAction
         +gotoSettingsAction
+        +speedLimiterAction
+    }
+
+    private val speedLimiterAction = simpleAction(
+        title = Res.string.speed_limiter.asStringSource(),
+        icon = MyIcons.speedLimiter,
+        onActionPerformed = {
+            toggleSpeedLimiter()
+        }
+    )
+
+    private fun toggleSpeedLimiter() {
+        scope.launch {
+            val currentLimit = appSettings.speedLimit.value
+            val newLimit = if (currentLimit == 0L) {
+                1024L * 1024L // 1 MB/s
+            } else {
+                0L // Unlimited
+            }
+            appSettings.speedLimit.emit(newLimit)
+        }
     }
 
     companion object {

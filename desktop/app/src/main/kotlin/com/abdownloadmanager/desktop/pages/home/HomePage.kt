@@ -247,6 +247,10 @@ fun HomePage(component: HomeComponent) {
                             component.requestAddNewDownload()
                         }
                         Actions(component.headerActions)
+                        SpeedLimiterButton(
+                            isEnabled = component.appSettings.speedLimit.collectAsState().value > 0,
+                            onToggle = { component.toggleSpeedLimiter() }
+                        )
                     }
                     var lastSelected by remember { mutableStateOf(null as Long?) }
                     DownloadList(
@@ -742,6 +746,10 @@ private fun TopBar(component: HomeComponent) {
             modifier = Modifier,
             textPadding = PaddingValues(8.dp),
         )
+        SpeedLimiterButton(
+            isEnabled = component.appSettings.speedLimit.collectAsState().value > 0,
+            onToggle = { component.toggleSpeedLimiter() }
+        )
     }
 }
 
@@ -753,7 +761,7 @@ fun HomeSearch(
 ) {
     val searchBoxInteractionSource = remember { MutableInteractionSource() }
 
-    val isFocused by searchBoxInteractionSource.collectIsFocusedAsState()
+    val isFocused by searchBoxInteractionSource.collectAsState()
     WithLanguageDirection {
         SearchBox(
             text = component.filterState.textToSearch,
@@ -771,5 +779,3 @@ fun HomeSearch(
         )
     }
 }
-
-

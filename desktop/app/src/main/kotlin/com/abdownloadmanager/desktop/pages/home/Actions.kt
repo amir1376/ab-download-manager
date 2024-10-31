@@ -135,3 +135,27 @@ private fun GroupActionButton(
         }
     }
 }
+
+@Composable
+fun SpeedLimiterButton(
+    isEnabled: Boolean,
+    onToggle: () -> Unit
+) {
+    val icon = if (isEnabled) MyIcons.speedLimiterEnabled else MyIcons.speedLimiterDisabled
+    val title = if (isEnabled) "Disable Speed Limiter" else "Enable Speed Limiter"
+
+    Column(
+        modifier = Modifier
+            .clickable { onToggle() }
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        WithContentColor(myColors.onBackground) {
+            WithContentAlpha(1f) {
+                MyIcon(icon, null, Modifier.size(16.dp))
+                Spacer(Modifier.size(2.dp))
+                Text(title, maxLines = 1, fontSize = myTextSizes.sm)
+            }
+        }
+    }
+}
