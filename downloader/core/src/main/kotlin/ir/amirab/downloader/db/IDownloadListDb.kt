@@ -1,7 +1,7 @@
 package ir.amirab.downloader.db
 
 import ir.amirab.downloader.downloaditem.DownloadItem
-
+import java.io.File
 
 interface IDownloadListDb {
     // modification/add implementations must be thread safe
@@ -14,6 +14,5 @@ interface IDownloadListDb {
     suspend fun removeById(itemId: Long)
     suspend fun getLastId(): Long
 
-//    suspend fun allAsFlow(): Flow<List<DownloadItem>>
+    suspend fun getFilePathById(id: Long): File?
 }
-

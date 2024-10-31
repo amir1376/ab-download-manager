@@ -25,6 +25,7 @@ import kotlinx.coroutines.sync.withLock
 import okio.Throttler
 import java.io.File
 import java.net.URL
+import java.nio.file.*
 
 class DownloadManager(
     val dlListDb: IDownloadListDb,
@@ -344,6 +345,52 @@ class DownloadManager(
         onDownloadItemChange(updated)
     }
 
+    private val fileWatcherScope = CoroutineScope(SupervisorJob())
+    private val fileWatcher = FileSystems.getDefault().newWatchService()
+
+    init {
+        fileWatcherScope.launch {
+            while (true) {
+                val key = fileWatcher.take()
+                for (event in key.pollEvents()) {
+                    val kind = event.kind()
+                    if (kind == StandardWatchEventKinds.OVERFLOW) {
+                        continue
+                    }
+                    val ev = event as WatchEvent<Path>
+                    val fileName = ev.context()
+                    val filePath = (key.watchable() as Path).resolve(fileName)
+                    handleFileEvent(filePath)
+                }
+                key.reset()
+            }
+        }
+
+        scope.launch {
+            val downloadItems = getDownloadList()
+            val downloadDirectories = downloadItems.map { it.folder }.distinct()
+            for (directory in downloadDirectories) {
+                val path = Paths.get(directory)
+                path.register(
+                    fileWatcher,
+                    StandardWatchEventKinds.ENTRY_DELETE,
+                    StandardWatchEventKinds.ENTRY_MODIFY,
+                    StandardWatchEventKinds.ENTRY_MOVE
+                )
+            }
+        }
+    }
+
+    private suspend fun handleFileEvent(filePath: Path) {
+        val downloadItems = getDownloadList()
+        val affectedItems = downloadItems.filter {
+            val downloadFile = calculateOutputFile(it)
+            downloadFile.toPath() == filePath
+        }
+        for (item in affectedItems) {
+            removeDownload(item.id, false)
+        }
+    }
 }
 
 private class ContextProvider {

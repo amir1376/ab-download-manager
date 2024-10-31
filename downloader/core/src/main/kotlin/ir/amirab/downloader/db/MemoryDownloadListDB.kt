@@ -3,6 +3,7 @@ package ir.amirab.downloader.db
 import ir.amirab.downloader.downloaditem.DownloadItem
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import java.io.File
 
 class MemoryDownloadListDB : IDownloadListDb {
 
@@ -45,6 +46,10 @@ class MemoryDownloadListDB : IDownloadListDb {
         return list.maxByOrNull {
             it.id
         }?.id ?: -1
+    }
+
+    override suspend fun getFilePathById(id: Long): File? {
+        return getById(id)?.let { File(it.folder, it.name) }
     }
 
     private val flow = MutableSharedFlow<List<DownloadItem>>(

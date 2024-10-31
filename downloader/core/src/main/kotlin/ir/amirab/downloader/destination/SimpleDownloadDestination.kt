@@ -142,4 +142,8 @@ class SimpleDownloadDestination(
     override fun canGetFileWriter(): Boolean {
         return true
     }
+
+    override fun isOutputFileValid(): Boolean {
+        return outputFile.exists() && outputFile.isFile
+    }
 }

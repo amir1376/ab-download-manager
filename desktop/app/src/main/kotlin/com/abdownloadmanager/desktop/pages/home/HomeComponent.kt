@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
+import java.nio.file.*
 
 @Stable
 class FilterState {
@@ -899,5 +900,52 @@ class HomeComponent(
 
     companion object {
         val CATEGORIES_SIZE_RANGE = 0.dp..500.dp
+    }
+
+    private val fileWatcherScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val fileWatcher = FileSystems.getDefault().newWatchService()
+
+    init {
+        fileWatcherScope.launch {
+            while (true) {
+                val key = fileWatcher.take()
+                for (event in key.pollEvents()) {
+                    val kind = event.kind()
+                    if (kind == StandardWatchEventKinds.OVERFLOW) {
+                        continue
+                    }
+                    val ev = event as WatchEvent<Path>
+                    val fileName = ev.context()
+                    val filePath = (key.watchable() as Path).resolve(fileName)
+                    handleFileEvent(filePath)
+                }
+                key.reset()
+            }
+        }
+
+        scope.launch {
+            val downloadItems = downloadSystem.getDownloadList()
+            val downloadDirectories = downloadItems.map { it.folder }.distinct()
+            for (directory in downloadDirectories) {
+                val path = Paths.get(directory)
+                path.register(
+                    fileWatcher,
+                    StandardWatchEventKinds.ENTRY_DELETE,
+                    StandardWatchEventKinds.ENTRY_MODIFY,
+                    StandardWatchEventKinds.ENTRY_MOVE
+                )
+            }
+        }
+    }
+
+    private suspend fun handleFileEvent(filePath: Path) {
+        val downloadItems = downloadSystem.getDownloadList()
+        val affectedItems = downloadItems.filter {
+            val downloadFile = downloadSystem.getDownloadFile(it)
+            downloadFile.toPath() == filePath
+        }
+        for (item in affectedItems) {
+            downloadSystem.removeDownload(item.id, false)
+        }
     }
 }
