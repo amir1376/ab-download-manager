@@ -139,7 +139,7 @@ fun BatchDownload(
                 Spacer(Modifier.height(8.dp))
                 LabeledContent(
                     label = {
-                        Text(myStringResource(Res.string.wildcard_length))
+                        Text(myStringResource(Res.string.batch_download_wildcard_length))
                     },
                     content = {
                         WildcardLengthUi(

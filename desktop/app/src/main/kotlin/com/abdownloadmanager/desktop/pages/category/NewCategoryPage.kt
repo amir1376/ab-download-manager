@@ -181,8 +181,8 @@ fun CategoryAutoUrls(
     onUrlPatternChanged: (String) -> Unit,
 ) {
     OptionalWithLabel(
-        label = myStringResource(Res.string.url_patterns),
-        helpText = myStringResource(Res.string.url_patterns_description),
+        label = myStringResource(Res.string.category_url_patterns),
+        helpText = myStringResource(Res.string.category_url_patterns_description),
         enabled = enabled,
         setEnabled = setEnabled
     ) {
