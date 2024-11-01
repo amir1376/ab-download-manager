@@ -117,7 +117,10 @@ fun BatchDownload(
                                 placeholder = "",
                                 modifier = Modifier.width(90.dp),
                                 start = {
-                                    Text("${myStringResource(Res.string.from)}:", Modifier.padding(horizontal = 8.dp))
+                                    Text(
+                                        "${myStringResource(Res.string.range_from)}:",
+                                        Modifier.padding(horizontal = 8.dp)
+                                    )
                                 }
                             )
                             Spacer(Modifier.width(8.dp))
@@ -130,7 +133,10 @@ fun BatchDownload(
                                 placeholder = "",
                                 modifier = Modifier.width(90.dp),
                                 start = {
-                                    Text("${myStringResource(Res.string.to)}:", Modifier.padding(horizontal = 8.dp))
+                                    Text(
+                                        "${myStringResource(Res.string.range_to)}:",
+                                        Modifier.padding(horizontal = 8.dp)
+                                    )
                                 }
                             )
                         }
