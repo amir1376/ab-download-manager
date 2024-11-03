@@ -11,7 +11,6 @@ import okio.Path.Companion.toPath
 import okio.buffer
 import java.io.InputStream
 import java.net.URI
-import java.util.Locale
 import java.util.Properties
 
 class LanguageManager(
@@ -20,8 +19,8 @@ class LanguageManager(
     private val _languageList: MutableStateFlow<List<LanguageInfo>> = MutableStateFlow(emptyList())
     val languageList = _languageList.asStateFlow()
     val selectedLanguage = storage.selectedLanguage
-    val isRtl = selectedLanguage.mapStateFlow {
-        rtlLanguages.contains(it)
+    val isRtl = selectedLanguage.mapStateFlow { selectedLanguage ->
+        rtlLanguages.any { selectedLanguage.startsWith(it) }
     }
 
     fun boot() {
@@ -29,10 +28,11 @@ class LanguageManager(
         instance = this
     }
 
-    fun selectLanguage(code: String?) {
-        val languageCode = code ?: Locale.getDefault().language
-        val languageInfo = languageList.value.find { it.languageCode == languageCode }
-        selectedLanguage.value = (languageInfo ?: DefaultLanguageInfo).languageCode
+    fun selectLanguage(languageInfo: LanguageInfo) {
+//        ensure that language info is in the list!
+//        val languageInfo = languageList.value.find { it == languageInfo }
+//        selectedLanguage.value = (languageInfo ?: DefaultLanguageInfo).toLocaleString()
+        selectedLanguage.value = languageInfo.toLocaleString()
     }
 
     fun getMessage(key: String): String {
@@ -74,23 +74,23 @@ class LanguageManager(
         }
     }
 
-    private fun bestLanguageInfo(code: String): LanguageInfo {
+    private fun bestLanguageInfo(locale: String): LanguageInfo {
         return languageList.value.find {
-            it.languageCode == code
+            it.toLocaleString() == locale
         } ?: DefaultLanguageInfo
     }
 
     private fun getMessageContainer(): MessageData {
         val requestedLanguage = getRequestedLanguage()
         this.loadedLanguage.let { loadedLanguage ->
-            if (loadedLanguage != null && loadedLanguage.languageInfo.languageCode == requestedLanguage) {
+            if (loadedLanguage != null && loadedLanguage.languageInfo.toLocaleString() == requestedLanguage) {
                 return loadedLanguage.messageData
             }
         }
         synchronized(this) {
             // make sure not created earlier
             this.loadedLanguage.let { loadedLanguage ->
-                if (loadedLanguage != null && loadedLanguage.languageInfo.languageCode == requestedLanguage) {
+                if (loadedLanguage != null && loadedLanguage.languageInfo.toLocaleString() == requestedLanguage) {
                     return loadedLanguage.messageData
                 }
             }
@@ -125,12 +125,17 @@ class LanguageManager(
     companion object {
         lateinit var instance: LanguageManager
         private const val LOCALES_PATH = "/com/abdownloadmanager/resources/locales"
-        val DefaultLanguageInfo = LanguageInfo(
-            languageCode = "en",
-            countryCode = "US",
-            nativeName = "English",
-            path = URI("$RESOURCE_PROTOCOL:$LOCALES_PATH/en_US.properties")
-        )
+        val DefaultLanguageInfo = run {
+            val locale = MyLocale(
+                languageCode = "en",
+                countryCode = "US",
+            )
+            LanguageInfo(
+                locale = locale,
+                nativeName = "English",
+                path = URI("$RESOURCE_PROTOCOL:$LOCALES_PATH/${locale}.properties")
+            )
+        }
 
         fun openStream(uri: URI): InputStream {
             return when (uri.scheme) {
@@ -144,8 +149,10 @@ class LanguageManager(
             path: String,
         ): LanguageInfo {
             return LanguageInfo(
-                languageCode = languageCode,
-                countryCode = countryCode,
+                locale = MyLocale(
+                    languageCode = languageCode,
+                    countryCode = countryCode,
+                ),
                 nativeName = LanguageNameProvider.getNativeName(this),
                 path = URI(path),
             )
@@ -189,8 +196,11 @@ private data class LoadedLanguage(
 
 @Immutable
 data class LanguageInfo(
-    val languageCode: String,
-    val countryCode: String?,
+    val locale: MyLocale,
     val nativeName: String,
     val path: URI,
-)
+) {
+    fun toLocaleString(): String {
+        return locale.toString()
+    }
+}
