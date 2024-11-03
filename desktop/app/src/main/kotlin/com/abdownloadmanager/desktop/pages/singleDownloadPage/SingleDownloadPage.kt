@@ -394,7 +394,7 @@ fun prettifyStatus(status: PartDownloadStatus): StringSource {
         PartDownloadStatus.IDLE -> Res.string.idle
         PartDownloadStatus.Completed -> Res.string.finished
         PartDownloadStatus.ReceivingData -> Res.string.receiving_data
-        PartDownloadStatus.SendGet -> Res.string.send_get
+        PartDownloadStatus.SendGet -> Res.string.connecting
     }.asStringSource()
 }
 
