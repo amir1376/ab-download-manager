@@ -196,7 +196,7 @@ fun BatchDownload(
                 onClick = component::confirm
             )
             Spacer(Modifier.width(8.dp))
-            ActionButton(myStringResource(Res.string.ok), onClick = component.onClose)
+            ActionButton(myStringResource(Res.string.close), onClick = component.onClose)
         }
     }
 }
