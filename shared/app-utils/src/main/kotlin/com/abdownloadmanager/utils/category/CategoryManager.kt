@@ -133,8 +133,12 @@ class CategoryManager(
 
     private fun createDirectoryIfNecessary(category: Category) {
         kotlin.runCatching {
-            val folder = File(category.path)
-            if (folder.exists()) {
+            val folder = category
+                .getDownloadPath()
+                ?.let(::File)
+                ?.canonicalFile
+                ?: return
+            if (!folder.exists()) {
                 folder.mkdirs()
             }
         }
@@ -201,7 +205,7 @@ class CategoryManager(
 
     fun isThisPathBelongsToACategory(folder: String): Boolean {
         return getCategories()
-            .map { it.path }.contains(folder)
+            .mapNotNull { it.getDownloadPath() }.contains(folder)
     }
 
     companion object {

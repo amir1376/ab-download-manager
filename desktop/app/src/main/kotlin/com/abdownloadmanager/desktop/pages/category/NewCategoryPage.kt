@@ -82,7 +82,9 @@ fun NewCategory(
             CategoryDefaultPath(
                 path = categoryComponent.path.collectAsState().value,
                 onPathChanged = categoryComponent::setPath,
-                defaultDownloadLocation = categoryComponent.defaultDownloadLocation.collectAsState().value
+                defaultDownloadLocation = categoryComponent.defaultDownloadLocation.collectAsState().value,
+                checked = categoryComponent.usePath.collectAsState().value,
+                setChecked = categoryComponent::setUsePath
             )
         }
         Spacer(Modifier.height(12.dp))
@@ -115,6 +117,8 @@ fun CategoryDefaultPath(
     defaultDownloadLocation: String,
     path: String,
     onPathChanged: (String) -> Unit,
+    checked: Boolean,
+    setChecked: (Boolean) -> Unit,
 ) {
     val initialDirectory = remember(path, defaultDownloadLocation) {
         path
@@ -135,14 +139,17 @@ fun CategoryDefaultPath(
         directory?.path?.let(onPathChanged)
     }
 
-    WithLabel(
+    OptionalWithLabel(
         label = myStringResource(Res.string.category_download_location),
-        helpText = myStringResource(Res.string.category_download_location_description)
+        helpText = myStringResource(Res.string.category_download_location_description),
+        enabled = checked,
+        setEnabled = setChecked,
     ) {
         CategoryPageTextField(
             text = path,
             onTextChange = onPathChanged,
             modifier = Modifier.fillMaxWidth(),
+            enabled = checked,
             placeholder = "",
             errorText = null,
             end = {
