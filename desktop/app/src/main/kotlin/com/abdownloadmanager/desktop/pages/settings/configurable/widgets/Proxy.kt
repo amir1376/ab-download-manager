@@ -1,7 +1,6 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -21,14 +20,15 @@ import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.utils.compose.widget.Icon
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.utils.proxy.ProxyMode
 import com.abdownloadmanager.utils.proxy.ProxyRules
 import com.abdownloadmanager.utils.proxy.ProxyWithRules
 import ir.amirab.downloader.connection.proxy.Proxy
 import ir.amirab.downloader.connection.proxy.ProxyType
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.DesktopUtils
 
 
@@ -56,11 +56,13 @@ fun RenderProxyConfig(cfg: ProxyConfigurable, modifier: Modifier) {
                 },
                 modifier = Modifier.widthIn(min = 120.dp),
                 render = {
-                    val text = when (it) {
-                        ProxyMode.Direct -> "No Proxy"
-                        ProxyMode.UseSystem -> "Use System Proxy"
-                        ProxyMode.Manual -> "Manual Proxy"
-                    }
+                    val text = myStringResource(
+                        when (it) {
+                            ProxyMode.Direct -> Res.string.proxy_no
+                            ProxyMode.UseSystem -> Res.string.proxy_system
+                            ProxyMode.Manual -> Res.string.proxy_manual
+                        }
+                    )
                     Text(text)
                 },
             )
@@ -71,7 +73,7 @@ fun RenderProxyConfig(cfg: ProxyConfigurable, modifier: Modifier) {
                     ProxyMode.Direct -> {}
                     ProxyMode.UseSystem -> {
                         ActionButton(
-                            "Open System Proxy Settings",
+                            myStringResource(Res.string.proxy_open_system_proxy_settings),
                             onClick = {
                                 DesktopUtils.openSystemProxySettings()
                             },
@@ -153,7 +155,7 @@ fun RenderManualProxyConfig(
         mutableStateOf(false)
     }
     ActionButton(
-        "Change proxy",
+        myStringResource(Res.string.change_proxy),
         onClick = {
             showManualProxyConfig = true
         },
@@ -192,7 +194,7 @@ private fun ProxyEditDialog(
             val (excludeURLPatterns, setExcludeURLPatterns) = state.excludeURLPatterns
 
             SettingsDialog(
-                headerTitle = "Edit Proxy",
+                headerTitle = myStringResource(Res.string.proxy_change_title),
                 onDismiss = onDismiss,
                 content = {
                     Column(
@@ -205,7 +207,7 @@ private fun ProxyEditDialog(
                         DialogConfigItem(
                             modifier = Modifier,
                             title = {
-                                Text("Type")
+                                Text(myStringResource(Res.string.proxy_type))
                             },
                             value = {
                                 Multiselect(
@@ -228,7 +230,7 @@ private fun ProxyEditDialog(
                         DialogConfigItem(
                             modifier = Modifier,
                             title = {
-                                Text("Address & Port")
+                                Text(myStringResource(Res.string.address_and_port))
                             },
                             value = {
                                 Row(
@@ -244,7 +246,7 @@ private fun ProxyEditDialog(
                                     IntTextField(
                                         value = port,
                                         onValueChange = setPort,
-                                        placeholder = "Port",
+                                        placeholder = myStringResource(Res.string.port),
                                         range = 1..65535,
                                         modifier = Modifier.width(96.dp),
                                         keyboardOptions = KeyboardOptions(),
@@ -269,7 +271,7 @@ private fun ProxyEditDialog(
                                         size = 16.dp
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Text("Use Authentication")
+                                    Text(myStringResource(Res.string.use_authentication))
                                 }
                             },
                             value = {
@@ -279,7 +281,7 @@ private fun ProxyEditDialog(
                                     MyTextField(
                                         text = username,
                                         onTextChange = setUsername,
-                                        placeholder = "Username",
+                                        placeholder = myStringResource(Res.string.username),
                                         modifier = Modifier.weight(1f),
                                         enabled = useAuth,
                                     )
@@ -287,7 +289,7 @@ private fun ProxyEditDialog(
                                     MyTextField(
                                         text = password,
                                         onTextChange = setPassword,
-                                        placeholder = "Password",
+                                        placeholder = myStringResource(Res.string.password),
                                         modifier = Modifier.weight(1f),
                                         enabled = useAuth,
                                     )
@@ -299,10 +301,10 @@ private fun ProxyEditDialog(
                             modifier = Modifier,
                             title = {
                                 Row {
-                                    Text("Don't Use proxy for")
+                                    Text(myStringResource(Res.string.proxy_do_not_use_proxy_for))
                                     Spacer(Modifier.width(8.dp))
                                     Help(
-                                        "A list of urls that may not be proxied\nYou can use wildcard with *\nfor example 192.168.1.* example.com (space separated)"
+                                        myStringResource(Res.string.proxy_do_not_use_proxy_for_description)
                                     )
                                 }
                             },
@@ -323,13 +325,13 @@ private fun ProxyEditDialog(
                 },
                 actions = {
                     ActionButton(
-                        "Save",
+                        myStringResource(Res.string.change),
                         enabled = state.canSave,
                         onClick = {
                             state.save()
                         })
                     Spacer(Modifier.width(8.dp))
-                    ActionButton("Cancel", onClick = {
+                    ActionButton(myStringResource(Res.string.cancel), onClick = {
                         onDismiss()
                     })
                 }
@@ -374,7 +376,7 @@ private fun SettingsDialog(
             )
             MyIcon(
                 MyIcons.windowClose,
-                "Close",
+                myStringResource(Res.string.close),
                 Modifier
                     .clip(CircleShape)
                     .clickable { onDismiss() }
