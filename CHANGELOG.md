@@ -14,6 +14,22 @@
 
 ### Security
 
+## 1.4.1
+
+### Added
+
+- Portuguese (Brazilian) Language
+
+### Changed
+
+- Updated some languages
+
+### Fixed
+
+- Language names not shown by their native names
+- Selected language not saved properly
+- Wrong text for "Close" button in "Batch Download" page
+
 ## 1.4.0
 
 ### Added
