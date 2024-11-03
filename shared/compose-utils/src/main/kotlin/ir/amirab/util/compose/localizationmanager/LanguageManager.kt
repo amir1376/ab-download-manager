@@ -108,30 +108,17 @@ class LanguageManager(
         val fileSystem = FileSystem.RESOURCES
         return fileSystem
             .list(LOCALES_PATH.toPath())
-            .mapNotNull {
+            .mapNotNull { path ->
                 kotlin.runCatching {
-                    if (fileSystem.metadataOrNull(it)?.isRegularFile == false) {
+                    if (fileSystem.metadataOrNull(path)?.isRegularFile == false) {
                         return@runCatching null
                     }
-                    val languageCodeAndCountryCode = extractLanguageCodeAndCountryCodeFromFileName(it.name)
+                    val languageCodeAndCountryCode = extractLanguageCodeAndCountryCodeFromFileName(path.name)
                         ?: return@runCatching null
-                    val locale = if (languageCodeAndCountryCode.countryCode != null) {
-                        Locale(languageCodeAndCountryCode.languageCode, languageCodeAndCountryCode.countryCode)
-                    } else {
-                        Locale(languageCodeAndCountryCode.languageCode)
-                    }
-                    locale to it
-                }.getOrNull()
-            }.let {
-                val localesWithPath = it
-                localesWithPath.map { (locale, path) ->
-                    locale.toLanguageInfo(
+                    languageCodeAndCountryCode.toLanguageInfo(
                         path = "$RESOURCE_PROTOCOL://$path",
-                        hasMultiRegion = localesWithPath.count {
-                            it.first.language == locale.language
-                        } > 1
                     )
-                }
+                }.getOrNull()
             }
     }
 
@@ -153,48 +140,32 @@ class LanguageManager(
             }.buffer().inputStream()
         }
 
-        private fun Locale.toLanguageInfo(
+        private fun MyLocale.toLanguageInfo(
             path: String,
-            hasMultiRegion: Boolean,
         ): LanguageInfo {
             return LanguageInfo(
-                languageCode = language,
-                countryCode = country,
-                nativeName = if (hasMultiRegion) getDisplayName(this) else getDisplayLanguage(this),
-                path = URI(path)
+                languageCode = languageCode,
+                countryCode = countryCode,
+                nativeName = LanguageNameProvider.getNativeName(this),
+                path = URI(path),
             )
         }
 
         private val rtlLanguages = arrayOf("ar", "fa", "he", "iw", "ji", "ur", "yi")
 
-        private fun extractLanguageCodeAndCountryCodeFromFileName(name: String): LanguageCodeAndCountryCode? {
+        private fun extractLanguageCodeAndCountryCodeFromFileName(name: String): MyLocale? {
             return name
                 .split(".")
                 .firstOrNull()
                 ?.takeIf { it.isNotBlank() }
                 ?.let {
                     it.split("_").run {
-                        LanguageCodeAndCountryCode(
+                        MyLocale(
                             languageCode = get(0),
                             countryCode = getOrNull(1)
                         )
                     }
                 }
-        }
-    }
-}
-
-private data class LanguageCodeAndCountryCode(
-    val languageCode: String,
-    val countryCode: String?,
-) {
-    override fun toString(): String {
-        return buildString {
-            append(languageCode)
-            countryCode?.let {
-                append("_")
-                append(it)
-            }
         }
     }
 }
