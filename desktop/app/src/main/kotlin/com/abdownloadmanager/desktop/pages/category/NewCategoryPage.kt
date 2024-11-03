@@ -153,7 +153,10 @@ fun CategoryDefaultPath(
             placeholder = "",
             errorText = null,
             end = {
-                MyTextFieldIcon(MyIcons.folder) {
+                MyTextFieldIcon(
+                    MyIcons.folder,
+                    enabled = checked,
+                ) {
                     downloadFolderPickerLauncher.launch()
                 }
             }

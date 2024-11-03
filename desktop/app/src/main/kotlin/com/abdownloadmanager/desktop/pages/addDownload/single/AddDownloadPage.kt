@@ -592,12 +592,13 @@ fun getExtension(s: String): String? {
 @Composable
 fun MyTextFieldIcon(
     icon: IconSource,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     MyIcon(icon, null, Modifier
         .pointerHoverIcon(PointerIcon.Default)
         .fillMaxHeight()
-        .clickable { onClick() }
+        .clickable(enabled = enabled, onClick = onClick)
         .wrapContentHeight()
         .padding(horizontal = 8.dp)
         .size(16.dp))
