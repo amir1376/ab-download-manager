@@ -240,11 +240,11 @@ fun languageConfig(
         backedBy = createMutableStateFlowFromStateFlow(
             flow = currentLanguageName.mapStateFlow { l ->
                 allLanguages.value.find {
-                    it.languageCode == l
+                    it.toLocaleString() == l
                 } ?: LanguageManager.DefaultLanguageInfo
             },
-            updater = {
-                languageManager.selectLanguage(it.languageCode)
+            updater = { languageInfo ->
+                languageManager.selectLanguage(languageInfo)
             },
             scope = scope,
         ),
