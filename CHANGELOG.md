@@ -14,6 +14,28 @@
 
 ### Security
 
+## 1.4.0
+
+### Added
+
+- Localization Support
+- Persian Language
+- Arabic Language
+- Chinese (Simplified) Language
+- Ukrainian Language
+- Russian Language
+- Albanian Language
+- Bengali Language
+
+### Changed
+
+- Category Download Location is now optional
+
+### Fixed
+
+- A bug in Download Engine
+- "Add Queue" page will be shown properly when opened from "Import List" page
+
 ## 1.3.0
 
 ### Added
