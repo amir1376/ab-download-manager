@@ -192,13 +192,13 @@ class AddMultiDownloadComponent(
                             url = url,
                             fileName = fleName,
                         )
-                    )?.path
+                    )?.getDownloadPath()
                     ?: defaultFolder
             }
 
             is CategorySelectionMode.Fixed -> {
                 downloadSystem.categoryManager
-                    .getCategoryById(categorySelectionMode.categoryId)?.path
+                    .getCategoryById(categorySelectionMode.categoryId)?.getDownloadPath()
                     ?: defaultFolder
             }
 

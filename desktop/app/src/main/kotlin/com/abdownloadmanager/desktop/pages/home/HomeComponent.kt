@@ -289,6 +289,7 @@ class CategoryActions(
     private val onRequestAddCategory: () -> Unit,
 ) {
     private val mainItemExists = MutableStateFlow(categoryItem != null)
+    private val canBeOpened = MutableStateFlow(categoryItem?.usePath ?: false)
     private inline fun useItem(
         block: (Category) -> Unit,
     ) {
@@ -298,7 +299,7 @@ class CategoryActions(
     val openCategoryFolderAction = simpleAction(
         title = Res.string.open_folder.asStringSource(),
         icon = MyIcons.folderOpen,
-        checkEnable = mainItemExists,
+        checkEnable = canBeOpened,
         onActionPerformed = {
             scope.launch {
                 useItem {
@@ -843,7 +844,9 @@ class HomeComponent(
             categoryItem = categoryItem,
             openFolder = {
                 runCatching {
-                    FileUtils.openFolder(File(it.path))
+                    it.getDownloadPath()?.let {
+                        FileUtils.openFolder(File(it))
+                    }
                 }
             },
             onRequestAddCategory = {

@@ -42,6 +42,7 @@ class CategoryComponent(
             setUrlPatternsEnabled(category.acceptedUrlPatterns.isNotEmpty())
             setUrlPatterns(category.acceptedUrlPatterns.joinToString(" "))
             setPath(category.path)
+            setUsePath(category.usePath)
         }
     }
 
@@ -81,15 +82,22 @@ class CategoryComponent(
         _path.value = path
     }
 
+    private val _usePath = MutableStateFlow(false)
+    val usePath = _usePath.asStateFlow()
+    fun setUsePath(usePath: Boolean) {
+        _usePath.value = usePath
+    }
+
     val canSubmit = combineStateFlows(
         icon,
         name,
         types,
-        path
-    ) { icon, name, types, path ->
+        path,
+        usePath,
+    ) { icon, name, types, path, usePath ->
         val iconOk = icon != null
         val nameOk = name.isNotBlank()
-        val pathOk = FileUtils.canWriteInThisFolder(path)
+        val pathOk = FileUtils.canWriteInThisFolder(path) || !usePath
         iconOk && nameOk && pathOk
     }
     val isEditMode = id >= 0
@@ -114,6 +122,7 @@ class CategoryComponent(
                     .value!!
                     .uriOrNull()!!,
                 path = path,
+                usePath = usePath.value,
                 acceptedUrlPatterns = urlPatterns.value
                     .split(" ")
                     .filterNot { it.isBlank() }

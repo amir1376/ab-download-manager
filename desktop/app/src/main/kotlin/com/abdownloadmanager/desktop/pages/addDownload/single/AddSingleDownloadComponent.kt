@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient
@@ -66,20 +65,29 @@ class AddSingleDownloadComponent(
 
     private val _useCategory = MutableStateFlow(false)
     val useCategory = _useCategory.asStateFlow()
-    fun setUseCategory(value: Boolean) {
-        _useCategory.update { value }
-        if (value) {
-            useCategoryFolder()
+    fun setUseCategory(useCategory: Boolean) {
+        _useCategory.update { useCategory }
+        if (useCategory) {
+            val usedCategoryFolder = useCategoryFolder(_useCategory.value)
+            if (!usedCategoryFolder) {
+                useDefaultFolder()
+            }
         } else {
             useDefaultFolder()
         }
     }
 
-    private fun useCategoryFolder() {
+    private fun useCategoryFolder(
+        useCategory: Boolean,
+    ): Boolean {
         val category = selectedCategory.value
-        if (useCategory.value && category != null) {
-            setFolder(category.path)
+        if (useCategory && category != null) {
+            category.getDownloadPath()?.let {
+                setFolder(it)
+                return true
+            }
         }
+        return false
     }
 
     private fun useDefaultFolder() {
@@ -89,8 +97,12 @@ class AddSingleDownloadComponent(
 
     fun setSelectedCategory(category: Category) {
         _selectedCategory.update { category }
-        if (useCategory.value) {
-            useCategoryFolder()
+        val useCategory = useCategory.value
+        if (useCategory) {
+            val used = useCategoryFolder(useCategory)
+            if (!used) {
+                useDefaultFolder()
+            }
         }
     }
 
@@ -145,8 +157,8 @@ class AddSingleDownloadComponent(
             if (category == null) {
                 setUseCategory(false)
             } else {
-                setUseCategory(true)
                 setSelectedCategory(category)
+                setUseCategory(true)
             }
         }.launchIn(scope)
     }
@@ -333,7 +345,7 @@ class AddSingleDownloadComponent(
             true
         } else {
             // only add if category path is not the same as provided path
-            category.path != folder
+            category.getDownloadPath() != folder
         }
         if (shouldAdd) {
             addToLastUsedLocations(folder)
