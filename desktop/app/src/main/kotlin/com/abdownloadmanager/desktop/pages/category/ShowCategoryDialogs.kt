@@ -3,8 +3,10 @@ package com.abdownloadmanager.desktop.pages.category
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 
@@ -26,7 +28,8 @@ private fun CategoryDialog(
         },
         alwaysOnTop = true,
         state = rememberWindowState(
-            size = DpSize(350.dp, 400.dp)
+            size = DpSize(350.dp, 400.dp),
+            position = WindowPosition.Aligned(Alignment.Center),
         )
     ) {
         NewCategory(component)
