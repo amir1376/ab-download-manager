@@ -136,7 +136,7 @@ object LanguageNameProvider : ILanguageNameProvider {
         "yo" to "Èdè Yorùbá",
         "zh" to "中文",
         "zh_CN" to "简体中文",
-        "zh_TW" to "繁體中文",
+        "zh_TW" to "正體中文",
         "zu" to "isiZulu",
     )
 
