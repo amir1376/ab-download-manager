@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
 import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
+import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import com.abdownloadmanager.desktop.ui.widget.ProvideLanguageManager
@@ -83,6 +84,10 @@ object Ui : KoinComponent {
                                 val batchDownloadSlot = appComponent.batchDownloadSlot.collectAsState().value
                                 batchDownloadSlot.child?.instance?.let {
                                     BatchDownloadWindow(it)
+                                }
+                                val editDownloadSlot = appComponent.editDownloadSlot.collectAsState().value
+                                editDownloadSlot.child?.instance?.let {
+                                    EditDownloadWindow(it)
                                 }
                                 ShowAddDownloadDialogs(appComponent)
                                 ShowDownloadDialogs(appComponent)

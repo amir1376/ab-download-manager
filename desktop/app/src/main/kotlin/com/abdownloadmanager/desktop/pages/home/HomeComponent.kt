@@ -76,6 +76,7 @@ class DownloadActions(
     private val scope: CoroutineScope,
     downloadSystem: DownloadSystem,
     downloadDialogManager: DownloadDialogManager,
+    editDownloadDialogManager: EditDownloadDialogManager,
     val selections: StateFlow<List<IDownloadItemState>>,
     private val mainItem: StateFlow<Long?>,
     private val queueManager: QueueManager,
@@ -192,6 +193,20 @@ class DownloadActions(
             }
         }
     )
+    val editDownloadAction = simpleAction(
+        title = Res.string.edit.asStringSource(),
+        icon = MyIcons.edit,
+        checkEnable = defaultItem.mapStateFlow {
+            it ?: return@mapStateFlow false
+            it.statusOrFinished() !is DownloadJobStatus.IsActive
+        },
+        onActionPerformed = {
+            scope.launch {
+                val item = defaultItem.value ?: return@launch
+                editDownloadDialogManager.openEditDownloadDialog(item.id)
+            }
+        }
+    )
 
     val copyDownloadLinkAction = simpleAction(
         title = Res.string.copy_link.asStringSource(),
@@ -268,6 +283,7 @@ class DownloadActions(
         +moveToCategoryAction
         separator()
         +(copyDownloadLinkAction)
+        +editDownloadAction
         +(openDownloadDialogAction)
     }
 }
@@ -381,6 +397,7 @@ class HomeComponent(
     ctx: ComponentContext,
     private val downloadItemOpener: DownloadItemOpener,
     private val downloadDialogManager: DownloadDialogManager,
+    private val editDownloadDialogManager: EditDownloadDialogManager,
     private val addDownloadDialogManager: AddDownloadDialogManager,
     private val categoryDialogManager: CategoryDialogManager,
     private val notificationSender: NotificationSender,
@@ -826,6 +843,7 @@ class HomeComponent(
         scope = scope,
         downloadSystem = downloadSystem,
         downloadDialogManager = downloadDialogManager,
+        editDownloadDialogManager = editDownloadDialogManager,
         selections = selectionListItems,
         mainItem = mainItem,
         queueManager = queueManager,
@@ -882,6 +900,7 @@ class HomeComponent(
         "DELETE" to downloadActions.deleteAction
         "ctrl O" to downloadActions.openFileAction
         "ctrl F" to downloadActions.openFolderAction
+        "ctrl E" to downloadActions.editDownloadAction
         "ctrl P" to downloadActions.pauseAction
         "ctrl R" to downloadActions.resumeAction
         "DELETE" to downloadActions.deleteAction

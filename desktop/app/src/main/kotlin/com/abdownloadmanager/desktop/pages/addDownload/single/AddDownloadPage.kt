@@ -33,8 +33,6 @@ import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.*
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
-import com.abdownloadmanager.utils.category.rememberIconPainter
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.compose.asStringSource
@@ -182,7 +180,10 @@ fun AddDownloadPage(
             )
         }
         if (component.showMoreSettings) {
-            ExtraConfig(component)
+            ExtraConfig(
+                onDismiss = { component.showMoreSettings = false },
+                configurables = component.configurables,
+            )
         }
     }
 }

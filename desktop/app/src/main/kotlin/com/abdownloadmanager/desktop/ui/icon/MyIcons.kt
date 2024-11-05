@@ -20,6 +20,7 @@ object MyIcons : IMyIcons {
     override val windowClose get() = "/icons/window_close.svg".asIconSource()
 
     override val exit get() = "/icons/exit.svg".asIconSource()
+    override val edit get() = "/icons/edit.svg".asIconSource()
     override val undo get() = "/icons/undo.svg".asIconSource()
 
     override val openSource: IconSource get() = "/icons/open_source.svg".asIconSource()
