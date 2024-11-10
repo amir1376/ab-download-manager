@@ -10,7 +10,7 @@ import org.koin.core.component.inject
 class IntegrationHandlerImp: IntegrationHandler,KoinComponent{
     val appComponent by inject<AppComponent>()
     override suspend fun addDownload(list: List<NewDownloadInfoFromIntegration>) {
-        appComponent.openAddDownloadDialog(list.map {
+        appComponent.externalCredentialComingIntoApp(list.map {
             DownloadCredentials(
                 link = it.link,
                 headers = it.headers,

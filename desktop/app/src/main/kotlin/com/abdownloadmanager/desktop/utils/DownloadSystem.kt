@@ -5,15 +5,14 @@ import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.CategorySelectionMode
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.db.IDownloadListDb
-import ir.amirab.downloader.downloaditem.DownloadItem
-import ir.amirab.downloader.downloaditem.DownloadItemContext
-import ir.amirab.downloader.downloaditem.DownloadStatus
-import ir.amirab.downloader.downloaditem.EmptyContext
+import ir.amirab.downloader.downloaditem.*
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.StoppedBy
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.downloader.monitor.IDownloadMonitor
+import ir.amirab.downloader.monitor.isDownloadActiveFlow
+import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import kotlinx.coroutines.CoroutineScope
@@ -221,6 +220,37 @@ class DownloadSystem(
     fun getUnfinishedDownloadIds(): List<Long> {
         return downloadMonitor.activeDownloadListFlow.value.map {
             it.id
+        }
+    }
+    fun getAllRegisteredDownloadFiles(): List<File> {
+        return downloadMonitor.run {
+            activeDownloadListFlow.value + completedDownloadListFlow.value
+        }.map {
+            File(it.folder, it.name)
+        }
+    }
+
+    suspend fun isDownloadActive(id: Long): Boolean {
+        return downloadMonitor.isDownloadActiveFlow(id).value
+    }
+
+    suspend fun editDownload(updatedItem: DownloadItem) {
+        val wasActive = isDownloadActive(updatedItem.id)
+        if (wasActive) {
+            manualPause(updatedItem.id)
+        }
+        downloadManager.updateDownloadItem(updatedItem.id) { currentItem ->
+            var shouldUpdate = true
+            if (currentItem.folder == updatedItem.folder && currentItem.name != updatedItem.name) {
+                val success = getDownloadFile(currentItem).renameTo(getDownloadFile(updatedItem))
+                shouldUpdate = success
+            }
+            if (shouldUpdate) {
+                currentItem.applyFrom(updatedItem)
+            }
+        }
+        if (wasActive) {
+            manualResume(updatedItem.id)
         }
     }
 }

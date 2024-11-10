@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.pages.addDownload.shared
 
-import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurable
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
 import com.abdownloadmanager.desktop.ui.theme.myColors
@@ -22,11 +21,15 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
+import com.abdownloadmanager.desktop.pages.settings.configurable.Configurable
 import java.awt.Dimension
 import java.awt.MouseInfo
 
 @Composable
-fun ExtraConfig(component: AddSingleDownloadComponent) {
+fun ExtraConfig(
+    onDismiss: () -> Unit,
+    configurables: List<Configurable<*>>,
+) {
     val h = 250
     val w = 300
     val state = rememberDialogState(
@@ -35,9 +38,7 @@ fun ExtraConfig(component: AddSingleDownloadComponent) {
             width = w.dp,
         ),
     )
-    BaseOptionDialog({
-        component.showMoreSettings = false
-    }, state) {
+    BaseOptionDialog(onDismiss, state) {
         LaunchedEffect(window){
             window.moveSafe(
                 MouseInfo.getPointerInfo().location.run {
@@ -84,7 +85,6 @@ fun ExtraConfig(component: AddSingleDownloadComponent) {
                         Column(
                             Modifier.verticalScroll(scrollState)
                         ) {
-                            val configurables = component.configurables
                             for ((index, cfg) in configurables.withIndex()) {
                                 RenderConfigurable(
                                     cfg,

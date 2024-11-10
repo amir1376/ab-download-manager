@@ -7,6 +7,7 @@ import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadC
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadComponent
 import com.abdownloadmanager.desktop.pages.category.CategoryComponent
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
+import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadComponent
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.SettingsComponent
@@ -41,9 +42,11 @@ import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.CategorySelectionMode
 import ir.amirab.downloader.exception.TooManyErrorException
+import ir.amirab.downloader.monitor.isDownloadActiveFlow
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.combineStringSources
+import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -70,6 +73,7 @@ class AppComponent(
     DownloadDialogManager,
     AddDownloadDialogManager,
     CategoryDialogManager,
+    EditDownloadDialogManager,
     NotificationSender,
     DownloadItemOpener,
     ContainsEffects<AppEffects> by supportEffects(),
@@ -112,6 +116,7 @@ class AppComponent(
                 addDownloadDialogManager = this,
                 categoryDialogManager = this,
                 notificationSender = this,
+                editDownloadDialogManager = this,
             )
         }
     ).subscribeAsStateFlow()
@@ -150,6 +155,43 @@ class AppComponent(
         }
     ).subscribeAsStateFlow()
 
+    private val editDownload = SlotNavigation<Long>()
+    val editDownloadSlot = childSlot(
+        editDownload,
+        serializer = null,
+        key = "editDownload",
+        childFactory = { editDownloadConfig: Long, componentContext: ComponentContext ->
+            EditDownloadComponent(
+                ctx = componentContext,
+                onRequestClose = {
+                    closeEditDownloadDialog()
+                },
+                onEdited = {
+                    scope.launch {
+                        downloadSystem.editDownload(it)
+                        closeEditDownloadDialog()
+                    }
+                },
+                downloadId = editDownloadConfig,
+                acceptEdit = downloadSystem.downloadMonitor
+                    .isDownloadActiveFlow(editDownloadConfig)
+                    .mapStateFlow { !it },
+            )
+        }
+    ).subscribeAsStateFlow()
+
+    override fun openEditDownloadDialog(id: Long) {
+        val currentComponent = editDownloadSlot.value.child?.instance
+        if (currentComponent != null && currentComponent.downloadId == id) {
+            currentComponent.bringToFront()
+        } else {
+            editDownload.activate(id)
+        }
+    }
+
+    override fun closeEditDownloadDialog() {
+        editDownload.dismiss()
+    }
 
     fun openSettings() {
         scope.launch {
@@ -546,6 +588,18 @@ class AppComponent(
         }
     }
 
+    fun externalCredentialComingIntoApp(list: List<DownloadCredentials>) {
+        val editDownloadComponent = editDownloadSlot.value.child?.instance
+        if (editDownloadComponent != null) {
+            list.firstOrNull()?.let {
+                editDownloadComponent.importCredential(it)
+                editDownloadComponent.bringToFront()
+            }
+        } else {
+            openAddDownloadDialog(list)
+        }
+    }
+
     override fun openAddDownloadDialog(
         links: List<DownloadCredentials>,
     ) {
@@ -774,6 +828,11 @@ interface DownloadDialogManager {
     val openedDownloadDialogs: StateFlow<List<SingleDownloadComponent>>
     fun openDownloadDialog(id: Long)
     fun closeDownloadDialog(id: Long)
+}
+
+interface EditDownloadDialogManager {
+    fun openEditDownloadDialog(id: Long)
+    fun closeEditDownloadDialog()
 }
 
 interface AddDownloadDialogManager {
