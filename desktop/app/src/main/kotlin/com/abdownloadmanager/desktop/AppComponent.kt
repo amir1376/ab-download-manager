@@ -743,6 +743,14 @@ class AppComponent(
         showOpenSourceLibraries.update { false }
     }
 
+    fun openTranslatorsPage() {
+        showTranslators.update { true }
+    }
+
+    fun closeTranslatorsPage() {
+        showTranslators.update { false }
+    }
+
     fun openQueues() {
         scope.launch {
             showQueuesSlot.value.child?.instance.let {
@@ -820,6 +828,7 @@ class AppComponent(
 //    val updater = UpdateComponent(childContext("updater"))
     val showAboutPage = MutableStateFlow(false)
     val showOpenSourceLibraries = MutableStateFlow(false)
+    val showTranslators = MutableStateFlow(false)
     val theme = appRepository.theme
 //    val uiScale = appRepository.uiScale
 }

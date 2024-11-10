@@ -201,6 +201,12 @@ buildConfig {
         }
     )
     buildConfigField(
+        "PROJECT_TRANSLATIONS",
+        provider {
+            "https://crowdin.com/project/ab-download-manager"
+        }
+    )
+    buildConfigField(
         "INTEGRATION_CHROME_LINK",
         provider {
             "https://chromewebstore.google.com/detail/ab-download-manager-brows/bbobopahenonfdgjgaleledndnnfhooj"

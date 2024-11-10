@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
 import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
+import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
@@ -98,6 +99,7 @@ object Ui : KoinComponent {
                                 NewQueueDialog(appComponent)
                                 ShowMessageDialogs(appComponent)
                                 ShowOpenSourceLibraries(appComponent)
+                                ShowTranslators(appComponent)
                             }
                         }
                     }

@@ -75,7 +75,7 @@ fun AddMultiDownloadTable(
                     content = it
                 )
             },
-            wrapItem = { item, content ->
+            wrapItem = { _, item, content ->
                 val shape = RoundedCornerShape(12.dp)
                 WithContentAlpha(1f) {
                     val isSelected = remember(item, component.selectionList) {

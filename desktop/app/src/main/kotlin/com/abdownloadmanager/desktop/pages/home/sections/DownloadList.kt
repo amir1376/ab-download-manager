@@ -154,7 +154,7 @@ fun DownloadList(
             wrapHeader = {
                 MyStyledTableHeader(itemHorizontalPadding = itemHorizontalPadding, content = it)
             },
-            wrapItem = { item, rowContent ->
+            wrapItem = { _, item, rowContent ->
                 val isSelected = selectionList.contains(item.id)
                 var shouldWaitForSecondClick by remember {
                     mutableStateOf(false)

@@ -40,10 +40,12 @@ import ir.amirab.util.compose.resources.myStringResource
 fun AboutPage(
     close: () -> Unit,
     onRequestShowOpenSourceLibraries: () -> Unit,
+    onRequestShowTranslators: () -> Unit,
 ) {
     Column(Modifier.padding(16.dp)) {
         RenderAppInfo(
-            onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries
+            onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
+            onRequestShowTranslators = onRequestShowTranslators,
         )
         Spacer(Modifier.weight(1f))
         Row(Modifier.fillMaxWidth().wrapContentWidth(Alignment.End)) {
@@ -58,6 +60,7 @@ fun AboutPage(
 @Composable
 fun RenderAppInfo(
     onRequestShowOpenSourceLibraries: () -> Unit,
+    onRequestShowTranslators: () -> Unit,
 ) {
     Row(
         Modifier.fillMaxWidth()
@@ -112,6 +115,15 @@ fun RenderAppInfo(
                         style = LocalTextStyle.current.merge(LinkStyle),
                         modifier = Modifier.clickable {
                             onRequestShowOpenSourceLibraries()
+                        }
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(myStringResource(Res.string.localized_by_translators))
+                    Text(
+                        myStringResource(Res.string.meet_the_translators),
+                        style = LocalTextStyle.current.merge(LinkStyle),
+                        modifier = Modifier.clickable {
+                            onRequestShowTranslators()
                         }
                     )
                 }

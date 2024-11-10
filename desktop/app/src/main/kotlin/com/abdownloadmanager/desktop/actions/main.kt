@@ -167,6 +167,12 @@ val openOpenSourceThirdPartyLibraries = simpleAction(
 ) {
     appComponent.openOpenSourceLibraries()
 }
+val openTranslators = simpleAction(
+    title = Res.string.meet_the_translators.asStringSource(),
+    icon = MyIcons.language,
+) {
+    appComponent.openTranslatorsPage()
+}
 
 val supportActionGroup = MenuItem.SubMenu(
     title = Res.string.support_and_community.asStringSource(),

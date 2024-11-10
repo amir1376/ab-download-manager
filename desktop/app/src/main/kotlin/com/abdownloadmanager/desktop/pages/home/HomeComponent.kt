@@ -563,6 +563,7 @@ class HomeComponent(
             +supportActionGroup
             separator()
             +openOpenSourceThirdPartyLibraries
+            +openTranslators
             +openAboutAction
         }
     }.filterIsInstance<MenuItem.SubMenu>()

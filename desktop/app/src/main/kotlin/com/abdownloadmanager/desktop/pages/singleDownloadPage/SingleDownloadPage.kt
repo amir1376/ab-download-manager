@@ -130,8 +130,8 @@ fun SingleDownloadPage(singleDownloadComponent: SingleDownloadComponent) {
                 Spacer(Modifier.size(8.dp))
             }
             val resizingState = LocalSingleDownloadPageSizing.current
-            LaunchedEffect(resizingState.resizingPartInfo){
-                if (resizingState.partInfoHeight<=0.dp){
+            LaunchedEffect(resizingState.resizingPartInfo) {
+                if (resizingState.partInfoHeight <= 0.dp) {
                     setShowPartInfo(false)
                 }
             }
@@ -317,7 +317,7 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                             cells = PartInfoCells.all()
                         )
                     },
-                    wrapItem = { _, content ->
+                    wrapItem = { _, _, content ->
                         WithContentAlpha(1f) {
                             val interactionSource = remember { MutableInteractionSource() }
                             val isHovered by interactionSource.collectIsHoveredAsState()
@@ -375,7 +375,7 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
         val singleDownloadPageSizing = LocalSingleDownloadPageSizing.current
         val mutableInteractionSource = remember { MutableInteractionSource() }
         val isDraggingHandle by mutableInteractionSource.collectIsDraggedAsState()
-        LaunchedEffect(isDraggingHandle){
+        LaunchedEffect(isDraggingHandle) {
             singleDownloadPageSizing.resizingPartInfo = isDraggingHandle
         }
         Handle(

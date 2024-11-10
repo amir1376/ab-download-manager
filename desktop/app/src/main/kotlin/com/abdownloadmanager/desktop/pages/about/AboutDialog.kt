@@ -22,6 +22,9 @@ fun ShowAboutDialog(appComponent: AppComponent) {
             },
             onRequestShowOpenSourceLibraries = {
                 appComponent.openOpenSourceLibraries()
+            },
+            onRequestShowTranslators = {
+                appComponent.openTranslatorsPage()
             }
         )
     }
@@ -31,19 +34,21 @@ fun ShowAboutDialog(appComponent: AppComponent) {
 fun AboutDialog(
     onClose: () -> Unit,
     onRequestShowOpenSourceLibraries: () -> Unit,
+    onRequestShowTranslators: () -> Unit,
 ) {
     CustomWindow(
         resizable = false,
         onRequestToggleMaximize = null,
         state = rememberWindowState(
-            size = DpSize(400.dp, 300.dp)
+            size = DpSize(400.dp, 330.dp)
         ),
         onCloseRequest = onClose
     ) {
         WindowTitle(myStringResource(Res.string.about))
         AboutPage(
             close = onClose,
-            onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries
+            onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
+            onRequestShowTranslators = onRequestShowTranslators
         )
     }
 }
