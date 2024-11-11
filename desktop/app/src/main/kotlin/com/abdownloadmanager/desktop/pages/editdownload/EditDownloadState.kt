@@ -31,7 +31,13 @@ sealed interface CanEditWarnings {
         val newSize: Long,
     ) : CanEditWarnings {
         override fun asStringSource(): StringSource {
-            return "The saved item have size of $currentSize and now will change to $newSize".asStringSource()
+            return Res.string.edit_download_saved_download_item_size_not_match
+                .asStringSourceWithARgs(
+                    Res.string.edit_download_saved_download_item_size_not_match_createArgs(
+                        currentSize = "$currentSize",
+                        newSize = "$newSize",
+                    )
+                )
         }
 
     }
