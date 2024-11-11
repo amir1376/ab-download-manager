@@ -78,20 +78,8 @@ fun MenuBar(
                         .wrapContentHeight(Alignment.CenterVertically)
                 ) {
                     val text = subMenu.title.collectAsState().value.rememberString()
-                    val (firstChar, leadingText) = remember(text) {
-                        when (text.length) {
-                            0 -> "" to ""
-                            1 -> text to ""
-                            else -> text.first().toString() to text.substring(1)
-                        }
-                    }
                     Text(
-                        buildAnnotatedString {
-                            withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
-                                append(firstChar)
-                            }
-                            append(leadingText)
-                        },
+                        text = text,
                         maxLines = 1,
                         fontSize = myTextSizes.base,
                         color = myColors.onBackground,
