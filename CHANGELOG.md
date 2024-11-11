@@ -14,6 +14,21 @@
 
 ### Security
 
+## 1.4.2
+
+### Added
+
+- Edit Download Page (Rename, Refresh links/credentials etc…)
+- Translators Credit Page
+- Traditional Chinese Language
+- Spanish Language
+- French Language
+- Turkish Language
+
+### Changed
+
+- Updated translations
+
 ## 1.4.1
 
 ### Added
