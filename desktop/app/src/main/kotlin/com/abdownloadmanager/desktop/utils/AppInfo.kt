@@ -10,6 +10,7 @@ object AppInfo {
     val packageName = SharedConstants.packageName
     val website = SharedConstants.projectWebsite
     val sourceCode = SharedConstants.projectSourceCode
+    val translationsUrl = SharedConstants.projectTranslations
 
 
     val version = AppVersion.get()

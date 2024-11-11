@@ -77,5 +77,6 @@ interface IMyIcons {
     val downloadEngine: IconSource
     val browserIntegration: IconSource
     val network: IconSource
+    val language: IconSource
     val externalLink: IconSource
 }

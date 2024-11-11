@@ -89,6 +89,7 @@ override val back get() = "/icons/back.svg".asIconSource()
     override val appearance: IconSource get() = "/icons/color.svg".asIconSource()
     override val downloadEngine: IconSource get() = "/icons/down_speed.svg".asIconSource()
     override val network: IconSource get() = "/icons/network.svg".asIconSource()
+    override val language: IconSource get() = "/icons/language.svg".asIconSource()
 
     override val externalLink: IconSource get() = "/icons/external_link.svg".asIconSource()
 }

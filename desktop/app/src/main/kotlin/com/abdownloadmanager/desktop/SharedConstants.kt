@@ -8,6 +8,7 @@ interface BaseConstants{
     val packageName:String
     val projectWebsite:String
     val projectSourceCode:String
+    val projectTranslations: String
     val browserIntegrations:List<BrowserIntegrationModel>
     val telegramGroupUrl:String
     val telegramChannelUrl:String
@@ -17,6 +18,7 @@ object SharedConstants:BaseConstants{
     override val appName: String = BuildConfig.APP_NAME
     override val packageName: String = BuildConfig.PACKAGE_NAME
     override val projectWebsite: String= BuildConfig.PROJECT_WEBSITE
+    override val projectTranslations: String = BuildConfig.PROJECT_TRANSLATIONS
     override val projectSourceCode: String= BuildConfig.PROJECT_SOURCE_CODE
     override val browserIntegrations: List<BrowserIntegrationModel> = listOf(
         BrowserIntegrationModel(

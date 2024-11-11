@@ -61,7 +61,7 @@ private fun OpenSourceLibraries(
                     content = it,
                 )
             },
-            wrapItem = { item, rowContent ->
+            wrapItem = { _, item, rowContent ->
                 Box(Modifier
                     .clickable {
                         currentDialog = item
