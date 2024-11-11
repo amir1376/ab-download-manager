@@ -68,7 +68,7 @@ abstract class PropertiesToKotlinTask @Inject constructor(
     ): String {
         val myStringResourceClassName = myStringResourceClass
             .split(".").last()
-        val variableRegex by lazy { "\\{\\{(?<variable>.+)\\}\\}".toRegex() }
+        val variableRegex by lazy { "\\{\\{(?<variable>.+?)\\}\\}".toRegex() }
         fun findVariablesOfValue(value: String): List<String> {
             return variableRegex
                 .findAll(value)
