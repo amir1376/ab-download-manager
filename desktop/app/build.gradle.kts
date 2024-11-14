@@ -5,6 +5,9 @@ import org.jetbrains.changelog.Changelog
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import ir.amirab.util.platform.Platform
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat.*
+import java.lang.System.getProperty
+
+
 
 plugins {
     id(MyPlugins.kotlin)
@@ -84,6 +87,7 @@ tasks.processResources {
 }
 
 val desktopPackageName = "com.abdownloadmanager.desktop"
+val systemArch = getProperty("os.arch")
 compose {
     desktop {
         application {
@@ -296,6 +300,7 @@ val createBinariesForCi by tasks.registering {
                 CiUtils.movePackagedAndCreateSignature(
                     getAppVersion(),
                     packageName,
+                    systemArch,
                     target,
                     installerPlugin.outputFolder.get().asFile,
                     output,
@@ -312,6 +317,7 @@ val createBinariesForCi by tasks.registering {
                 CiUtils.movePackagedAndCreateSignature(
                     getAppVersion(),
                     packageName,
+                    systemArch,
                     target,
                     mainRelease.get().asFile.resolve(target.outputDirName),
                     output,
@@ -329,6 +335,7 @@ val createBinariesForCi by tasks.registering {
             output,
             CiUtils.getTargetFileName(
                 packageName,
+                systemArch,
                 getAppVersion(),
                 null, // this is not an installer (it will be automatically converted to current os name
             )

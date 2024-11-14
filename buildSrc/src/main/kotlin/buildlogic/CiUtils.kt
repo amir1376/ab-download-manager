@@ -9,6 +9,7 @@ import java.io.File
 object CiUtils {
     fun getTargetFileName(
         packageName: String,
+        systemArch: String,
         appVersion: Version,
         target: InstallerTargetFormat?,
     ): String {
@@ -35,7 +36,7 @@ object CiUtils {
                 }
             }
         }.name.lowercase()
-        return "${packageName}_${appVersion}_${platformName}.${fileExtension}"
+        return "${packageName}_${appVersion}_${platformName}_${systemArch}.${fileExtension}"
     }
 
     fun getFileOfPackagedTarget(
@@ -89,6 +90,7 @@ object CiUtils {
     fun movePackagedAndCreateSignature(
         appVersion: Version,
         packageName: String,
+        systemArch: String,
         target: InstallerTargetFormat,
         basePackagedAppsDir: File,
         outputDir: File,
@@ -106,7 +108,7 @@ object CiUtils {
             target = target
         )
 
-        val newName = getTargetFileName(packageName, appVersion, target)
+        val newName = getTargetFileName(packageName, systemArch, appVersion, target)
         copyAndHashToDestination(
             src = exeFile,
             destinationFolder = outputDir,
