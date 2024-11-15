@@ -208,7 +208,7 @@ class DownloadSystem(
     }
 
     fun getAllDownloadIds(): List<Long> {
-        return getUnfinishedDownloadIds() + getUnfinishedDownloadIds()
+        return getUnfinishedDownloadIds() + getFinishedDownloadIds()
     }
 
     fun getFinishedDownloadIds(): List<Long> {
