@@ -70,19 +70,32 @@ in order to download and install the app
 
 ## Screenshots
 
-<div align="center">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/screenshots/app-home_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/screenshots/app-home_light.png">
-  <img alt="App Home Section" src="./assets/screenshots/app-home_dark.png">
-</picture>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/screenshots/app-download_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/screenshots/app-download_light.png">
-  <img alt="App Download Section" src="./assets/screenshots/app-download_dark.png">
-</picture>
-</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col" width="1000px">Screenshots One</th>
+      <th scope="col" width="1000px">Screenshots Two</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <picture>
+           <source media="(prefers-color-scheme: dark)" srcset="./assets/screenshots/app-home_dark.png">
+           <source media="(prefers-color-scheme: light)" srcset="./assets/screenshots/app-home_light.png">
+           <img alt="App Home Section" src="./assets/screenshots/app-home_dark.png">
+        </picture>
+      </td>
+      <td>
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="./assets/screenshots/app-download_dark.png">
+          <source media="(prefers-color-scheme: light)" srcset="./assets/screenshots/app-download_light.png">
+          <img alt="App Download Section" src="./assets/screenshots/app-download_dark.png">
+        </picture>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Acknowledgements
 
