@@ -149,7 +149,7 @@ In case you don't want to package it or your OS does not support those package t
 ```bash
 ./gradlew
 
-./gradle createReleaseDistributable
+./gradlew createReleaseDistributable
 ```
 It will create an output folder
 
