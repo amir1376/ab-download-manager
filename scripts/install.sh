@@ -8,7 +8,7 @@ set -euo pipefail
 # --- Get the latest version of the app from the GitHub API
 
 get_latest_version() {
-    curl -s https://api.github.com/repos/amir1376/ab-download-manager/releases/latest | jq -r '.tag_name'
+    curl -fSs https://api.github.com/repos/amir1376/ab-download-manager/releases/latest | jq -r '.tag_name'
 }
 
 APP_NAME="ABDownloadManager"
@@ -22,16 +22,18 @@ BINARY_PATH=$HOME/.local/$APP_NAME/bin/$APP_NAME
 DOWNLOAD_URL="https://github.com/amir1376/ab-download-manager/releases/download/${LATEST_VERSION}/$ASSET_NAME"
 DEPENDENCIES=(curl jq tar)
 
+LOG_FILE="/tmp/ab-dm-installer.log"
+
 # --- Custom Logger
 logger() {
-  timestamp=$(date +"[%Y/%m/%d %H:%M:%S]")
+  timestamp=$(date +"%Y/%m/%d %H:%M:%S")
 
   if [[ "$1" == "error" ]]; then
     # Red color for errors
-    echo -e "${timestamp} [Error]: \033[0;31m${timestamp} $@\033[0m"
+    echo -e "${timestamp} -- "$0" [Error]: \033[0;31m$@\033[0m" | tee -a ${LOG_FILE}
   else
     # Default color for non-error messages
-    echo -e "${timestamp} $@"
+    echo -e "${timestamp} -- "$0" [Info]: $@" | tee -a ${LOG_FILE}
   fi
 }
 
@@ -65,7 +67,6 @@ install_dependencies() {
     detect_package_manager
     logger "installing dependencies: ${DEPENDENCIES[@]}"
     sudo ${systemPackage} install -y ${DEPENDENCIES[@]}
-    clear
 }
 
 # --- Delete the old version Application if exists
@@ -75,17 +76,6 @@ delete_old_version() {
     rm -rf "$HOME/.local/$APP_NAME"
     rm -rf "$HOME/.local/bin/$APP_NAME"
     logger "removed old version AB Download Manager"
-}
-
-# --- Check if the app is installed
-check_if_installed() {
-    local installed_version
-    installed_version=$($APP_NAME --version 2>/dev/null)
-    if [ -n "$installed_version" ]; then
-        echo "$installed_version"
-    else
-        echo ""
-    fi
 }
 
 # --- Generate a .desktop file for the app
@@ -106,17 +96,26 @@ EOF
 
 # --- Download the latest version of the app
 download_zip() {
-    # --- Remove The App tarball if its not downloaded correctly
-    # due to internet connectivity or sth else 
-    sudo find  "/tmp" -type f -iname "$ASSET_NAME" -exec bash -c 'echo "File {} removed"; rm {}' \;
-    logger "Downloading AB Download Manager ..."
-    curl -Ls -o "/tmp/$ASSET_NAME" "${DOWNLOAD_URL}"
-    logger "Download Finished"
+    # Remove the app tarball if it exists in /tmp
+    rm -f "/tmp/$ASSET_NAME"
+
+    logger "downloading AB Download Manager ..."
+    # Perform the download with curl
+    if curl --progress-bar -fSL -o "/tmp/$ASSET_NAME" "${DOWNLOAD_URL}"; then
+        logger "download finished successfully"
+    else
+        logger error "Download failed! Something Went Wrong"
+        logger error "Hint: Check Your Internet Connectivity"
+        # Optionally remove the partially downloaded file
+        rm -f "/tmp/$ASSET_NAME"
+    fi
 }
+
 
 # --- Install the app
 install_app() {
-    echo "Installing AB Download Manager ..."
+
+    logger "Installing AB Download Manager ..."
     # --- Setup ~/.local directories
     mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications"
     tar -xzf "/tmp/$ASSET_NAME" -C "$HOME/.local"
@@ -130,36 +129,49 @@ install_app() {
     # Create a .desktop file in ~/.local/share/applications
     generate_desktop_file
 
-    echo "AB Download Manager installed successfully"
-    echo "it can be found in Applications menu or run '$APP_NAME' in terminal"
-    echo "Making sure $HOME/.local/bin is in your PATH"
+    logger "AB Download Manager installed successfully"
+    logger "it can be found in Applications menu or run '$APP_NAME' in terminal"
+    logger "Making sure $HOME/.local/bin exists in PATH"
     if ! $(echo "$PATH" | grep "$HOME/.local/bin" >/dev/null 2>&1); then
-        echo "Adding $HOME/.local/bin to ${USER}'s PATH"
+        logger "Adding $HOME/.local/bin to ${USER}'s PATH"
         echo "export $HOME/.local/bin:$PATH" >> $HOME/.bashrc
     fi
+    logger "installation logs saved in: ${LOG_FILE}"
     
 }
 
-# Update the app
+# --- Check if the app is installed
+check_if_installed() {
+    local installed_version
+    installed_version=$($APP_NAME --version 2>/dev/null)
+    if [ -n "$installed_version" ]; then
+        echo "$installed_version"
+    else
+        echo ""
+    fi
+}
+
+# --- Update the app
 update_app() {
-    echo "Checking update..."
+    logger "checking update"
     if [ "$1" != "${LATEST_VERSION:1}" ]; then
-        echo "An update is available: v${LATEST_VERSION:1}. Updating..."
+        logger "new version is available: v${LATEST_VERSION:1}. Updating..."
         download_zip
         delete_old_version
         install_app
     else
-        echo "You have the latest version installed."
+        logger "You have the latest version installed."
         exit 0
     fi
 }
 
 main() {
+    echo "" > "$LOG_FILE"
     local installed_version
     install_dependencies
     installed_version=$(check_if_installed)
     if [ -n "$installed_version" ]; then
-        echo "AB Download Manager v$installed_version is currently installed"
+        logger "AB Download Manager v$installed_version is currently installed."
         update_app "$installed_version"
     else
         download_zip
