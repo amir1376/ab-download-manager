@@ -34,39 +34,41 @@ Please visit [Project Website](https://abdownloadmanager.com) for more info
 
 ## Installation
 
+[Download Instructions](https://abdownloadmanager.com)
+
+[GitHub Releases](https://github.com/amir1376/ab-download-manager/releases/latest)
+
 in order to download and install the app
 
-- You can visit [Project Website](https://abdownloadmanager.com) for Download Instructions
-- using an installation script
-  - <details>
-    <summary>bash script (Linux)</summary>
+### installation script (Linux)
 
-    you can run this to install or update existing installed version
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh | bash
-    ```
+```bash
+curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh | bash
+```
 
-    </details>
-- using a package manager
-  - <details>
-    <summary>winget (for Windows)</summary>
+### winget or scoop (for Windows)
 
-    ```bash
-    winget install amir1376.ABDownloadManager
-    ```
+**winget**:
 
-    </details>
-  - <details>
-    <summary>scoop (for Windows)</summary>
+```bash
+winget install amir1376.ABDownloadManager
+```
 
-    ```bash
-    scoop install extras/abdownloadmanager
-    ```
+**scoop**:
 
-    </details>
-- Or you can find download links for your OS
-  from [GitHub Releases](https://github.com/amir1376/ab-download-manager/releases/latest)
+```bash
+scoop install extras/abdownloadmanager
+```
 
+
+
+## Uninstall
+
+perform below command to uninstall
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/uninstall.sh | bash
+```
 
 ## Screenshots
 
