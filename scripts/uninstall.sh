@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+# set -x
 
 
 APP_NAME="ABDownloadManager"
@@ -20,11 +21,31 @@ logger() {
   fi
 }
 
+delete_app_config_dir() {
+
+    local answer
+    read -p "Do you want to continue? [Y/n]: " -r answer
+    answer=${answer:-Y}  # Set default to 'Y' if no input is given
+
+    case $answer in
+        [Yy]* )
+            rm -rf "$HOME/.abdm"
+            logger "$APP_NAME settings and download lists directory: $HOME/.abdm removed."
+            ;;
+        [Nn]* )
+            logger "Remove The $HOME/.abdm directory manually."
+            ;;
+        * )
+            logger error "Please answer yes or no."
+            delete_app_config_dir
+            ;;
+    esac
+}
 
 delete_app() {
 
     logger "Killing Any $APP_NAME Processes ..."
-    pkill --echo -f "$APP_NAME"
+    pkill -f "$APP_NAME"
 
     logger "removing $APP_NAME desktop file ..."
     # --- Remove the .desktop file in ~/.local/share/applications
@@ -37,7 +58,12 @@ delete_app() {
     rm -rf "$HOME/.local/$APP_NAME"
     rm -rf "$HOME/.local/bin/$APP_NAME"
 
-    rm -rf $HOME/Downloads/ABDM
+    logger "removing $APP_NAME autostart at boot file ..."
+    rm -f "$HOME/.config/autostart/AB Download Manager.desktop"
+
+    logger "removing $APP_NAME settings and download lists"
+    delete_app_config_dir
+
     logger "AB Download Manager completely removed"
 }
 

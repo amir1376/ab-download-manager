@@ -5,23 +5,7 @@
 
 set -euo pipefail
 
-# --- Get the latest version of the app from the GitHub API
-
-get_latest_version() {
-    curl -fSs https://api.github.com/repos/amir1376/ab-download-manager/releases/latest | jq -r '.tag_name'
-}
-
-APP_NAME="ABDownloadManager"
-PLATFORM="linux"
-EXT="tar.gz"
-
-LATEST_VERSION=$(get_latest_version)
-ASSET_NAME=${APP_NAME}_${LATEST_VERSION:1}_${PLATFORM}.${EXT}
-BINARY_PATH=$HOME/.local/$APP_NAME/bin/$APP_NAME
-
-DOWNLOAD_URL="https://github.com/amir1376/ab-download-manager/releases/download/${LATEST_VERSION}/$ASSET_NAME"
-DEPENDENCIES=(curl jq tar)
-
+DEPENDENCIES=(curl tar)
 LOG_FILE="/tmp/ab-dm-installer.log"
 
 # --- Custom Logger
@@ -62,12 +46,57 @@ detect_package_manager() {
     fi
 }
 
+detect_package_manager
+
 # --- Install dependencies
 install_dependencies() {
-    detect_package_manager
-    logger "installing dependencies: ${DEPENDENCIES[@]}"
-    sudo ${systemPackage} install -y ${DEPENDENCIES[@]}
+
+    local answer
+    read -p "Do you want to install $1? [Y/n]: " -r answer
+    answer=${answer:-Y}  # Set default to 'Y' if no input is given
+
+    case $answer in
+        [Yy]* )
+            sudo ${systemPackage} update -y
+            logger "installing $1 package ..."
+            sudo ${systemPackage} install -y $1
+            ;;
+        [Nn]* )
+            logger "Skipping the installation of $1."
+            ;;
+        * )
+            logger error "Please answer yes or no."
+            install_dependencies "$1"  # re-prompt for the same package
+            ;;
+    esac
 }
+
+# Check dependencies and install if missing
+check_dependencies() {
+    for pkg in "${DEPENDENCIES[@]}"; do
+        if ! command -v "$pkg" >/dev/null 2>&1; then
+            logger "$pkg is not installed. Installing..."
+            install_dependencies "$pkg"
+        else
+            logger "$pkg is already installed."
+        fi
+    done
+}
+
+APP_NAME="ABDownloadManager"
+PLATFORM="linux"
+EXT="tar.gz"
+
+RELEASE_URL="https://api.github.com/repos/amir1376/ab-download-manager/releases/latest"
+GITHUB_RELEASE_DOWNLOAD="https://github.com/amir1376/ab-download-manager/releases/download"
+
+LATEST_VERSION=$(curl -fSs "${RELEASE_URL}" | grep '"tag_name":' | sed -E 's/.*"tag_name": ?"([^"]+)".*/\1/')
+
+ASSET_NAME="${APP_NAME}_${LATEST_VERSION:1}_${PLATFORM}.${EXT}"
+DOWNLOAD_URL="$GITHUB_RELEASE_DOWNLOAD/${LATEST_VERSION}/$ASSET_NAME"
+
+BINARY_PATH="$HOME/.local/$APP_NAME/bin/$APP_NAME"
+
 
 # --- Delete the old version Application if exists
 delete_old_version() {
@@ -131,11 +160,7 @@ install_app() {
 
     logger "AB Download Manager installed successfully"
     logger "it can be found in Applications menu or run '$APP_NAME' in terminal"
-    logger "Making sure $HOME/.local/bin exists in PATH"
-    if ! $(echo "$PATH" | grep "$HOME/.local/bin" >/dev/null 2>&1); then
-        logger "Adding $HOME/.local/bin to ${USER}'s PATH"
-        echo "export $HOME/.local/bin:$PATH" >> $HOME/.bashrc
-    fi
+    logger "Make sure $HOME/.local/bin exists in PATH"
     logger "installation logs saved in: ${LOG_FILE}"
     
 }
@@ -168,7 +193,7 @@ update_app() {
 main() {
     echo "" > "$LOG_FILE"
     local installed_version
-    install_dependencies
+    check_dependencies
     installed_version=$(check_if_installed)
     if [ -n "$installed_version" ]; then
         logger "AB Download Manager v$installed_version is currently installed."
