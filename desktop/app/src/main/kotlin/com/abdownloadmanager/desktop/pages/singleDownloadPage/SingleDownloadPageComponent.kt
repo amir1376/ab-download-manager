@@ -290,8 +290,8 @@ class SingleDownloadComponent(
     val settings by lazy {
         listOf(
             BooleanConfigurable(
-                title = Res.string.download_item_settings_show_completion_dialog.asStringSource(),
-                description = Res.string.download_item_settings_show_completion_dialog_description.asStringSource(),
+                title = Res.string.download_item_settings_show_download_completion_dialog.asStringSource(),
+                description = Res.string.download_item_settings_show_download_completion_dialog_description.asStringSource(),
                 backedBy = itemShouldShowCompletionDialog.mapTwoWayStateFlow(
                     map = {
                         it ?: globalShowCompletionDialog.value
