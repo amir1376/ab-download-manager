@@ -230,7 +230,9 @@ class DownloadJob(
         val last = downloadItem.copy()
         downloadItem.apply(updater)
         if (downloadManager.calculateOutputFile(last) != downloadManager.calculateOutputFile(downloadItem)) {
-            pause()
+            if (isDownloadActive.value) {
+                pause()
+            }
             // destination should be closed for now!
             initializeDestination()
         }
