@@ -13,7 +13,6 @@ import ir.amirab.util.compose.action.simpleAction
 import com.abdownloadmanager.desktop.utils.getIcon
 import com.abdownloadmanager.desktop.utils.getName
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.category.Category
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.queue.DownloadQueue
@@ -115,11 +114,12 @@ val stopAllAction = simpleAction(
 }.apply {
 }
 
-val exitAction = simpleAction(
+// ui exit
+val requestExitAction = simpleAction(
     Res.string.exit.asStringSource(),
     MyIcons.exit,
 ) {
-    appComponent.requestClose()
+    scope.launch { appComponent.requestExitApp() }
 }
 
 val browserIntegrations = MenuItem.SubMenu(

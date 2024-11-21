@@ -522,7 +522,7 @@ class HomeComponent(
             +newDownloadFromClipboardAction
             +batchDownloadAction
             separator()
-            +exitAction
+            +requestExitAction
 
         }
         subMenu(Res.string.tasks.asStringSource()) {
@@ -897,7 +897,7 @@ class HomeComponent(
         "ctrl V" to newDownloadFromClipboardAction
         "ctrl C" to downloadActions.copyDownloadLinkAction
         "ctrl alt S" to gotoSettingsAction
-        "ctrl W" to exitAction
+        "ctrl W" to requestExitAction
         "DELETE" to downloadActions.deleteAction
         "ctrl O" to downloadActions.openFileAction
         "ctrl F" to downloadActions.openFolderAction

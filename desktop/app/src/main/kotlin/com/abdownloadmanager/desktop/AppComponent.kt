@@ -48,7 +48,6 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -732,8 +731,29 @@ class AppComponent(
         }
     }
 
-    fun requestClose() {
+    private val _showConfirmExitDialog = MutableStateFlow(false)
+    val showConfirmExitDialog = _showConfirmExitDialog.asStateFlow()
+
+    fun exitAppAsync() {
+        scope.launch { exitApp() }
+    }
+
+    suspend fun exitApp() {
+        downloadSystem.stopAnything()
         exitProcess(0)
+    }
+
+    fun closeConfirmExit() {
+        _showConfirmExitDialog.value = false
+    }
+
+    suspend fun requestExitApp() {
+        val hasActiveDownloads = downloadSystem.downloadMonitor.activeDownloadCount.value > 0
+        if (hasActiveDownloads) {
+            _showConfirmExitDialog.value = true
+            return
+        }
+        exitApp()
     }
 
     fun openAbout() {
