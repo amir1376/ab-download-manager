@@ -534,6 +534,11 @@ class AppComponent(
                 openDownloadDialog(it.downloadItem.id)
             }
         }
+        if (it is DownloadManagerEvents.OnJobStarting) {
+            if (appSettings.autoShowDownloadProgressDialog.value) {
+                openDownloadDialog(it.downloadItem.id)
+            }
+        }
     }
 
     override suspend fun openDownloadItem(id: Long) {
