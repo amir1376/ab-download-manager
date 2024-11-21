@@ -63,7 +63,7 @@ class SingleDownloadComponent(
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
 
     val itemStateFlow = MutableStateFlow<IDownloadItemState?>(null)
-    private val globalShowCompletionDialog: StateFlow<Boolean> = appSettings.showCompletionDialog
+    private val globalShowCompletionDialog: StateFlow<Boolean> = appSettings.showDownloadCompletionDialog
     private val itemShouldShowCompletionDialog: MutableStateFlow<Boolean?> = MutableStateFlow(null as Boolean?)
     private val shouldShowCompletionDialog = combineStateFlows(
         globalShowCompletionDialog,
@@ -91,7 +91,7 @@ class SingleDownloadComponent(
                         itemStateFlow.value = null
                         // app component tries to create this component if user want to auto open completion dialog and this component is not created yet
                         // so we keep this component active a while to prevent create new component
-                        // this prevents opening this window if global [appSettings.showCompletionDialog] is true but user explicitly tells that he don't want to open completion dialog for this item
+                        // this prevents opening this window if global [appSettings.showDownloadCompletionDialog] is true but user explicitly tells that he don't want to open completion dialog for this item
                         delay(100)
                         close()
                     }

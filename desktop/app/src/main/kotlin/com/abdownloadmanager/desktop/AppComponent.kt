@@ -530,12 +530,12 @@ class AppComponent(
                 description = Res.string.finished.asStringSource(),
                 type = NotificationType.Success,
             )
-            if (appSettings.showCompletionDialog.value) {
+            if (appSettings.showDownloadCompletionDialog.value) {
                 openDownloadDialog(it.downloadItem.id)
             }
         }
         if (it is DownloadManagerEvents.OnJobStarting) {
-            if (appSettings.autoShowDownloadProgressDialog.value) {
+            if (appSettings.showDownloadProgressDialog.value) {
                 openDownloadDialog(it.downloadItem.id)
             }
         }

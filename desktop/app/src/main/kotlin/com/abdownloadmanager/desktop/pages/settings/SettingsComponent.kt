@@ -110,7 +110,7 @@ fun showDownloadFinishWindow(settingsStorage: AppSettingsStorage): BooleanConfig
     return BooleanConfigurable(
         title = Res.string.settings_show_completion_dialog.asStringSource(),
         description = Res.string.settings_show_completion_dialog_description.asStringSource(),
-        backedBy = settingsStorage.showCompletionDialog,
+        backedBy = settingsStorage.showDownloadCompletionDialog,
         describe = {
             (if (it) Res.string.enabled else Res.string.disabled).asStringSource()
         },
@@ -121,7 +121,7 @@ fun autoShowDownloadProgressWindow(settingsStorage: AppSettingsStorage): Boolean
     return BooleanConfigurable(
         title = Res.string.settings_show_download_progress_dialog.asStringSource(),
         description = Res.string.settings_show_download_progress_dialog_description.asStringSource(),
-        backedBy = settingsStorage.autoShowDownloadProgressDialog,
+        backedBy = settingsStorage.showDownloadProgressDialog,
         describe = {
             (if (it) Res.string.enabled else Res.string.disabled).asStringSource()
         },

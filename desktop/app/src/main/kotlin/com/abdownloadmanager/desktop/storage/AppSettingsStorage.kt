@@ -21,8 +21,8 @@ data class AppSettingsModel(
     val useServerLastModifiedTime: Boolean = false,
     val useSparseFileAllocation: Boolean = true,
     val useAverageSpeed: Boolean = true,
-    val autoShowDownloadProgressDialog: Boolean = true,
-    val showCompletionDialog: Boolean = true,
+    val showDownloadProgressDialog: Boolean = true,
+    val showDownloadCompletionDialog: Boolean = true,
     val speedLimit: Long = 0,
     val autoStartOnBoot: Boolean = true,
     val notificationSound: Boolean = true,
@@ -46,8 +46,8 @@ data class AppSettingsModel(
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
             val useSparseFileAllocation = booleanKeyOf("useSparseFileAllocation")
             val useAverageSpeed = booleanKeyOf("useAverageSpeed")
-            val autoShowDownloadProgressDialog = booleanKeyOf("autoShowDownloadProgressDialog")
-            val showCompletionDialog = booleanKeyOf("showCompletionDialog")
+            val showDownloadProgressDialog = booleanKeyOf("showDownloadProgressDialog")
+            val showDownloadCompletionDialog = booleanKeyOf("showDownloadCompletionDialog")
             val speedLimit = longKeyOf("speedLimit")
             val autoStartOnBoot = booleanKeyOf("autoStartOnBoot")
             val notificationSound = booleanKeyOf("notificationSound")
@@ -70,10 +70,10 @@ data class AppSettingsModel(
                     ?: default.useServerLastModifiedTime,
                 useSparseFileAllocation = source.get(Keys.useSparseFileAllocation) ?: default.useSparseFileAllocation,
                 useAverageSpeed = source.get(Keys.useAverageSpeed) ?: default.useAverageSpeed,
-                autoShowDownloadProgressDialog = source.get(Keys.autoShowDownloadProgressDialog)
-                    ?: default.autoShowDownloadProgressDialog,
-                showCompletionDialog = source.get(Keys.showCompletionDialog)
-                    ?: default.showCompletionDialog,
+                showDownloadProgressDialog = source.get(Keys.showDownloadProgressDialog)
+                    ?: default.showDownloadProgressDialog,
+                showDownloadCompletionDialog = source.get(Keys.showDownloadCompletionDialog)
+                    ?: default.showDownloadCompletionDialog,
                 speedLimit = source.get(Keys.speedLimit) ?: default.speedLimit,
                 autoStartOnBoot = source.get(Keys.autoStartOnBoot) ?: default.autoStartOnBoot,
                 notificationSound = source.get(Keys.notificationSound) ?: default.notificationSound,
@@ -94,8 +94,8 @@ data class AppSettingsModel(
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
                 put(Keys.useSparseFileAllocation, focus.useSparseFileAllocation)
                 put(Keys.useAverageSpeed, focus.useAverageSpeed)
-                put(Keys.autoShowDownloadProgressDialog, focus.autoShowDownloadProgressDialog)
-                put(Keys.showCompletionDialog, focus.showCompletionDialog)
+                put(Keys.showDownloadProgressDialog, focus.showDownloadProgressDialog)
+                put(Keys.showDownloadCompletionDialog, focus.showDownloadCompletionDialog)
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
                 put(Keys.notificationSound, focus.notificationSound)
@@ -120,8 +120,8 @@ class AppSettingsStorage(
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
     val useSparseFileAllocation = from(AppSettingsModel.useSparseFileAllocation)
     val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
-    val autoShowDownloadProgressDialog = from(AppSettingsModel.autoShowDownloadProgressDialog)
-    val showCompletionDialog = from(AppSettingsModel.showCompletionDialog)
+    val showDownloadProgressDialog = from(AppSettingsModel.showDownloadProgressDialog)
+    val showDownloadCompletionDialog = from(AppSettingsModel.showDownloadCompletionDialog)
     val speedLimit = from(AppSettingsModel.speedLimit)
     val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)
     val notificationSound = from(AppSettingsModel.notificationSound)
