@@ -5,13 +5,9 @@ import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
-import ir.amirab.util.config.booleanKeyOf
-import ir.amirab.util.config.intKeyOf
-import ir.amirab.util.config.longKeyOf
-import ir.amirab.util.config.stringKeyOf
-import ir.amirab.util.config.MapConfig
-import kotlinx.coroutines.flow.MutableStateFlow
+import ir.amirab.util.config.*
 import kotlinx.serialization.Serializable
+import org.koin.core.component.KoinComponent
 import java.io.File
 
 @optics
@@ -25,6 +21,7 @@ data class AppSettingsModel(
     val useServerLastModifiedTime: Boolean = false,
     val useSparseFileAllocation: Boolean = true,
     val useAverageSpeed: Boolean = true,
+    val showCompletionDialog: Boolean = true,
     val speedLimit: Long = 0,
     val autoStartOnBoot: Boolean = true,
     val notificationSound: Boolean = true,
@@ -38,7 +35,7 @@ data class AppSettingsModel(
         val default: AppSettingsModel get() = AppSettingsModel()
     }
 
-    object ConfigLens : Lens<MapConfig, AppSettingsModel> {
+    object ConfigLens : Lens<MapConfig, AppSettingsModel>, KoinComponent {
         object Keys {
             val theme = stringKeyOf("theme")
             val language = stringKeyOf("language")
@@ -48,6 +45,7 @@ data class AppSettingsModel(
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
             val useSparseFileAllocation = booleanKeyOf("useSparseFileAllocation")
             val useAverageSpeed = booleanKeyOf("useAverageSpeed")
+            val showCompletionDialog = booleanKeyOf("showCompletionDialog")
             val speedLimit = longKeyOf("speedLimit")
             val autoStartOnBoot = booleanKeyOf("autoStartOnBoot")
             val notificationSound = booleanKeyOf("notificationSound")
@@ -66,15 +64,18 @@ data class AppSettingsModel(
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
-                useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime) ?: default.useServerLastModifiedTime,
+                useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime)
+                    ?: default.useServerLastModifiedTime,
                 useSparseFileAllocation = source.get(Keys.useSparseFileAllocation) ?: default.useSparseFileAllocation,
                 useAverageSpeed = source.get(Keys.useAverageSpeed) ?: default.useAverageSpeed,
+                showCompletionDialog = source.get(Keys.showCompletionDialog)
+                    ?: default.showCompletionDialog,
                 speedLimit = source.get(Keys.speedLimit) ?: default.speedLimit,
                 autoStartOnBoot = source.get(Keys.autoStartOnBoot) ?: default.autoStartOnBoot,
                 notificationSound = source.get(Keys.notificationSound) ?: default.notificationSound,
                 defaultDownloadFolder = source.get(Keys.defaultDownloadFolder) ?: default.defaultDownloadFolder,
                 browserIntegrationEnabled = source.get(Keys.browserIntegrationEnabled)
-                        ?: default.browserIntegrationEnabled,
+                    ?: default.browserIntegrationEnabled,
                 browserIntegrationPort = source.get(Keys.browserIntegrationPort) ?: default.browserIntegrationPort,
             )
         }
@@ -89,6 +90,7 @@ data class AppSettingsModel(
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
                 put(Keys.useSparseFileAllocation, focus.useSparseFileAllocation)
                 put(Keys.useAverageSpeed, focus.useAverageSpeed)
+                put(Keys.showCompletionDialog, focus.showCompletionDialog)
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
                 put(Keys.notificationSound, focus.notificationSound)
@@ -113,6 +115,7 @@ class AppSettingsStorage(
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
     val useSparseFileAllocation = from(AppSettingsModel.useSparseFileAllocation)
     val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
+    val showCompletionDialog = from(AppSettingsModel.showCompletionDialog)
     val speedLimit = from(AppSettingsModel.speedLimit)
     val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)
     val notificationSound = from(AppSettingsModel.notificationSound)

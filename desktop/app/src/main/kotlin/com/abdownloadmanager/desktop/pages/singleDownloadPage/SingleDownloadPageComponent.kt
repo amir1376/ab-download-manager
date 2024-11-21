@@ -7,6 +7,8 @@ import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import arrow.optics.copy
+import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable
+import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.FileIconProvider
@@ -19,7 +21,9 @@ import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
-import kotlinx.coroutines.delay
+import ir.amirab.util.flow.combineStateFlows
+import ir.amirab.util.flow.mapStateFlow
+import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -49,6 +53,7 @@ class SingleDownloadComponent(
     ContainsEffects<SingleDownloadEffects> by supportEffects(),
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
+    private val appSettings: AppSettingsStorage by inject()
     val fileIconProvider: FileIconProvider by inject()
     private val singleDownloadPageStateToPersist by lazy {
         get<PageStatesStorage>().downloadPage
@@ -57,9 +62,17 @@ class SingleDownloadComponent(
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
 
     val itemStateFlow = MutableStateFlow<IDownloadItemState?>(null)
+    private val globalShowCompletionDialog: StateFlow<Boolean> = appSettings.showCompletionDialog
+    private val itemShouldShowCompletionDialog: MutableStateFlow<Boolean?> = MutableStateFlow(null as Boolean?)
+    private val shouldShowCompletionDialog = combineStateFlows(
+        globalShowCompletionDialog,
+        itemShouldShowCompletionDialog,
+    ) { global, item ->
+        item ?: global
+    }
+
     private fun shouldShowCompletionDialog(): Boolean {
-        // TODO implement an option to allow user disable this
-        return true
+        return shouldShowCompletionDialog.value
     }
 
     init {
@@ -74,6 +87,7 @@ class SingleDownloadComponent(
                     if (shouldShowCompletionDialog()) {
                         itemStateFlow.value = item
                     } else {
+                        itemStateFlow.value = null
                         close()
                     }
                 } else {
@@ -270,6 +284,21 @@ class SingleDownloadComponent(
 
     val settings by lazy {
         listOf(
+            BooleanConfigurable(
+                title = Res.string.download_item_settings_show_completion_dialog.asStringSource(),
+                description = Res.string.download_item_settings_show_completion_dialog_description.asStringSource(),
+                backedBy = itemShouldShowCompletionDialog.mapTwoWayStateFlow(
+                    map = {
+                        it ?: globalShowCompletionDialog.value
+                    },
+                    unMap = { it }
+                ),
+                describe = {
+                    (if (it) Res.string.enabled
+                    else Res.string.enabled)
+                        .asStringSource()
+                },
+            ),
             IntConfigurable(
                 title = Res.string.download_item_settings_thread_count.asStringSource(),
                 description = Res.string.download_item_settings_thread_count_description.asStringSource(),
