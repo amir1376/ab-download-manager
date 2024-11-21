@@ -21,6 +21,7 @@ data class AppSettingsModel(
     val useServerLastModifiedTime: Boolean = false,
     val useSparseFileAllocation: Boolean = true,
     val useAverageSpeed: Boolean = true,
+    val autoShowDownloadProgressDialog: Boolean = true,
     val showCompletionDialog: Boolean = true,
     val speedLimit: Long = 0,
     val autoStartOnBoot: Boolean = true,
@@ -45,6 +46,7 @@ data class AppSettingsModel(
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
             val useSparseFileAllocation = booleanKeyOf("useSparseFileAllocation")
             val useAverageSpeed = booleanKeyOf("useAverageSpeed")
+            val autoShowDownloadProgressDialog = booleanKeyOf("autoShowDownloadProgressDialog")
             val showCompletionDialog = booleanKeyOf("showCompletionDialog")
             val speedLimit = longKeyOf("speedLimit")
             val autoStartOnBoot = booleanKeyOf("autoStartOnBoot")
@@ -68,6 +70,8 @@ data class AppSettingsModel(
                     ?: default.useServerLastModifiedTime,
                 useSparseFileAllocation = source.get(Keys.useSparseFileAllocation) ?: default.useSparseFileAllocation,
                 useAverageSpeed = source.get(Keys.useAverageSpeed) ?: default.useAverageSpeed,
+                autoShowDownloadProgressDialog = source.get(Keys.autoShowDownloadProgressDialog)
+                    ?: default.autoShowDownloadProgressDialog,
                 showCompletionDialog = source.get(Keys.showCompletionDialog)
                     ?: default.showCompletionDialog,
                 speedLimit = source.get(Keys.speedLimit) ?: default.speedLimit,
@@ -90,6 +94,7 @@ data class AppSettingsModel(
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
                 put(Keys.useSparseFileAllocation, focus.useSparseFileAllocation)
                 put(Keys.useAverageSpeed, focus.useAverageSpeed)
+                put(Keys.autoShowDownloadProgressDialog, focus.autoShowDownloadProgressDialog)
                 put(Keys.showCompletionDialog, focus.showCompletionDialog)
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
@@ -115,6 +120,7 @@ class AppSettingsStorage(
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
     val useSparseFileAllocation = from(AppSettingsModel.useSparseFileAllocation)
     val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
+    val autoShowDownloadProgressDialog = from(AppSettingsModel.autoShowDownloadProgressDialog)
     val showCompletionDialog = from(AppSettingsModel.showCompletionDialog)
     val speedLimit = from(AppSettingsModel.speedLimit)
     val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)
