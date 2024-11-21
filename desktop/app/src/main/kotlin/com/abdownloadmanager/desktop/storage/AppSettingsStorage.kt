@@ -16,7 +16,7 @@ data class AppSettingsModel(
     val theme: String = "dark",
     val language: String = "en",
     val mergeTopBarWithTitleBar: Boolean = false,
-    val threadCount: Int = 5,
+    val threadCount: Int = 8,
     val dynamicPartCreation: Boolean = true,
     val useServerLastModifiedTime: Boolean = false,
     val useSparseFileAllocation: Boolean = true,
