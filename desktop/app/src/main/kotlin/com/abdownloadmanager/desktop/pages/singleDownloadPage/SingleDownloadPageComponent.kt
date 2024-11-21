@@ -24,6 +24,7 @@ import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -88,6 +89,10 @@ class SingleDownloadComponent(
                         itemStateFlow.value = item
                     } else {
                         itemStateFlow.value = null
+                        // app component tries to create this component if user want to auto open completion dialog and this component is not created yet
+                        // so we keep this component active a while to prevent create new component
+                        // this prevents opening this window if global [appSettings.showCompletionDialog] is true but user explicitly tells that he don't want to open completion dialog for this item
+                        delay(100)
                         close()
                     }
                 } else {

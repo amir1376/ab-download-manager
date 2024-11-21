@@ -48,6 +48,7 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -529,6 +530,9 @@ class AppComponent(
                 description = Res.string.finished.asStringSource(),
                 type = NotificationType.Success,
             )
+            if (appSettings.showCompletionDialog.value) {
+                openDownloadDialog(it.downloadItem.id)
+            }
         }
     }
 
