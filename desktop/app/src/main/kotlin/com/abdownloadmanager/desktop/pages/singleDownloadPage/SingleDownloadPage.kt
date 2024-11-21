@@ -65,79 +65,76 @@ enum class SingleDownloadPageSections(
 private val tabs = SingleDownloadPageSections.entries.toList()
 
 @Composable
-fun SingleDownloadPage(singleDownloadComponent: SingleDownloadComponent) {
-    val itemState = singleDownloadComponent.itemStateFlow.collectAsState().value
+fun ProgressDownloadPage(singleDownloadComponent: SingleDownloadComponent, itemState: ProcessingDownloadItemState) {
     var selectedTab by remember { mutableStateOf(Info) }
     val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
     val setShowPartInfo = singleDownloadComponent::setShowPartInfo
-    if (itemState != null) {
+    Column(
+        Modifier.padding(horizontal = 16.dp)
+    ) {
         Column(
-            Modifier.padding(horizontal = 16.dp)
+            Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .background(myColors.surface)
+                .padding(1.dp),
         ) {
-            Column(
-                Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(myColors.surface)
-                    .padding(1.dp),
-            ) {
-                //tabs
-                MyTabRow {
-                    for (tab in tabs) {
-                        MyTab(
-                            selected = tab == selectedTab, {
-                                selectedTab = tab
-                            },
-                            icon = tab.icon,
-                            title = tab.title
-                        )
-                    }
-                }
-                val scrollState = rememberScrollState()
-                //info / settings ...
-                val tabContentModifier = Modifier
-
-                Box(
-                    Modifier.height(150.dp)
-                        .clip(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp))
-                        .background(myColors.background)
-                        .verticalScroll(scrollState)
-                ) {
-                    when (selectedTab) {
-                        Info -> RenderInfo(
-                            tabContentModifier,
-                            singleDownloadComponent
-                        )
-
-                        Settings -> RenderSettings(
-                            tabContentModifier.padding(end = 12.dp),
-                            singleDownloadComponent,
-                        )
-                    }
-                    VerticalScrollbar(
-                        adapter = rememberScrollbarAdapter(scrollState),
-                        modifier = Modifier.matchParentSize().wrapContentWidth(Alignment.End),
-                        style = LocalScrollbarStyle.current.copy(
-                            shape = RectangleShape
-                        )
+            //tabs
+            MyTabRow {
+                for (tab in tabs) {
+                    MyTab(
+                        selected = tab == selectedTab, {
+                            selectedTab = tab
+                        },
+                        icon = tab.icon,
+                        title = tab.title
                     )
                 }
             }
-            Spacer(Modifier.size(8.dp))
-            Column(Modifier) {
-                RenderProgressBar(itemState)
-                Spacer(Modifier.size(8.dp))
-                RenderActions(itemState, singleDownloadComponent, showPartInfo, setShowPartInfo)
-                Spacer(Modifier.size(8.dp))
-            }
-            val resizingState = LocalSingleDownloadPageSizing.current
-            LaunchedEffect(resizingState.resizingPartInfo) {
-                if (resizingState.partInfoHeight <= 0.dp) {
-                    setShowPartInfo(false)
+            val scrollState = rememberScrollState()
+            //info / settings ...
+            val tabContentModifier = Modifier
+
+            Box(
+                Modifier.height(150.dp)
+                    .clip(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp))
+                    .background(myColors.background)
+                    .verticalScroll(scrollState)
+            ) {
+                when (selectedTab) {
+                    Info -> RenderInfo(
+                        tabContentModifier,
+                        singleDownloadComponent
+                    )
+
+                    Settings -> RenderSettings(
+                        tabContentModifier.padding(end = 12.dp),
+                        singleDownloadComponent,
+                    )
                 }
+                VerticalScrollbar(
+                    adapter = rememberScrollbarAdapter(scrollState),
+                    modifier = Modifier.matchParentSize().wrapContentWidth(Alignment.End),
+                    style = LocalScrollbarStyle.current.copy(
+                        shape = RectangleShape
+                    )
+                )
             }
-            if (showPartInfo && itemState is ProcessingDownloadItemState) {
-                RenderPartInfo(itemState)
+        }
+        Spacer(Modifier.size(8.dp))
+        Column(Modifier) {
+            RenderProgressBar(itemState)
+            Spacer(Modifier.size(8.dp))
+            RenderActions(itemState, singleDownloadComponent, showPartInfo, setShowPartInfo)
+            Spacer(Modifier.size(8.dp))
+        }
+        val resizingState = LocalSingleDownloadPageSizing.current
+        LaunchedEffect(resizingState.resizingPartInfo) {
+            if (resizingState.partInfoHeight <= 0.dp) {
+                setShowPartInfo(false)
             }
+        }
+        if (showPartInfo) {
+            RenderPartInfo(itemState)
         }
     }
 }
@@ -485,7 +482,7 @@ fun RenderInfo(
             .padding(horizontal = 16.dp)
             .padding(top = 8.dp)
     ) {
-        for (propertyItem in singleDownloadComponent.extraDownloadInfo.collectAsState().value) {
+        for (propertyItem in singleDownloadComponent.extraDownloadProgressInfo.collectAsState().value) {
             Spacer(Modifier.height(2.dp))
             RenderPropertyItem(propertyItem)
         }
