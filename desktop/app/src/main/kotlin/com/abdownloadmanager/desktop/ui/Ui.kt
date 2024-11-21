@@ -14,9 +14,6 @@ import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialog
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.ABDownloaderTheme
 import com.abdownloadmanager.desktop.ui.widget.tray.ComposeTray
-import com.abdownloadmanager.desktop.ui.widget.ProvideNotificationManager
-import com.abdownloadmanager.desktop.ui.widget.ShowMessageDialogs
-import com.abdownloadmanager.desktop.ui.widget.useNotification
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
 import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
@@ -24,16 +21,15 @@ import ir.amirab.util.compose.action.buildMenu
 import com.abdownloadmanager.desktop.utils.isInDebugMode
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
 import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
+import com.abdownloadmanager.desktop.pages.confirmexit.ConfirmExit
 import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
-import com.abdownloadmanager.desktop.ui.widget.ProvideLanguageManager
+import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.utils.compose.ProvideDebugInfo
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import kotlinx.coroutines.CoroutineScope
@@ -100,6 +96,7 @@ object Ui : KoinComponent {
                                 ShowMessageDialogs(appComponent)
                                 ShowOpenSourceLibraries(appComponent)
                                 ShowTranslators(appComponent)
+                                ConfirmExit(appComponent)
                             }
                         }
                     }
@@ -140,7 +137,7 @@ private fun ApplicationScope.SystemTray(
             buildMenu {
                 +showDownloadList
                 +gotoSettingsAction
-                +exitAction
+                +requestExitAction
             }
         }
     )
