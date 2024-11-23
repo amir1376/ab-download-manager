@@ -1,14 +1,16 @@
 package ir.amirab.util.compose.action
 
-import ir.amirab.util.compose.IconSource
+import androidx.compose.ui.graphics.vector.ImageVector
 import ir.amirab.util.compose.StringSource
 
 abstract class AnAction(
     title: StringSource,
-    icon: IconSource? = null,
+    icon: ImageVector? = null,
+    image: ImageVector? = null,
 ) : MenuItem.SingleItem(
     title=title,
     icon=icon,
+    image=image,
 ) {
     override fun onClick() = actionPerformed()
 

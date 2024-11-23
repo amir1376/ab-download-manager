@@ -1,7 +1,5 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.animation.core.animateFloatAsState
@@ -22,6 +20,9 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.VerticalDirection
+import com.abdownloadmanager.utils.compose.widget.Icon
 
 
 @Composable
@@ -294,10 +295,10 @@ private fun <T : Comparable<T>> VerticalDirectionHandle(
     WithContentAlpha(
         animateFloatAsState(if (isDragging || isHovered) 1f else 0.5f).value
     ) {
-        MyIcon(
-            MyIcons.verticalDirection,
-            null,
-            Modifier
+        Icon(
+            imageVector = AbIcons.Default.VerticalDirection,
+            contentDescription = null,
+            modifier = Modifier
                 .ifThen(enabled) {
                     hoverable(interactionSource)
                         .resizeHandle(

@@ -1,14 +1,9 @@
 package com.abdownloadmanager.utils.category
 
-import com.abdownloadmanager.utils.compose.IMyIcons
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.uriOrNull
+import com.abdownloadmanager.utils.category.CategoryIconType.*
 import java.io.File
 
-class DefaultCategories(
-    private val icons: IMyIcons,
-    private val getDefaultDownloadFolder: () -> String,
-) {
+class DefaultCategories(private val getDefaultDownloadFolder: () -> String) {
 
     fun getCategoryOfFileName(name: String): Category? {
         return getDefaultCategories()
@@ -16,12 +11,6 @@ class DefaultCategories(
     }
 
     fun getDefaultCategories(): List<Category> {
-        fun IconSource.toUri(): String {
-            return requireNotNull(uriOrNull()) {
-                "It seems that we use an icon that does not have uri"
-            }
-        }
-
         fun relative(path: String): String {
             return File(getDefaultDownloadFolder(), path).path
         }
@@ -30,7 +19,7 @@ class DefaultCategories(
             id = 0,
             name = "Compressed",
             path = relative("Compressed"),
-            icon = icons.zipFile.toUri(),
+            iconType = ZipFile,
             acceptedFileTypes = listOf(
                 "zip",
                 "rar",
@@ -49,7 +38,7 @@ class DefaultCategories(
             id = 1,
             name = "Programs",
             path = relative("Programs"),
-            icon = icons.applicationFile.toUri(),
+            iconType = ApplicationFile,
             acceptedFileTypes = listOf(
                 "apk",
                 "exe",
@@ -67,7 +56,7 @@ class DefaultCategories(
             id = 2,
             name = "Videos",
             path = relative("Videos"),
-            icon = icons.videoFile.toUri(),
+            iconType = VideoFile,
             acceptedFileTypes = listOf(
                 "mp4",
                 "avi",
@@ -86,7 +75,7 @@ class DefaultCategories(
             id = 3,
             name = "Music",
             path = relative("Music"),
-            icon = icons.musicFile.toUri(),
+            iconType = MusicFile,
             acceptedFileTypes = listOf(
                 "mp3",
                 "wav",
@@ -103,7 +92,7 @@ class DefaultCategories(
             id = 4,
             name = "Pictures",
             path = relative("Pictures"),
-            icon = icons.pictureFile.toUri(),
+            iconType = PictureFile,
             acceptedFileTypes = listOf(
                 "jpg",
                 "jpeg",
@@ -124,7 +113,7 @@ class DefaultCategories(
             id = 5,
             name = "Documents",
             path = relative("Documents"),
-            icon = icons.documentFile.toUri(),
+            iconType = DocumentFile,
             acceptedFileTypes = listOf(
                 "doc",
                 "docx",

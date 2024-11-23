@@ -1,8 +1,6 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.FolderConfigurable
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.widget.MyTextField
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +10,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Folder
+import com.abdownloadmanager.utils.compose.widget.Icon
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import ir.amirab.util.desktop.LocalWindow
@@ -53,8 +54,8 @@ fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
                 textPadding = PaddingValues(4.dp),
                 placeholder = cfg.title.rememberString(),
                 end = {
-                    MyIcon(
-                        icon = MyIcons.folder,
+                    Icon(
+                        imageVector = AbIcons.Default.Folder,
                         contentDescription = null,
                         modifier = Modifier
                             .pointerHoverIcon(PointerIcon.Default)

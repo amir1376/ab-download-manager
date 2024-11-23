@@ -5,7 +5,8 @@ import com.abdownloadmanager.desktop.ui.widget.menu.SubMenu
 import ir.amirab.util.compose.action.MenuItem
 import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 import ir.amirab.util.desktop.systemtray.AwtTray
@@ -13,7 +14,7 @@ import ir.amirab.util.desktop.systemtray.AwtTray
 @Composable
 fun ComposeTray(
     tooltip: String,
-    icon: Painter,
+    icon: ImageVector,
     state: TrayState = rememberTrayState(),
     onClick: () -> Unit,
     menu: List<MenuItem>,
@@ -22,7 +23,7 @@ fun ComposeTray(
     val closeOptions = { popUpPosition = null }
     AwtTray(
         tooltip = tooltip,
-        icon = icon,
+        icon = rememberVectorPainter(icon),
         state = state,
         onClick = onClick,
         onRightClick = {

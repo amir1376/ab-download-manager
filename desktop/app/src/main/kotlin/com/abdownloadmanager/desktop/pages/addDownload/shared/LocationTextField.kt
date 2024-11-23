@@ -2,7 +2,6 @@ package com.abdownloadmanager.desktop.pages.addDownload.shared
 
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPageTextField
 import com.abdownloadmanager.desktop.pages.addDownload.single.MyTextFieldIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.Text
@@ -20,6 +19,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Down
+import com.abdownloadmanager.desktop.ui.icons.default.Folder
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.resources.*
 import ir.amirab.util.compose.resources.myStringResource
@@ -71,10 +73,10 @@ fun LocationTextField(
             errorText = errorText,
             end = {
                 Row {
-                    MyTextFieldIcon(MyIcons.folder) {
+                    MyTextFieldIcon(AbIcons.Default.Folder) {
                         downloadLauncherFolderPickerLauncher.launch()
                     }
-                    MyTextFieldIcon(MyIcons.down) {
+                    MyTextFieldIcon(AbIcons.Default.Down) {
                         showLastUsedLocations = !showLastUsedLocations
                     }
                 }

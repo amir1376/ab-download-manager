@@ -4,36 +4,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.abdownloadmanager.utils.category.CategoryIconType
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.DefaultCategories
-import com.abdownloadmanager.utils.category.iconSource
-import com.abdownloadmanager.utils.compose.IMyIcons
-import ir.amirab.util.compose.IconSource
-
 
 interface FileIconProvider {
-    fun getIcon(fileName: String): IconSource
 
     /**
      * Automatically update icon if other dependencies changed
      */
     @Composable
-    fun rememberIcon(fileName: String): IconSource
+    fun rememberCategoryIcon(fileName: String): CategoryIconType
 }
 
 class FileIconProviderUsingCategoryIcons(
     private val defaultCategories: DefaultCategories,
     private val categoryManager: CategoryManager,
-    private val icons: IMyIcons,
 ) : FileIconProvider {
-    override fun getIcon(fileName: String): IconSource {
-        return fromDefaultCategories(fileName)
-            ?: fromUserDefinedCategories(fileName)
-            ?: icons.file
-    }
 
     @Composable
-    override fun rememberIcon(fileName: String): IconSource {
+    override fun rememberCategoryIcon(fileName: String): CategoryIconType {
         val fromDefault = remember(fileName) {
             fromDefaultCategories(fileName)
         }
@@ -47,16 +37,16 @@ class FileIconProviderUsingCategoryIcons(
         if (fromCategories != null) {
             return fromCategories
         }
-        return icons.file
+        return CategoryIconType.Other
     }
 
-    private fun fromDefaultCategories(fileName: String): IconSource? {
+    private fun fromDefaultCategories(fileName: String): CategoryIconType? {
         return defaultCategories
-            .getCategoryOfFileName(fileName)?.iconSource()
+            .getCategoryOfFileName(fileName)?.iconType
     }
 
-    private fun fromUserDefinedCategories(fileName: String): IconSource? {
+    private fun fromUserDefinedCategories(fileName: String): CategoryIconType? {
         return categoryManager
-            .getCategoryOfFileName(fileName)?.iconSource()
+            .getCategoryOfFileName(fileName)?.iconType
     }
 }

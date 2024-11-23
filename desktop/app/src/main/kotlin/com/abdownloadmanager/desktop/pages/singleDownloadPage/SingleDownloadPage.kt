@@ -5,9 +5,6 @@ import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPage
 import com.abdownloadmanager.utils.compose.LocalContentColor
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.WithContentColor
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.*
@@ -31,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -38,8 +36,19 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Check
+import com.abdownloadmanager.desktop.ui.icons.default.Down
+import com.abdownloadmanager.desktop.ui.icons.default.File
+import com.abdownloadmanager.desktop.ui.icons.default.Folder
+import com.abdownloadmanager.desktop.ui.icons.default.Info
+import com.abdownloadmanager.desktop.ui.icons.default.Pause
+import com.abdownloadmanager.desktop.ui.icons.default.Resume
+import com.abdownloadmanager.desktop.ui.icons.default.Settings
+import com.abdownloadmanager.desktop.ui.icons.default.Up
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.compose.useIsInDebugMode
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.part.PartDownloadStatus
@@ -50,15 +59,15 @@ import ir.amirab.util.compose.resources.myStringResource
 
 enum class SingleDownloadPageSections(
     val title: StringSource,
-    val icon: IconSource,
+    val icon: ImageVector,
 ) {
     Info(
         Res.string.info.asStringSource(),
-        MyIcons.info
+        AbIcons.Default.Info
     ),
     Settings(
         Res.string.settings.asStringSource(),
-        MyIcons.settings
+        AbIcons.Default.Settings
     ),
 }
 
@@ -199,10 +208,10 @@ fun RenderProgressBar(itemState: IDownloadItemState) {
                     )
             ) {
                 if (progress == 1f) {
-                    MyIcon(
-                        MyIcons.check,
-                        null,
-                        Modifier
+                    Icon(
+                        imageVector = AbIcons.Default.Check,
+                        contentDescription = null,
+                        modifier = Modifier
                             .padding(1.dp)
                             .clip(CircleShape)
                             .background(myColors.onBackground)
@@ -542,9 +551,9 @@ private fun PartInfoButton(
         },
         text = myStringResource(Res.string.parts_info),
         icon = if (showing) {
-            MyIcons.up
+            AbIcons.Default.Up
         } else {
-            MyIcons.down
+            AbIcons.Default.Down
         }
     )
 }
@@ -554,12 +563,16 @@ private fun SingleDownloadPageButton(
     onClick: () -> Unit,
     text: String,
     color: Color = LocalContentColor.current,
-    icon: IconSource? = null,
+    icon: ImageVector? = null,
 ) {
     WithContentColor(color) {
         Row(Modifier.clickable { onClick() }.padding(8.dp)) {
             icon?.let {
-                MyIcon(it, null, Modifier.size(16.dp))
+                Icon(
+                    imageVector = it,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
             }
             Spacer(Modifier.width(8.dp))
             Text(text, maxLines = 1, fontSize = myTextSizes.base)
@@ -583,7 +596,7 @@ private fun OpenFileButton(open: () -> Unit) {
         {
             open()
         },
-        icon = MyIcons.fileOpen,
+        icon = AbIcons.Default.File,
         text = myStringResource(Res.string.open_file)
     )
 }
@@ -594,7 +607,7 @@ private fun OpenFolderButton(open: () -> Unit) {
         {
             open()
         },
-        icon = MyIcons.folderOpen,
+        icon = AbIcons.Default.Folder,
         text = myStringResource(Res.string.open_folder),
     )
 }
@@ -613,11 +626,11 @@ private fun ToggleButton(
     val isResumeSupported = itemState.supportResume == true
     val (icon, text) = when (itemState.status) {
         is DownloadJobStatus.CanBeResumed -> {
-            MyIcons.resume to Res.string.resume
+            AbIcons.Default.Resume to Res.string.resume
         }
 
         is DownloadJobStatus.IsActive -> {
-            MyIcons.pause to Res.string.pause
+            AbIcons.Default.Pause to Res.string.pause
         }
 
         else -> return

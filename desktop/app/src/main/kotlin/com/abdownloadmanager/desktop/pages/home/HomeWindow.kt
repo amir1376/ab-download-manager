@@ -10,12 +10,10 @@ import com.abdownloadmanager.desktop.actions.LocalShortCutManager
 import com.abdownloadmanager.desktop.actions.handle
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.rememberWindowController
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
-import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
-import ir.amirab.util.compose.resources.myStringResource
 import java.awt.Dimension
 
 @Composable
@@ -29,10 +27,9 @@ fun HomeWindow(
         position = WindowPosition.Aligned(Alignment.Center)
     )
     val onCloseRequest = onCLoseRequest
-    val windowIcon = MyIcons.appIcon
     val windowController = rememberWindowController(
-        AppInfo.name,
-        windowIcon.rememberPainter(),
+        title = AppInfo.name,
+        icon = AbIcons.Colored.AppIcon,
     )
 
     CompositionLocalProvider(

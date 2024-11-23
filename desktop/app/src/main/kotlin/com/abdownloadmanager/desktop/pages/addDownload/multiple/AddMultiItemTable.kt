@@ -25,9 +25,10 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.pages.category.toCategoryImageVector
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.FileIconProvider
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 
@@ -266,12 +267,12 @@ private fun NameCell(
     iconProvider: FileIconProvider,
 ) {
     val name by downloadUiChecker.name.collectAsState()
-    val icon = iconProvider.rememberIcon(name)
+    val icon = iconProvider.rememberCategoryIcon(name).toCategoryImageVector()
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        MyIcon(
-            icon = icon,
+        Icon(
+            imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(16.dp).alpha(0.75f)
         )

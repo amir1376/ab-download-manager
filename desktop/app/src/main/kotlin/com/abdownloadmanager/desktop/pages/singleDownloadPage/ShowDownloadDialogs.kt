@@ -4,7 +4,6 @@ import com.abdownloadmanager.desktop.DownloadDialogManager
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +13,8 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
@@ -96,7 +97,7 @@ private fun FrameWindowScope.CommonContent(
         }
     }
     WindowTitle(getDownloadTitle(itemState))
-    WindowIcon(MyIcons.appIcon)
+    WindowIcon(icon = AbIcons.Colored.AppIcon)
     UpdateTaskBar(window, itemState)
 }
 

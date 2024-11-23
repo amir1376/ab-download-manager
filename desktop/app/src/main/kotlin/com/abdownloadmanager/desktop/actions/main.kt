@@ -3,7 +3,22 @@ package com.abdownloadmanager.desktop.actions
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.desktop.di.Di
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
+import com.abdownloadmanager.desktop.ui.icons.colored.Telegram
+import com.abdownloadmanager.desktop.ui.icons.default.Clipboard
+import com.abdownloadmanager.desktop.ui.icons.default.DownSpeed
+import com.abdownloadmanager.desktop.ui.icons.default.Exit
+import com.abdownloadmanager.desktop.ui.icons.default.Group
+import com.abdownloadmanager.desktop.ui.icons.default.Info
+import com.abdownloadmanager.desktop.ui.icons.default.Language
+import com.abdownloadmanager.desktop.ui.icons.default.OpenSource
+import com.abdownloadmanager.desktop.ui.icons.default.Plus
+import com.abdownloadmanager.desktop.ui.icons.default.Queue
+import com.abdownloadmanager.desktop.ui.icons.default.Resume
+import com.abdownloadmanager.desktop.ui.icons.default.Settings
+import com.abdownloadmanager.desktop.ui.icons.default.Speaker
+import com.abdownloadmanager.desktop.ui.icons.default.Stop
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
 import ir.amirab.util.compose.action.AnAction
@@ -41,14 +56,14 @@ private val activeQueuesFlow = downloadSystem
     )
 
 val newDownloadAction = simpleAction(
-    Res.string.new_download.asStringSource(),
-    MyIcons.add,
+    title = Res.string.new_download.asStringSource(),
+    icon = AbIcons.Default.Plus,
 ) {
     appComponent.openAddDownloadDialog(listOf(DownloadCredentials.empty()))
 }
 val newDownloadFromClipboardAction = simpleAction(
-    Res.string.import_from_clipboard.asStringSource(),
-    MyIcons.paste,
+    title = Res.string.import_from_clipboard.asStringSource(),
+    icon = AbIcons.Default.Clipboard,
 ) {
     val contentsInClipboard = ClipboardUtil.read()
     if (contentsInClipboard.isNullOrEmpty()) {
@@ -64,12 +79,12 @@ val newDownloadFromClipboardAction = simpleAction(
 }
 val batchDownloadAction = simpleAction(
     title = Res.string.batch_download.asStringSource(),
-    icon = MyIcons.download
+    icon = AbIcons.Default.DownSpeed
 ) {
     appComponent.openBatchDownload()
 }
 val stopQueueGroupAction = MenuItem.SubMenu(
-    icon = MyIcons.stop,
+    icon = AbIcons.Default.Stop,
     title = Res.string.stop_queue.asStringSource(),
     items = emptyList()
 ).apply {
@@ -83,7 +98,7 @@ val stopQueueGroupAction = MenuItem.SubMenu(
 
 
 val startQueueGroupAction = MenuItem.SubMenu(
-    icon = MyIcons.resume,
+    icon = AbIcons.Default.Resume,
     title = Res.string.start_queue.asStringSource(),
     items = emptyList()
 ).apply {
@@ -99,8 +114,8 @@ val startQueueGroupAction = MenuItem.SubMenu(
 
 
 val stopAllAction = simpleAction(
-    Res.string.stop_all.asStringSource(),
-    MyIcons.stop,
+    title = Res.string.stop_all.asStringSource(),
+    icon = AbIcons.Default.Stop,
     checkEnable = combineStateFlows(
         downloadSystem.downloadMonitor.activeDownloadCount,
         activeQueuesFlow
@@ -116,20 +131,20 @@ val stopAllAction = simpleAction(
 
 // ui exit
 val requestExitAction = simpleAction(
-    Res.string.exit.asStringSource(),
-    MyIcons.exit,
+    title = Res.string.exit.asStringSource(),
+    icon = AbIcons.Default.Exit,
 ) {
     scope.launch { appComponent.requestExitApp() }
 }
 
 val browserIntegrations = MenuItem.SubMenu(
     title = Res.string.download_browser_integration.asStringSource(),
-    icon = MyIcons.download,
+    icon = AbIcons.Default.DownSpeed,
     items = buildMenu {
         for (browserExtension in SharedConstants.browserIntegrations) {
             item(
                 title = browserExtension.type.getName().asStringSource(),
-                icon = browserExtension.type.getIcon(),
+                image = browserExtension.type.getIcon(),
                 onClick = { UrlUtils.openUrl(browserExtension.url) }
             )
         }
@@ -137,14 +152,14 @@ val browserIntegrations = MenuItem.SubMenu(
 )
 
 val gotoSettingsAction = simpleAction(
-    Res.string.settings.asStringSource(),
-    MyIcons.settings,
+    title = Res.string.settings.asStringSource(),
+    icon = AbIcons.Default.Settings,
 ) {
     appComponent.openSettings()
 }
 val showDownloadList = simpleAction(
-    Res.string.show_downloads.asStringSource(),
-    MyIcons.settings,
+    title = Res.string.show_downloads.asStringSource(),
+    icon = AbIcons.Default.Settings,
 ) {
     appComponent.openHome()
 }
@@ -157,38 +172,38 @@ val showDownloadList = simpleAction(
 }*/
 val openAboutAction = simpleAction(
     title = Res.string.about.asStringSource(),
-    icon = MyIcons.info,
+    icon = AbIcons.Default.Info,
 ) {
     appComponent.openAbout()
 }
 val openOpenSourceThirdPartyLibraries = simpleAction(
     title = Res.string.view_the_open_source_licenses.asStringSource(),
-    icon = MyIcons.openSource,
+    icon = AbIcons.Default.OpenSource,
 ) {
     appComponent.openOpenSourceLibraries()
 }
 val openTranslators = simpleAction(
     title = Res.string.meet_the_translators.asStringSource(),
-    icon = MyIcons.language,
+    icon = AbIcons.Default.Language,
 ) {
     appComponent.openTranslatorsPage()
 }
 
 val supportActionGroup = MenuItem.SubMenu(
     title = Res.string.support_and_community.asStringSource(),
-    icon = MyIcons.group,
+    icon = AbIcons.Default.Group,
     items = buildMenu {
-        item(Res.string.website.asStringSource(), MyIcons.appIcon) {
+        item(title = Res.string.website.asStringSource(), image = AbIcons.Colored.AppIcon) {
             UrlUtils.openUrl(AppInfo.website)
         }
-        item(Res.string.source_code.asStringSource(), MyIcons.openSource) {
+        item(title = Res.string.source_code.asStringSource(), icon = AbIcons.Default.OpenSource) {
             UrlUtils.openUrl(AppInfo.sourceCode)
         }
-        subMenu(Res.string.telegram.asStringSource(), MyIcons.telegram) {
-            item(Res.string.channel.asStringSource(), MyIcons.speaker) {
+        subMenu(title = Res.string.telegram.asStringSource(), image = AbIcons.Colored.Telegram) {
+            item(title = Res.string.channel.asStringSource(), icon = AbIcons.Default.Speaker) {
                 UrlUtils.openUrl(SharedConstants.telegramChannelUrl)
             }
-            item(Res.string.group.asStringSource(), MyIcons.group) {
+            item(title = Res.string.group.asStringSource(), icon = AbIcons.Default.Group) {
                 UrlUtils.openUrl(SharedConstants.telegramGroupUrl)
             }
         }
@@ -197,7 +212,7 @@ val supportActionGroup = MenuItem.SubMenu(
 
 val openQueuesAction = simpleAction(
     title = Res.string.queues.asStringSource(),
-    icon = MyIcons.queue
+    icon = AbIcons.Default.Queue
 ) {
     appComponent.openQueues()
 }

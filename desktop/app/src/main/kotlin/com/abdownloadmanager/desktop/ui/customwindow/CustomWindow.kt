@@ -3,8 +3,6 @@ package com.abdownloadmanager.desktop.ui.customwindow
 import ir.amirab.util.customwindow.ProvideWindowSpotContainer
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.WithContentColor
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 //import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
@@ -22,10 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,6 +31,8 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowState
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.customwindow.HitSpots
@@ -48,7 +48,7 @@ private fun FrameWindowScope.CustomWindowFrame(
     onRequestToggleMaximize: (() -> Unit)?,
     title: String,
     titlePosition: TitlePosition,
-    windowIcon: Painter? = null,
+    windowIcon: ImageVector? = null,
     background: Color,
     onBackground: Color,
     start: (@Composable () -> Unit)?,
@@ -102,7 +102,7 @@ fun isWindowFloating(): Boolean {
 @Composable
 fun FrameWindowScope.SnapDraggableToolbar(
     title: String,
-    windowIcon: Painter? = null,
+    windowIcon: ImageVector? = null,
     titlePosition: TitlePosition,
     start: (@Composable () -> Unit)?,
     end: (@Composable () -> Unit)?,
@@ -149,7 +149,7 @@ fun FrameWindowScope.SnapDraggableToolbar(
 @Composable
 private fun FrameWindowScope.FrameContent(
     title: String,
-    windowIcon: Painter? = null,
+    windowIcon: ImageVector? = null,
     titlePosition: TitlePosition,
     start: (@Composable () -> Unit)?,
     end: (@Composable () -> Unit)?,
@@ -251,12 +251,6 @@ private fun FrameWindowScope.Title(
     }
 }
 
-private val defaultAppIcon: IconSource
-    @Composable
-    get() {
-        return MyIcons.appIcon
-    }
-
 private fun Color.toWindowColorType() = java.awt.Color(
     red, green, blue
 )
@@ -288,8 +282,7 @@ fun CustomWindow(
     val end = windowController.end
     val title = windowController.title.orEmpty()
     val titlePosition = windowController.titlePosition
-    val icon = windowController.icon ?: defaultAppIcon.rememberPainter()
-
+    val icon = windowController.icon ?: AbIcons.Colored.AppIcon
 
     val transparent: Boolean
     val undecorated: Boolean
@@ -307,7 +300,7 @@ fun CustomWindow(
         state = state,
         transparent = transparent,
         undecorated = undecorated,
-        icon = icon,
+        icon = rememberVectorPainter(icon),
         title = title,
         resizable = resizable,
         onCloseRequest = onCloseRequest,
@@ -396,7 +389,7 @@ private fun Modifier.clearFocusOnTap(): Modifier = composed {
 
 class WindowController(
     title: String? = null,
-    icon: Painter? = null,
+    icon: ImageVector? = null,
 ) {
     var title by mutableStateOf(title)
     var titlePosition by mutableStateOf(TitlePosition.default())
@@ -419,7 +412,7 @@ data class TitlePosition(
 @Composable
 fun rememberWindowController(
     title: String? = null,
-    icon: Painter? = null,
+    icon: ImageVector? = null,
 ): WindowController {
     val controller = remember {
         WindowController(
@@ -487,12 +480,7 @@ fun WindowTitlePosition(titlePosition: TitlePosition) {
 }
 
 @Composable
-fun WindowIcon(icon: IconSource) {
-    WindowIcon(icon.rememberPainter())
-}
-
-@Composable
-fun WindowIcon(icon: Painter) {
+fun WindowIcon(icon: ImageVector) {
     val current = LocalWindowController.current
     DisposableEffect(icon) {
         current.let {

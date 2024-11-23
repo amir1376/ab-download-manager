@@ -1,12 +1,13 @@
 package ir.amirab.util.compose.action
 
-import ir.amirab.util.compose.IconSource
+import androidx.compose.ui.graphics.vector.ImageVector
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.*
 
 inline fun simpleAction(
     title: StringSource,
-    icon: IconSource? = null,
+    icon: ImageVector? = null,
+    image: ImageVector? = null,
     crossinline onActionPerformed: AnAction.() -> Unit,
 ): AnAction {
     return object : AnAction(
@@ -17,7 +18,7 @@ inline fun simpleAction(
 }
 inline fun simpleAction(
     title: StringSource,
-    icon: IconSource? = null,
+    icon: ImageVector? = null,
     checkEnable: StateFlow<Boolean>,
     crossinline onActionPerformed: AnAction.() -> Unit,
 ): AnAction {

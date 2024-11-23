@@ -1,10 +1,6 @@
 package com.abdownloadmanager.utils.category
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.remember
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.fromUri
 import ir.amirab.util.wildcardMatch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -12,8 +8,6 @@ import kotlinx.serialization.Serializable
 /**
  * @param path
  * this is a default download path for this category
- * @param icon
- * can be used by [IconSource]
  */
 @Immutable
 @Serializable
@@ -22,8 +16,8 @@ data class Category(
     val id: Long,
     @SerialName("name")
     val name: String,
-    @SerialName("icon")
-    val icon: String,
+    @SerialName("iconType")
+    val iconType: CategoryIconType,
     @SerialName("path")
     // don't directly use this check for usePath first! see [getDownloadPath()]
     val path: String,
@@ -66,16 +60,5 @@ data class Category(
                 input = url
             )
         }
-    }
-}
-
-fun Category.iconSource(): IconSource? {
-    return IconSource.fromUri(icon)
-}
-
-@Composable
-fun Category.rememberIconPainter(): IconSource? {
-    return remember(icon) {
-        iconSource()
     }
 }

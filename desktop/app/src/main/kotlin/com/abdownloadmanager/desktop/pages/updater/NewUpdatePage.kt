@@ -2,7 +2,6 @@ package com.abdownloadmanager.desktop.pages.updater
 
 import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
@@ -22,6 +21,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
 import io.github.z4kn4fein.semver.Version
 import com.abdownloadmanager.updatechecker.VersionData
 
@@ -33,7 +34,7 @@ fun NewUpdatePage(
     cancel: () -> Unit,
 ) {
     WindowTitle("New Update")
-    WindowIcon(MyIcons.appIcon)
+    WindowIcon(icon = AbIcons.Colored.AppIcon)
     Column(
         Modifier
             .fillMaxSize()

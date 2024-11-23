@@ -14,13 +14,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.addDownload.single.MyTextFieldIcon
 import com.abdownloadmanager.desktop.pages.batchdownload.WildcardSelect.*
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.AddLink
+import com.abdownloadmanager.desktop.ui.icons.default.Clipboard
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.util.ifThen
@@ -31,9 +34,8 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.compose.LocalContentColor
 import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 
@@ -75,15 +77,18 @@ fun BatchDownload(
                                 .focusRequester(linkFocusRequester)
                                 .fillMaxWidth(),
                             start = {
-                                MyTextFieldIcon(MyIcons.link)
+                                MyTextFieldIcon(icon = AbIcons.Default.AddLink)
                             },
                             end = {
-                                MyTextFieldIcon(MyIcons.paste, {
-                                    val v = ClipboardUtil.read()
-                                    if (v != null) {
-                                        setLink(v)
+                                MyTextFieldIcon(
+                                    icon = AbIcons.Default.Clipboard,
+                                    onClick = {
+                                        val v = ClipboardUtil.read()
+                                        if (v != null) {
+                                            setLink(v)
+                                        }
                                     }
-                                })
+                                )
                             },
                             errorText = when (val v = validationResult) {
                                 BatchDownloadValidationResult.URLInvalid -> {
@@ -348,16 +353,19 @@ private fun BatchDownloadPageTextField(
 
 @Composable
 private fun MyTextFieldIcon(
-    icon: IconSource,
+    icon: ImageVector,
     onClick: (() -> Unit)? = null,
 ) {
-    MyIcon(icon, null, Modifier
-        .fillMaxHeight()
-        .ifThen(onClick != null) {
-            pointerHoverIcon(PointerIcon.Default)
-                .clickable { onClick?.invoke() }
-        }
-        .wrapContentHeight()
-        .padding(horizontal = 8.dp)
-        .size(16.dp))
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxHeight()
+            .ifThen(onClick != null) {
+                pointerHoverIcon(PointerIcon.Default)
+                    .clickable { onClick?.invoke() }
+            }
+            .wrapContentHeight()
+            .padding(horizontal = 8.dp)
+            .size(16.dp))
 }

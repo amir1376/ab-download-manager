@@ -5,11 +5,9 @@ import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownload
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemPage
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPage
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
-import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadEffects
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,8 +17,9 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import ir.amirab.util.compose.resources.myStringResource
 import java.awt.Dimension
 
@@ -57,7 +56,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
                     }
 //                    BringToFront()
                     WindowTitle(myStringResource(Res.string.add_download))
-                    WindowIcon(MyIcons.appIcon)
+                    WindowIcon(icon = AbIcons.Colored.AppIcon)
                     AddDownloadPage(addDownloadComponent)
                 }
             }
@@ -80,7 +79,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
                     }
 //                    BringToFront()
                     WindowTitle(myStringResource(Res.string.add_download))
-                    WindowIcon(MyIcons.appIcon)
+                    WindowIcon(icon = AbIcons.Colored.AppIcon)
                     AddMultiItemPage(addDownloadComponent)
                 }
             }

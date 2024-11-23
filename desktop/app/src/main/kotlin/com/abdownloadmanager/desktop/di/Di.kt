@@ -8,7 +8,6 @@ import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import ir.amirab.downloader.queue.QueueManager
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.*
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
@@ -38,7 +37,6 @@ import com.abdownloadmanager.updatechecker.UpdateChecker
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.FileIconProviderUsingCategoryIcons
 import com.abdownloadmanager.utils.category.*
-import com.abdownloadmanager.utils.compose.IMyIcons
 import com.abdownloadmanager.utils.proxy.IProxyStorage
 import com.abdownloadmanager.utils.proxy.ProxyData
 import com.abdownloadmanager.utils.proxy.ProxyManager
@@ -135,12 +133,10 @@ val downloadSystemModule = module {
         FileIconProviderUsingCategoryIcons(
             get(),
             get(),
-            MyIcons,
         )
     }.bind<FileIconProvider>()
     single {
         DefaultCategories(
-            icons = get(),
             getDefaultDownloadFolder = {
                 get<AppSettingsStorage>().defaultDownloadFolder.value
             }
@@ -227,9 +223,6 @@ val appModule = module {
     single {
         LanguageManager(get())
     }
-    single {
-        MyIcons
-    }.bind<IMyIcons>()
     single {
         ProxyDatastoreStorage(
             kotlinxSerializationDataStore(

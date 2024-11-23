@@ -15,14 +15,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.abdownloadmanager.desktop.pages.settings.configurable.ProxyConfigurable
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.WindowClose
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.utils.compose.widget.Icon
 import com.abdownloadmanager.utils.proxy.ProxyMode
 import com.abdownloadmanager.utils.proxy.ProxyRules
 import com.abdownloadmanager.utils.proxy.ProxyWithRules
@@ -374,10 +375,10 @@ private fun SettingsDialog(
                 fontSize = myTextSizes.lg,
                 fontWeight = FontWeight.Bold,
             )
-            MyIcon(
-                MyIcons.windowClose,
-                myStringResource(Res.string.close),
-                Modifier
+            Icon(
+                imageVector = AbIcons.Default.WindowClose,
+                contentDescription = myStringResource(Res.string.close),
+                modifier = Modifier
                     .clip(CircleShape)
                     .clickable { onDismiss() }
                     .padding(12.dp)

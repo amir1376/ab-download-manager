@@ -17,20 +17,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.ui.widget.menu.MyDropDown
 import com.abdownloadmanager.desktop.utils.div
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import ir.amirab.util.compose.IconSource
+import com.abdownloadmanager.utils.compose.widget.Icon
 
 @Composable
 fun IconPick(
-    selectedIcon: IconSource?,
-    icons: List<IconSource>,
-    onSelected: (IconSource) -> Unit,
+    selectedIcon: ImageVector?,
+    icons: List<ImageVector>,
+    onSelected: (ImageVector) -> Unit,
     onCancel: () -> Unit,
 ) {
     MyDropDown(
@@ -64,9 +64,9 @@ fun IconPick(
 @Composable
 private fun Content(
     modifier: Modifier,
-    selectedIcon: IconSource?,
-    icons: List<IconSource>,
-    onSelected: (IconSource) -> Unit,
+    selectedIcon: ImageVector?,
+    icons: List<ImageVector>,
+    onSelected: (ImageVector) -> Unit,
 ) {
     val state = rememberLazyListState()
     Box {
@@ -78,12 +78,12 @@ private fun Content(
                 val shape = RoundedCornerShape(6.dp)
                 items(icons.chunked(6)) { rowItems ->
                     Row {
-                        for (iconSource in rowItems) {
-                            val isSelected = selectedIcon == iconSource
-                            MyIcon(
-                                iconSource,
-                                null,
-                                Modifier
+                        for (icon in rowItems) {
+                            val isSelected = selectedIcon == icon
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null,
+                                modifier = Modifier
                                     .clip(shape)
                                     .ifThen(isSelected) {
                                         background(myColors.primary / 0.25f)
@@ -95,7 +95,7 @@ private fun Content(
                                         shape
                                     )
                                     .clickable {
-                                        onSelected(iconSource)
+                                        onSelected(icon)
                                     }
                                     .padding(8.dp)
                                     .size(24.dp),

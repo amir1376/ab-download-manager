@@ -3,8 +3,6 @@ package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 import com.abdownloadmanager.desktop.pages.settings.configurable.Configurable
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.WithContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.util.ifThen
@@ -31,7 +29,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
-
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Check
+import com.abdownloadmanager.desktop.ui.icons.default.Down
+import com.abdownloadmanager.desktop.ui.icons.default.QuestionMark
+import com.abdownloadmanager.utils.compose.widget.Icon
 
 @Composable
 fun <T> RenderSpinner(
@@ -86,7 +88,11 @@ fun <T> RenderSpinner(
                             .padding(vertical = borderWidth)
                             .width(borderWidth).background(myColors.onBackground / 10)
                     )
-                    MyIcon(MyIcons.down, null, Modifier.padding(4.dp).size(12.dp))
+                    Icon(
+                        imageVector = AbIcons.Default.Down,
+                        contentDescription = null,
+                        modifier = Modifier.padding(4.dp).size(12.dp)
+                    )
                 }
             }
         }
@@ -133,7 +139,11 @@ fun <T> RenderSpinner(
                                             Modifier.width(borderWidth)
                                         )
                                         if (selected) {
-                                            MyIcon(MyIcons.check, null, Modifier.padding(4.dp).size(12.dp))
+                                            Icon(
+                                                imageVector = AbIcons.Default.Check,
+                                                contentDescription = null,
+                                                modifier = Modifier.padding(4.dp).size(12.dp)
+                                            )
                                         }
                                     }
                                 }
@@ -305,10 +315,10 @@ private fun Help(
         showHelpContent = false
     }
     Column(modifier) {
-        MyIcon(
-            MyIcons.question,
-            "Hint",
-            Modifier
+        Icon(
+            imageVector = AbIcons.Default.QuestionMark,
+            contentDescription = "Hint",
+            modifier = Modifier
                 .clip(CircleShape)
                 .clickable {
                     showHelpContent = !showHelpContent

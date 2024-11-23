@@ -2,7 +2,8 @@ package com.abdownloadmanager.desktop.actions
 
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.di.Di
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Info
 import com.abdownloadmanager.desktop.ui.widget.MessageDialogType
 import ir.amirab.util.compose.action.AnAction
 import ir.amirab.util.compose.action.MenuItem
@@ -14,8 +15,8 @@ private val appComponent = Di.get<AppComponent>()
 
 val dummyException by lazy {
     simpleAction(
-        "Dummy Exception".asStringSource(),
-        MyIcons.info
+        title = "Dummy Exception".asStringSource(),
+        icon = AbIcons.Default.Info
     ) {
         error("This is a dummy exception that is thrown by developer")
     }
@@ -23,7 +24,7 @@ val dummyException by lazy {
 val dummyMessage by lazy {
     MenuItem.SubMenu(
         title = "Show Dialog Message".asStringSource(),
-        icon = MyIcons.info,
+        icon = AbIcons.Default.Info,
         items = listOf(
             MessageDialogType.Info,
             MessageDialogType.Error,
@@ -35,8 +36,8 @@ val dummyMessage by lazy {
 
 private fun createDummyMessage(type: MessageDialogType): AnAction {
     return simpleAction(
-        "$type Message".asStringSource(),
-        MyIcons.info,
+        title = "$type Message".asStringSource(),
+        icon = AbIcons.Default.Info,
     ) {
         appComponent.sendDialogNotification(
             type = type,

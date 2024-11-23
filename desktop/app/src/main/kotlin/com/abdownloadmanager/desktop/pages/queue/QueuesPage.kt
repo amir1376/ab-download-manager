@@ -5,9 +5,6 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderC
 import com.abdownloadmanager.utils.compose.LocalContentAlpha
 import com.abdownloadmanager.utils.compose.LocalContentColor
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.*
@@ -29,14 +26,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.*
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
@@ -134,9 +134,9 @@ private fun Actions(
     }
 }
 
-enum class QueueInfoPages(val title: StringSource, val icon: IconSource) {
-    Config(Res.string.config.asStringSource(), MyIcons.settings),
-    Items(Res.string.items.asStringSource(), MyIcons.queue),
+enum class QueueInfoPages(val title: StringSource, val icon: ImageVector) {
+    Config(Res.string.config.asStringSource(), AbIcons.Default.Settings),
+    Items(Res.string.items.asStringSource(), AbIcons.Default.Queue),
 }
 
 @Composable
@@ -238,7 +238,7 @@ fun RenderQueueItems(
             val hasSelections = selectedIds.isNotEmpty()
             val space = 4.dp
             IconActionButton(
-                icon = MyIcons.remove,
+                icon = AbIcons.Default.Delete,
                 contentDescription = myStringResource(Res.string.remove),
                 onClick = {
                     component.deleteItems()
@@ -247,7 +247,7 @@ fun RenderQueueItems(
             )
             Spacer(Modifier.weight(1f))
             IconActionButton(
-                icon = MyIcons.down,
+                icon = AbIcons.Default.Down,
                 contentDescription = myStringResource(Res.string.move_down),
                 onClick = {
                     component.moveDownItems()
@@ -256,7 +256,7 @@ fun RenderQueueItems(
             )
             Spacer(Modifier.width(space))
             IconActionButton(
-                icon = MyIcons.up,
+                icon = AbIcons.Default.Up,
                 contentDescription = myStringResource(Res.string.move_up),
                 onClick = {
                     component.moveUpItems()
@@ -375,10 +375,10 @@ private fun QueueListSection(
                     isSelected = isSelected,
                     onClick = { setSelected(s.id) }
                 ) {
-                    MyIcon(
-                        MyIcons.folder,
-                        null,
-                        Modifier.size(16.dp)
+                    Icon(
+                        imageVector = AbIcons.Default.Folder,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
@@ -419,7 +419,7 @@ private fun QueueListSection(
             horizontalArrangement = Arrangement.End
         ) {
             IconActionButton(
-                icon = MyIcons.add,
+                icon = AbIcons.Default.Plus,
                 contentDescription = myStringResource(Res.string.add_new_queue),
                 onClick = {
                     component.addQueue()
@@ -427,7 +427,7 @@ private fun QueueListSection(
             )
             spacer()
             IconActionButton(
-                icon = MyIcons.remove,
+                icon = AbIcons.Default.Delete,
                 contentDescription = myStringResource(Res.string.remove_queue),
                 enabled = component.canDeleteThisQueue(selectedItem),
                 onClick = {

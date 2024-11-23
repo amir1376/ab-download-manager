@@ -2,7 +2,6 @@ package com.abdownloadmanager.desktop.pages.home.sections
 
 import com.abdownloadmanager.desktop.pages.home.sections.SortIndicatorMode.*
 import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.*
@@ -19,10 +18,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.pages.category.toCategoryImageVector
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
@@ -100,12 +100,12 @@ fun NameCell(
     category: Category?,
     fileIconProvider: FileIconProvider,
 ) {
-    val fileIcon = fileIconProvider.rememberIcon(itemState.name)
+    val fileIcon = fileIconProvider.rememberCategoryIcon(itemState.name).toCategoryImageVector()
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        MyIcon(
-            icon = fileIcon,
+        Icon(
+            imageVector = fileIcon,
             modifier = Modifier.size(16.dp),
             contentDescription = null,
 //            tint = LocalContentColor.current / 75

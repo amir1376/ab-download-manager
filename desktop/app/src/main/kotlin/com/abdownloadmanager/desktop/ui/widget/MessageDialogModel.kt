@@ -3,8 +3,6 @@ package com.abdownloadmanager.desktop.ui.widget
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import androidx.compose.foundation.layout.*
@@ -19,6 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Info
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.StringSource
 import java.awt.Dimension
 import java.util.UUID
@@ -85,8 +86,8 @@ fun MessageDialog(
                 MessageDialogType.Success -> myColors.success
                 MessageDialogType.Warning -> myColors.warning
             }
-            MyIcon(
-                icon = MyIcons.info,
+            Icon(
+                imageVector = AbIcons.Default.Info,
                 tint = color,
                 modifier = Modifier
                     .padding(16.dp)

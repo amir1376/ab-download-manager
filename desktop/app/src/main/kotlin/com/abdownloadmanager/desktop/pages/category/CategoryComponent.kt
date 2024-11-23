@@ -1,13 +1,11 @@
 package com.abdownloadmanager.desktop.pages.category
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.BaseComponent
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.CategoryManager
-import com.abdownloadmanager.utils.category.iconSource
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.uriOrNull
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +34,7 @@ class CategoryComponent(
     fun loadCategoryData() {
         scope.launch {
             val category = categoryManager.getCategoryById(id) ?: return@launch
-            setIcon(category.iconSource())
+            setIcon(category.toCategoryImageVector())
             setName(category.name)
             setTypes(category.acceptedFileTypes.joinToString(" "))
             setUrlPatternsEnabled(category.acceptedUrlPatterns.isNotEmpty())
@@ -46,10 +44,10 @@ class CategoryComponent(
         }
     }
 
-    private val _icon = MutableStateFlow(null as IconSource?)
+    private val _icon = MutableStateFlow<ImageVector?>(null)
     val icon = _icon.asStateFlow()
-    fun setIcon(iconSource: IconSource?) {
-        _icon.value = iconSource
+    fun setIcon(imageVector: ImageVector?) {
+        _icon.value = imageVector
     }
 
     private val _name = MutableStateFlow("")
@@ -118,9 +116,7 @@ class CategoryComponent(
                     .split(" ")
                     .filterNot { it.isBlank() }
                     .distinct(),
-                icon = icon
-                    .value!!
-                    .uriOrNull()!!,
+                iconType = icon.value.toCategoryIconType(),
                 path = path,
                 usePath = usePath.value,
                 acceptedUrlPatterns = urlPatterns.value

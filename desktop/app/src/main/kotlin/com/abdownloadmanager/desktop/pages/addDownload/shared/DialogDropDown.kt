@@ -23,16 +23,17 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Check
+import com.abdownloadmanager.desktop.ui.icons.default.Down
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.ui.widget.Text
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 import java.awt.MouseInfo
 
@@ -141,10 +142,10 @@ fun <T> DropDownContent(
                                 }
                                 val selectedIconModifier = Modifier.size(16.dp)
                                 if (isSelected) {
-                                    MyIcon(
-                                        MyIcons.check,
-                                        null,
-                                        selectedIconModifier,
+                                    Icon(
+                                        imageVector = AbIcons.Default.Check,
+                                        contentDescription = null,
+                                        modifier = selectedIconModifier,
                                     )
                                 } else {
                                     Spacer(selectedIconModifier)
@@ -222,10 +223,10 @@ private fun <T> DropDownHeader(
                 .width(1.dp)
                 .background(borderColor)
         )
-        MyIcon(
-            MyIcons.down,
-            null,
-            Modifier
+        Icon(
+            imageVector = AbIcons.Default.Down,
+            contentDescription = null,
+            modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .size(16.dp),
         )

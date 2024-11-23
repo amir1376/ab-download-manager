@@ -1,7 +1,5 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.utils.div
@@ -17,7 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.compose.widget.Icon
 
 @Composable
 fun alphaFlicker(): Float {
@@ -27,7 +27,7 @@ fun alphaFlicker(): Float {
 
 @Composable
 fun IconActionButton(
-    icon: IconSource,
+    icon: ImageVector,
     contentDescription: String,
     indicateActive: Boolean = false,
     requiresAttention: Boolean = false,
@@ -59,10 +59,10 @@ fun IconActionButton(
             }
             .padding(6.dp)
     ) {
-        MyIcon(
-            icon,
-            contentDescription,
-            Modifier
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            modifier = Modifier
                 .size(16.dp)
         )
     }

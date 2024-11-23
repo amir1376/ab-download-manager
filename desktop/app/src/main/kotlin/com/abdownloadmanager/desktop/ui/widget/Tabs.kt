@@ -1,7 +1,5 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.utils.compose.WithContentAlpha
@@ -14,7 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.StringSource
 
 
@@ -32,7 +32,7 @@ fun MyTabRow(content: @Composable RowScope.() -> Unit) {
 fun MyTab(
     selected: Boolean,
     onClick: () -> Unit,
-    icon: IconSource,
+    icon: ImageVector,
     title: StringSource,
     selectionBackground: Color = myColors.background,
 ) {
@@ -55,7 +55,7 @@ fun MyTab(
                 .padding(vertical = 6.dp)
 
         ) {
-            MyIcon(icon, null, Modifier.size(16.dp))
+            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(4.dp))
             Text(title.rememberString(), maxLines = 1, fontSize = myTextSizes.base)
         }

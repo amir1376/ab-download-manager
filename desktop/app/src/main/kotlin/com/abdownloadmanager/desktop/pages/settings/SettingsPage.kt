@@ -4,9 +4,6 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderC
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.widget.Handle
 import com.abdownloadmanager.desktop.ui.widget.Text
@@ -20,13 +17,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
-import kotlinx.coroutines.channels.ticker
 
 @Composable
 private fun SideBar(
@@ -60,7 +59,7 @@ private fun SideBar(
 }
 
 @Composable
-private fun SideBarItem(icon: IconSource, name: String, isSelected: Boolean, onClick: () -> Unit) {
+private fun SideBarItem(icon: ImageVector, name: String, isSelected: Boolean, onClick: () -> Unit) {
     val shape = RoundedCornerShape(12.dp)
     WithContentAlpha(if (isSelected) 1f else 0.75f) {
         Row(
@@ -85,7 +84,7 @@ private fun SideBarItem(icon: IconSource, name: String, isSelected: Boolean, onC
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            MyIcon(icon, null, Modifier.size(16.dp))
+            Icon(icon, null, Modifier.size(16.dp))
             Spacer(Modifier.width(8.dp))
             Text(
                 name,
@@ -106,7 +105,7 @@ fun SettingsPage(
 ) {
     WindowTitle(myStringResource(Res.string.settings))
 //    WindowIcon(MyIcons.settings)
-    WindowIcon(MyIcons.appIcon)
+    WindowIcon(icon = AbIcons.Colored.AppIcon)
     Row {
         var sideBarWidth by remember { mutableStateOf(250.dp) }
         SideBar(settingsComponent, Modifier.fillMaxHeight().width(sideBarWidth))

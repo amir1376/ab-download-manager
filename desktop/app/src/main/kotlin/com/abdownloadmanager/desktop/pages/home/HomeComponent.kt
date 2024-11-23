@@ -6,7 +6,6 @@ import com.abdownloadmanager.desktop.pages.home.sections.DownloadListCells
 import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
 import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadStatusCategoryFilter
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.widget.NotificationType
 import com.abdownloadmanager.desktop.ui.widget.customtable.Sort
 import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
@@ -22,6 +21,19 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Copy
+import com.abdownloadmanager.desktop.ui.icons.default.Delete
+import com.abdownloadmanager.desktop.ui.icons.default.Edit
+import com.abdownloadmanager.desktop.ui.icons.default.File
+import com.abdownloadmanager.desktop.ui.icons.default.Folder
+import com.abdownloadmanager.desktop.ui.icons.default.Info
+import com.abdownloadmanager.desktop.ui.icons.default.Pause
+import com.abdownloadmanager.desktop.ui.icons.default.Plus
+import com.abdownloadmanager.desktop.ui.icons.default.Refresh
+import com.abdownloadmanager.desktop.ui.icons.default.Resume
+import com.abdownloadmanager.desktop.ui.icons.default.Settings
+import com.abdownloadmanager.desktop.ui.icons.default.Undo
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.FileIconProvider
@@ -107,7 +119,7 @@ class DownloadActions(
     }
     val openFileAction = simpleAction(
         title = Res.string.open.asStringSource(),
-        icon = MyIcons.fileOpen,
+        icon = AbIcons.Default.File,
         checkEnable = defaultItem.mapStateFlow {
             it?.statusOrFinished() is DownloadJobStatus.Finished
         },
@@ -121,7 +133,7 @@ class DownloadActions(
 
     val openFolderAction = simpleAction(
         title = Res.string.open_folder.asStringSource(),
-        icon = MyIcons.folderOpen,
+        icon = AbIcons.Default.Folder,
         checkEnable = defaultItem.mapStateFlow {
             it?.statusOrFinished() is DownloadJobStatus.Finished
         },
@@ -135,7 +147,7 @@ class DownloadActions(
 
     val deleteAction = simpleAction(
         title = Res.string.delete.asStringSource(),
-        icon = MyIcons.remove,
+        icon = AbIcons.Default.Delete,
         checkEnable = selections.mapStateFlow { it.isNotEmpty() },
         onActionPerformed = {
             scope.launch {
@@ -146,7 +158,7 @@ class DownloadActions(
 
     val resumeAction = simpleAction(
         title = Res.string.resume.asStringSource(),
-        icon = MyIcons.resume,
+        icon = AbIcons.Default.Resume,
         checkEnable = resumableSelections.mapStateFlow {
             it.isNotEmpty()
         },
@@ -162,8 +174,8 @@ class DownloadActions(
     )
 
     val reDownloadAction = simpleAction(
-        Res.string.restart_download.asStringSource(),
-        MyIcons.refresh
+        title = Res.string.restart_download.asStringSource(),
+        icon = AbIcons.Default.Refresh
     ) {
         scope.launch {
             selections.value.forEach {
@@ -179,7 +191,7 @@ class DownloadActions(
 
     val pauseAction = simpleAction(
         title = Res.string.pause.asStringSource(),
-        icon = MyIcons.pause,
+        icon = AbIcons.Default.Pause,
         checkEnable = pausableSelections.mapStateFlow {
             it.isNotEmpty()
         },
@@ -195,7 +207,7 @@ class DownloadActions(
     )
     val editDownloadAction = simpleAction(
         title = Res.string.edit.asStringSource(),
-        icon = MyIcons.edit,
+        icon = AbIcons.Default.Edit,
         checkEnable = defaultItem.mapStateFlow {
             it ?: return@mapStateFlow false
             it.statusOrFinished() !is DownloadJobStatus.IsActive
@@ -210,7 +222,7 @@ class DownloadActions(
 
     val copyDownloadLinkAction = simpleAction(
         title = Res.string.copy_link.asStringSource(),
-        icon = MyIcons.copy,
+        icon = AbIcons.Default.Copy,
         checkEnable =
         selections.mapStateFlow { it.isNotEmpty() },
         onActionPerformed = {
@@ -224,7 +236,10 @@ class DownloadActions(
         }
     )
 
-    val openDownloadDialogAction = simpleAction(Res.string.show_properties.asStringSource(), MyIcons.info) {
+    val openDownloadDialogAction = simpleAction(
+        title = Res.string.show_properties.asStringSource(),
+        icon = AbIcons.Default.Info
+    ) {
         selections.value.map { it.id }
             .forEach { id ->
                 downloadDialogManager.openDownloadDialog(id)
@@ -314,7 +329,7 @@ class CategoryActions(
 
     val openCategoryFolderAction = simpleAction(
         title = Res.string.open_folder.asStringSource(),
-        icon = MyIcons.folderOpen,
+        icon = AbIcons.Default.Folder,
         checkEnable = canBeOpened,
         onActionPerformed = {
             scope.launch {
@@ -327,7 +342,7 @@ class CategoryActions(
 
     val deleteAction = simpleAction(
         title = Res.string.delete_category.asStringSource(),
-        icon = MyIcons.remove,
+        icon = AbIcons.Default.Delete,
         checkEnable = mainItemExists,
         onActionPerformed = {
             scope.launch {
@@ -339,7 +354,7 @@ class CategoryActions(
     )
     val editAction = simpleAction(
         title = Res.string.edit_category.asStringSource(),
-        icon = MyIcons.settings,
+        icon = AbIcons.Default.Settings,
         checkEnable = mainItemExists,
         onActionPerformed = {
             scope.launch {
@@ -352,7 +367,7 @@ class CategoryActions(
 
     val addCategoryAction = simpleAction(
         title = Res.string.add_category.asStringSource(),
-        icon = MyIcons.add,
+        icon = AbIcons.Default.Plus,
         onActionPerformed = {
             scope.launch {
                 onRequestAddCategory()
@@ -361,7 +376,7 @@ class CategoryActions(
     )
     val categorizeItemsAction = simpleAction(
         title = Res.string.auto_categorize_downloads.asStringSource(),
-        icon = MyIcons.refresh,
+        icon = AbIcons.Default.Refresh,
         onActionPerformed = {
             scope.launch {
                 onRequestCategorizeItems()
@@ -370,7 +385,7 @@ class CategoryActions(
     )
     val resetToDefaultAction = simpleAction(
         title = Res.string.restore_defaults.asStringSource(),
-        icon = MyIcons.undo,
+        icon = AbIcons.Default.Undo,
         checkEnable = categoryManager
             .categoriesFlow
             .mapStateFlow { !defaultCategories.isDefault(it) },
@@ -534,7 +549,7 @@ class HomeComponent(
             separator()
             subMenu(
                 title = Res.string.delete.asStringSource(),
-                icon = MyIcons.remove
+                icon = AbIcons.Default.Delete
             ) {
                 item(Res.string.all_finished.asStringSource()) {
                     requestDelete(downloadSystem.getFinishedDownloadIds())

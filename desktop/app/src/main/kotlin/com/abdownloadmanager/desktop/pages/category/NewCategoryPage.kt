@@ -11,10 +11,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.addDownload.single.MyTextFieldIcon
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.AddLink
+import com.abdownloadmanager.desktop.ui.icons.default.Check
+import com.abdownloadmanager.desktop.ui.icons.default.Clear
+import com.abdownloadmanager.desktop.ui.icons.default.Clipboard
+import com.abdownloadmanager.desktop.ui.icons.default.Color
+import com.abdownloadmanager.desktop.ui.icons.default.Copy
+import com.abdownloadmanager.desktop.ui.icons.default.Delete
+import com.abdownloadmanager.desktop.ui.icons.default.DownSpeed
+import com.abdownloadmanager.desktop.ui.icons.default.Earth
+import com.abdownloadmanager.desktop.ui.icons.default.ExternalLink
+import com.abdownloadmanager.desktop.ui.icons.default.File
+import com.abdownloadmanager.desktop.ui.icons.default.Folder
+import com.abdownloadmanager.desktop.ui.icons.default.Group
+import com.abdownloadmanager.desktop.ui.icons.default.Info
+import com.abdownloadmanager.desktop.ui.icons.default.List
+import com.abdownloadmanager.desktop.ui.icons.default.Lock
+import com.abdownloadmanager.desktop.ui.icons.default.Network
+import com.abdownloadmanager.desktop.ui.icons.default.Pause
+import com.abdownloadmanager.desktop.ui.icons.default.Plus
+import com.abdownloadmanager.desktop.ui.icons.default.QuestionMark
+import com.abdownloadmanager.desktop.ui.icons.default.Queue
+import com.abdownloadmanager.desktop.ui.icons.default.Resume
+import com.abdownloadmanager.desktop.ui.icons.default.Search
+import com.abdownloadmanager.desktop.ui.icons.default.Settings
+import com.abdownloadmanager.desktop.ui.icons.default.Share
+import com.abdownloadmanager.desktop.ui.icons.default.Speaker
+import com.abdownloadmanager.desktop.ui.icons.default.Stop
+import com.abdownloadmanager.desktop.ui.icons.default.VerticalDirection
+import com.abdownloadmanager.desktop.ui.icons.filetype.FileApplication
+import com.abdownloadmanager.desktop.ui.icons.filetype.FileDocument
+import com.abdownloadmanager.desktop.ui.icons.filetype.FileMusic
+import com.abdownloadmanager.desktop.ui.icons.filetype.FilePicture
+import com.abdownloadmanager.desktop.ui.icons.filetype.FileUnknown
+import com.abdownloadmanager.desktop.ui.icons.filetype.FileVideo
+import com.abdownloadmanager.desktop.ui.icons.filetype.FileZip
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.util.ifThen
@@ -22,11 +58,9 @@ import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.utils.compose.widget.Icon
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.LocalWindow
 import java.io.File
@@ -56,7 +90,7 @@ fun NewCategory(
         ) {
             Row {
                 CategoryIcon(
-                    iconSource = categoryComponent.icon.collectAsState().value,
+                    icon = categoryComponent.icon.collectAsState().value,
                     onChange = categoryComponent::setIcon
                 )
                 Spacer(Modifier.width(16.dp))
@@ -154,7 +188,7 @@ fun CategoryDefaultPath(
             errorText = null,
             end = {
                 MyTextFieldIcon(
-                    MyIcons.folder,
+                    icon = AbIcons.Default.Folder,
                     enabled = checked,
                 ) {
                     downloadFolderPickerLauncher.launch()
@@ -279,8 +313,8 @@ private fun OptionalWithLabel(
 
 @Composable
 private fun CategoryIcon(
-    iconSource: IconSource?,
-    onChange: (IconSource) -> Unit,
+    icon: ImageVector?,
+    onChange: (ImageVector) -> Unit,
 ) {
     var showIconPicker by remember {
         mutableStateOf(false)
@@ -289,57 +323,57 @@ private fun CategoryIcon(
         myStringResource(Res.string.icon)
     ) {
         RenderIcon(
-            icon = iconSource,
-            requiresAttention = iconSource == null,
+            icon = icon,
+            requiresAttention = icon == null,
             onClick = {
                 showIconPicker = !showIconPicker
             }
         )
         if (showIconPicker) {
             IconPick(
-                selectedIcon = iconSource,
+                selectedIcon = icon,
                 icons = listOf(
-                    MyIcons.pictureFile,
-                    MyIcons.musicFile,
-                    MyIcons.zipFile,
-                    MyIcons.videoFile,
-                    MyIcons.applicationFile,
-                    MyIcons.documentFile,
-                    MyIcons.otherFile,
+                    AbIcons.FileType.FilePicture,
+                    AbIcons.FileType.FileMusic,
+                    AbIcons.FileType.FileZip,
+                    AbIcons.FileType.FileVideo,
+                    AbIcons.FileType.FileApplication,
+                    AbIcons.FileType.FileDocument,
+                    AbIcons.FileType.FileUnknown,
 
-                    MyIcons.file,
-                    MyIcons.folder,
+                    AbIcons.Default.File,
+                    AbIcons.Default.Folder,
 
-                    MyIcons.browserIntegration,
-                    MyIcons.appearance,
+                    AbIcons.Default.Earth,
+                    AbIcons.Default.Color,
 
-                    MyIcons.settings,
-                    MyIcons.search,
-                    MyIcons.info,
-                    MyIcons.check,
-                    MyIcons.link,
-                    MyIcons.download,
-                    MyIcons.speaker,
-                    MyIcons.group,
-                    MyIcons.activeCount,
-                    MyIcons.speed,
-                    MyIcons.resume,
-                    MyIcons.pause,
-                    MyIcons.stop,
-                    MyIcons.queue,
-                    MyIcons.remove,
-                    MyIcons.clear,
-                    MyIcons.add,
-                    MyIcons.paste,
-                    MyIcons.copy,
-                    MyIcons.refresh,
-                    MyIcons.share,
-                    MyIcons.lock,
-                    MyIcons.question,
-                    MyIcons.verticalDirection,
-                    MyIcons.downloadEngine,
-                    MyIcons.network,
-                    MyIcons.externalLink,
+                    AbIcons.Default.Settings,
+                    AbIcons.Default.Search,
+                    AbIcons.Default.Info,
+                    AbIcons.Default.Check,
+                    AbIcons.Default.AddLink,
+                    AbIcons.Default.DownSpeed,
+                    AbIcons.Default.Speaker,
+                    AbIcons.Default.Group,
+                    AbIcons.Default.List,
+                    AbIcons.Default.DownSpeed,
+                    AbIcons.Default.Resume,
+                    AbIcons.Default.Pause,
+                    AbIcons.Default.Stop,
+                    AbIcons.Default.Queue,
+                    AbIcons.Default.Delete,
+                    AbIcons.Default.Clear,
+                    AbIcons.Default.Plus,
+                    AbIcons.Default.Clipboard,
+                    AbIcons.Default.Copy,
+                    AbIcons.Default.Resume,
+                    AbIcons.Default.Share,
+                    AbIcons.Default.Lock,
+                    AbIcons.Default.QuestionMark,
+                    AbIcons.Default.VerticalDirection,
+                    AbIcons.Default.DownSpeed,
+                    AbIcons.Default.Network,
+                    AbIcons.Default.ExternalLink,
                 ),
                 onSelected = {
                     onChange(it)
@@ -356,7 +390,7 @@ private fun CategoryIcon(
 
 @Composable
 private fun RenderIcon(
-    icon: IconSource?,
+    icon: ImageVector?,
     indicateActive: Boolean = false,
     requiresAttention: Boolean = false,
     onClick: () -> Unit,
@@ -386,10 +420,10 @@ private fun RenderIcon(
         val modifier = Modifier
             .size(20.dp)
         if (icon != null) {
-            MyIcon(
-                icon,
-                null,
-                modifier,
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = modifier,
             )
         } else {
             Spacer(modifier)

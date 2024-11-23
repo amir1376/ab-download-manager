@@ -16,11 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
 import com.abdownloadmanager.desktop.pages.settings.configurable.Configurable
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.QuestionMark
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.utils.compose.WithContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.utils.compose.widget.Icon
 
 @Composable
 fun Help(
@@ -31,10 +32,10 @@ fun Help(
         showHelpContent = false
     }
     Column {
-        MyIcon(
-            MyIcons.question,
-            "Hint",
-            Modifier
+        Icon(
+            imageVector = AbIcons.Default.QuestionMark,
+            contentDescription = "Hint",
+            modifier = Modifier
                 .clip(CircleShape)
                 .clickable {
                     showHelpContent = !showHelpContent

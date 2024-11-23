@@ -4,9 +4,6 @@ import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.desktop.pages.home.sections.category.*
 import com.abdownloadmanager.utils.compose.WithContentAlpha
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.*
@@ -39,15 +36,19 @@ import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.window.Dialog
+import com.abdownloadmanager.desktop.pages.category.toCategoryImageVector
 import com.abdownloadmanager.desktop.ui.customwindow.*
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.DownSpeed
+import com.abdownloadmanager.desktop.ui.icons.default.List
 import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.rememberIconPainter
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.action.MenuItem
@@ -568,10 +569,10 @@ fun DragWidget(
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        MyIcon(
-            MyIcons.download,
-            null,
-            Modifier.size(36.dp),
+        Icon(
+            imageVector = AbIcons.Default.DownSpeed,
+            contentDescription = null,
+            modifier = Modifier.size(36.dp),
         )
         Text(
             text = myStringResource(Res.string.drop_link_or_file_here),
@@ -669,9 +670,9 @@ fun CategoryOption(
 ) {
     ShowOptionsInDropDown(
         MenuItem.SubMenu(
-            icon = categoryOptionMenuState.categoryItem?.rememberIconPainter(),
+            icon = categoryOptionMenuState.categoryItem?.toCategoryImageVector(),
             title = categoryOptionMenuState.categoryItem?.name.orEmpty().asStringSource(),
-            categoryOptionMenuState.menu,
+            items = categoryOptionMenuState.menu,
         ),
         onDismiss
     )
@@ -697,7 +698,7 @@ private fun Footer(component: HomeComponent) {
     ) {
         Spacer(Modifier.weight(1f))
         val activeCount by component.activeDownloadCountFlow.collectAsState()
-        FooterItem(MyIcons.activeCount, activeCount.toString(), "")
+        FooterItem(icon = AbIcons.Default.List, value = activeCount.toString(), unit = "")
         val size by component.globalSpeedFlow.collectAsState(0)
         val speed = baseConvertBytesToHumanReadable(size)
         if (speed != null) {
@@ -707,16 +708,16 @@ private fun Footer(component: HomeComponent) {
                     "$it/s"
                 }
                 .orEmpty()
-            FooterItem(MyIcons.speed, speedText, unitText)
+            FooterItem(AbIcons.Default.DownSpeed, speedText, unitText)
         }
     }
 }
 
 @Composable
-private fun FooterItem(icon: IconSource, value: String, unit: String) {
+private fun FooterItem(icon: ImageVector, value: String, unit: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         WithContentAlpha(0.25f) {
-            MyIcon(icon, null, Modifier.size(16.dp))
+            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(16.dp))
         }
         Spacer(Modifier.width(8.dp))
         WithContentAlpha(0.75f) {

@@ -2,17 +2,15 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.onClick
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.pages.category.toCategoryImageVector
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Check
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
@@ -21,7 +19,7 @@ import com.abdownloadmanager.desktop.utils.convertSizeToHumanReadable
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.compose.WithContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.util.compose.resources.myStringResource
 
@@ -112,9 +110,10 @@ private fun RenderName(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                MyIcon(
-                    MyIcons.check, null,
-                    Modifier.size(24.dp)
+                Icon(
+                    imageVector = AbIcons.Default.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
@@ -143,8 +142,10 @@ private fun RenderFileIconAndSize(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        MyIcon(
-            icon = component.fileIconProvider.rememberIcon(itemState.name),
+        Icon(
+            imageVector = component.fileIconProvider
+                .rememberCategoryIcon(itemState.name)
+                .toCategoryImageVector(),
             contentDescription = null,
             modifier = Modifier.size(24.dp),
         )

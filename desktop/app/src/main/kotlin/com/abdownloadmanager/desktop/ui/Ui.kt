@@ -11,7 +11,6 @@ import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
 import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
 import com.abdownloadmanager.desktop.pages.settings.SettingWindow
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialogs
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.ABDownloaderTheme
 import com.abdownloadmanager.desktop.ui.widget.tray.ComposeTray
 import com.abdownloadmanager.desktop.utils.AppInfo
@@ -29,6 +28,8 @@ import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
 import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.utils.compose.ProvideDebugInfo
 import ir.amirab.util.compose.localizationmanager.LanguageManager
@@ -129,7 +130,7 @@ private fun ApplicationScope.SystemTray(
     trayState: TrayState,
 ) {
     ComposeTray(
-        icon = MyIcons.appIcon.rememberPainter(),
+        icon = AbIcons.Colored.AppIcon,
         onClick = showDownloadList,
         tooltip = "Ab Download Manager",
         state = trayState,

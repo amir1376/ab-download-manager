@@ -2,8 +2,6 @@ package com.abdownloadmanager.desktop.ui.widget.menu
 
 import com.abdownloadmanager.desktop.actions.LocalShortCutManager
 import com.abdownloadmanager.utils.compose.ProvideTextStyle
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.util.ifThen
@@ -33,6 +31,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Next
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.modifiers.autoMirror
 import javax.swing.KeyStroke
 
@@ -200,6 +201,7 @@ private fun ReactableItem(
     val iconModifier = Modifier.size(16.dp)
     val title by item.title.collectAsState()
     val icon by item.icon.collectAsState()
+    val image by item.image.collectAsState()
     val itemPadding = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isEnabled = (item as? MenuItem.HasEnable)
@@ -230,7 +232,16 @@ private fun ReactableItem(
         icon.let { icon ->
             if (icon != null) {
                 Spacer(Modifier.width(4.dp))
-                MyIcon(icon, null, iconModifier)
+                Icon(icon, null, iconModifier)
+                Spacer(Modifier.width(8.dp))
+            } else {
+                Spacer(iconModifier)
+            }
+        }
+        image.let { image ->
+            if (image != null) {
+                Spacer(Modifier.width(4.dp))
+                Image(image, null, iconModifier)
                 Spacer(Modifier.width(8.dp))
             } else {
                 Spacer(iconModifier)
@@ -318,10 +329,10 @@ fun RenderSubMenuItem(
         },
         isSelected = isSelected,
         extraContent = {
-            MyIcon(
-                MyIcons.next,
-                null,
-                Modifier
+            Icon(
+                imageVector = AbIcons.Default.Next,
+                contentDescription = null,
+                modifier = Modifier
                     .size(16.dp)
                     .autoMirror(),
             )

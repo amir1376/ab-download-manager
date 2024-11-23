@@ -1,7 +1,5 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.MyTextField
@@ -20,8 +18,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Clear
+import com.abdownloadmanager.desktop.ui.icons.default.Search
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -46,10 +47,10 @@ fun SearchBox(
             WithContentAlpha(
                 animateFloatAsState(if (text.isBlank()) 0.9f else 1f).value
             ) {
-                MyIcon(
-                    MyIcons.search,
-                    myStringResource(Res.string.search),
-                    Modifier
+                Icon(
+                    imageVector = AbIcons.Default.Search,
+                    contentDescription = myStringResource(Res.string.search),
+                    modifier = Modifier
                         .padding(start = 8.dp)
                         .size(16.dp)
                 )
@@ -57,10 +58,10 @@ fun SearchBox(
         },
         end = {
             AnimatedContent(text.isNotBlank()) {
-                MyIcon(
-                    MyIcons.clear,
-                    myStringResource(Res.string.clear),
-                    Modifier
+                Icon(
+                    imageVector = AbIcons.Default.Clear,
+                    contentDescription = myStringResource(Res.string.clear),
+                    modifier = Modifier
                         .padding(end = 8.dp)
                         .clip(CircleShape)
                         .pointerHoverIcon(PointerIcon.Default)

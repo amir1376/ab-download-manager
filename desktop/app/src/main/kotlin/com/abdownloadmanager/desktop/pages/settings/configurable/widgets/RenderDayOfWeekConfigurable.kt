@@ -1,8 +1,6 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.DayOfWeekConfigurable
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.util.ifThen
@@ -18,8 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Check
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.StringSource
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.asStringSource
 import kotlinx.datetime.DayOfWeek
 import java.time.DayOfWeek.*
@@ -104,10 +104,10 @@ fun RenderDayOfWeek(
             .padding(horizontal = 4.dp)
 
     ) {
-        MyIcon(
-            MyIcons.check,
-            null,
-            Modifier.size(8.dp)
+        Icon(
+            imageVector = AbIcons.Default.Check,
+            contentDescription = null,
+            modifier = Modifier.size(8.dp)
                 .alpha(if (selected) 1f else 0f),
         )
         Spacer(Modifier.width(2.dp))

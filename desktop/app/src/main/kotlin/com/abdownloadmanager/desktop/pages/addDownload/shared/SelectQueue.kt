@@ -2,7 +2,6 @@ package com.abdownloadmanager.desktop.pages.addDownload.shared
 
 import com.abdownloadmanager.desktop.actions.newQueueAction
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
@@ -24,8 +23,9 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Plus
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.queue.DownloadQueue
 import java.awt.MouseInfo
@@ -140,7 +140,7 @@ fun ShowAddToQueueDialog(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ){
                             IconActionButton(
-                                MyIcons.add,
+                                icon = AbIcons.Default.Plus,
                                 contentDescription = myStringResource(Res.string.add_new_queue),
                                 onClick = newQueueAction
                             )

@@ -1,7 +1,5 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.utils.compose.WithContentAlpha
@@ -21,6 +19,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Info
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.*
@@ -191,8 +192,8 @@ fun LoadingIcon(modifier: Modifier, percent: Int?) {
 
 @Composable
 private fun InfoIcon(modifier: Modifier, color: Color) {
-    MyIcon(
-        icon = MyIcons.info,
+    Icon(
+        imageVector = AbIcons.Default.Info,
         contentDescription = null,
         modifier = modifier,
         tint = color,

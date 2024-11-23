@@ -4,8 +4,6 @@ import com.abdownloadmanager.desktop.pages.home.sections.SortIndicatorMode
 import com.abdownloadmanager.desktop.pages.home.sections.isAscending
 import com.abdownloadmanager.desktop.pages.home.sections.isDescending
 import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.util.ifThen
@@ -27,7 +25,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberCursorPositionProvider
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Down
+import com.abdownloadmanager.desktop.ui.icons.default.Sort123
+import com.abdownloadmanager.desktop.ui.icons.default.Sort321
+import com.abdownloadmanager.desktop.ui.icons.default.Undo
+import com.abdownloadmanager.desktop.ui.icons.default.Up
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 import kotlinx.coroutines.flow.*
 
@@ -251,8 +256,8 @@ private fun <T, C : TableCell<T>> ShowColumnConfigMenu(
                 )
                 Spacer(Modifier.width(8.dp))
                 IconActionButton(
-                    MyIcons.undo,
-                    myStringResource(Res.string.reset),
+                    icon = AbIcons.Default.Undo,
+                    contentDescription = myStringResource(Res.string.reset),
                     onClick = {
                         tableState.reset()
                     }
@@ -306,18 +311,18 @@ private fun <T, Cell : TableCell<T>> CellConfigItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            MyIcon(
-                MyIcons.up,
-                null,
-                Modifier
+            Icon(
+                imageVector = AbIcons.Default.Up,
+                contentDescription = null,
+                modifier = Modifier
                     .size(12.dp)
                     .clickable {
                         move(true)
                     })
-            MyIcon(
-                MyIcons.down,
-                null,
-                Modifier
+            Icon(
+                imageVector = AbIcons.Default.Down,
+                contentDescription = null,
+                modifier = Modifier
                     .size(12.dp)
                     .clickable {
                         move(false)
@@ -424,10 +429,10 @@ fun SortIndicator(
         val passiveAlpha = color / 0.25f
         val activeAlpha = color / 0.75f
 //        val activeAlpha=(currentAlpha + 0.5f).coerceAtMost(1f)
-        MyIcon(
-            MyIcons.sortUp,
-            null,
-            Modifier
+        Icon(
+            imageVector = AbIcons.Default.Sort321,
+            contentDescription = null,
+            modifier = Modifier
                 .size(size),
             tint = if (mode.isAscending()) {
                 activeAlpha
@@ -435,10 +440,10 @@ fun SortIndicator(
                 passiveAlpha
             }
         )
-        MyIcon(
-            MyIcons.sortDown,
-            null,
-            Modifier
+        Icon(
+            imageVector = AbIcons.Default.Sort123,
+            contentDescription = null,
+            modifier = Modifier
                 .size(size),
             tint = if (mode.isDescending()) {
                 activeAlpha

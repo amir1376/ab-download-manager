@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.pages.home
 
-import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.util.ifThen
@@ -17,7 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.compose.widget.Icon
 
 @Composable
 fun Actions(list: List<MenuItem>) {
@@ -82,9 +83,21 @@ private fun ActionButton(
         WithContentColor(myColors.onBackground) {
             WithContentAlpha(1f) {
                 val icon by action.icon.collectAsState()
+                val image by action.image.collectAsState()
                 val title by action.title.collectAsState()
                 icon?.let {
-                    MyIcon(it, null, Modifier.size(16.dp))
+                    Icon(
+                        imageVector = it,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                image?.let {
+                    Image(
+                        imageVector = it,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
                 Spacer(Modifier.size(2.dp))
                 Text(title.rememberString(), maxLines = 1, fontSize = myTextSizes.sm)
@@ -115,9 +128,21 @@ private fun GroupActionButton(
             WithContentColor(myColors.onBackground) {
                 WithContentAlpha(1f) {
                     val icon by action.icon.collectAsState()
+                    val image by action.image.collectAsState()
                     val title by action.title.collectAsState()
                     icon?.let {
-                        MyIcon(it, null, Modifier.size(16.dp))
+                        Icon(
+                            imageVector = it,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                    image?.let {
+                        Image(
+                            imageVector = it,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                     Spacer(Modifier.size(2.dp))
                     Text(title.rememberString(), maxLines = 1, fontSize = myTextSizes.sm)

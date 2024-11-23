@@ -3,9 +3,6 @@ package com.abdownloadmanager.desktop.pages.addDownload.single
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.WithContentColor
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.*
@@ -25,14 +22,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.*
+import com.abdownloadmanager.desktop.pages.category.toCategoryImageVector
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Check
+import com.abdownloadmanager.desktop.ui.icons.default.Clear
+import com.abdownloadmanager.desktop.ui.icons.default.Clipboard
+import com.abdownloadmanager.desktop.ui.icons.default.Lock
+import com.abdownloadmanager.desktop.ui.icons.default.QuestionMark
+import com.abdownloadmanager.desktop.ui.icons.default.Refresh
+import com.abdownloadmanager.desktop.ui.icons.default.Settings
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.compose.asStringSource
@@ -367,15 +375,15 @@ fun RenderResumeSupport(component: AddSingleDownloadComponent) {
                         .padding(horizontal = 2.dp)
                         .size(10.dp)
                     if (fileInfo.resumeSupport) {
-                        MyIcon(
-                            icon = MyIcons.check,
+                        Icon(
+                            imageVector = AbIcons.Default.Check,
                             contentDescription = null,
                             modifier = iconModifier,
                             tint = myColors.success
                         )
                     } else {
-                        MyIcon(
-                            icon = MyIcons.clear,
+                        Icon(
+                            imageVector = AbIcons.Default.Clear,
                             contentDescription = null,
                             modifier = iconModifier,
                             tint = myColors.error,
@@ -437,13 +445,16 @@ private fun PrimaryMainConfigActionButton(
 fun ConfigActionsButtons(component: AddSingleDownloadComponent) {
     val responseInfo by component.linkResponseInfo.collectAsState()
     Row {
-        IconActionButton(MyIcons.refresh, myStringResource(Res.string.refresh)) {
+        IconActionButton(
+            icon = AbIcons.Default.Refresh,
+            contentDescription = myStringResource(Res.string.refresh)
+        ) {
             component.refresh()
         }
         Spacer(Modifier.width(6.dp))
         IconActionButton(
-            MyIcons.settings,
-            myStringResource(Res.string.settings),
+            icon = AbIcons.Default.Settings,
+            contentDescription = myStringResource(Res.string.settings),
             indicateActive = component.showMoreSettings,
             requiresAttention = responseInfo?.requireBasicAuth ?: false
         ) {
@@ -533,7 +544,7 @@ fun RenderFileTypeAndSize(
             } else {
 //                val extension = getExtension(fileInfo?.fileName ?: usersSetFileName) ?: "unknown"
                 val downloadItem by component.downloadItem.collectAsState()
-                val icon = fileIconProvider.rememberIcon(downloadItem.name)
+                val icon = fileIconProvider.rememberCategoryIcon(downloadItem.name).toCategoryImageVector()
 
 //                val bitmap = FileIconProvider.getIconOfFileExtension(extension)
 
@@ -546,17 +557,17 @@ fun RenderFileTypeAndSize(
                         WithContentAlpha(1f) {
                             if (fileInfo != null) {
                                 if (fileInfo.requiresAuth) {
-                                    MyIcon(
-                                        MyIcons.lock,
-                                        null,
-                                        iconModifier,
+                                    Icon(
+                                        imageVector = AbIcons.Default.Lock,
+                                        contentDescription = null,
+                                        modifier = iconModifier,
                                         tint = myColors.error
                                     )
                                 }
-                                MyIcon(
-                                    icon,
-                                    null,
-                                    iconModifier
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    modifier = iconModifier
                                 )
                                 val size = fileInfo.totalLength?.let {
                                     convertSizeToHumanReadable(it)
@@ -570,8 +581,8 @@ fun RenderFileTypeAndSize(
                                     fontSize = myTextSizes.sm,
                                 )
                             } else {
-                                MyIcon(
-                                    icon = MyIcons.question,
+                                Icon(
+                                    imageVector = AbIcons.Default.QuestionMark,
                                     contentDescription = null,
                                     modifier = iconModifier,
                                 )
@@ -592,17 +603,21 @@ fun getExtension(s: String): String? {
 
 @Composable
 fun MyTextFieldIcon(
-    icon: IconSource,
+    icon: ImageVector,
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    MyIcon(icon, null, Modifier
-        .pointerHoverIcon(PointerIcon.Default)
-        .fillMaxHeight()
-        .clickable(enabled = enabled, onClick = onClick)
-        .wrapContentHeight()
-        .padding(horizontal = 8.dp)
-        .size(16.dp))
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        modifier = Modifier
+            .pointerHoverIcon(PointerIcon.Default)
+            .fillMaxHeight()
+            .clickable(enabled = enabled, onClick = onClick)
+            .wrapContentHeight()
+            .padding(horizontal = 8.dp)
+            .size(16.dp)
+    )
 }
 
 @Composable
@@ -618,7 +633,7 @@ private fun UrlTextField(
         myStringResource(Res.string.download_link),
         modifier = modifier.fillMaxWidth(),
         end = {
-            MyTextFieldIcon(MyIcons.paste) {
+            MyTextFieldIcon(AbIcons.Default.Clipboard) {
                 setText(
                     ClipboardUtil.read()
                         .orEmpty()

@@ -1,8 +1,6 @@
 package com.abdownloadmanager.desktop.ui.widget
 
 import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.utils.div
@@ -30,6 +28,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Check
+import com.abdownloadmanager.utils.compose.widget.Icon
 
 @Composable
 fun CheckBox(
@@ -74,8 +75,8 @@ fun CheckBox(
                 .alpha(animateFloatAsState(if (value) 1f else 0f).value)
                 .background(myColors.primaryGradient)
             if (it) {
-                MyIcon(
-                    MyIcons.check,
+                Icon(
+                    imageVector = AbIcons.Default.Check,
                     contentDescription = null,
                     modifier = m,
                     tint = myColors.onPrimaryGradient,

@@ -1,8 +1,12 @@
 package com.abdownloadmanager.desktop.utils
 
 import androidx.compose.runtime.Immutable
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.BrowserGoogleChrome
+import com.abdownloadmanager.desktop.ui.icons.colored.BrowserMicrosoftEdge
+import com.abdownloadmanager.desktop.ui.icons.colored.BrowserMozillaFirefox
+import com.abdownloadmanager.desktop.ui.icons.colored.BrowserOpera
 
 sealed class BrowserType(
     val code:String
@@ -20,12 +24,12 @@ fun BrowserType.getName():String{
         BrowserType.Opera -> "Opera"
     }
 }
-fun BrowserType.getIcon(): IconSource {
+fun BrowserType.getIcon(): ImageVector {
     return when(this){
-        BrowserType.Chrome -> MyIcons.browserGoogleChrome
-        BrowserType.Edge -> MyIcons.browserMicrosoftEdge
-        BrowserType.Firefox -> MyIcons.browserMozillaFirefox
-        BrowserType.Opera -> MyIcons.browserOpera
+        BrowserType.Chrome -> AbIcons.Colored.BrowserGoogleChrome
+        BrowserType.Edge -> AbIcons.Colored.BrowserMicrosoftEdge
+        BrowserType.Firefox -> AbIcons.Colored.BrowserMozillaFirefox
+        BrowserType.Opera -> AbIcons.Colored.BrowserOpera
     }
 }
 @Immutable

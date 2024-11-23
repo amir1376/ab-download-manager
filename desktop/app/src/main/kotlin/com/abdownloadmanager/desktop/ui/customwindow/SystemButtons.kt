@@ -1,9 +1,6 @@
 package com.abdownloadmanager.desktop.ui.customwindow
 
 import com.abdownloadmanager.utils.compose.LocalContentColor
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -18,8 +15,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.WindowClose
+import com.abdownloadmanager.desktop.ui.icons.default.WindowFloating
+import com.abdownloadmanager.desktop.ui.icons.default.WindowMaximize
+import com.abdownloadmanager.desktop.ui.icons.default.WindowMinimize
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.customwindow.HitSpots
 import ir.amirab.util.customwindow.windowFrameItem
 
@@ -30,14 +34,14 @@ fun SystemButton(
     onBackground: Color = LocalContentColor.current,
     hoveredBackgroundColor: Color = background,
     onHoveredBackgroundColor: Color = LocalContentColor.current,
-    icon: IconSource,
+    icon: ImageVector,
     modifier: Modifier = Modifier,
 ) {
     val isFocused = isWindowFocused()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
-    MyIcon(
-        icon = icon,
+    Icon(
+        imageVector = icon,
         contentDescription = null,
         tint = animateColorAsState(
             when {
@@ -78,7 +82,7 @@ fun CloseButton(
         onBackground = myColors.onBackground,
         hoveredBackgroundColor = Color(0xFFc42b1c),
         onHoveredBackgroundColor = myColors.onError,
-        icon = MyIcons.windowClose,
+        icon = AbIcons.Default.WindowClose,
         modifier = modifier,
     )
 }
@@ -105,7 +109,7 @@ fun FrameWindowScope.WindowsActionButtons(
     ) {
         onRequestMinimize?.let {
             SystemButton(
-                icon = MyIcons.windowMinimize,
+                icon = AbIcons.Default.WindowMinimize,
                 onClick = onRequestMinimize,
                 modifier = Modifier.windowFrameItem("minimize", HitSpots.MINIMIZE_BUTTON)
             )
@@ -115,9 +119,9 @@ fun FrameWindowScope.WindowsActionButtons(
             SystemButton(
                 icon =
                 if (isWindowMaximized()) {
-                    MyIcons.windowFloating
+                    AbIcons.Default.WindowFloating
                 } else {
-                    MyIcons.windowMaximize
+                    AbIcons.Default.WindowMaximize
                 },
                 onClick = onToggleMaximize,
                 modifier = Modifier.windowFrameItem("maximize", HitSpots.MAXIMIZE_BUTTON)

@@ -3,9 +3,6 @@ package com.abdownloadmanager.desktop.pages.home.sections.category
 import androidx.compose.animation.*
 import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.background
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ExpandableItem
 import com.abdownloadmanager.utils.compose.WithContentAlpha
@@ -22,15 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.pages.category.toCategoryImageVector
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Folder
+import com.abdownloadmanager.desktop.ui.icons.default.Up
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.rememberIconPainter
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
@@ -39,7 +40,7 @@ import ir.amirab.util.compose.asStringSource
 
 class DownloadStatusCategoryFilterByList(
     name: StringSource,
-    icon: IconSource,
+    icon: ImageVector,
     val acceptedStatus: List<DownloadStatus>,
 ) : DownloadStatusCategoryFilter(name, icon) {
     override fun accept(iDownloadStatus: IDownloadItemState): Boolean {
@@ -51,7 +52,7 @@ class DownloadStatusCategoryFilterByList(
 
 abstract class DownloadStatusCategoryFilter(
     val name: StringSource,
-    val icon: IconSource,
+    val icon: ImageVector,
 ) {
     abstract fun accept(iDownloadStatus: IDownloadItemState): Boolean
 }
@@ -61,20 +62,20 @@ object DefinedStatusCategories {
 
 
     val All = object : DownloadStatusCategoryFilter(
-        Res.string.all.asStringSource(),
-        MyIcons.folder,
+        name = Res.string.all.asStringSource(),
+        icon = AbIcons.Default.Folder,
     ) {
         override fun accept(iDownloadStatus: IDownloadItemState): Boolean = true
     }
     val Finished = DownloadStatusCategoryFilterByList(
-        Res.string.finished.asStringSource(),
-        MyIcons.folder,
-        listOf(DownloadStatus.Completed)
+        name = Res.string.finished.asStringSource(),
+        icon = AbIcons.Default.Folder,
+        acceptedStatus = listOf(DownloadStatus.Completed)
     )
     val Unfinished = DownloadStatusCategoryFilterByList(
-        Res.string.Unfinished.asStringSource(),
-        MyIcons.folder,
-        listOf(
+        name = Res.string.Unfinished.asStringSource(),
+        icon = AbIcons.Default.Folder,
+        acceptedStatus = listOf(
             DownloadStatus.Error,
             DownloadStatus.Added,
             DownloadStatus.Paused,
@@ -110,11 +111,10 @@ private fun CategoryFilterItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             WithContentAlpha(if (isSelected) 1f else 0.75f) {
-                val iconPainter = category.rememberIconPainter()
-                MyIcon(
-                    iconPainter ?: MyIcons.folder,
-                    null,
-                    Modifier.size(16.dp),
+                Icon(
+                    imageVector = category.toCategoryImageVector() ?: AbIcons.Default.Folder,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
@@ -199,10 +199,10 @@ fun StatusFilterItem(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     WithContentAlpha(if (isSelected) 1f else 0.75f) {
-                        MyIcon(
-                            statusFilter.icon,
-                            null,
-                            Modifier.size(16.dp)
+                        Icon(
+                            imageVector = statusFilter.icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
@@ -212,18 +212,19 @@ fun StatusFilterItem(
                             fontSize = myTextSizes.lg,
                             maxLines = 1,
                         )
-                        MyIcon(MyIcons.up, null, Modifier
-                            .fillMaxHeight().wrapContentHeight()
-                            .clip(CircleShape)
-                            .size(24.dp)
-                            .clickable {
-                                onRequestExpand(!isExpanded)
-                            }
-                            .padding(6.dp)
-                            .width(16.dp)
-                            .let {
-                                it.rotate(if (isExpanded) 180f else 0f)
-                            })
+                        Icon(
+                            imageVector = AbIcons.Default.Up,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxHeight().wrapContentHeight()
+                                .clip(CircleShape)
+                                .size(24.dp)
+                                .clickable {
+                                    onRequestExpand(!isExpanded)
+                                }
+                                .padding(6.dp)
+                                .width(16.dp)
+                                .rotate(if (isExpanded) 180f else 0f))
                     }
                 }
                 AnimatedVisibility(

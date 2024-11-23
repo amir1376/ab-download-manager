@@ -11,14 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.*
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.pages.category.toCategoryImageVector
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Plus
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.ui.widget.Text
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.rememberIconPainter
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.utils.compose.widget.Icon
 
 @Composable
 fun CategorySelect(
@@ -66,13 +67,13 @@ private fun RenderCategory(
         modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val icon = category.rememberIconPainter()
+        val icon = category.toCategoryImageVector()
         val iconModifier = Modifier.size(16.dp)
         if (icon != null) {
-            MyIcon(
-                icon,
-                null,
-                iconModifier,
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = iconModifier,
             )
         } else {
             Spacer(iconModifier)
@@ -110,10 +111,10 @@ fun CategoryAddButton(
             .aspectRatio(1f)
 //            .padding(horizontal = 8.dp)
     ) {
-        MyIcon(
-            MyIcons.add,
+        Icon(
+            imageVector = AbIcons.Default.Plus,
             contentDescription = "Add Category",
-            Modifier
+            modifier = Modifier
                 .align(Alignment.Center)
                 .size(16.dp)
         )

@@ -1,6 +1,6 @@
 package ir.amirab.util.compose.action
 
-import ir.amirab.util.compose.IconSource
+import androidx.compose.ui.graphics.vector.ImageVector
 import ir.amirab.util.compose.StringSource
 
 @DslMarker
@@ -11,21 +11,29 @@ class MenuScope {
     private val list = mutableListOf<MenuItem>()
     fun item(
         title: StringSource,
-        icon: IconSource? = null,
+        icon: ImageVector? = null,
+        image: ImageVector? = null,
         onClick: AnAction.() -> Unit,
     ) {
-        val action= simpleAction(title, icon, onClick)
+        val action = simpleAction(
+            title = title,
+            icon = icon,
+            image = image,
+            onActionPerformed = onClick
+        )
         list.add(action)
     }
 
     fun subMenu(
         title: StringSource,
-        icon: IconSource? = null,
+        icon: ImageVector? = null,
+        image: ImageVector? = null,
         block: MenuScope.() -> Unit,
     ) {
         val subMenu= MenuItem.SubMenu(
             title = title,
             icon = icon,
+            image = image,
             items = MenuScope().apply(block).build()
         )
         list.add(subMenu)

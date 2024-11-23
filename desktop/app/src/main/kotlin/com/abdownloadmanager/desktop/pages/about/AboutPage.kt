@@ -2,7 +2,6 @@ package com.abdownloadmanager.desktop.pages.about
 
 import com.abdownloadmanager.utils.compose.LocalTextStyle
 import com.abdownloadmanager.utils.compose.ProvideTextStyle
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
@@ -29,11 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.App
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.colored.AppIcon
+import com.abdownloadmanager.desktop.ui.icons.default.ExternalLink
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -74,10 +74,8 @@ fun RenderAppInfo(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Image(
-                        MyIcons.appIcon.rememberPainter(),
-                        null,
-                        Modifier
-                            .size(48.dp)
+                        imageVector = AbIcons.Colored.AppIcon,
+                        contentDescription = null,
                     )
                     Spacer(Modifier.width(16.dp))
                     Column {
@@ -165,10 +163,10 @@ fun LinkText(
             overflow = overflow,
             maxLines = maxLines,
         )
-        MyIcon(
-            MyIcons.externalLink,
-            null,
-            Modifier.size(10.dp).alpha(
+        Icon(
+            imageVector = AbIcons.Default.ExternalLink,
+            contentDescription = null,
+            modifier = Modifier.size(10.dp).alpha(
                 if (isHovered) 0.75f
                 else 0.5f
             )

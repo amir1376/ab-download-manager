@@ -4,13 +4,16 @@ import com.abdownloadmanager.desktop.pages.settings.SettingSections.*
 import com.abdownloadmanager.desktop.pages.settings.configurable.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.BaseComponent
 import com.abdownloadmanager.desktop.utils.convertSpeedToHumanReadable
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.Color
+import com.abdownloadmanager.desktop.ui.icons.default.DownSpeed
+import com.abdownloadmanager.desktop.ui.icons.default.Network
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.proxy.ProxyManager
 import com.abdownloadmanager.utils.proxy.ProxyMode
@@ -28,15 +31,15 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 sealed class SettingSections(
-    val icon: IconSource,
+    val icon: ImageVector,
     val name: StringSource,
 ) {
-    data object Appearance : SettingSections(MyIcons.appearance, Res.string.appearance.asStringSource())
+    data object Appearance : SettingSections(AbIcons.Default.Color, Res.string.appearance.asStringSource())
 
     //    TODO ADD Network section (proxy , etc..)
     //    data object Network : SettingSections(MyIcons.network, "Network")
-    data object DownloadEngine : SettingSections(MyIcons.downloadEngine, Res.string.download_engine.asStringSource())
-    data object BrowserIntegration : SettingSections(MyIcons.network, Res.string.browser_integration.asStringSource())
+    data object DownloadEngine : SettingSections(AbIcons.Default.DownSpeed, Res.string.download_engine.asStringSource())
+    data object BrowserIntegration : SettingSections(AbIcons.Default.Network, Res.string.browser_integration.asStringSource())
 }
 
 interface SettingSectionGetter {

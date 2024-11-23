@@ -1,7 +1,5 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.utils.compose.WithContentAlpha
@@ -14,7 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.icons.AbIcons
+import com.abdownloadmanager.desktop.ui.icons.default.AddLink
+import com.abdownloadmanager.desktop.ui.icons.default.DownSpeed
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.utils.compose.widget.Icon
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -23,8 +25,6 @@ fun AddUrlButton(
     onClick:()->Unit
 ) {
     val shape = RoundedCornerShape(12.dp)
-    val addUrlIcon = MyIcons.link
-    val downloadIcon = MyIcons.download
     Row(
         modifier
             .clip(shape)
@@ -37,7 +37,11 @@ fun AddUrlButton(
 
         ) {
         WithContentAlpha(1f) {
-            MyIcon(addUrlIcon, null, Modifier.size(16.dp))
+            Icon(
+                imageVector = AbIcons.Default.AddLink,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
             Spacer(Modifier.width(10.dp))
             Text(
                 myStringResource(Res.string.new_download),
@@ -54,10 +58,10 @@ fun AddUrlButton(
                     myColors.primaryGradient
                 ).padding(4.dp)
         ) {
-            MyIcon(
-                downloadIcon,
-                null,
-                Modifier.size(12.dp),
+            Icon(
+                imageVector = AbIcons.Default.DownSpeed,
+                contentDescription = null,
+                modifier = Modifier.size(12.dp),
                 tint = myColors.onPrimaryGradient,
             )
         }
