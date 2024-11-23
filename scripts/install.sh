@@ -85,6 +85,7 @@ check_dependencies() {
 
 APP_NAME="ABDownloadManager"
 PLATFORM="linux"
+ARCH="x64"
 EXT="tar.gz"
 
 RELEASE_URL="https://api.github.com/repos/amir1376/ab-download-manager/releases/latest"
@@ -92,7 +93,7 @@ GITHUB_RELEASE_DOWNLOAD="https://github.com/amir1376/ab-download-manager/release
 
 LATEST_VERSION=$(curl -fSs "${RELEASE_URL}" | grep '"tag_name":' | sed -E 's/.*"tag_name": ?"([^"]+)".*/\1/')
 
-ASSET_NAME="${APP_NAME}_${LATEST_VERSION:1}_${PLATFORM}.${EXT}"
+ASSET_NAME="${APP_NAME}_${LATEST_VERSION:1}_${PLATFORM}_${ARCH}.${EXT}"
 DOWNLOAD_URL="$GITHUB_RELEASE_DOWNLOAD/${LATEST_VERSION}/$ASSET_NAME"
 
 BINARY_PATH="$HOME/.local/$APP_NAME/bin/$APP_NAME"
