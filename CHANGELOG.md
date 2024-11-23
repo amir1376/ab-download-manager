@@ -14,6 +14,29 @@
 
 ### Security
 
+## 1.4.3
+
+### Added
+
+- "Download Completion" window
+- "Exit Confirmation" dialog when there is active download
+- An Option to automatically show "Download Completion" window (Optional)
+- An Option to automatically show "Download Progress" window when user presses on "Resume" (Optional)
+
+### Changed
+
+- Default thread count is now 8
+- Shape of filename of release binaries changed (added arch name after platform name)
+
+### Fixed
+
+- "Delete entire list" task does not remove all downloads
+- Filename not detected correctly from some download servers
+- Rename download changes state to paused if it was finished
+- Improved installation script for linux
+- Improved "Settings" page
+- Translations updated
+
 ## 1.4.2
 
 ### Added
