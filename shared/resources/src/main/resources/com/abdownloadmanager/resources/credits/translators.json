@@ -5,6 +5,10 @@
       "link": "https://crowdin.com/profile/lamjed001"
     },
     {
+      "name": "abuda7m (abuda7mx)",
+      "link": "https://crowdin.com/profile/abuda7mx"
+    },
+    {
       "name": "Mohamed Mahmoud (master3lwa)",
       "link": "https://crowdin.com/profile/master3lwa"
     },
@@ -23,16 +27,20 @@
     {
       "name": "u!^DEV (uDEV)",
       "link": "https://crowdin.com/profile/uDEV"
+    },
+    {
+      "name": "Lukas (lukasitaly)",
+      "link": "https://github.com/lukasitaly"
     }
   ],
   "es-ES": [
     {
-      "name": "seniordevops",
-      "link": "https://crowdin.com/profile/seniordevops"
-    },
-    {
       "name": "c-sanchez",
       "link": "https://crowdin.com/profile/c-sanchez"
+    },
+    {
+      "name": "seniordevops",
+      "link": "https://crowdin.com/profile/seniordevops"
     }
   ],
   "fa": [
@@ -53,12 +61,18 @@
   ],
   "id": [
     {
-      "name": "kuydukuy (hilmy2nd)",
-      "link": "https://crowdin.com/profile/hilmy2nd"
-    },
-    {
       "name": "Christian Elbrianno (crse)",
       "link": "https://crowdin.com/profile/crse"
+    },
+    {
+      "name": "kuydukuy (hilmy2nd)",
+      "link": "https://crowdin.com/profile/hilmy2nd"
+    }
+  ],
+  "it": [
+    {
+      "name": "Lukas (lukasitaly)",
+      "link": "https://github.com/lukasitaly"
     }
   ],
   "pt-BR": [
@@ -69,6 +83,10 @@
     {
       "name": "Davy J. (deaveipslon)",
       "link": "https://crowdin.com/profile/deaveipslon"
+    },
+    {
+      "name": "Jean Pereira (JeanxPereira)",
+      "link": "https://crowdin.com/profile/JeanxPereira"
     }
   ],
   "ru": [
@@ -127,6 +145,14 @@
     {
       "name": "ɴᴇᴋᴏ (NeKoOuO)",
       "link": "https://crowdin.com/profile/NeKoOuO"
+    },
+    {
+      "name": "notlin4",
+      "link": "https://crowdin.com/profile/notlin4"
+    },
+    {
+      "name": "塔可努丨TechNoob (TN_TechNoob)",
+      "link": "https://crowdin.com/profile/TN_TechNoob"
     }
   ]
 }
