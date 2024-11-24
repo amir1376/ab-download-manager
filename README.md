@@ -86,10 +86,10 @@ curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master
 </picture>
 </div>
 
-## Acknowledgements
+## Project Status & Feedback
 
 Please keep in mind that this project is in the beginning of its journey.
-**lots of features** are on the way!. 
+**lots of features** are on the way!.
 
 **But**, in the meantime you may face **Bugs or Problems**. so.
 Please report them (by [Community chat](#community) or `GitHub Issues`) to me,And I'll do my best to fix them ASAP
