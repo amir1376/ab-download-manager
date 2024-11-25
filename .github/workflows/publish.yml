@@ -23,7 +23,7 @@ jobs:
           set -Eeuo pipefail
           jdksPath="$HOME/.jdks"
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
-          jdkFileName="jbrsdk_jcef-17.0.10-$os-b1207.14"
+          jdkFileName="jbrsdk_jcef-17.0.12-$os-b1207.37"
           jdkFileNameWithExt="$jdkFileName.tar.gz"
           link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
           curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileNameWithExt"
