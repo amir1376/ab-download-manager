@@ -10,4 +10,5 @@ dependencies {
     api(libs.semver)
     api(libs.arrow.optics)
     api("ir.amirab.util:platform:1")
+    implementation(libs.jna.platform)
 }
