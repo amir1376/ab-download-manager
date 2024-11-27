@@ -34,26 +34,30 @@ internal class WindowsFileUtils : FileUtilsBase() {
     private fun showFileInFolderViaNative(
         file: String,
     ): Boolean {
-        Ole32.INSTANCE.CoInitializeEx(null, Ole32.COINIT_APARTMENTTHREADED)
-        val path = Shell32Ex.INSTANCE.ILCreateFromPath(File(file).parent)
-        val selectedFiles = arrayOf(Shell32Ex.INSTANCE.ILCreateFromPath(file))
-        val cidl = WinDef.UINT(selectedFiles.size.toLong())
         try {
-            val res = Shell32Ex.INSTANCE.SHOpenFolderAndSelectItems(
-                pIdlFolder = path,
-                cIdl = cidl,
-                apIdl = selectedFiles,
-                dwFlags = WinDef.DWORD(0)
-            )
-            return WinError.S_OK == res
+            Ole32.INSTANCE.CoInitializeEx(null, Ole32.COINIT_APARTMENTTHREADED)
+            val path = Shell32Ex.INSTANCE.ILCreateFromPath(File(file).parent)
+            val selectedFiles = arrayOf(Shell32Ex.INSTANCE.ILCreateFromPath(file))
+            val cidl = WinDef.UINT(selectedFiles.size.toLong())
+            try {
+                val res = Shell32Ex.INSTANCE.SHOpenFolderAndSelectItems(
+                    pIdlFolder = path,
+                    cIdl = cidl,
+                    apIdl = selectedFiles,
+                    dwFlags = WinDef.DWORD(0)
+                )
+                return WinError.S_OK == res
+            } finally {
+                Shell32Ex.INSTANCE.ILFree(path)
+                selectedFiles.forEach {
+                    Shell32Ex.INSTANCE.ILFree(it)
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             return false
         } finally {
-            Shell32Ex.INSTANCE.ILFree(path)
-            selectedFiles.forEach {
-                Shell32Ex.INSTANCE.ILFree(it)
-            }
+            Ole32.INSTANCE.CoUninitialize()
         }
     }
 
