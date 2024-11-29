@@ -26,7 +26,6 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.rememberCategoryOf
@@ -312,7 +311,7 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object Name : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.name
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.name }
 
         override val id: String = "Name"
         override val name: StringSource = Res.string.name.asStringSource()
@@ -321,7 +320,7 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object Status : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.statusOrFinished().order
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.statusOrFinished().order }
 
         override val id: String = "Status"
         override val name: StringSource = Res.string.status.asStringSource()
@@ -330,7 +329,7 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object Size : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.contentLength
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.contentLength }
 
         override val id: String = "Size"
         override val name: StringSource = Res.string.size.asStringSource()
@@ -339,7 +338,7 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object Speed : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.speedOrNull() ?: 0L
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.speedOrNull() ?: 0L }
 
         override val id: String = "Speed"
         override val name: StringSource = Res.string.speed.asStringSource()
@@ -348,7 +347,7 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object TimeLeft : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.remainingOrNull() ?: Long.MAX_VALUE
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.remainingOrNull() ?: Long.MAX_VALUE }
 
         override val id: String = "Time Left"
         override val name: StringSource = Res.string.time_left.asStringSource()
@@ -357,7 +356,7 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object DateAdded : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.dateAdded
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.dateAdded }
 
         override val id: String = "Date Added"
         override val name: StringSource = Res.string.date_added.asStringSource()
