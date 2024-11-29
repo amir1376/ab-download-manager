@@ -66,7 +66,7 @@ interface CustomCellRenderer {
 }
 
 interface SortableCell<Item> : TableCell<Item> {
-    fun sortBy(item: Item): Comparable<*>
+    fun comparator(): Comparator<Item>
 }
 
 
@@ -368,7 +368,7 @@ class TableState<Item, Cell : TableCell<Item>>(
                 list
             } else {
                 list.sortedWith(
-                    compareBy(sortedBy.cell::sortBy)
+                    sortedBy.cell.comparator()
                         .let {
                             if (sortedBy.isUp()) {
                                 it.reversed()

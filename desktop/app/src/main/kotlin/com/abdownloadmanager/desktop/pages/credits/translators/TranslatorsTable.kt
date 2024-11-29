@@ -11,7 +11,7 @@ import ir.amirab.util.compose.asStringSource
 sealed interface TranslatorsCells : TableCell<LanguageTranslationInfo> {
     data object LanguageName : TranslatorsCells,
         SortableCell<LanguageTranslationInfo> {
-        override fun sortBy(item: LanguageTranslationInfo): Comparable<*> = item.locale
+        override fun comparator(): Comparator<LanguageTranslationInfo> = compareBy { it.locale }
         override val id: String = "language"
         override val name: StringSource = Res.string.language.asStringSource()
         override val size: CellSize = CellSize.Resizeable(100.dp..1000.dp, 200.dp)
