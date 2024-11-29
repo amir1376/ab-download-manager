@@ -29,11 +29,8 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.rememberCategoryOf
+import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.remainingOrNull
-import ir.amirab.downloader.monitor.speedOrNull
-import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.delay
@@ -320,7 +317,16 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object Status : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.statusOrFinished().order }
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy(
+            {
+                it.statusOrFinished().order
+            }, {
+                when (it) {
+                    is CompletedDownloadItemState -> 100
+                    is ProcessingDownloadItemState -> it.percent ?: 0
+                }
+            }
+        )
 
         override val id: String = "Status"
         override val name: StringSource = Res.string.status.asStringSource()
