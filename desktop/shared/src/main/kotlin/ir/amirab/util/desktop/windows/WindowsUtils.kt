@@ -12,8 +12,10 @@ class WindowsUtils : DesktopUtils {
             )
         )
         if (!result) {
-            arrayOf(
-                "rundll32.exe shell32.dll,Control_RunDLL inetcpl.cpl,,4"
+            execAndWait(
+                arrayOf(
+                    "rundll32.exe shell32.dll,Control_RunDLL inetcpl.cpl,,4"
+                )
             )
         }
     }
