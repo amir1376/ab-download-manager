@@ -260,7 +260,6 @@ class AppComponent(
                             startNewDownload(
                                 item = item,
                                 onDuplicateStrategy = onDuplicate,
-                                openDownloadDialog = true,
                                 categoryId = categoryId,
                             )
                             closeAddDownloadDialog(config.id)
@@ -710,7 +709,6 @@ class AppComponent(
     fun startNewDownload(
         item: DownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
-        openDownloadDialog: Boolean,
         categoryId: Long?,
     ) {
         scope.launch {
@@ -722,11 +720,6 @@ class AppComponent(
             )
             launch {
                 downloadSystem.manualResume(id)
-            }
-            if (openDownloadDialog) {
-                launch {
-                    openDownloadDialog(id)
-                }
             }
         }
     }
