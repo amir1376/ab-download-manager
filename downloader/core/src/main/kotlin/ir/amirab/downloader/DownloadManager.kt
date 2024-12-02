@@ -93,7 +93,7 @@ class DownloadManager(
 
                     OverrideDownload -> {
                         foundItems.forEach {
-                            deleteDownload(it.id, true,RemovedBy(DuplicateRemoval))
+                            deleteDownload(it.id, { true }, RemovedBy(DuplicateRemoval))
                         }
                         removedItems=foundItems
                     }
@@ -142,7 +142,11 @@ class DownloadManager(
         return job
     }
 
-    suspend fun deleteDownload(id: Long, alsoRemoveFile: Boolean,context: DownloadItemContext=EmptyContext) {
+    suspend fun deleteDownload(
+        id: Long,
+        alsoRemoveFile: (DownloadItem) -> Boolean,
+        context: DownloadItemContext = EmptyContext,
+    ) {
         kotlin.runCatching { pause(id) }
         val itemToDelete = dlListDb.getById(id) ?: return
         contextContainer.updateContext(id){ it+context }
@@ -153,7 +157,7 @@ class DownloadManager(
             DownloadManagerEvents.OnJobRemoved(itemToDelete, contextContainer.getContext(id))
         )
         contextContainer.removeContext(id)
-        if (alsoRemoveFile) {
+        if (alsoRemoveFile(itemToDelete)) {
             val fileToDelete = calculateOutputFile(itemToDelete)
             if (fileToDelete.isFile) {
                 fileToDelete.delete()

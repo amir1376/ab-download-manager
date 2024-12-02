@@ -61,6 +61,8 @@ sealed interface HomeEffects {
 
     data class DeleteItems(
         val list: List<Long>,
+        val finishedCount: Int,
+        val unfinishedCount: Int,
     ) : HomeEffects
 
     data class DeleteCategory(
@@ -460,7 +462,27 @@ class HomeComponent(
     private fun requestDelete(
         downloadList: List<Long>,
     ) {
-        sendEffect(HomeEffects.DeleteItems(downloadList))
+        if (downloadList.isEmpty()) {
+            // nothing to delete!
+            return
+        }
+        scope.launch {
+            val unfinished = downloadSystem.getUnfinishedDownloadIds()
+                .count {
+                    it in downloadList
+                }
+            val finished = downloadSystem.getFinishedDownloadIds()
+                .count {
+                    it in downloadList
+                }
+            sendEffect(
+                HomeEffects.DeleteItems(
+                    list = downloadList,
+                    unfinishedCount = unfinished,
+                    finishedCount = finished,
+                )
+            )
+        }
     }
 
     fun onConfirmDeleteCategory(promptState: CategoryDeletePromptState) {

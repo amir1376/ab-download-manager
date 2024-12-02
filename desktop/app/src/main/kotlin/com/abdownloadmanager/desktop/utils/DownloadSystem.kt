@@ -12,7 +12,6 @@ import ir.amirab.downloader.downloaditem.contexts.StoppedBy
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
-import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import kotlinx.coroutines.CoroutineScope
@@ -110,7 +109,14 @@ class DownloadSystem(
     }
 
     suspend fun removeDownload(id: Long, alsoRemoveFile: Boolean) {
-        downloadManager.deleteDownload(id, alsoRemoveFile, RemovedBy(User))
+        downloadManager.deleteDownload(id, {
+            if (it.status == DownloadStatus.Completed) {
+                alsoRemoveFile
+            } else {
+                // always remove file if download is not finished!
+                true
+            }
+        }, RemovedBy(User))
         categoryManager.removeItemInCategories(listOf(id))
     }
 
@@ -222,6 +228,7 @@ class DownloadSystem(
             it.id
         }
     }
+
     fun getAllRegisteredDownloadFiles(): List<File> {
         return downloadMonitor.run {
             activeDownloadListFlow.value + completedDownloadListFlow.value
