@@ -117,7 +117,7 @@ fun SubMenu(
 
 @Composable
 fun MenuColumn(
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val shape = LocalMenuBoxClip.current
     Column(
@@ -389,18 +389,14 @@ fun RenderShortcutStroke(shortcutStroke: KeyStroke) {
             horizontalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             val shape = RoundedCornerShape(10)
-            for (it in modifiers) {
-                WithContentAlpha(0.75f) {
-                    WithContentColor(myColors.onBackground) {
-                        Text(
-                            it,
-                            Modifier
-                                .clip(shape)
-                                .background(myColors.onBackground / 5)
-                                .padding(2.dp)
-                        )
-                    }
-                }
+            WithContentColor(myColors.onBackground) {
+                Text(
+                    modifiers.joinToString("+"),
+                    Modifier
+                        .clip(shape)
+                        .background(myColors.onBackground / 5)
+                        .padding(2.dp)
+                )
             }
         }
     }
