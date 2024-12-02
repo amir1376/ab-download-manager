@@ -45,13 +45,13 @@ import androidx.compose.ui.window.Dialog
 import com.abdownloadmanager.desktop.ui.customwindow.*
 import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.rememberIconPainter
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
 import java.awt.datatransfer.DataFlavor
 import java.io.File
@@ -79,7 +79,11 @@ fun HomePage(component: HomeComponent) {
             when (it) {
                 is HomeEffects.DeleteItems -> {
                     if (it.list.isNotEmpty()) {
-                        showDeletePromptState = DeletePromptState(it.list)
+                        showDeletePromptState = DeletePromptState(
+                            downloadList = it.list,
+                            finishedCount = it.finishedCount,
+                            unfinishedCount = it.unfinishedCount,
+                        )
                     }
                 }
 
@@ -353,35 +357,59 @@ private fun ShowDeletePrompts(
                 color = myColors.onBackground,
             )
             Spacer(Modifier.height(12.dp))
+            val finishedCount = deletePromptState.finishedCount
+            val unfinishedCount = deletePromptState.unfinishedCount
             Text(
-                myStringResource(
-                    Res.string.confirm_delete_download_items_description,
-                    Res.string.confirm_delete_download_items_description_createArgs(
-                        count = deletePromptState.downloadList.size.toString()
-                    ),
-                ),
+                when {
+                    deletePromptState.hasBothFinishedAndUnfinished() -> {
+                        Res.string.confirm_delete_download_finished_and_unfinished_items_description.asStringSourceWithARgs(
+                            Res.string.confirm_delete_download_finished_and_unfinished_items_description_createArgs(
+                                finishedCount = finishedCount.toString(),
+                                unfinishedCount = unfinishedCount.toString(),
+                            )
+                        )
+                    }
+
+                    deletePromptState.hasUnfinishedDownloads -> {
+                        Res.string.confirm_delete_download_unfinished_items_description.asStringSourceWithARgs(
+                            Res.string.confirm_delete_download_unfinished_items_description_createArgs(
+                                count = unfinishedCount.toString(),
+                            )
+                        )
+                    }
+
+                    else -> {
+                        Res.string.confirm_delete_download_items_description.asStringSourceWithARgs(
+                            Res.string.confirm_delete_download_items_description_createArgs(
+                                count = finishedCount.toString()
+                            ),
+                        )
+                    }
+                }.rememberString(),
                 fontSize = myTextSizes.base,
                 color = myColors.onBackground,
             )
-            Spacer(Modifier.height(12.dp))
-            Row(
-                Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
+            if (deletePromptState.hasFinishedDownloads) {
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        deletePromptState.alsoDeleteFile = !deletePromptState.alsoDeleteFile
+                    },
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    deletePromptState.alsoDeleteFile = !deletePromptState.alsoDeleteFile
-                },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CheckBox(deletePromptState.alsoDeleteFile, {
-                    deletePromptState.alsoDeleteFile = it
-                })
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    myStringResource(Res.string.also_delete_file_from_disk),
-                    fontSize = myTextSizes.base,
-                    color = myColors.onBackground,
-                )
+                    CheckBox(deletePromptState.alsoDeleteFile, {
+                        deletePromptState.alsoDeleteFile = it
+                    })
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        myStringResource(Res.string.also_delete_file_from_disk),
+                        fontSize = myTextSizes.base,
+                        color = myColors.onBackground,
+                    )
+                }
             }
             Spacer(Modifier.height(12.dp))
             Row(
@@ -530,8 +558,16 @@ private fun ShowDeleteCategoryPrompt(
 @Stable
 class DeletePromptState(
     val downloadList: List<Long>,
+    val finishedCount: Int,
+    val unfinishedCount: Int,
 ) {
+    val hasFinishedDownloads = finishedCount > 0
+    var hasUnfinishedDownloads = unfinishedCount > 0
     var alsoDeleteFile by mutableStateOf(false)
+
+    fun hasBothFinishedAndUnfinished(): Boolean {
+        return hasFinishedDownloads && hasUnfinishedDownloads
+    }
 }
 
 @Immutable
