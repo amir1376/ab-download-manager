@@ -11,13 +11,18 @@ import com.abdownloadmanager.utils.compose.WithContentColor
 import ir.amirab.util.compose.action.MenuItem
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.compose.widget.ScrollFade
+import org.http4k.routing.inspect.BackgroundColour
 
 @Composable
 fun Actions(list: List<MenuItem>) {
@@ -31,12 +36,13 @@ fun Actions(list: List<MenuItem>) {
             for (a in list) {
                 when (a) {
                     MenuItem.Separator -> {
-                        Spacer(Modifier
-                            .padding(horizontal = 4.dp)
-                            .fillMaxHeight()
-                            .padding(vertical = 4.dp)
-                            .width(1.dp)
-                            .background(myColors.onBackground / 5)
+                        Spacer(
+                            Modifier
+                                .padding(horizontal = 4.dp)
+                                .fillMaxHeight()
+                                .padding(vertical = 4.dp)
+                                .width(1.dp)
+                                .background(myColors.onBackground / 5)
                         )
                     }
 
@@ -50,13 +56,11 @@ fun Actions(list: List<MenuItem>) {
                 }
             }
         }
-        val adapter = rememberScrollbarAdapter(scrollState)
-        HorizontalScrollbar(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(),
-
-            adapter = adapter
+        ScrollFade(
+            scrollState,
+            Orientation.Horizontal,
+            gradientLength = 0.2f,
+            targetBackground = myColors.background / 0.8f
         )
     }
 }
