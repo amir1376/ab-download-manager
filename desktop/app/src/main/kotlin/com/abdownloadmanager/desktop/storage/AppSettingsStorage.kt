@@ -4,6 +4,7 @@ import com.abdownloadmanager.desktop.utils.*
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
+import com.abdownloadmanager.desktop.App
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.*
 import kotlinx.serialization.Serializable
@@ -15,6 +16,7 @@ import java.io.File
 data class AppSettingsModel(
     val theme: String = "dark",
     val language: String = "en",
+    val uiScale: Float? = null,
     val mergeTopBarWithTitleBar: Boolean = false,
     val threadCount: Int = 8,
     val dynamicPartCreation: Boolean = true,
@@ -40,6 +42,7 @@ data class AppSettingsModel(
         object Keys {
             val theme = stringKeyOf("theme")
             val language = stringKeyOf("language")
+            val uiScale = floatKeyOf("uiScale")
             val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
             val threadCount = intKeyOf("threadCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
@@ -57,12 +60,12 @@ data class AppSettingsModel(
         }
 
 
-
         override fun get(source: MapConfig): AppSettingsModel {
             val default by lazy { AppSettingsModel.default }
             return AppSettingsModel(
                 theme = source.get(Keys.theme) ?: default.theme,
                 language = source.get(Keys.language) ?: default.language,
+                uiScale = source.get(Keys.uiScale) ?: default.uiScale,
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
@@ -88,6 +91,7 @@ data class AppSettingsModel(
             return source.apply {
                 put(Keys.theme, focus.theme)
                 put(Keys.language, focus.language)
+                putNullable(Keys.uiScale, focus.uiScale)
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
                 put(Keys.threadCount, focus.threadCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
@@ -107,6 +111,16 @@ data class AppSettingsModel(
     }
 }
 
+private val uiScaleLens: Lens<AppSettingsModel, Float?>
+    get() = Lens(
+        get = {
+            it.uiScale
+        },
+        set = { s, f ->
+            s.copy(uiScale = f)
+        }
+    )
+
 class AppSettingsStorage(
     settings: DataStore<MapConfig>,
 ) :
@@ -114,6 +128,7 @@ class AppSettingsStorage(
     LanguageStorage {
     var theme = from(AppSettingsModel.theme)
     override val selectedLanguage = from(AppSettingsModel.language)
+    var uiScale = from(uiScaleLens)
     var mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)

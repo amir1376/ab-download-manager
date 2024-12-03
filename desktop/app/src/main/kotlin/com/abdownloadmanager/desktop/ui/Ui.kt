@@ -60,7 +60,7 @@ object Ui : KoinComponent {
                     ProvideNotificationManager {
                         ABDownloaderTheme(
                             myColors = theme,
-//                    uiScale = appComponent.uiScale.collectAsState().value
+                            uiScale = appComponent.uiScale.collectAsState().value
                         ) {
                             ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
                                 val trayState = rememberTrayState()

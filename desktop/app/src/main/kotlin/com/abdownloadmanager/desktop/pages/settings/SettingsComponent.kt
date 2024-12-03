@@ -199,17 +199,17 @@ fun proxyConfig(proxyManager: ProxyManager, scope: CoroutineScope): ProxyConfigu
     )
 }
 
-/*
-fun uiScaleConfig(appSettings: AppSettings): EnumConfigurable<Float?> {
+fun uiScaleConfig(appSettings: AppSettingsStorage): EnumConfigurable<Float?> {
     return EnumConfigurable(
-        title = "Ui Scale",
-        description = "Scale Ui Elements",
+        title = Res.string.settings_ui_scale.asStringSource(),
+        description = Res.string.settings_ui_scale_description.asStringSource(),
         backedBy = appSettings.uiScale,
         possibleValues = listOf(
             null,
-            0.5f,
-            0.75f,
+            0.8f,
+            0.9f,
             1f,
+            1.1f,
             1.25f,
             1.5f,
             1.75f,
@@ -218,14 +218,13 @@ fun uiScaleConfig(appSettings: AppSettings): EnumConfigurable<Float?> {
         renderMode = EnumConfigurable.RenderMode.Spinner,
         describe = {
             if (it == null) {
-                "System"
+                Res.string.system.asStringSource()
             } else {
-                "$it x"
+                "$it x".asStringSource()
             }
         }
     )
 }
-*/
 
 fun themeConfig(
     themeManager: ThemeManager,
@@ -377,7 +376,7 @@ class SettingsComponent(
                 Appearance -> listOf(
                     themeConfig(themeManager, scope),
                     languageConfig(languageManager, scope),
-//                    uiScaleConfig(appSettings),
+                    uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
                     mergeTopBarWithTitleBarConfig(appSettings),
                     playSoundNotification(appSettings),

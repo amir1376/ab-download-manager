@@ -852,7 +852,7 @@ class AppComponent(
     val showOpenSourceLibraries = MutableStateFlow(false)
     val showTranslators = MutableStateFlow(false)
     val theme = appRepository.theme
-//    val uiScale = appRepository.uiScale
+    val uiScale = appRepository.uiScale
 }
 
 interface DownloadDialogManager {
