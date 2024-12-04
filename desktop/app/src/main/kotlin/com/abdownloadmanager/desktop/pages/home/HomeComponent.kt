@@ -628,7 +628,6 @@ class HomeComponent(
             DownloadListCells.DateAdded,
         ),
         forceVisibleCells = listOf(
-            DownloadListCells.Check,
             DownloadListCells.Name,
         ),
         initialSortBy = Sort(DownloadListCells.DateAdded, true)
