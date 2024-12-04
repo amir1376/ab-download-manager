@@ -1,5 +1,6 @@
 package com.abdownloadmanager.desktop.pages.about
 
+import androidx.compose.foundation.*
 import com.abdownloadmanager.utils.compose.LocalTextStyle
 import com.abdownloadmanager.utils.compose.ProvideTextStyle
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
@@ -9,9 +10,6 @@ import com.abdownloadmanager.desktop.ui.widget.ActionButton
 import com.abdownloadmanager.desktop.ui.widget.Text
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.utils.compose.WithContentAlpha
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
@@ -44,10 +42,12 @@ fun AboutPage(
 ) {
     Column(Modifier.padding(16.dp)) {
         RenderAppInfo(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
             onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
             onRequestShowTranslators = onRequestShowTranslators,
         )
-        Spacer(Modifier.weight(1f))
         Row(Modifier.fillMaxWidth().wrapContentWidth(Alignment.End)) {
             ActionButton(
                 myStringResource(Res.string.close),
@@ -59,11 +59,12 @@ fun AboutPage(
 
 @Composable
 fun RenderAppInfo(
+    modifier: Modifier,
     onRequestShowOpenSourceLibraries: () -> Unit,
     onRequestShowTranslators: () -> Unit,
 ) {
     Row(
-        Modifier.fillMaxWidth()
+        modifier.fillMaxWidth()
             .padding(horizontal = 8.dp),
     ) {
         ProvideTextStyle(
