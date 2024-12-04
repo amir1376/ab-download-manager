@@ -5,7 +5,7 @@ import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.WithContentColor
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
-//import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.utils.*
@@ -25,9 +25,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
@@ -323,50 +325,61 @@ fun CustomWindow(
                 else Color.Black
             }.toWindowColorType()
         }
-        CompositionLocalProvider(
-            LocalWindowController provides windowController,
-            LocalWindowState provides state,
-            LocalWindow provides window,
-        ) {
-            if (preventMinimize) {
-                PreventMinimize()
-            }
-            // a window frame which totally rendered with compose
-            CustomWindowFrame(
-                onRequestMinimize = onRequestMinimize,
-                onRequestClose = onCloseRequest,
-                onRequestToggleMaximize = onRequestToggleMaximize,
-                title = title,
-                titlePosition = titlePosition,
-                windowIcon = icon,
-                background = background,
-                onBackground = myColors.onBackground,
-                start = start,
-                end = end,
+        UiScaledContent {
+            CompositionLocalProvider(
+                LocalWindowController provides windowController,
+                LocalWindowState provides state,
+                LocalWindow provides window,
             ) {
-//                val defaultDensity = LocalDensity.current
-//                val uiScale = LocalUiScale.current
-//                val density = remember(uiScale) {
-//                    if (uiScale == null) {
-//                        defaultDensity
-//                    } else {
-//                        Density(uiScale)
-//                    }
-//                }
-//                CompositionLocalProvider(
-//                    LocalDensity provides density
-//                ) {
-                ResponsiveBox {
-                    Box(Modifier.clearFocusOnTap()) {
-                        PopUpContainer {
-                            content()
+                if (preventMinimize) {
+                    PreventMinimize()
+                }
+                // a window frame which totally rendered with compose
+                CustomWindowFrame(
+                    onRequestMinimize = onRequestMinimize,
+                    onRequestClose = onCloseRequest,
+                    onRequestToggleMaximize = onRequestToggleMaximize,
+                    title = title,
+                    titlePosition = titlePosition,
+                    windowIcon = icon,
+                    background = background,
+                    onBackground = myColors.onBackground,
+                    start = start,
+                    end = end,
+                ) {
+                    ResponsiveBox {
+                        Box(Modifier.clearFocusOnTap()) {
+                            PopUpContainer {
+                                content()
+                            }
                         }
                     }
                 }
-//                }
             }
         }
     }
+}
+
+/**
+ * put this in every window because [Window] composable override [LocalDensity]
+ */
+@Composable
+fun UiScaledContent(
+    defaultDensity: Density = LocalDensity.current,
+    uiScale: Float? = LocalUiScale.current,
+    content: @Composable () -> Unit,
+) {
+    val density = remember(uiScale) {
+        if (uiScale == null) {
+            defaultDensity
+        } else {
+            Density(uiScale)
+        }
+    }
+    CompositionLocalProvider(
+        LocalDensity provides density,
+        content,
+    )
 }
 
 @Composable

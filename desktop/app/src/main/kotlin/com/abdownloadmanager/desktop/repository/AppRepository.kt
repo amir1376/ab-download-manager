@@ -23,7 +23,7 @@ class AppRepository : KoinComponent {
     private val proxyManager: ProxyManager by inject()
     val theme = appSettings.theme
 
-    //    val uiScale = appSettings.uiScale
+    val uiScale = appSettings.uiScale
     private val downloadSystem : DownloadSystem by inject()
     private val downloadSettings: DownloadSettings by inject()
     private val downloadManager: DownloadManager = downloadSystem.downloadManager

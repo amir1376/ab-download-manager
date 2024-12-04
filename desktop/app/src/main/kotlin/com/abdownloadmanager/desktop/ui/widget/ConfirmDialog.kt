@@ -18,9 +18,11 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 
 @Suppress("unused")
@@ -39,8 +41,9 @@ fun ConfirmDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
 ) {
-    val h = 180
-    val w = 400
+    val uiScale = LocalUiScale.current
+    val h = 180.applyUiScale(uiScale)
+    val w = 400.applyUiScale(uiScale)
     val state = rememberWindowState(
         size = DpSize(w.dp, h.dp),
         position = WindowPosition.Aligned(Alignment.Center)

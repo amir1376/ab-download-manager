@@ -12,12 +12,15 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberPopupPositionProviderAtPosition
+import com.abdownloadmanager.desktop.ui.customwindow.UiScaledContent
 import ir.amirab.util.compose.asStringSource
 
 /*
@@ -101,12 +104,14 @@ private val textSizes = TextSizes(
 @Composable
 fun ABDownloaderTheme(
     myColors: MyColors,
-//    uiScale: Float? = null,
+    uiScale: Float? = null,
     content: @Composable () -> Unit,
 ) {
+    val systemDensity = LocalDensity.current
     CompositionLocalProvider(
         LocalMyColors provides AnimatedColors(myColors, tween(500)),
-//        LocalUiScale provides uiScale,
+        LocalUiScale provides uiScale,
+        LocalSystemDensity provides systemDensity,
     ) {
         CompositionLocalProvider(
             LocalContextMenuRepresentation provides myContextMenuRepresentation(),
@@ -120,7 +125,11 @@ fun ABDownloaderTheme(
                 fontSize = textSizes.base,
             ),
         ) {
-            content()
+            // it is overridden by [Window] Composable,
+            // but I put this here. maybe I need this outside of window  scope!
+            UiScaledContent {
+                content()
+            }
         }
     }
 }
@@ -172,7 +181,7 @@ private fun myDefaultScrollBarStyle(): ScrollbarStyle {
         thickness = 12.dp,
         shape = RoundedCornerShape(4.dp),
         hoverDurationMillis = 300,
-        unhoverColor = myColors.onBackground/10,
-        hoverColor = myColors.onBackground/30
+        unhoverColor = myColors.onBackground / 10,
+        hoverColor = myColors.onBackground / 30
     )
 }

@@ -14,12 +14,14 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 import java.awt.Taskbar
 import java.awt.Window
@@ -110,9 +112,12 @@ private fun CompletedWindow(
     }
     val defaultHeight = 160f
     val defaultWidth = 450f
+    val uiScale = LocalUiScale.current
     val state = rememberWindowState(
-        height = defaultHeight.dp,
-        width = defaultWidth.dp,
+        size = DpSize(
+            height = defaultHeight.dp,
+            width = defaultWidth.dp
+        ).applyUiScale(uiScale),
         position = WindowPosition(Alignment.Center)
     )
     CustomWindow(
@@ -136,7 +141,7 @@ private fun CompletedWindow(
             state.size = DpSize(
                 width = w.dp,
                 height = h.dp
-            )
+            ).applyUiScale(uiScale)
         }
         CompletedDownloadPage(
             singleDownloadComponent,
@@ -153,8 +158,9 @@ private fun ProgressWindow(
     val onRequestClose = {
         singleDownloadComponent.close()
     }
-    val defaultHeight = 290f
-    val defaultWidth = 450f
+    val uiScale = LocalUiScale.current
+    val defaultHeight = 290f.applyUiScale(uiScale)
+    val defaultWidth = 450f.applyUiScale(uiScale)
 
     val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
     val state = rememberWindowState(
@@ -181,6 +187,7 @@ private fun ProgressWindow(
         var w = defaultWidth
         if (showPartInfo) {
             h += singleDownloadPageSizing.partInfoHeight.value
+                .applyUiScale(uiScale)
         }
         LaunchedEffect(w, h) {
             state.size = DpSize(

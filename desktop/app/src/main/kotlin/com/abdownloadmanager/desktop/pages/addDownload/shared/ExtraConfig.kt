@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
 import com.abdownloadmanager.desktop.pages.settings.configurable.Configurable
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 import java.awt.MouseInfo
 
@@ -36,7 +38,7 @@ fun ExtraConfig(
         size = DpSize(
             height = h.dp,
             width = w.dp,
-        ),
+        ).applyUiScale(LocalUiScale.current),
     )
     BaseOptionDialog(onDismiss, state) {
         LaunchedEffect(window){
