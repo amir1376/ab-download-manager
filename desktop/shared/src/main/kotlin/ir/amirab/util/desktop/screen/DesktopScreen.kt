@@ -21,6 +21,13 @@ fun Int.applyUiScale(
     if (userUiScale == null) return this
     return (this * userUiScale / systemUiScale).toInt()
 }
+fun Float.applyUiScale(
+    userUiScale: Float?,
+    systemUiScale: Float = GlobalDensity.density,
+): Float {
+    if (userUiScale == null) return this
+    return (this * userUiScale / systemUiScale)
+}
 
 fun Int.unApplyUiScale(
     userUiScale: Float?,
@@ -28,6 +35,13 @@ fun Int.unApplyUiScale(
 ): Int {
     if (userUiScale == null) return this
     return (this * systemUiScale / userUiScale).toInt()
+}
+fun Float.unApplyUiScale(
+    userUiScale: Float?,
+    systemUiScale: Float = GlobalDensity.density,
+): Float {
+    if (userUiScale == null) return this
+    return (this * systemUiScale / userUiScale)
 }
 
 fun DpSize.applyUiScale(

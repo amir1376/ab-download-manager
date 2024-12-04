@@ -9,9 +9,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.resources.*
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
 fun ShowAboutDialog(appComponent: AppComponent) {
@@ -41,6 +43,7 @@ fun AboutDialog(
         onRequestToggleMaximize = null,
         state = rememberWindowState(
             size = DpSize(400.dp, 330.dp)
+                .applyUiScale(LocalUiScale.current)
         ),
         onCloseRequest = onClose
     ) {

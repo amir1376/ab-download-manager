@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
 fun NewQueueDialog(
@@ -17,7 +19,8 @@ fun NewQueueDialog(
     if (appComponent.showCreateQueueDialog.collectAsState().value){
         CustomWindow(
             state = rememberWindowState(
-                size = DpSize(width = 300.dp, height = 130.dp),
+                size = DpSize(width = 300.dp, height = 130.dp)
+                    .applyUiScale(LocalUiScale.current),
                 position = WindowPosition.Aligned(Alignment.Center),
             ),
             resizable = false,

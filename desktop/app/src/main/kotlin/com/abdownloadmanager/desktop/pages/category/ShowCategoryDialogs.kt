@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
 fun ShowCategoryDialogs(dialogManager: CategoryDialogManager) {
@@ -28,7 +30,7 @@ private fun CategoryDialog(
         },
         alwaysOnTop = true,
         state = rememberWindowState(
-            size = DpSize(350.dp, 400.dp),
+            size = DpSize(350.dp, 400.dp).applyUiScale(LocalUiScale.current),
             position = WindowPosition.Aligned(Alignment.Center),
         )
     ) {

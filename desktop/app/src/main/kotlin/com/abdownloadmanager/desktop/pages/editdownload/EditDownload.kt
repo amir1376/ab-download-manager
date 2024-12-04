@@ -33,6 +33,7 @@ import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
@@ -41,6 +42,7 @@ import com.abdownloadmanager.utils.compose.WithContentColor
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
 fun EditDownloadWindow(
@@ -48,7 +50,8 @@ fun EditDownloadWindow(
 ) {
     CustomWindow(
         state = rememberWindowState(
-            size = DpSize(450.dp, 230.dp),
+            size = DpSize(450.dp, 230.dp)
+                .applyUiScale(LocalUiScale.current),
             position = WindowPosition.Aligned(Alignment.Center)
         ),
         alwaysOnTop = true,
