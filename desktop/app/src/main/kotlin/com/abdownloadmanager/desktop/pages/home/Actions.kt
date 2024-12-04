@@ -21,13 +21,14 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.compose.LocalTextStyle
 import com.abdownloadmanager.utils.compose.widget.ScrollFade
 import org.http4k.routing.inspect.BackgroundColour
 
 @Composable
 fun Actions(list: List<MenuItem>) {
     val scrollState = rememberScrollState()
-    Box {
+    Column {
         Row(
             Modifier
                 .height(IntrinsicSize.Max)
@@ -56,15 +57,24 @@ fun Actions(list: List<MenuItem>) {
                 }
             }
         }
-        ScrollFade(
-            scrollState,
-            Orientation.Horizontal,
-            gradientLength = 0.2f,
-            targetBackground = myColors.background / 0.8f
-        )
+        val adapter = rememberScrollbarAdapter(scrollState)
+        if (adapter.needScroll()) {
+            HorizontalScrollbar(
+                adapter = adapter,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp),
+                style = LocalScrollbarStyle.current.copy(
+                    thickness = 6.dp
+                ),
+            )
+        }
     }
 }
 
+private fun androidx.compose.foundation.v2.ScrollbarAdapter.needScroll(): Boolean {
+    return contentSize > viewportSize
+}
 
 @Composable
 private fun ActionButton(
