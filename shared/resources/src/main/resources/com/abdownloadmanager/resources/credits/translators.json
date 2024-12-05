@@ -115,19 +115,23 @@
     {
       "name": "Misha Dyshlenko (lony_official)",
       "link": "https://crowdin.com/profile/lony_official"
-    },
-    {
-      "name": "YALdysse_",
-      "link": "https://crowdin.com/profile/YALdysse_"
     }
   ],
   "vi": [
     {
       "name": "Zenfast",
       "link": "https://crowdin.com/profile/Zenfast"
+    },
+    {
+      "name": "allehS (shellawa)",
+      "link": "https://crowdin.com/profile/shellawa"
     }
   ],
   "zh-CN": [
+    {
+      "name": "Ipmlosion",
+      "link": "https://crowdin.com/profile/Ipmlosion"
+    },
     {
       "name": "Pylogmon (pylogmon)",
       "link": "https://crowdin.com/profile/pylogmon"
@@ -139,6 +143,18 @@
     {
       "name": "Sendevia",
       "link": "https://crowdin.com/profile/Sendevia"
+    },
+    {
+      "name": "none2003",
+      "link": "https://crowdin.com/profile/none2003"
+    },
+    {
+      "name": "Aira_Nadih",
+      "link": "https://crowdin.com/profile/Aira_Nadih"
+    },
+    {
+      "name": "pompurin404",
+      "link": "https://github.com/pompurin404"
     }
   ],
   "zh-TW": [
@@ -153,6 +169,14 @@
     {
       "name": "塔可努丨TechNoob (TN_TechNoob)",
       "link": "https://crowdin.com/profile/TN_TechNoob"
+    },
+    {
+      "name": "none2003",
+      "link": "https://crowdin.com/profile/none2003"
+    },
+    {
+      "name": "jrthsr700tmax",
+      "link": "https://crowdin.com/profile/jrthsr700tmax"
     }
   ]
 }
