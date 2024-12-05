@@ -7,6 +7,9 @@ import com.abdownloadmanager.desktop.ui.theme.MyColors
 import com.abdownloadmanager.desktop.ui.theme.SystemThemeDetector
 import com.abdownloadmanager.desktop.ui.theme.darkColors
 import com.abdownloadmanager.desktop.ui.theme.lightColors
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +31,7 @@ class ThemeManager(
         val DEFAULT_THEME_ID = DefaultTheme.id
         val systemThemeInfo = ThemeInfo(
             id = "system",
-            name = "System",
+            name = Res.string.system.asStringSource(),
             color = Color.Gray,
         )
     }
@@ -147,14 +150,14 @@ class ThemeManager(
 @Stable
 data class ThemeInfo(
     val id: String,
-    val name: String,
+    val name: StringSource,
     val color: Color,
 )
 
 private fun MyColors.toThemeInfo(): ThemeInfo {
     return ThemeInfo(
         id = id,
-        name = name,
+        name = name.asStringSource(),
         color = surface,
     )
 }

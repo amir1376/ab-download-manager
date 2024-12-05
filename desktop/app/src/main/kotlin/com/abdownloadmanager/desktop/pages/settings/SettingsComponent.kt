@@ -244,7 +244,7 @@ fun themeConfig(
         ),
         possibleValues = themes.value,
         describe = {
-            it.name.asStringSource()
+            it.name
         },
     )
 }
