@@ -14,6 +14,29 @@
 
 ### Security
 
+## 1.4.4
+
+### Added
+
+- UI Scale option
+
+### Changed
+
+- The "Selection" cell in download list table can be hidden (optional)
+
+### Fixed
+
+- Improved "Open Folder" in Windows
+- Support third party file managers in Windows
+- "Download Progress" Window shows up even if the "Auto Show Progress Window" option is disabled
+- Improved "Confirm Delete Download" UX
+- Improved the readability of shortcut text in menus
+- Improved sort of download list by status
+- Resize handle moves in opposite direction for RTL languages
+- Improved "Home" page
+- Improved "About" page
+- Updated translations
+
 ## 1.4.3
 
 ### Added
