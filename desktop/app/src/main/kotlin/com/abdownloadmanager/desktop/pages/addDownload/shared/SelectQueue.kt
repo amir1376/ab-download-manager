@@ -24,10 +24,12 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.resources.*
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.queue.DownloadQueue
+import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.MouseInfo
 
 @Composable
@@ -42,7 +44,7 @@ fun ShowAddToQueueDialog(
         size = DpSize(
             height = h.dp,
             width = w.dp,
-        ),
+        ).applyUiScale(LocalUiScale.current),
     )
     val close = {
         onClose()

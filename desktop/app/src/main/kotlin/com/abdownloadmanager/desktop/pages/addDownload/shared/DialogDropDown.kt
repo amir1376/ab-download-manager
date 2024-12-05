@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
 import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.ui.widget.Text
@@ -34,6 +35,7 @@ import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.MouseInfo
 
 @Composable
@@ -81,7 +83,7 @@ fun <T> DropDownContent(
     BaseOptionDialog(
         onCloseRequest = closeDialog,
         state = rememberDialogState(
-            size = dropDownSize
+            size = dropDownSize.applyUiScale(LocalUiScale.current)
         ),
         resizeable = true,
         content = {
