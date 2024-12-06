@@ -88,4 +88,8 @@ abstract class DownloadDestination(
             }
         }
     }
+
+    open fun isOutputFileValid(): Boolean {
+        return outputFile.exists() && outputFile.isFile
+    }
 }
