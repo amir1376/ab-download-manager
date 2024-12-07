@@ -12,7 +12,7 @@ sealed class Arch(val name: String) {
     companion object : ArchFinder by JvmArchFinder() {
         private val DefinedArchStrings = mapOf(
             X64 to listOf(
-                "amd64", "x64"
+                "amd64", "x64", "x86_64"
             ),
             Arm64 to listOf(
                 "arm64", "aarch64"
