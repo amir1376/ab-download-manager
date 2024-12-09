@@ -214,6 +214,10 @@ fun uiScaleConfig(appSettings: AppSettingsStorage): EnumConfigurable<Float?> {
             1.5f,
             1.75f,
             2f,
+            2.25f,
+            2.5f,
+            2.75f,
+            3f,
         ),
         renderMode = EnumConfigurable.RenderMode.Spinner,
         describe = {
