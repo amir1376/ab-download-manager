@@ -21,6 +21,22 @@ logger() {
   fi
 }
 
+remove_if_exists() {
+    local target="$1"
+
+    if [ -z "$target" ]; then
+        logger "No target specified in remove_if_exists function"
+        return 1
+    fi
+
+    if [ -e "$target" ]; then
+        logger "File \"$target\" Removed"
+        rm -rf "$target"
+    else
+        logger "File \"$target\" does not exist"
+    fi
+}
+
 delete_app_config_dir() {
 
     local answer
@@ -29,7 +45,7 @@ delete_app_config_dir() {
 
     case $answer in
         [Yy]* )
-            find "$HOME" -maxdepth 1 -type d -name ".abdm" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+            remove_if_exists "$HOME/.abdm"
             ;;
         [Nn]* )
             logger "Remove The $HOME/.abdm directory manually."
@@ -59,7 +75,7 @@ delete_app() {
         PIDS=$(pidof "$APP_NAME") || true
         if [ -n "$PIDS" ]; then
             echo "Process still running. Force killing..."
-            kill $PIDS 2>/dev/null || echo "Graceful kill failed..."
+            kill -9 $PIDS 2>/dev/null || echo "Force kill failed..."
         else
             echo "$APP_NAME terminated successfully."
         fi
@@ -69,20 +85,21 @@ delete_app() {
 
     logger "removing $APP_NAME desktop file ..."
     # --- Remove the .desktop file in ~/.local/share/applications
-    find "$HOME/.local/share/applications" -maxdepth 1 -type f -name "abdownloadmanager.desktop" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+    remove_if_exists "$HOME/.local/share/applications/abdownloadmanager.desktop"
 
-    logger "unlinking $APP_NAME link ..."
-    find "$HOME/.local/bin/" -maxdepth 1 -type f -name "$APP_NAME" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+    logger "removing $APP_NAME link ..."
+    remove_if_exists "$HOME/.local/bin/$APP_NAME"
 
     logger "removing $APP_NAME binary ..."
-    find "$HOME/.local/bin" -maxdepth 1 -type l -name "$APP_NAME" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
-    find "$HOME/.local/bin" -maxdepth 1 -type d -name "$APP_NAME" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+    remove_if_exists "$HOME/.local/$APP_NAME"
 
     logger "removing $APP_NAME autostart at boot file ..."
-    find "$HOME/.config/autostart" -maxdepth 1 -type d -name "AB Download Manager.desktop" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+    remove_if_exists "$HOME/.config/autostart/AB Download Manager.desktop"
 
-    logger "removing $APP_NAME settings and download lists"
-    delete_app_config_dir
+    if [ -e "$HOME/.abdm" ]; then
+        logger "removing $APP_NAME settings and download lists $HOME/.abdm"
+        delete_app_config_dir
+    fi
 
     logger "AB Download Manager completely removed"
 }

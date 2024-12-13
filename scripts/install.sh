@@ -21,6 +21,22 @@ logger() {
   fi
 }
 
+remove_if_exists() {
+    local target="$1"
+
+    if [ -z "$target" ]; then
+        logger "No target specified in remove_if_exists function"
+        return 1
+    fi
+
+    if [ -e "$target" ]; then
+        logger "File \"$target\" Removed"
+        rm -rf "$target"
+    else
+        logger "File \"$target\" does not exist"
+    fi
+}
+
 # --- Detect OS and The Package Manager to use
 detect_package_manager() {
     if [ -f /etc/os-release ]; then
@@ -117,7 +133,7 @@ delete_old_version() {
         PIDS=$(pidof "$APP_NAME") || true
         if [ -n "$PIDS" ]; then
             echo "Process still running. Force killing..."
-            kill $PIDS 2>/dev/null || echo "Graceful kill failed..."
+            kill -9 $PIDS 2>/dev/null || echo "Force kill failed..."
         else
             echo "$APP_NAME terminated successfully."
         fi
@@ -127,9 +143,9 @@ delete_old_version() {
 
     # Remove old version directories
     # First Remove link to "$HOME/.local/$APP_NAME"
-    find "$HOME/.local/bin" -maxdepth 1 -type l -name "$APP_NAME" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+    remove_if_exists "$HOME/.local/bin/$APP_NAME"
     # then Remove the main binary files directory
-    find "$HOME/.local/bin" -maxdepth 1 -type d -name "$APP_NAME" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+    remove_if_exists "$HOME/.local/$APP_NAME"
 
 
     # Log the removal action
@@ -155,7 +171,7 @@ EOF
 # --- Download the latest version of the app
 download_zip() {
     # Remove the app tarball if it exists in /tmp
-    find "/tmp" -maxdepth 1 -type f -name "$ASSET_NAME" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+    remove_if_exists "/tmp/$ASSET_NAME"
 
     logger "downloading AB Download Manager ..."
     # Perform the download with curl
@@ -163,9 +179,9 @@ download_zip() {
         logger "download finished successfully"
     else
         logger error "Download failed! Something Went Wrong"
-        logger error "Hint: Check Your Internet Connectivity"
+        logger error "Check Your Internet Connectivity"
         # Optionally remove the partially downloaded file
-        find "/tmp" -maxdepth 1 -type f -name "$ASSET_NAME" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+        remove_if_exists "/tmp/$ASSET_NAME"
     fi
 }
 
@@ -179,7 +195,7 @@ install_app() {
     tar -xzf "/tmp/$ASSET_NAME" -C "$HOME/.local"
 
     # --- remove tarball after installation
-    find "/tmp" -maxdepth 1 -type f -name "$ASSET_NAME" -exec bash -c 'echo "File {} Removed"; rm -rf {}' \;
+    remove_if_exists "/tmp/$ASSET_NAME"
 
     # Link the binary to ~/.local/bin
     ln -sf "$BINARY_PATH" "$HOME/.local/bin/$APP_NAME"
