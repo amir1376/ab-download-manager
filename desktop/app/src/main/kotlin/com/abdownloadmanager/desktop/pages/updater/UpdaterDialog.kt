@@ -1,14 +1,13 @@
 package com.abdownloadmanager.desktop.pages.updater
 
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.widget.NotificationModel
 import com.abdownloadmanager.desktop.ui.widget.NotificationType
 import com.abdownloadmanager.desktop.ui.widget.ShowNotification
-import com.abdownloadmanager.desktop.ui.widget.useNotification
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.UpdateCheckStatus
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -21,7 +20,7 @@ fun ShowUpdaterDialog(updaterComponent: UpdateComponent) {
     val closeUpdatePage = {
         updaterComponent.requestClose()
     }
-    val status = updaterComponent.updateCheckStatus
+    val status = updaterComponent.updateCheckStatus.collectAsState().value
 
     var message by remember { mutableStateOf(null as String?) }
     var notificationType by remember { mutableStateOf(null as NotificationType?) }
@@ -33,21 +32,22 @@ fun ShowUpdaterDialog(updaterComponent: UpdateComponent) {
             }
         }
         when (status) {
-            UpdateStatus.Checking -> {
+            UpdateCheckStatus.Checking -> {
                 message = "Checking for update"
                 notificationType = NotificationType.Loading(null)
             }
 
-            is UpdateStatus.Error -> {
+            is UpdateCheckStatus.Error -> {
                 clearMessageAfter(3000)
                 message = """
                     Error while checking for update
                     ${status.e.localizedMessage}
                     """.trimIndent()
+                status.e.printStackTrace()
                 notificationType = NotificationType.Error
             }
 
-            UpdateStatus.NoUpdate -> {
+            UpdateCheckStatus.NoUpdate -> {
                 clearMessageAfter(3000)
                 message = "No update"
                 notificationType = NotificationType.Info

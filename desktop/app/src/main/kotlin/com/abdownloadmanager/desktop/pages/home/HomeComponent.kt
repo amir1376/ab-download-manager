@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.resources.Res
@@ -413,6 +414,7 @@ class HomeComponent(
     private val queueManager: QueueManager by inject()
     private val pageStorage: PageStatesStorage by inject()
     private val appSettings: AppSettingsStorage by inject()
+    private val updateManager: UpdateManager by inject()
     val filterState = FilterState()
     val mergeTopBarWithTitleBar = appSettings.mergeTopBarWithTitleBar
 
@@ -589,8 +591,9 @@ class HomeComponent(
             +gotoSettingsAction
         }
         subMenu(Res.string.help.asStringSource()) {
-            //TODO Enable Updater
-//            +checkForUpdateAction
+            if (updateManager.isUpdateSupported()) {
+                +checkForUpdateAction
+            }
             +supportActionGroup
             separator()
             +openOpenSourceThirdPartyLibraries

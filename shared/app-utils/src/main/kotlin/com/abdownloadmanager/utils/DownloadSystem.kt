@@ -126,10 +126,12 @@ class DownloadSystem(
     }
 
     suspend fun manualResume(id: Long): Boolean {
-//        if (mainDownloadQueue.isQueueActive) {
-//            return false
-//        }
-        downloadManager.resume(id, ResumedBy(User))
+        manualResume(id, ResumedBy(User))
+        return true
+    }
+
+    suspend fun manualResume(id: Long, context: DownloadItemContext): Boolean {
+        downloadManager.resume(id, context)
         return true
     }
 

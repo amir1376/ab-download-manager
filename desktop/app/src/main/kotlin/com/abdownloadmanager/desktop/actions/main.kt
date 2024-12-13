@@ -149,12 +149,12 @@ val showDownloadList = simpleAction(
     appComponent.openHome()
 }
 
-/*val checkForUpdateAction = simpleAction(
-    title = "Check For Update",
+val checkForUpdateAction = simpleAction(
+    title = "Check For Update".asStringSource(),
     icon = MyIcons.refresh,
 ) {
     appComponent.updater.requestCheckForUpdate()
-}*/
+}
 val openAboutAction = simpleAction(
     title = Res.string.about.asStringSource(),
     icon = MyIcons.info,
