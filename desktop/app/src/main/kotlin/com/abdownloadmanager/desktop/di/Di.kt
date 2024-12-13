@@ -1,10 +1,12 @@
 package com.abdownloadmanager.desktop.di
 
+import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.integration.IntegrationHandlerImp
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
+import com.abdownloadmanager.desktop.pages.updater.UpdateDownloaderViaDownloadSystem
 import ir.amirab.downloader.queue.QueueManager
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.*
@@ -23,6 +25,8 @@ import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.util.startup.Startup
 import com.abdownloadmanager.integration.Integration
+import com.abdownloadmanager.updateapplier.DesktopUpdateApplier
+import com.abdownloadmanager.updateapplier.UpdateApplier
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.util.config.datastore.createMapConfigDatastore
 import kotlinx.coroutines.*
@@ -188,8 +192,25 @@ val integrationModule = module {
     }
 }
 val updaterModule = module {
+    single<UpdateApplier> {
+        DesktopUpdateApplier(
+            AppInfo.installationFolder,
+            AppInfo.updateDir.path,
+            AppInfo.logDir.path,
+            UpdateDownloaderViaDownloadSystem(
+                get(),
+                get<AppSettingsStorage>().defaultDownloadFolder.value,
+            ),
+        )
+    }
     single<UpdateChecker> {
         DummyUpdateChecker(AppVersion.get())
+    }
+    single {
+        UpdateManager(
+            updateChecker = get(),
+            updateApplier = get(),
+        )
     }
 }
 val startUpModule = module {

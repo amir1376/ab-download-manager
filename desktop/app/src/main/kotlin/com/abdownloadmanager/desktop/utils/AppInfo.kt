@@ -21,6 +21,18 @@ object AppInfo {
 //        }
         System.getProperty("jpackage.app-path")
     }
+    val installationFolder: String? = run {
+        exeFile?.let(::File)
+            ?.parentFile // executable path
+            ?.let {
+                when (Platform.getCurrentPlatform()) {
+                    Platform.Desktop.Linux -> it.parentFile // <installationFolder>/bin/ABDownloadManager
+                    Platform.Desktop.MacOS -> it.parentFile // not checked yet
+                    Platform.Desktop.Windows -> it // <installationFolder>/ABDownloadManager.exe
+                    else -> null
+                }?.path
+            }
+    }
 }
 
 fun AppInfo.isAppInstalled(): Boolean {
@@ -36,8 +48,11 @@ fun AppInfo.isInDebugMode(): Boolean {
 }
 
 val AppInfo.configDir: File get() = File(AppProperties.getConfigDirectory())
+val AppInfo.systemDir: File get() = File(AppProperties.getSystemDirectory())
+val AppInfo.updateDir: File get() = AppInfo.systemDir.resolve("update")
+val AppInfo.logDir: File get() = AppInfo.systemDir.resolve("log")
 val AppInfo.optionsDir: File get() = AppInfo.configDir.resolve("options")
-val AppInfo.downloadDbDir:File get() =  AppInfo.configDir.resolve("download_db")
-fun AppInfo.extensions(){
+val AppInfo.downloadDbDir: File get() = AppInfo.configDir.resolve("download_db")
+fun AppInfo.extensions() {
 
 }

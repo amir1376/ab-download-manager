@@ -1,44 +1,37 @@
 package com.abdownloadmanager
 
 import io.github.z4kn4fein.semver.Version
+import ir.amirab.util.platform.Arch
 import ir.amirab.util.platform.Platform
 
 data class AppArtifactInfo(
     val version: Version,
     val platform: Platform,
+    val arch: Arch,
 )
 
 object ArtifactUtil {
-    private val versionPatern = "(\\d+\\.\\d+\\.\\d+)"
-    val versionRegex = "_$versionPatern".toRegex()
-    val platformRegex = "_${versionPatern}_([a-zA-Z]+)".toRegex()
-    fun extractVersion(name: String): Version? {
-        versionRegex.toString()
-        val versionString = versionRegex.find(name)?.groupValues?.get(1) ?: return null
-        return Version.parse(versionString)
-    }
-
-    fun extractVersionFromTag(tagName: String): Version? {
-        return versionRegex.find(tagName)?.value?.let {
-            Version.parse(it)
-        }
-    }
-
-    private fun extractPlatformFromName(name: String): Platform? {
-        val platformString = platformRegex.find(name)?.groupValues?.get(2) ?: return null
-        return Platform.fromString(platformString)
-    }
-
+    val artifactRegex =
+        "(?<appName>[a-zA-Z]+)_(?<version>(\\d+\\.\\d+\\.\\d+))_(?<platform>[a-zA-Z]+)_(?<arch>[a-zA-Z0-9]+)\\.(?<extension>.+)".toRegex()
 
     fun getArtifactInfo(name: String): AppArtifactInfo? {
-        val version = extractVersion(name) ?: return null
-        val platform = extractPlatformFromName(name) ?: return null
+        val values = artifactRegex.find(name)?.groups ?: return null
+        val version = runCatching { values.get("version")?.value }
+            .getOrNull()
+            ?.let(Version::parse)
+            ?: return null
+        val platform = runCatching { values.get("platform")?.value }
+            .getOrNull()
+            ?.let(Platform::fromString)
+            ?: return null
+        val arch = runCatching { values.get("arch")?.value }
+            .getOrNull()
+            ?.let(Arch::fromString)
+            ?: return null
         return AppArtifactInfo(
             version = version,
             platform = platform,
+            arch = arch,
         )
-
-
     }
-
 }

@@ -22,12 +22,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
 import io.github.z4kn4fein.semver.Version
-import com.abdownloadmanager.updatechecker.VersionData
+import com.abdownloadmanager.updatechecker.UpdateInfo
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun NewUpdatePage(
-    versionVersionData: VersionData,
+    versionVersionData: UpdateInfo,
     currentVersion: Version,
     update: () -> Unit,
     cancel: () -> Unit,
@@ -49,7 +51,7 @@ fun NewUpdatePage(
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(4.dp))
-        WithContentAlpha(0.75f){
+        WithContentAlpha(0.75f) {
             Text(
                 text = "you can press on update button to update to the latest version",
                 fontSize = myTextSizes.base,
@@ -115,7 +117,7 @@ fun CancelButton(
     cancel: () -> Unit,
 ) {
     ActionButton(
-        text = "Cancel",
+        text = myStringResource(Res.string.cancel),
         modifier = modifier,
         onClick = cancel,
     )
@@ -156,9 +158,17 @@ private fun RenderKeyValue(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         WithContentAlpha(0.50f) {
-            Text(key, fontSize = myTextSizes.base)
+            Text(
+                key,
+                fontSize = myTextSizes.base,
+                maxLines = 1,
+            )
         }
         Spacer(Modifier.width(8.dp))
-        Text(value, fontSize = myTextSizes.base)
+        Text(
+            value,
+            fontSize = myTextSizes.base,
+            maxLines = 1,
+        )
     }
 }

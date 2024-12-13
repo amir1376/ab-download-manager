@@ -1,5 +1,8 @@
 package com.abdownloadmanager.updateapplier
 
-abstract class UpdateApplier{
-    abstract suspend fun applyUpdate()
+import com.abdownloadmanager.updatechecker.UpdateInfo
+
+interface UpdateApplier {
+    fun updateSupported(): Boolean
+    suspend fun applyUpdate(updateInfo: UpdateInfo)
 }
