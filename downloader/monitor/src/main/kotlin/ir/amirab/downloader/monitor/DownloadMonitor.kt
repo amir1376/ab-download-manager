@@ -260,8 +260,8 @@ class DownloadMonitor(
     )
 
     override suspend fun waitForDownloadToFinishOrCancel(
-        id: Long
-    ): Boolean {
+        id: Long,
+    ) {
         val event = downloadManager
             .listOfJobsEvents
             .filter {
@@ -278,10 +278,8 @@ class DownloadMonitor(
                     is DownloadManagerEvents.OnJobStarting -> false
                 }
             }
-        if (event is DownloadManagerEvents.OnJobCompleted) {
-            return true
-        } else {
-            return false
+        if (event is DownloadManagerEvents.OnJobCanceled) {
+            throw event.e
         }
     }
 }

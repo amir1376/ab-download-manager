@@ -14,8 +14,8 @@ interface IDownloadMonitor {
     val activeDownloadCount: StateFlow<Int>
 
     suspend fun waitForDownloadToFinishOrCancel(
-        id: Long
-    ): Boolean
+        id: Long,
+    )
 }
 
 fun IDownloadMonitor.isDownloadActiveFlow(

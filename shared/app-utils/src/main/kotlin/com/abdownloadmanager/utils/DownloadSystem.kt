@@ -126,10 +126,12 @@ class DownloadSystem(
     }
 
     suspend fun manualResume(id: Long): Boolean {
-//        if (mainDownloadQueue.isQueueActive) {
-//            return false
-//        }
-        downloadManager.resume(id, ResumedBy(User))
+        manualResume(id, ResumedBy(User))
+        return true
+    }
+
+    suspend fun manualResume(id: Long, context: DownloadItemContext): Boolean {
+        downloadManager.resume(id, context)
         return true
     }
 
@@ -209,6 +211,11 @@ class DownloadSystem(
     fun getDownloadItemByPath(path: String): IDownloadItemState? {
         return downloadMonitor.downloadListFlow.value.find {
             it.getFullPath().path == path
+        }
+    }
+    fun getDownloadItemsByFolder(folder: String): List<IDownloadItemState> {
+        return downloadMonitor.downloadListFlow.value.filter {
+            it.folder == folder
         }
     }
 

@@ -29,6 +29,7 @@ import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
+import com.abdownloadmanager.desktop.pages.updater.ShowUpdaterDialog
 import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.utils.compose.ProvideDebugInfo
 import ir.amirab.util.compose.localizationmanager.LanguageManager
@@ -89,8 +90,7 @@ object Ui : KoinComponent {
                                 ShowAddDownloadDialogs(appComponent)
                                 ShowDownloadDialogs(appComponent)
                                 ShowCategoryDialogs(appComponent)
-                                //TODO Enable Updater
-                                //ShowUpdaterDialog(appComponent.updater)
+                                ShowUpdaterDialog(appComponent.updater)
                                 ShowAboutDialog(appComponent)
                                 NewQueueDialog(appComponent)
                                 ShowMessageDialogs(appComponent)
