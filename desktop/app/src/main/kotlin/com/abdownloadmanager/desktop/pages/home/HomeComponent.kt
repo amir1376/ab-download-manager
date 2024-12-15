@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.CategoryItemWithId
@@ -39,6 +39,8 @@ import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import ir.amirab.downloader.downloaditem.contexts.RemovedBy
+import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.osfileutil.FileUtils
@@ -495,7 +497,11 @@ class HomeComponent(
         scope.launch {
             val selectionList = promptState.downloadList
             for (id in selectionList) {
-                downloadSystem.removeDownload(id, promptState.alsoDeleteFile)
+                downloadSystem.removeDownload(
+                    id = id,
+                    alsoRemoveFile = promptState.alsoDeleteFile,
+                    context = RemovedBy(User),
+                )
             }
         }
     }
@@ -558,6 +564,9 @@ class HomeComponent(
                 title = Res.string.delete.asStringSource(),
                 icon = MyIcons.remove
             ) {
+                item(Res.string.all_missing_files.asStringSource()) {
+                    requestDelete(downloadSystem.getListOfDownloadThatMissingFileOrHaveNotProgress().map { it.id })
+                }
                 item(Res.string.all_finished.asStringSource()) {
                     requestDelete(downloadSystem.getFinishedDownloadIds())
                 }

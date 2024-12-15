@@ -25,6 +25,7 @@ composeReorderable = "0.9.6"
 semver = "2.0.0"
 jgit = "6.9.0.202403050737-r"
 osThemeDetector = "3.9.1"
+kotlinFileWatcher = "1.3.0"
 
 [libraries]
 
@@ -118,6 +119,8 @@ androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "d
 osThemeDetector = { module = "com.github.Dansoftowner:jSystemThemeDetector", version.ref = "osThemeDetector" }
 
 handlebarsJava = "com.github.jknack:handlebars:4.4.0"
+
+kotlinFileWatcher = { module = "io.github.irgaly.kfswatch:kfswatch", version.ref = "kotlinFileWatcher" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

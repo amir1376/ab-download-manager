@@ -39,6 +39,7 @@ import ir.amirab.downloader.utils.OnDuplicateStrategy
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
 import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.CategorySelectionMode
 import ir.amirab.downloader.exception.TooManyErrorException

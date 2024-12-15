@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface IDownloadMonitor {
     var useAverageSpeed: Boolean
-    val activeDownloadListFlow: MutableStateFlow<List<ProcessingDownloadItemState>>
-    val completedDownloadListFlow: MutableStateFlow<List<CompletedDownloadItemState>>
-    val downloadListFlow: Flow<List<IDownloadItemState>>
+    val activeDownloadListFlow: StateFlow<List<ProcessingDownloadItemState>>
+    val completedDownloadListFlow: StateFlow<List<CompletedDownloadItemState>>
+    val downloadListFlow: StateFlow<List<IDownloadItemState>>
     val activeDownloadCount: StateFlow<Int>
 
     suspend fun waitForDownloadToFinishOrCancel(

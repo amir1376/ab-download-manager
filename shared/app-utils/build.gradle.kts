@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlinFileWatcher)
 
     implementation(compose.runtime)
     implementation(compose.foundation)

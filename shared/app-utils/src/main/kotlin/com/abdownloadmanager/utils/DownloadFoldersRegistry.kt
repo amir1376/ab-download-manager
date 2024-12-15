@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.utils
+package com.abdownloadmanager.utils
 
 import java.io.File
 

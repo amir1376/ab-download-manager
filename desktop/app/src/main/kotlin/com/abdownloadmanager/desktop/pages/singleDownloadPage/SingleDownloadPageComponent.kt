@@ -11,6 +11,7 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigur
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.utils.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.DownloadManagerEvents
@@ -22,7 +23,6 @@ import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.combineStateFlows
-import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -79,7 +79,7 @@ class SingleDownloadComponent(
     init {
         downloadMonitor
             .downloadListFlow
-            .conflate()
+//            .conflate()
             .onEach {
                 val item = it.firstOrNull { it.id == downloadId }
                 val previous = itemStateFlow.value

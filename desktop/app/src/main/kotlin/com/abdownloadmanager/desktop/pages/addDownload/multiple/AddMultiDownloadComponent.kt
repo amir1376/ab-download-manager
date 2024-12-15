@@ -4,7 +4,7 @@ import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.DownloadUiChecker
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
-import com.abdownloadmanager.desktop.utils.DownloadSystem
+import com.abdownloadmanager.utils.DownloadSystem
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

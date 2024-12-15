@@ -6,6 +6,7 @@ import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.utils.intervalFlow
 import ir.amirab.util.flow.saved
 import ir.amirab.downloader.DownloadManager
+import ir.amirab.util.flow.combineStateFlows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -37,8 +38,8 @@ class DownloadMonitor(
         }
     override val activeDownloadListFlow = MutableStateFlow<List<ProcessingDownloadItemState>>(emptyList())
     override val completedDownloadListFlow = MutableStateFlow<List<CompletedDownloadItemState>>(emptyList())
-    override val downloadListFlow: Flow<List<IDownloadItemState>> =
-            combine(activeDownloadListFlow, completedDownloadListFlow) { a, b -> a + b }
+    override val downloadListFlow: StateFlow<List<IDownloadItemState>> =
+        combineStateFlows(activeDownloadListFlow, completedDownloadListFlow) { a, b -> a + b }
 
     init {
         activeDownloadListFlow
