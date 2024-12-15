@@ -33,6 +33,7 @@ data class AppSettingsModel(
         .canonicalFile.absolutePath,
     val browserIntegrationEnabled: Boolean = true,
     val browserIntegrationPort: Int = 15151,
+    val trackDeletedFilesOnDisk: Boolean = false,
 ) {
     companion object {
         val default: AppSettingsModel get() = AppSettingsModel()
@@ -57,6 +58,7 @@ data class AppSettingsModel(
             val defaultDownloadFolder = stringKeyOf("defaultDownloadFolder")
             val browserIntegrationEnabled = booleanKeyOf("browserIntegrationEnabled")
             val browserIntegrationPort = intKeyOf("browserIntegrationPort")
+            val trackDeletedFilesOnDisk = booleanKeyOf("trackDeletedFilesOnDisk")
         }
 
 
@@ -84,6 +86,7 @@ data class AppSettingsModel(
                 browserIntegrationEnabled = source.get(Keys.browserIntegrationEnabled)
                     ?: default.browserIntegrationEnabled,
                 browserIntegrationPort = source.get(Keys.browserIntegrationPort) ?: default.browserIntegrationPort,
+                trackDeletedFilesOnDisk = source.get(Keys.trackDeletedFilesOnDisk) ?: default.trackDeletedFilesOnDisk,
             )
         }
 
@@ -106,6 +109,7 @@ data class AppSettingsModel(
                 put(Keys.defaultDownloadFolder, focus.defaultDownloadFolder)
                 put(Keys.browserIntegrationEnabled, focus.browserIntegrationEnabled)
                 put(Keys.browserIntegrationPort, focus.browserIntegrationPort)
+                put(Keys.trackDeletedFilesOnDisk, focus.trackDeletedFilesOnDisk)
             }
         }
     }
@@ -143,4 +147,5 @@ class AppSettingsStorage(
     val defaultDownloadFolder = from(AppSettingsModel.defaultDownloadFolder)
     val browserIntegrationEnabled = from(AppSettingsModel.browserIntegrationEnabled)
     val browserIntegrationPort = from(AppSettingsModel.browserIntegrationPort)
+    val trackDeletedFilesOnDisk = from(AppSettingsModel.trackDeletedFilesOnDisk)
 }

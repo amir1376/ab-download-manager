@@ -35,8 +35,11 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import com.abdownloadmanager.updatechecker.DummyUpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateChecker
+import com.abdownloadmanager.utils.DownloadFoldersRegistry
+import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.FileIconProviderUsingCategoryIcons
+import com.abdownloadmanager.utils.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.utils.category.*
 import com.abdownloadmanager.utils.compose.IMyIcons
 import com.abdownloadmanager.utils.proxy.IProxyStorage
@@ -263,6 +266,11 @@ val appModule = module {
                 AppComponent(context)
             }
         }
+    }
+    single {
+        RemovedDownloadsFromDiskTracker(
+            get(), get(), get(),
+        )
     }
 
 }

@@ -106,6 +106,21 @@ fun useSparseFileAllocation(appRepository: AppRepository): BooleanConfigurable {
     )
 }
 
+fun trackDeletedFilesOnDisk(appRepository: AppRepository): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_track_deleted_files_on_disk.asStringSource(),
+        description = Res.string.settings_track_deleted_files_on_disk_description.asStringSource(),
+        backedBy = appRepository.trackDeletedFilesOnDisk,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
 fun showDownloadFinishWindow(settingsStorage: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_show_completion_dialog.asStringSource(),
@@ -403,6 +418,7 @@ class SettingsComponent(
                     showDownloadFinishWindow(appSettings),
                     useServerLastModified(appRepository),
                     useSparseFileAllocation(appRepository),
+                    trackDeletedFilesOnDisk(appRepository),
                 )
             }
         }

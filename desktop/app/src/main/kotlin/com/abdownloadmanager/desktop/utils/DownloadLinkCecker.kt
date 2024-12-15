@@ -1,5 +1,6 @@
 package com.abdownloadmanager.desktop.utils
 
+import com.abdownloadmanager.utils.DownloadSystem
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.mapStateFlow
 import com.abdownloadmanager.utils.isValidUrl

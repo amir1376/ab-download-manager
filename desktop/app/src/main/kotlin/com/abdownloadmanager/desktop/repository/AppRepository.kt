@@ -2,10 +2,11 @@ package com.abdownloadmanager.desktop.repository
 
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.utils.AutoStartManager
-import com.abdownloadmanager.desktop.utils.DownloadSystem
+import com.abdownloadmanager.utils.DownloadSystem
 import ir.amirab.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
+import com.abdownloadmanager.utils.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.utils.proxy.ProxyManager
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.monitor.IDownloadMonitor
@@ -24,11 +25,12 @@ class AppRepository : KoinComponent {
     val theme = appSettings.theme
 
     val uiScale = appSettings.uiScale
-    private val downloadSystem : DownloadSystem by inject()
+    private val downloadSystem: DownloadSystem by inject()
     private val downloadSettings: DownloadSettings by inject()
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
     private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor
     private val integration: Integration by inject()
+    private val removedDownloadsFromDiskTracker: RemovedDownloadsFromDiskTracker by inject()
 
     val speedLimiter = appSettings.speedLimit
     val threadCount = appSettings.threadCount
@@ -39,7 +41,7 @@ class AppRepository : KoinComponent {
     val saveLocation = appSettings.defaultDownloadFolder
     val integrationEnabled = appSettings.browserIntegrationEnabled
     val integrationPort = appSettings.browserIntegrationPort
-
+    val trackDeletedFilesOnDisk = appSettings.trackDeletedFilesOnDisk
 
     init {
         //maybe its better to move this to another place
@@ -105,6 +107,16 @@ class AppRepository : KoinComponent {
                 integrationEnabled.update { false }
             }
         }.launchIn(scope)
+        trackDeletedFilesOnDisk
+            .debounce(500)
+            .onEach { enabled ->
+                if (enabled) {
+                    removedDownloadsFromDiskTracker.removeDownloadsThatFilesAreMissing()
+                    removedDownloadsFromDiskTracker.start()
+                } else {
+                    removedDownloadsFromDiskTracker.stop()
+                }
+            }.launchIn(scope)
     }
 
 }

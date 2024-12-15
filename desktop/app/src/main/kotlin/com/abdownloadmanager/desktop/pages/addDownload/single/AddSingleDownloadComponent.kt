@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient

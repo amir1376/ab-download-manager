@@ -3,7 +3,7 @@ package com.abdownloadmanager.desktop.pages.updater
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.utils.AppVersion
 import com.abdownloadmanager.desktop.utils.BaseComponent
-import com.abdownloadmanager.desktop.utils.DownloadSystem
+import com.abdownloadmanager.utils.DownloadSystem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue

@@ -1,11 +1,9 @@
 package com.abdownloadmanager.desktop.pages.editdownload
 
-import androidx.compose.runtime.Immutable
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
-import com.abdownloadmanager.desktop.utils.mvi.ContainsScreenState
-import com.abdownloadmanager.desktop.utils.mvi.SupportsScreenState
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
+import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.utils.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient

@@ -25,6 +25,7 @@ data class ProcessingDownloadItemState(
     val progress = parts.sumOf {
         it.howMuchProceed
     }
+    val hasProgress get() = progress > 0
     val gotAnyProgress= progress > 0L
     val percent: Int? = if (contentLength == DownloadItem.LENGTH_UNKNOWN) {
         null
