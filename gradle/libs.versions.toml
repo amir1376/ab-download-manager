@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.1.0"
 ksp = "2.1.0-1.0.29"
-compose = "1.7.1"
+compose = "1.7.3"
 ktorVersion = "2.3.7"
 kotlin-serialization = "1.7.3"
 okhttp = "4.12.0"
