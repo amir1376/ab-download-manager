@@ -946,6 +946,8 @@ class HomeComponent(
         +stopQueueGroupAction
         +stopAllAction
         separator()
+        +downloadActions.deleteAction
+        separator()
         +openQueuesAction
         +gotoSettingsAction
     }
