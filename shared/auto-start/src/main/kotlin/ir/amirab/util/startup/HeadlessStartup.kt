@@ -3,11 +3,11 @@ package ir.amirab.util.startup
 class HeadlessStartup(
     name: String,
     path: String,
-    isJar: Boolean = false,
+    args: List<String>,
 ) : AbstractStartupManager(
     name = name,
     path = path,
-    isJar = isJar
+    args = args,
 ) {
     @Throws(Exception::class)
     override fun install() {

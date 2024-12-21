@@ -7,11 +7,6 @@ import java.io.File
 import java.io.InputStreamReader
 
 object Utils {
-    val jarFile: File
-        get() = File(
-            Utils::class.java.protectionDomain.codeSource.location.path.replace("%20", " ").replace("file:", "")
-        )
-
     @get:Throws(Exception::class)
     val isRoot: Boolean
         get() = Platform.getCurrentPlatform() !== Platform.Desktop.Windows && BufferedReader(
