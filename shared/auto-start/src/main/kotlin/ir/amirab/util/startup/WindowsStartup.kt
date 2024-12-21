@@ -1,41 +1,37 @@
 package ir.amirab.util.startup
 
+import com.sun.jna.platform.win32.Advapi32Util
+import com.sun.jna.platform.win32.WinReg
+
 class WindowsStartup(
     name: String,
     path: String,
-    isJar: Boolean = false,
+    args: List<String>,
 ) : AbstractStartupManager(
     name = name,
     path = path,
-    isJar = isJar
+    args = args
 ) {
-
-    private fun getData(): String {
-
-        return if (isJar) {
-            val javaHome = System.getProperty("java.home") + "\\bin\\javaw.exe"
-            "$javaHome -jar \"$path\""
-        } else {
-            super.path
-        }
-    }
     @Throws(Exception::class)
     override fun install() {
-        val data=getData()
-
-        Runtime.getRuntime().exec(
-            arrayOf("reg", "add", "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\", "/v", super.name, "/t",
-                "REG_SZ", "/d", data, "/f"
-            )
+        val data = getExecutableWithArgs()
+        Advapi32Util.registrySetStringValue(
+            WinReg.HKEY_CURRENT_USER,
+            "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+            this.name,
+            data
         )
     }
 
     override fun uninstall() {
-        Runtime.getRuntime().exec(
-            arrayOf(
-                "reg", "delete", "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\",
-                "/v", super.name, "/f",
+        try {
+            Advapi32Util.registryDeleteValue(
+                WinReg.HKEY_CURRENT_USER,
+                "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                this.name,
             )
-        )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

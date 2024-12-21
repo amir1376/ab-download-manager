@@ -196,10 +196,8 @@ val startUpModule = module {
     single {
         Startup.getStartUpManagerForDesktop(
             name = AppInfo.name,
-            path = AppInfo.exeFile?.let { exeFile ->
-                "$exeFile ${AppArguments.Args.BACKGROUND}"
-            },
-            jar = false,
+            path = AppInfo.exeFile,
+            args = listOf(AppArguments.Args.BACKGROUND),
         )
     }
 }

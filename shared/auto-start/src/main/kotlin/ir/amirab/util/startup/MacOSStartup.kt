@@ -7,9 +7,11 @@ import java.io.PrintWriter
 class MacOSStartup(
     name: String,
     path: String,
-    isJar: Boolean,
+    args: List<String>,
 ) : AbstractStartupManager(
-    path = path, name = name, isJar = isJar,
+    path = path,
+    name = name,
+    args = args,
 ) {
     private fun getFile(): File {
         if (!launchAgentsDir.exists()) {
@@ -28,11 +30,7 @@ class MacOSStartup(
         out.println("\t<string>" + super.name + "</string>")
         out.println("\t<key>ProgramArguments</key>")
         out.println("\t<array>")
-        if (isJar) {
-            out.println("\t\t<string>java</string>")
-            out.println("\t\t<string>-jar</string>")
-        }
-        out.println("\t\t<string>" + super.path + "</string>")
+        out.println("\t\t<string>" + getExecutableWithArgs() + "</string>")
         out.println("\t</array>")
         out.println("\t<key>RunAtLoad</key>")
         out.println("\t<true/>")
