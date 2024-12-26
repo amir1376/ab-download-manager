@@ -33,7 +33,7 @@ fun ExtraConfig(
     configurables: List<Configurable<*>>,
 ) {
     val h = 250
-    val w = 300
+    val w = 350
     val state = rememberDialogState(
         size = DpSize(
             height = h.dp,

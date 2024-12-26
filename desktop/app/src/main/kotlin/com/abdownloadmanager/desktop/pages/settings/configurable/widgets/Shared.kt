@@ -260,7 +260,7 @@ fun ConfigTemplate(
             horizontalArrangement = Arrangement.Center,
         ) {
             Column(
-                Modifier.weight(1f, true),
+                Modifier.weight(2f, true),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start,
             ) {
