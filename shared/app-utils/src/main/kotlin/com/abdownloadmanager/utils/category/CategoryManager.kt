@@ -208,6 +208,26 @@ class CategoryManager(
             .mapNotNull { it.getDownloadPath() }.contains(folder)
     }
 
+    @Suppress("NAME_SHADOWING")
+    fun updateCategoryFoldersBasedOnDefaultDownloadFolder(
+        previousDownloadFolder: String,
+        currentDownloadFolder: String,
+    ) {
+        val previousDownloadFolder = File(previousDownloadFolder).absoluteFile
+        val currentDownloadFolder = File(currentDownloadFolder).absoluteFile
+        for (category in getCategories()) {
+            val categoryPath = File(category.path).absoluteFile
+            if (categoryPath.startsWith(previousDownloadFolder)) {
+                val relativePath = categoryPath.relativeTo(previousDownloadFolder)
+                updateCategory(category.id) {
+                    it.copy(
+                        path = currentDownloadFolder.resolve(relativePath).absolutePath
+                    )
+                }
+            }
+        }
+    }
+
     companion object {
         /**
          * Reserved ids for default categories
