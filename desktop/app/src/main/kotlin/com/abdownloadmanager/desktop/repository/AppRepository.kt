@@ -7,9 +7,11 @@ import ir.amirab.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
 import com.abdownloadmanager.utils.autoremove.RemovedDownloadsFromDiskTracker
+import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.proxy.ProxyManager
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.monitor.IDownloadMonitor
+import ir.amirab.util.flow.withPrevious
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
@@ -31,6 +33,7 @@ class AppRepository : KoinComponent {
     private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor
     private val integration: Integration by inject()
     private val removedDownloadsFromDiskTracker: RemovedDownloadsFromDiskTracker by inject()
+    val categoryManager: CategoryManager by inject()
 
     val speedLimiter = appSettings.speedLimit
     val threadCount = appSettings.threadCount
@@ -44,6 +47,18 @@ class AppRepository : KoinComponent {
     val trackDeletedFilesOnDisk = appSettings.trackDeletedFilesOnDisk
 
     init {
+        saveLocation
+            .debounce(500)
+            .withPrevious()
+            .onEach { (oldDownloadFolder, newDownloadFolder) ->
+                if (oldDownloadFolder == null) {
+                    return@onEach
+                }
+                categoryManager.updateCategoryFoldersBasedOnDefaultDownloadFolder(
+                    previousDownloadFolder = oldDownloadFolder,
+                    currentDownloadFolder = newDownloadFolder,
+                )
+            }.launchIn(scope)
         //maybe its better to move this to another place
         appSettings.autoStartOnBoot
             .debounce(500)
