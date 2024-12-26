@@ -156,7 +156,13 @@ FunctionEnd
 	Delete "$DESKTOP\${APP_DISPLAY_NAME}.lnk"
 !macroend
 
-
+Function .onInstSuccess
+    ; Check if the installer is running in silent mode
+    ${If} ${Silent}
+        ; In silent mode, always run the app
+        Call RunMainBinary
+    ${Endif}
+FunctionEnd
 
 Section "${APP_DISPLAY_NAME}"
     SectionInstType RO

@@ -13,9 +13,6 @@ import com.abdownloadmanager.desktop.ui.customwindow.rememberWindowController
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
-import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
-import ir.amirab.util.compose.resources.myStringResource
 import java.awt.Dimension
 
 @Composable
@@ -31,7 +28,7 @@ fun HomeWindow(
     val onCloseRequest = onCLoseRequest
     val windowIcon = MyIcons.appIcon
     val windowController = rememberWindowController(
-        AppInfo.name,
+        AppInfo.displayName,
         windowIcon.rememberPainter(),
     )
 

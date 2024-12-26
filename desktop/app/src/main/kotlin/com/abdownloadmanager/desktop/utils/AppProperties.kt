@@ -20,6 +20,7 @@ object AppProperties {
 
     private object Keys {
         const val CONFIG_DIRECTORY: String = "app.config.path"
+        const val SYSTEM_DIRECTORY: String = "app.system.path"
         const val DEBUG: String = "app.debug"
     }
 
@@ -79,6 +80,11 @@ object AppProperties {
 
     fun getConfigDirectory(): String {
         return ensureAndGet(Keys.CONFIG_DIRECTORY)
+            .toString()
+    }
+
+    fun getSystemDirectory(): String {
+        return ensureAndGet(Keys.SYSTEM_DIRECTORY)
             .toString()
     }
     //app.properties in installation directory

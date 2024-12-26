@@ -45,7 +45,7 @@ dependencies {
     implementation(libs.androidx.datastore)
 
     implementation(libs.aboutLibraries.core)
-
+    implementation(libs.markdownRenderer.core)
     implementation(libs.composeFileKit) {
         exclude(group = "net.java.dev.jna")
     }
@@ -181,12 +181,16 @@ buildConfig {
         }
     )
     buildConfigField(
+        "APP_DISPLAY_NAME",
+        provider { getPrettifiedAppName() }
+    )
+    buildConfigField(
         "APP_VERSION",
         provider { getAppVersionString() }
     )
     buildConfigField(
         "APP_NAME",
-        provider { getPrettifiedAppName() }
+        provider { getAppName() }
     )
     buildConfigField(
         "PROJECT_WEBSITE",
@@ -198,6 +202,18 @@ buildConfig {
         "PROJECT_SOURCE_CODE",
         provider {
             "https://github.com/amir1376/ab-download-manager"
+        }
+    )
+    buildConfigField(
+        "PROJECT_GITHUB_OWNER",
+        provider {
+            "amir1376"
+        }
+    )
+    buildConfigField(
+        "PROJECT_GITHUB_REPO",
+        provider {
+            "ab-download-manager"
         }
     )
     buildConfigField(

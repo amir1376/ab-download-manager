@@ -12,6 +12,7 @@ import com.abdownloadmanager.desktop.pages.home.HomeComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.SettingsComponent
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadComponent
+import com.abdownloadmanager.desktop.pages.updater.UpdateComponent
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.ui.widget.MessageDialogModel
@@ -42,6 +43,7 @@ import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.utils.category.CategoryManager
 import com.abdownloadmanager.utils.category.CategorySelectionMode
+import com.arkivanov.decompose.childContext
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
 import ir.amirab.util.compose.StringSource
@@ -847,8 +849,10 @@ class AppComponent(
         ).all { it }
     }
 
-    //    TODO enable updater
-//    val updater = UpdateComponent(childContext("updater"))
+    val updater = UpdateComponent(
+        childContext("updater"),
+        this,
+    )
     val showAboutPage = MutableStateFlow(false)
     val showOpenSourceLibraries = MutableStateFlow(false)
     val showTranslators = MutableStateFlow(false)

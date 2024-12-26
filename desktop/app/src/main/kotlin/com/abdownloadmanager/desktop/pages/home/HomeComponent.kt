@@ -20,8 +20,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
+import com.abdownloadmanager.desktop.ui.widget.MessageDialogType
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.utils.FileIconProvider
@@ -41,10 +43,12 @@ import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.User
+import ir.amirab.util.AppVersionTracker
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -413,6 +417,8 @@ class HomeComponent(
     private val queueManager: QueueManager by inject()
     private val pageStorage: PageStatesStorage by inject()
     private val appSettings: AppSettingsStorage by inject()
+    private val updateManager: UpdateManager by inject()
+    private val appVersionTracker: AppVersionTracker by inject()
     val filterState = FilterState()
     val mergeTopBarWithTitleBar = appSettings.mergeTopBarWithTitleBar
 
@@ -589,8 +595,9 @@ class HomeComponent(
             +gotoSettingsAction
         }
         subMenu(Res.string.help.asStringSource()) {
-            //TODO Enable Updater
-//            +checkForUpdateAction
+            if (updateManager.isUpdateSupported()) {
+                +checkForUpdateAction
+            }
             +supportActionGroup
             separator()
             +openOpenSourceThirdPartyLibraries
@@ -814,6 +821,33 @@ class HomeComponent(
                 downloads.any { it.id == previouslySelectedItem }
             }
         }.launchIn(scope)
+        // if the app is updated then clean downloaded files
+        if (appVersionTracker.isUpgraded()) {
+            // clean update files
+            scope.launch {
+                // temporary fix:
+                // at the moment we relly on DownloadMonitor for getting the list of downloads by their folder
+                // so wait for the download list to be updated by the download monitor
+                delay(1000)
+                // then clean up the downloaded files
+                updateManager.cleanDownloadedFiles()
+            }
+            // show user about update
+            scope.launch {
+                // let user focus to the app
+                delay(1000)
+                notificationSender.sendNotification(
+                    title = Res.string.update_updater.asStringSource(),
+                    description = Res.string.update_app_updated_to_version_n.asStringSourceWithARgs(
+                        Res.string.update_app_updated_to_version_n_createArgs(
+                            version = appVersionTracker.currentVersion.toString()
+                        )
+                    ),
+                    type = NotificationType.Success,
+                    tag = "Updater"
+                )
+            }
+        }
     }
 
     private val selectionListItems = combineStateFlows(

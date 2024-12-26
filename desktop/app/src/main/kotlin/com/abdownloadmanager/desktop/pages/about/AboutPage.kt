@@ -27,11 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.App
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -83,7 +81,7 @@ fun RenderAppInfo(
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
-                            AppInfo.name,
+                            AppInfo.displayName,
                             fontSize = myTextSizes.xl,
                             fontWeight = FontWeight.Bold,
                         )
