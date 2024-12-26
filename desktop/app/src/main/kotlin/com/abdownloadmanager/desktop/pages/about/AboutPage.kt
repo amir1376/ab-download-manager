@@ -2,23 +2,22 @@ package com.abdownloadmanager.desktop.pages.about
 
 import androidx.compose.foundation.*
 import com.abdownloadmanager.utils.compose.LocalTextStyle
-import com.abdownloadmanager.utils.compose.ProvideTextStyle
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.ActionButton
 import com.abdownloadmanager.desktop.ui.widget.Text
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalUriHandler
@@ -26,110 +25,360 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.util.ifThen
+import com.abdownloadmanager.desktop.ui.widget.IconActionButton
+import com.abdownloadmanager.desktop.ui.widget.Tooltip
+import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.resources.Res
+import ir.amirab.util.UrlUtils
+import ir.amirab.util.compose.IconSource
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
+import java.net.URL
 
 @Composable
 fun AboutPage(
-    close: () -> Unit,
     onRequestShowOpenSourceLibraries: () -> Unit,
     onRequestShowTranslators: () -> Unit,
 ) {
-    Column(Modifier.padding(16.dp)) {
+    Box {
+        BackgroundEffects()
         RenderAppInfo(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier,
             onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
             onRequestShowTranslators = onRequestShowTranslators,
         )
-        Row(Modifier.fillMaxWidth().wrapContentWidth(Alignment.End)) {
-            ActionButton(
-                myStringResource(Res.string.close),
-                onClick = close
+    }
+}
+
+@Composable
+private fun AppIconAndVersion(
+    modifier: Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.padding(
+            horizontal = 24.dp,
+            vertical = 8.dp,
+        )
+    ) {
+        val shape = RoundedCornerShape(16.dp)
+        Image(
+            MyIcons.appIcon.rememberPainter(),
+            null,
+            Modifier
+                .shadow(12.dp, shape, spotColor = myColors.primary)
+                .clip(shape)
+                .border(
+                    1.dp,
+                    Brush.linearGradient(
+                        listOf(myColors.primary, myColors.secondary)
+                    ),
+                    shape
+                )
+                .background(myColors.surface)
+                .padding(16.dp)
+                .size(52.dp)
+        )
+        Spacer(Modifier.size(16.dp))
+        Column(
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                AppInfo.displayName,
+                fontSize = myTextSizes.lg,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(2.dp))
+            WithContentAlpha(0.75f) {
+                Text(
+                    myStringResource(
+                        Res.string.version_n,
+                        Res.string.version_n_createArgs(
+                            value = AppInfo.version.toString(),
+                        )
+                    ),
+                    fontSize = myTextSizes.base,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RenderAppInfo(
+    modifier: Modifier,
+    onRequestShowOpenSourceLibraries: () -> Unit,
+    onRequestShowTranslators: () -> Unit,
+) {
+    Row(
+        modifier.fillMaxSize(),
+    ) {
+        Column(
+            Modifier.width(250.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            AppIconAndVersion(Modifier.fillMaxWidth())
+            Spacer(Modifier.weight(1f))
+            Column(
+                Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    myStringResource(Res.string.developed_with_love_for_you),
+                )
+                Spacer(Modifier.height(8.dp))
+                Spacer(
+                    Modifier
+                        .fillMaxWidth()
+                        .background(myColors.onBackground / 0.05f)
+                        .height(1.dp)
+                )
+                Spacer(Modifier.height(8.dp))
+                val websiteUrl = SharedConstants.projectWebsite
+                val websiteDisplayName = remember(websiteUrl) {
+                    kotlin.runCatching {
+                        URL(websiteUrl).host
+                    }.getOrNull() ?: websiteUrl
+                }
+                LinkText(
+                    text = websiteDisplayName,
+                    link = websiteUrl,
+                    showExternalIndicator = false,
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
+        Spacer(
+            Modifier
+                .fillMaxHeight()
+                .width(1.dp)
+                .background(myColors.onBackground.copy(0.15f))
+        )
+        Column(
+            Modifier.weight(1f)
+        ) {
+            CreditsSection(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
+                onRequestShowTranslators = onRequestShowTranslators,
+            )
+            Spacer(Modifier.height(1.dp).fillMaxWidth().background(myColors.onBackground / 0.15f))
+            SocialAndLinks(
+                Modifier
+                    .fillMaxWidth()
+                    .background(myColors.surface / 0.5f)
+                    .padding(top = 12.dp)
+                    .padding(bottom = 16.dp)
+                    .wrapContentWidth(),
+                horizontalPadding = 8.dp,
             )
         }
     }
 }
 
 @Composable
-fun RenderAppInfo(
-    modifier: Modifier,
+private fun SocialAndLinks(
+    modifier: Modifier = Modifier,
+    horizontalPadding: Dp,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .padding(
+                horizontal = horizontalPadding,
+            )
+    ) {
+        SocialSmallButton(
+            MyIcons.earth,
+            Res.string.visit_the_project_website.asStringSource(),
+            onClick = {
+                UrlUtils.openUrl(SharedConstants.projectWebsite)
+            }
+        )
+        SocialSmallButton(
+            MyIcons.openSource,
+            Res.string.view_the_source_code.asStringSource(),
+            onClick = {
+                UrlUtils.openUrl(SharedConstants.projectSourceCode)
+            }
+        )
+        SocialSmallButton(
+            MyIcons.speaker,
+            Res.string.channel.asStringSource(),
+            onClick = {
+                UrlUtils.openUrl(SharedConstants.telegramChannelUrl)
+            }
+        )
+        SocialSmallButton(
+            MyIcons.group,
+            Res.string.group.asStringSource(),
+            onClick = {
+                UrlUtils.openUrl(SharedConstants.telegramGroupUrl)
+            }
+        )
+        SocialSmallButton(
+            MyIcons.language,
+            Res.string.translators_contribute_title.asStringSource(),
+            onClick = {
+                UrlUtils.openUrl(SharedConstants.projectTranslations)
+            }
+        )
+    }
+}
+
+@Composable
+private fun CreditsSection(
+    modifier: Modifier = Modifier,
     onRequestShowOpenSourceLibraries: () -> Unit,
     onRequestShowTranslators: () -> Unit,
 ) {
-    Row(
-        modifier.fillMaxWidth()
-            .padding(horizontal = 8.dp),
+    Column(
+        modifier
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        ProvideTextStyle(
-            TextStyle(fontSize = myTextSizes.base)
-        ) {
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        MyIcons.appIcon.rememberPainter(),
-                        null,
-                        Modifier
-                            .size(48.dp)
-                    )
-                    Spacer(Modifier.width(16.dp))
-                    Column {
-                        Text(
-                            AppInfo.displayName,
-                            fontSize = myTextSizes.xl,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Spacer(Modifier.height(2.dp))
-                        WithContentAlpha(0.75f) {
-                            Text(
-                                myStringResource(
-                                    Res.string.version_n,
-                                    Res.string.version_n_createArgs(
-                                        value = AppInfo.version.toString()
-                                    )
-                                ), fontSize = myTextSizes.base
-                            )
-                        }
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                WithContentAlpha(1f) {
-                    Text(myStringResource(Res.string.developed_with_love_for_you))
-                    LinkText(myStringResource(Res.string.visit_the_project_website), AppInfo.website)
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(myStringResource(Res.string.this_is_a_free_and_open_source_software))
-                    LinkText(myStringResource(Res.string.view_the_source_code), AppInfo.sourceCode)
-                    Spacer(Modifier.height(8.dp))
-                    Text(myStringResource(Res.string.powered_by_open_source_software))
-                    Text(
-                        myStringResource(Res.string.view_the_open_source_licenses),
-                        style = LocalTextStyle.current.merge(LinkStyle),
-                        modifier = Modifier.clickable {
-                            onRequestShowOpenSourceLibraries()
-                        }
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(myStringResource(Res.string.localized_by_translators))
-                    Text(
-                        myStringResource(Res.string.meet_the_translators),
-                        style = LocalTextStyle.current.merge(LinkStyle),
-                        modifier = Modifier.clickable {
-                            onRequestShowTranslators()
-                        }
-                    )
-                }
+        val itemModifier = Modifier.fillMaxWidth()
+        AboutPageListItemButton(
+            itemModifier,
+            icon = MyIcons.hearth,
+            title = Res.string.this_is_a_free_and_open_source_software.asStringSource(),
+            description = Res.string.view_the_source_code.asStringSource(),
+            onClick = {
+                UrlUtils.openUrl(AppInfo.sourceCode)
             }
+        )
+        AboutPageListItemButton(
+            itemModifier,
+            icon = MyIcons.openSource,
+            title = Res.string.powered_by_open_source_software.asStringSource(),
+            description = Res.string.view_the_open_source_licenses.asStringSource(),
+            onClick = {
+                onRequestShowOpenSourceLibraries()
+            }
+        )
+        AboutPageListItemButton(
+            itemModifier,
+            icon = MyIcons.language,
+            title = Res.string.localized_by_translators.asStringSource(),
+            description = Res.string.meet_the_translators.asStringSource(),
+            onClick = {
+                onRequestShowTranslators()
+            }
+        )
+    }
+}
+
+@Composable
+private fun SocialSmallButton(
+    icon: IconSource,
+    title: StringSource,
+    onClick: () -> Unit,
+) {
+    Tooltip(title) {
+        IconActionButton(
+            icon,
+            contentDescription = title.rememberString(),
+            onClick = onClick,
+        )
+    }
+}
+
+@Composable
+private fun AboutPageListItemButton(
+    modifier: Modifier,
+    icon: IconSource,
+    title: StringSource,
+    description: StringSource,
+    onClick: () -> Unit,
+) {
+    val shape = RoundedCornerShape(6.dp)
+    Row(
+        modifier
+            .clickable(onClick = onClick)
+            .border(1.dp, myColors.onBackground / 0.15f, shape)
+            .clip(shape)
+            .background(myColors.surface / 0.5f)
+            .padding(
+                horizontal = 8.dp,
+                vertical = 8.dp,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MyIcon(
+            icon = icon,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Column {
+            Text(
+                title.rememberString(),
+                fontSize = myTextSizes.base,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(description.rememberString())
         }
     }
 }
+
+
+@Composable
+private fun BoxScope.BackgroundEffects() {
+    Box(
+        Modifier
+            .align(Alignment.TopCenter)
+            .offset(x = (-50).dp, y = (-148).dp)
+            .fillMaxWidth(0.5f)
+            .height(250.dp)
+            .blur(
+                56.dp,
+                edgeTreatment = BlurredEdgeTreatment.Unbounded
+            )
+            .clip(CircleShape)
+            .background(
+                myColors.primary / 0.15f
+            )
+    )
+    Box(
+        Modifier
+            .align(Alignment.BottomStart)
+            .size(220.dp)
+            .offset(x = (-64).dp, y = (+128).dp)
+            .blur(
+                56.dp,
+                edgeTreatment = BlurredEdgeTreatment.Unbounded
+            )
+            .clip(CircleShape)
+            .background(
+                myColors.secondaryVariant / 0.15f
+            )
+    )
+    Box(
+        Modifier
+            .align(Alignment.BottomEnd)
+            .size(220.dp)
+            .offset(x = 32.dp, y = (-32).dp)
+            .blur(
+                56.dp,
+                edgeTreatment = BlurredEdgeTreatment.Unbounded
+            )
+            .clip(CircleShape)
+            .background(
+                myColors.secondary / 0.15f
+            )
+    )
+}
+
 
 @Composable
 fun LinkText(
@@ -137,6 +386,7 @@ fun LinkText(
     link: String,
     modifier: Modifier = Modifier,
     maxLines: Int = Int.MAX_VALUE,
+    showExternalIndicator: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
     val handler = LocalUriHandler.current
@@ -164,14 +414,16 @@ fun LinkText(
             overflow = overflow,
             maxLines = maxLines,
         )
-        MyIcon(
-            MyIcons.externalLink,
-            null,
-            Modifier.size(10.dp).alpha(
-                if (isHovered) 0.75f
-                else 0.5f
+        if (showExternalIndicator) {
+            MyIcon(
+                MyIcons.externalLink,
+                null,
+                Modifier.size(10.dp).alpha(
+                    if (isHovered) 0.75f
+                    else 0.5f
+                )
             )
-        )
+        }
     }
 }
 

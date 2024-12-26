@@ -92,4 +92,7 @@ override val back get() = "/icons/back.svg".asIconSource()
     override val language: IconSource get() = "/icons/language.svg".asIconSource()
 
     override val externalLink: IconSource get() = "/icons/external_link.svg".asIconSource()
+
+    override val earth: IconSource get() = "/icons/earth.svg".asIconSource()
+    override val hearth: IconSource get() = "/icons/hearth.svg".asIconSource()
 }

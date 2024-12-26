@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
-import com.abdownloadmanager.desktop.pages.settings.configurable.Configurable
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
@@ -51,32 +50,10 @@ fun Help(
             tint = myColors.onSurface,
         )
         if (showHelpContent) {
-            Popup(
-                popupPositionProvider = rememberComponentRectPositionProvider(
-                    anchor = Alignment.TopCenter,
-                    alignment = Alignment.TopCenter,
-                ),
-                onDismissRequest = onRequestCloseShowHelpContent
-            ) {
-                val shape = RoundedCornerShape(6.dp)
-                Box(
-                    Modifier
-                        .padding(vertical = 4.dp)
-                        .widthIn(max = 240.dp)
-                        .shadow(24.dp)
-                        .clip(shape)
-                        .border(1.dp, myColors.surface, shape)
-                        .background(myColors.menuGradientBackground)
-                        .padding(8.dp)
-                ) {
-                    WithContentColor(myColors.onSurface) {
-                        Text(
-                            content,
-                            fontSize = myTextSizes.base,
-                        )
-                    }
-                }
-            }
+            TooltipPopup(
+                onRequestCloseShowHelpContent = onRequestCloseShowHelpContent,
+                content = content,
+            )
         }
     }
 }
