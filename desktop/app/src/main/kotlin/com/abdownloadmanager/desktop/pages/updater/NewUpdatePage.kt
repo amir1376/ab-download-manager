@@ -1,5 +1,7 @@
 package com.abdownloadmanager.desktop.pages.updater
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
@@ -11,17 +13,18 @@ import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.ui.theme.myMarkdownColors
 import com.abdownloadmanager.desktop.ui.theme.myMarkdownTypography
@@ -41,6 +44,7 @@ fun NewUpdatePage(
 ) {
     WindowTitle(myStringResource(Res.string.update_updater))
     WindowIcon(MyIcons.refresh)
+    val contentHorizontalPadding = 16.dp
     Box {
         BackgroundEffects()
         Column(
@@ -49,44 +53,46 @@ fun NewUpdatePage(
         ) {
             Column(
                 Modifier
-                    .padding(horizontal = 16.dp)
                     .padding(
-                        bottom = 16.dp,
                         top = 8.dp
                     )
                     .weight(1f)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = myStringResource(Res.string.update_available),
-                        fontSize = myTextSizes.xl,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = myStringResource(
-                            Res.string.version_n, Res.string.version_n_createArgs(
-                                newVersionInfo.version.toString()
-                            )
-                        ),
-                        fontSize = myTextSizes.xl,
-                        fontWeight = FontWeight.Bold,
-                        color = myColors.success,
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
-                WithContentAlpha(0.8f) {
+                Column(
+                    Modifier
+                        .padding(horizontal = contentHorizontalPadding)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = myStringResource(Res.string.update_available),
+                            fontSize = myTextSizes.xl,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = myStringResource(
+                                Res.string.version_n, Res.string.version_n_createArgs(
+                                    newVersionInfo.version.toString()
+                                )
+                            ),
+                            fontSize = myTextSizes.xl,
+                            fontWeight = FontWeight.Bold,
+                            color = myColors.success,
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
                     Text(
                         text = myStringResource(Res.string.update_available_suggest_to_to_update),
                         fontSize = myTextSizes.base,
                     )
+                    Spacer(Modifier.height(8.dp))
                 }
-                Spacer(Modifier.height(8.dp))
                 RenderChangeLog(
                     Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    newVersionInfo.changeLog
+                    newVersionInfo.changeLog,
+                    horizontalPadding = contentHorizontalPadding,
                 )
             }
             Actions(
@@ -143,7 +149,6 @@ fun Actions(modifier: Modifier, update: () -> Unit, cancel: () -> Unit) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .background(myColors.surface / 0.5f)
                 .padding(horizontal = 16.dp)
                 .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.End
@@ -197,7 +202,11 @@ fun CancelButton(
 }
 
 @Composable
-private fun RenderChangeLog(modifier: Modifier, changeLog: String) {
+private fun RenderChangeLog(
+    modifier: Modifier,
+    changeLog: String,
+    horizontalPadding: Dp,
+) {
     val trimmedChangelog = remember {
         changeLog
             .lines()
@@ -207,42 +216,70 @@ private fun RenderChangeLog(modifier: Modifier, changeLog: String) {
     Column(modifier) {
         Text(
             text = myStringResource(Res.string.update_release_notes),
+            modifier = Modifier.padding(horizontal = horizontalPadding),
             fontWeight = FontWeight.Bold,
             fontSize = myTextSizes.lg,
         )
         Spacer(Modifier.height(8.dp))
-        val shape = RoundedCornerShape(6.dp)
-        val scrollState = rememberScrollState()
-        val scrollbarAdapter = rememberScrollbarAdapter(scrollState)
-        Row(
-            Modifier
-                .fillMaxSize()
-                .clip(shape)
-                .border(1.dp, myColors.onBackground / 0.05f, shape)
-                .background(myColors.surface / 75)
+        Column(
+            Modifier.background(myColors.surface / 75)
         ) {
-            Markdown(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(scrollState)
-                    .padding(8.dp),
-                content = trimmedChangelog,
-                colors = myMarkdownColors(),
-                typography = myMarkdownTypography()
+            val transition = rememberInfiniteTransition()
+            val topBorderColors = listOf(
+                myColors.primary to myColors.secondaryVariant,
+                myColors.secondary to myColors.primaryVariant,
+                myColors.primaryVariant to myColors.secondary,
+                myColors.secondaryVariant to myColors.primary,
             )
-            if (scrollbarAdapter.needScroll()) {
-                VerticalScrollbar(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(
-                            vertical = 4.dp,
-                            horizontal = 4.dp
-                        ),
-                    style = LocalScrollbarStyle.current.copy(
-                        thickness = 8.dp
-                    ),
-                    adapter = scrollbarAdapter
+            val animatedTopBorderColors = topBorderColors.map {
+                transition.animateColor(
+                    it.first, it.second, infiniteRepeatable(
+                        animation = tween(durationMillis = 3000, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    )
                 )
+            }
+            Spacer(
+                Modifier.fillMaxWidth()
+                    .height(2.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            animatedTopBorderColors.map { it.value }
+                        )
+                    )
+            )
+            val scrollState = rememberScrollState()
+            val scrollbarAdapter = rememberScrollbarAdapter(scrollState)
+            Row(
+                Modifier
+                    .fillMaxSize()
+            ) {
+                Markdown(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(scrollState)
+                        .padding(
+                            horizontal = horizontalPadding,
+                            vertical = 8.dp
+                        ),
+                    content = trimmedChangelog,
+                    colors = myMarkdownColors(),
+                    typography = myMarkdownTypography()
+                )
+                if (scrollbarAdapter.needScroll()) {
+                    VerticalScrollbar(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(
+                                vertical = 4.dp,
+                                horizontal = 4.dp
+                            ),
+                        style = LocalScrollbarStyle.current.copy(
+                            thickness = 6.dp
+                        ),
+                        adapter = scrollbarAdapter
+                    )
+                }
             }
         }
     }
