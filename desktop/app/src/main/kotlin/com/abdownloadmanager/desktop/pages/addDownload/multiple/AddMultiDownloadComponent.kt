@@ -180,10 +180,12 @@ class AddMultiDownloadComponent(
 
     private fun getFolderForItem(
         categorySelectionMode: CategorySelectionMode?,
+        allInSameLocation: Boolean,
         url: String,
         fleName: String,
         defaultFolder: String,
     ): String {
+        if (allInSameLocation) return defaultFolder
         return when (categorySelectionMode) {
             CategorySelectionMode.Auto -> {
                 downloadSystem.categoryManager
@@ -209,7 +211,8 @@ class AddMultiDownloadComponent(
     fun requestAddDownloads(
         queueId: Long?,
     ) {
-        val categorySelectionMode = when (saveMode.value) {
+        val saveMode = saveMode.value
+        val categorySelectionMode = when (saveMode) {
             EachFileInTheirOwnCategory -> CategorySelectionMode.Auto
             AllInOneCategory -> selectedCategory.value?.let {
                 CategorySelectionMode.Fixed(it.id)
@@ -233,7 +236,8 @@ class AddMultiDownloadComponent(
                         categorySelectionMode = categorySelectionMode,
                         url = it.credentials.value.link,
                         fleName = it.name.value,
-                        defaultFolder = it.folder.value
+                        defaultFolder = it.folder.value,
+                        allInSameLocation = saveMode == InSameLocation
                     ),
                     name = it.name.value,
                     link = it.credentials.value.link,
@@ -248,7 +252,7 @@ class AddMultiDownloadComponent(
                 categorySelectionMode = categorySelectionMode
             )
             val folder = folder.value
-            if (saveMode.value == InSameLocation) {
+            if (this.saveMode.value == InSameLocation) {
                 addToLastUsedLocations(folder)
             }
             requestClose()
