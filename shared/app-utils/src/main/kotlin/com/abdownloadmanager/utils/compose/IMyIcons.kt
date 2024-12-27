@@ -79,4 +79,7 @@ interface IMyIcons {
     val network: IconSource
     val language: IconSource
     val externalLink: IconSource
+
+    val earth: IconSource
+    val hearth: IconSource
 }
