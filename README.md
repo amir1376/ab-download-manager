@@ -1,3 +1,4 @@
+
 <div align="center">
   <a href="https://abdownloadmanager.com" target="_blank">
     <img width="180" src="assets/logo/app_logo_with_background.svg" alt="AB Download Manager Logo">
@@ -16,10 +17,13 @@
     <img alt="AB Download Manager Banner" src="assets/banners/app_banner.png"/>
 </a>
 
-
 ## Description
 
 [AB Download Manager](https://abdownloadmanager.com) is a desktop app which lets you manage and organize your download files better than before
+
+> [!CAUTION]
+> This is a forked project from [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager), aiming to provide the latest **macos** package of AB Download Manager, you can download from [GitHub Releases](https://github.com/peanut996/ab-download-manager-macos/releases/latest), but it is not recommended to use it, take the responsibility of using it at your own risk!
+
 
 ## Features
 
