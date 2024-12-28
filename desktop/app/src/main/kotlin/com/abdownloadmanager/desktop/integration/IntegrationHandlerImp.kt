@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.integration
 
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.repository.AppRepository
-import com.abdownloadmanager.desktop.utils.DownloadSystem
+import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.integration.NewDownloadInfoFromIntegration
 import com.abdownloadmanager.integration.NewDownloadTask
@@ -46,9 +46,10 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
                 )
         val id =
                 downloadSystem.addDownload(
-                        downloadItem,
-                        OnDuplicateStrategy.default(),
-                        task.queueId
+                    downloadItem = downloadItem,
+                    onDuplicateStrategy = OnDuplicateStrategy.default(),
+                    queueId = task.queueId,
+                    categoryId = null
                 )
         if (task.queueId != null) {
             val queue = queueManager.getQueue(task.queueId!!)
