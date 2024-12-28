@@ -9,8 +9,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemSaveMode.*
-import com.abdownloadmanager.desktop.utils.asState
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
 import com.abdownloadmanager.utils.category.CategoryItem
@@ -68,13 +66,20 @@ class AddMultiDownloadComponent(
 
     private val categoryManager: CategoryManager by inject()
     val categories = categoryManager.categoriesFlow
-    private val _selectedCategory = MutableStateFlow(categories.value.firstOrNull())
+    private val _selectedCategory = MutableStateFlow<Category?>(null)
     val selectedCategory = _selectedCategory.asStateFlow()
 
-    fun setSelectedCategory(category: Category) {
+    fun setSelectedCategory(category: Category?) {
         _selectedCategory.update {
             category
         }
+    }
+
+    private val _allInSameLocation = MutableStateFlow(false)
+    val allInSameLocation = _allInSameLocation.asStateFlow()
+
+    fun setAllItemsInSameLocation(sameLocation: Boolean) {
+        _allInSameLocation.update { sameLocation }
     }
 
     fun requestAddCategory() {
@@ -103,12 +108,6 @@ class AddMultiDownloadComponent(
     }
 
     var list: List<DownloadUiChecker> by mutableStateOf(emptyList())
-    private val _saveMode = MutableStateFlow(EachFileInTheirOwnCategory)
-    val saveMode = _saveMode.asStateFlow()
-    fun setSaveMode(saveMode: AddMultiItemSaveMode) {
-        _saveMode.update { saveMode }
-    }
-
 
     private val checkList = MutableSharedFlow<DownloadUiChecker>()
     private fun enqueueCheck(links: List<DownloadUiChecker>) {
@@ -161,19 +160,8 @@ class AddMultiDownloadComponent(
         }
     }
 
-    val isCategoryModeHasValidState by run {
-        val category by selectedCategory.asState(scope)
-        val saveMode by saveMode.asState(scope)
-        derivedStateOf {
-            when (saveMode) {
-                EachFileInTheirOwnCategory -> true
-                AllInOneCategory -> category != null
-                InSameLocation -> true
-            }
-        }
-    }
     val canClickAdd by derivedStateOf {
-        selectionList.isNotEmpty() && isCategoryModeHasValidState
+        selectionList.isNotEmpty()
     }
     private val queueManager: QueueManager by inject()
     val queueList = queueManager.queues
@@ -211,16 +199,11 @@ class AddMultiDownloadComponent(
     fun requestAddDownloads(
         queueId: Long?,
     ) {
-        val saveMode = saveMode.value
-        val categorySelectionMode = when (saveMode) {
-            EachFileInTheirOwnCategory -> CategorySelectionMode.Auto
-            AllInOneCategory -> selectedCategory.value?.let {
-                CategorySelectionMode.Fixed(it.id)
-            }
 
-            InSameLocation -> {
-                if (alsoAutoCategorize.value) CategorySelectionMode.Auto
-                else null
+        val categorySelectionMode = when {
+            alsoAutoCategorize.value -> CategorySelectionMode.Auto
+            else -> selectedCategory.value?.let {
+                CategorySelectionMode.Fixed(it.id)
             }
         }
         val itemsToAdd = list
@@ -237,7 +220,7 @@ class AddMultiDownloadComponent(
                         url = it.credentials.value.link,
                         fleName = it.name.value,
                         defaultFolder = it.folder.value,
-                        allInSameLocation = saveMode == InSameLocation
+                        allInSameLocation = allInSameLocation.value
                     ),
                     name = it.name.value,
                     link = it.credentials.value.link,
@@ -252,7 +235,7 @@ class AddMultiDownloadComponent(
                 categorySelectionMode = categorySelectionMode
             )
             val folder = folder.value
-            if (this.saveMode.value == InSameLocation) {
+            if (allInSameLocation.value) {
                 addToLastUsedLocations(folder)
             }
             requestClose()
