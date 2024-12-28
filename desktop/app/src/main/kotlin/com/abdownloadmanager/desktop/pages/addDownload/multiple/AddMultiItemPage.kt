@@ -14,10 +14,7 @@ import com.abdownloadmanager.desktop.pages.addDownload.shared.LocationTextField
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ShowAddToQueueDialog
 import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.ActionButton
-import com.abdownloadmanager.desktop.ui.widget.CheckBox
-import com.abdownloadmanager.desktop.ui.widget.Help
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.category.Category
@@ -124,7 +121,7 @@ private fun SaveSettings(
     val folder by component.folder.collectAsState()
 
     Column(modifier) {
-        Text("${myStringResource(Res.string.save_options_multi_download_page)}:")
+        Text("${myStringResource(Res.string.save_to)}:")
         Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             CategorySaveOption(selectedCategory, component)
@@ -142,8 +139,8 @@ private fun RowScope.LocationSaveOption(
 ) {
     val allItemsInSameLocation by component.allInSameLocation.collectAsState()
     SaveOption(
-        title = myStringResource(Res.string.all_items_in_specific_location),
-        selectedHelp = myStringResource(Res.string.selected_all_items_in_specific_location_description),
+        title = myStringResource(Res.string.all_items_in_one_Location),
+        selectedHelp = myStringResource(Res.string.all_items_in_one_Location_description),
         unselectedHelp = myStringResource(Res.string.unselected_all_items_in_specific_location_description),
         selected = allItemsInSameLocation,
         onSelectedChange = {
@@ -167,10 +164,11 @@ private fun RowScope.CategorySaveOption(
     selectedCategory: Category?,
     component: AddMultiDownloadComponent
 ) {
+
     SaveOption(
-        title = myStringResource(Res.string.all_items_in_specific_category),
-        selectedHelp = myStringResource(Res.string.selected_all_items_in_specific_category_description),
-        unselectedHelp = myStringResource(Res.string.unselected_all_items_in_specific_category_description),
+        title = myStringResource(Res.string.all_items_in_one_category),
+        selectedHelp = myStringResource(Res.string.all_items_in_one_category_description),
+        unselectedHelp = myStringResource(Res.string.each_item_on_its_own_category_description),
         selected = selectedCategory != null,
         onSelectedChange = {
             if (it) {
@@ -215,24 +213,28 @@ private fun RowScope.SaveOption(
     onSelectedChange: (Boolean) -> Unit,
     selectedContent: @Composable () -> Unit
 ) {
-    Column(modifier=Modifier.fillMaxWidth().weight(1f)) {
-        Row(
-            modifier=Modifier.onClick { onSelectedChange(!selected) },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            CheckBox(
-                value = selected,
-                onValueChange = onSelectedChange
-            )
-            Text(title)
-            Help(if (selected) selectedHelp else unselectedHelp)
-        }
-        AnimatedVisibility(selected){
+    ExpandableItem(
+        modifier=Modifier.fillMaxWidth().weight(1f),
+        isExpanded = selected,
+        header = {
+            Row(
+                modifier=Modifier.onClick { onSelectedChange(!selected) },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                CheckBox(
+                    value = selected,
+                    onValueChange = onSelectedChange
+                )
+                Text(title)
+                Help(if (selected) selectedHelp else unselectedHelp)
+            }
+        },
+        body = {
             Column {
                 Spacer(Modifier.height(8.dp))
                 selectedContent()
             }
         }
-    }
+    )
 }
