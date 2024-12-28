@@ -14,7 +14,7 @@ import ir.amirab.downloader.utils.OnDuplicateStrategy
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
+class IntegrationHandlerImp: IntegrationHandler,KoinComponent{
     val appComponent by inject<AppComponent>()
     val downloadSystem by inject<DownloadSystem>()
     val queueManager by inject<QueueManager>()
