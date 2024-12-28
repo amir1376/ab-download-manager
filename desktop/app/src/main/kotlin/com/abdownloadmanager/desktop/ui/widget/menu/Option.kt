@@ -47,12 +47,12 @@ fun ShowOptions(
             val itemPadding = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
             val title by menu.title.collectAsState()
             Text(
-                title,
+                title.rememberString(),
                 Modifier
                     .then(itemPadding)
                     .basicMarquee(
                         iterations = Int.MAX_VALUE,
-                        delayMillis = 0
+                        initialDelayMillis = 0
                     ),
                 fontSize = myTextSizes.base,
                 maxLines = 1,

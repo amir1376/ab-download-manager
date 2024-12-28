@@ -1,8 +1,10 @@
 import buildlogic.*
 import buildlogic.versioning.*
+import ir.amirab.installer.InstallerTargetFormat
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import ir.amirab.util.platform.Platform
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat.*
 
 plugins {
     id(MyPlugins.kotlin)
@@ -12,9 +14,9 @@ plugins {
     id(Plugins.changeLog)
     id(Plugins.ksp)
     id(Plugins.aboutLibraries)
+    id("ir.amirab.installer-plugin")
 //    id(MyPlugins.proguardDesktop)
 }
-
 dependencies {
     implementation(libs.decompose)
     implementation(libs.decompose.jbCompose)
@@ -43,7 +45,7 @@ dependencies {
     implementation(libs.androidx.datastore)
 
     implementation(libs.aboutLibraries.core)
-
+    implementation(libs.markdownRenderer.core)
     implementation(libs.composeFileKit) {
         exclude(group = "net.java.dev.jna")
     }
@@ -63,13 +65,13 @@ dependencies {
     implementation(project(":integration:server"))
     implementation(project(":desktop:shared"))
     implementation(project(":desktop:tray"))
-    implementation(project(":desktop:external-draggable"))
     implementation(project(":desktop:custom-window-frame"))
     implementation(project(":shared:app-utils"))
     implementation(project(":shared:utils"))
     implementation(project(":shared:updater"))
     implementation(project(":shared:auto-start"))
     implementation(project(":shared:nanohttp4k"))
+    implementation(project(":shared:resources"))
 }
 
 aboutLibraries {
@@ -102,7 +104,7 @@ compose {
             mainClass = "$desktopPackageName.AppKt"
             nativeDistributions {
                 modules("java.instrument", "jdk.unsupported")
-                targetFormats(TargetFormat.Msi, TargetFormat.Deb)
+                targetFormats(Msi, Deb)
                 if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
                     // filekit library requires this module in linux.
                     modules("jdk.security.auth")
@@ -114,21 +116,21 @@ compose {
                 val menuGroupName = getPrettifiedAppName()
                 licenseFile.set(rootProject.file("LICENSE"))
                 linux {
-                    debPackageVersion = getAppVersionStringForPackaging(TargetFormat.Deb)
-                    rpmPackageVersion = getAppVersionStringForPackaging(TargetFormat.Rpm)
+                    debPackageVersion = getAppVersionStringForPackaging(Deb)
+                    rpmPackageVersion = getAppVersionStringForPackaging(Rpm)
                     appCategory = "Network"
                     iconFile = project.file("icons/icon.png")
                     menuGroup = menuGroupName
                     shortcut = true
                 }
                 macOS {
-                    pkgPackageVersion = getAppVersionStringForPackaging(TargetFormat.Pkg)
-                    dmgPackageVersion = getAppVersionStringForPackaging(TargetFormat.Dmg)
+                    pkgPackageVersion = getAppVersionStringForPackaging(Pkg)
+                    dmgPackageVersion = getAppVersionStringForPackaging(Dmg)
                     iconFile = project.file("icons/icon.icns")
                 }
                 windows {
-                    exePackageVersion = getAppVersionStringForPackaging(TargetFormat.Exe)
-                    msiPackageVersion = getAppVersionStringForPackaging(TargetFormat.Msi)
+                    exePackageVersion = getAppVersionStringForPackaging(Exe)
+                    msiPackageVersion = getAppVersionStringForPackaging(Msi)
                     upgradeUuid = properties["INSTALLER.WINDOWS.UPGRADE_UUID"]?.toString()
                     iconFile = project.file("icons/icon.ico")
                     console = false
@@ -139,6 +141,32 @@ compose {
                 }
             }
         }
+    }
+}
+
+installerPlugin {
+    dependsOn("createReleaseDistributable")
+    outputFolder.set(layout.buildDirectory.dir("custom-installer"))
+    windows {
+        appName = getAppName()
+        appDisplayName = getPrettifiedAppName()
+        appVersion = getAppVersionStringForPackaging(Exe)
+        appDisplayVersion = getAppVersionString()
+        inputDir = project.file("build/compose/binaries/main-release/app/${getAppName()}")
+        outputFileName = getAppName()
+        licenceFile = rootProject.file("LICENSE")
+        iconFile = project.file("icons/icon.ico")
+        nsisTemplate = project.file("resources/installer/nsis-script-template.nsi")
+        extraParams = mapOf(
+            "app_publisher" to "abdownloadmanager.com",
+            "app_version_with_build" to "${getAppVersionStringForPackaging(Exe)}.0",
+            "source_code_url" to "https://github.com/amir1376/ab-download-manager",
+            "project_website" to "www.abdownloadmanager.com",
+            "copyright" to "© 2024-present AB Download Manager App",
+            "header_image_file" to project.file("resources/installer/abdm-header-image.bmp"),
+            "sidebar_image_file" to project.file("resources/installer/abdm-sidebar-image.bmp")
+        )
+
     }
 }
 
@@ -153,12 +181,16 @@ buildConfig {
         }
     )
     buildConfigField(
+        "APP_DISPLAY_NAME",
+        provider { getPrettifiedAppName() }
+    )
+    buildConfigField(
         "APP_VERSION",
         provider { getAppVersionString() }
     )
     buildConfigField(
         "APP_NAME",
-        provider { getPrettifiedAppName() }
+        provider { getAppName() }
     )
     buildConfigField(
         "PROJECT_WEBSITE",
@@ -170,6 +202,24 @@ buildConfig {
         "PROJECT_SOURCE_CODE",
         provider {
             "https://github.com/amir1376/ab-download-manager"
+        }
+    )
+    buildConfigField(
+        "PROJECT_GITHUB_OWNER",
+        provider {
+            "amir1376"
+        }
+    )
+    buildConfigField(
+        "PROJECT_GITHUB_REPO",
+        provider {
+            "ab-download-manager"
+        }
+    )
+    buildConfigField(
+        "PROJECT_TRANSLATIONS",
+        provider {
+            "https://crowdin.com/project/ab-download-manager"
         }
     )
     buildConfigField(
@@ -240,27 +290,51 @@ val createDistributableAppArchive by tasks.registering {
 val createBinariesForCi by tasks.registering {
     val nativeDistributions = compose.desktop.application.nativeDistributions
     val mainRelease = nativeDistributions.outputBaseDir.dir("main-release")
-    dependsOn("packageReleaseDistributionForCurrentOS")
+    if (installerPlugin.isThisPlatformSupported()) {
+        dependsOn(installerPlugin.createInstallerTask)
+        inputs.dir(installerPlugin.outputFolder)
+    } else {
+        dependsOn("packageReleaseDistributionForCurrentOS")
+        inputs.dir(mainRelease)
+    }
     dependsOn(createDistributableAppArchive)
     inputs.property("appVersion", getAppVersionString())
-    inputs.dir(mainRelease)
     inputs.dir(distributableAppArchiveDir)
     outputs.dir(ciDir.binariesDir)
     doLast {
         val output = ciDir.binariesDir.get().asFile
         val packageName = appPackageNameByComposePlugin
         output.deleteRecursively()
-        val allowedTarget = nativeDistributions.targetFormats.filter { it.isCompatibleWithCurrentOS }
-        for (target in allowedTarget) {
-            CiUtils.movePackagedAndCreateSignature(
-                getAppVersion(),
-                packageName,
-                target,
-                mainRelease.get().asFile,
-                output,
-            )
+
+        if (installerPlugin.isThisPlatformSupported()) {
+            val targets = installerPlugin.getCreatedInstallerTargetFormats()
+            for (target in targets) {
+                CiUtils.movePackagedAndCreateSignature(
+                    getAppVersion(),
+                    packageName,
+                    target,
+                    installerPlugin.outputFolder.get().asFile,
+                    output,
+                )
+            }
+            logger.lifecycle("app packages for '${targets.joinToString(", ") { it.name }}' written in $output using the installer plugin")
+        } else {
+            val allowedTargets = nativeDistributions
+                .targetFormats.filter { it.isCompatibleWithCurrentOS }
+                .map {
+                    it.toInstallerTargetFormat()
+                }
+            for (target in allowedTargets) {
+                CiUtils.movePackagedAndCreateSignature(
+                    getAppVersion(),
+                    packageName,
+                    target,
+                    mainRelease.get().asFile.resolve(target.outputDirName),
+                    output,
+                )
+            }
+            logger.lifecycle("app packages for '${allowedTargets.joinToString(", ") { it.name }}' written in $output using compose packager tool")
         }
-        logger.lifecycle("app packages for '${allowedTarget.joinToString(", ") { it.name }}' written in $output")
         val appArchiveDistributableDir = distributableAppArchiveDir.get().asFile
         CiUtils.copyAndHashToDestination(
             distributableAppArchiveDir.get().asFile.resolve(
@@ -272,7 +346,7 @@ val createBinariesForCi by tasks.registering {
             CiUtils.getTargetFileName(
                 packageName,
                 getAppVersion(),
-                TargetFormat.AppImage,
+                null, // this is not an installer (it will be automatically converted to current os name
             )
         )
         logger.lifecycle("distributable app archive written in ${output}")
@@ -299,3 +373,15 @@ val createReleaseFolderForCi by tasks.registering {
     dependsOn(createBinariesForCi, createChangeNoteForCi)
 }
 // ======= end of GitHub action stuff
+
+fun TargetFormat.toInstallerTargetFormat(): InstallerTargetFormat {
+    return when (this) {
+        AppImage -> error("$this is not recognized as installer")
+        Deb -> InstallerTargetFormat.Deb
+        Rpm -> InstallerTargetFormat.Rpm
+        Dmg -> InstallerTargetFormat.Dmg
+        Pkg -> InstallerTargetFormat.Pkg
+        Exe -> InstallerTargetFormat.Exe
+        Msi -> InstallerTargetFormat.Msi
+    }
+}

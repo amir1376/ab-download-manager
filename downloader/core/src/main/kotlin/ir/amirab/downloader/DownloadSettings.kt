@@ -2,7 +2,7 @@ package ir.amirab.downloader
 
 data class DownloadSettings(
     //can be changed after boot!
-    var defaultThreadCount: Int = 5,
+    var defaultThreadCount: Int = 8,
     var dynamicPartCreationMode: Boolean = true,
     var useServerLastModifiedTime: Boolean = false,
     var globalSpeedLimit: Long = 0,//unlimited

@@ -21,10 +21,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.mikepenz.aboutlibraries.entity.Developer
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.entity.License
 import com.mikepenz.aboutlibraries.entity.Organization
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import kotlinx.collections.immutable.ImmutableSet
 
 @Composable
@@ -67,10 +72,10 @@ fun LibraryDialog(
                     }
                     val links = buildList {
                         library.scm?.url?.let {
-                            add("SourceCode" to it)
+                            add(Res.string.source_code.asStringSource() to it)
                         }
                         library.website?.let {
-                            add("Website" to it)
+                            add(Res.string.website.asStringSource() to it)
                         }
                     }
                     links.takeIf { it.isNotEmpty() }?.let {
@@ -83,7 +88,7 @@ fun LibraryDialog(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                 ) {
-                    ActionButton("Close", onClick = {
+                    ActionButton(myStringResource(Res.string.close), onClick = {
                         onCloseRequest()
                     })
                 }
@@ -93,8 +98,8 @@ fun LibraryDialog(
 }
 
 @Composable
-private fun LibraryLinks(links: List<Pair<String, String>>) {
-    KeyValue("Links") {
+private fun LibraryLinks(links: List<Pair<StringSource, String>>) {
+    KeyValue(myStringResource(Res.string.links)) {
         ListOfNamesWithLinks(links)
     }
 }
@@ -110,12 +115,12 @@ private fun LibraryDescription(description: String) {
 
 @Composable
 private fun LibraryLicenseInfo(licenses: ImmutableSet<License>) {
-    KeyValue("License") {
+    KeyValue(myStringResource(Res.string.license)) {
         val l = licenses.map {
-            it.name to it.url
+            it.name.asStringSource() to it.url
         }
         if (l.isEmpty()) {
-            Text("no license found")
+            Text(myStringResource(Res.string.no_license_found))
         } else {
             ListOfNamesWithLinks(l)
         }
@@ -124,23 +129,23 @@ private fun LibraryLicenseInfo(licenses: ImmutableSet<License>) {
 
 @Composable
 private fun LibraryDevelopers(devs: List<Developer>) {
-    KeyValue("Developers") {
+    KeyValue(myStringResource(Res.string.developers)) {
         ListOfNamesWithLinks(
             devs
                 .filter { it.name != null }
                 .map {
-                    it.name!! to it.organisationUrl
+                    it.name!!.asStringSource() to it.organisationUrl
                 }
         )
     }
 }
 
 @Composable
-private fun ListOfNamesWithLinks(map: List<Pair<String, String?>>) {
+private fun ListOfNamesWithLinks(map: List<Pair<StringSource, String?>>) {
     Row {
         for ((i, v) in map.withIndex()) {
             val (name, link) = v
-            MaybeLinkText(name, link)
+            MaybeLinkText(name.rememberString(), link)
             if (i < map.lastIndex) {
                 Text(", ")
             }
@@ -150,7 +155,7 @@ private fun ListOfNamesWithLinks(map: List<Pair<String, String?>>) {
 
 @Composable
 fun LibraryOrganization(organization: Organization) {
-    KeyValue("Organization") {
+    KeyValue(myStringResource(Res.string.organization)) {
         MaybeLinkText(organization.name, organization.url)
     }
 }

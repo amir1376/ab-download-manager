@@ -11,6 +11,7 @@ import com.abdownloadmanager.desktop.actions.handle
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.rememberWindowController
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import java.awt.Dimension
 
@@ -25,10 +26,9 @@ fun HomeWindow(
         position = WindowPosition.Aligned(Alignment.Center)
     )
     val onCloseRequest = onCLoseRequest
-    val windowTitle = "AB Download Manager"
     val windowIcon = MyIcons.appIcon
     val windowController = rememberWindowController(
-        windowTitle,
+        AppInfo.displayName,
         windowIcon.rememberPainter(),
     )
 

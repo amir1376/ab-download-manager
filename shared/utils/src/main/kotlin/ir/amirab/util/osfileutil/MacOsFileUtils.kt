@@ -1,5 +1,6 @@
 package ir.amirab.util.osfileutil
 
+import ir.amirab.util.execAndWait
 import java.io.File
 
 internal class MacOsFileUtils : FileUtilsBase() {
@@ -10,4 +11,9 @@ internal class MacOsFileUtils : FileUtilsBase() {
     override fun openFolderOfFileInternal(file: File): Boolean {
         return execAndWait(arrayOf("open", "-R", file.path))
     }
+
+    override fun openFolderInternal(folder: File): Boolean {
+        return execAndWait(arrayOf("open", folder.path))
+    }
+
 }

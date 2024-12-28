@@ -1,6 +1,9 @@
 package com.abdownloadmanager.desktop.utils
 
+import com.abdownloadmanager.resources.Res
 import ir.amirab.downloader.utils.ByteConverter
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 
 data class HumanReadableSize(
     val value:Double,
@@ -52,8 +55,9 @@ fun convertBytesToHumanReadable(size: Long): String? {
     }
 }
 
-fun convertSizeToHumanReadable(size: Long): String {
-    return convertBytesToHumanReadable(size) ?: "unknown"
+fun convertSizeToHumanReadable(size: Long): StringSource {
+    return convertBytesToHumanReadable(size)?.asStringSource()
+        ?: Res.string.unknown.asStringSource()
 }
 
 fun convertSpeedToHumanReadable(size: Long, perUnit: String="s"): String {

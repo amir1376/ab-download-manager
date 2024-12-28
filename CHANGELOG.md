@@ -14,6 +14,160 @@
 
 ### Security
 
+## 1.5.0
+
+### Added
+
+- In App Update feature.
+- An option to track deleted files on disk and remove them from the download list (either manually or automatically).
+- Delete option to the Main toolbar.
+
+### Changed
+
+- UI Scale maximum value increased to 3x.
+
+### Fixed
+
+- When you change "Default download Folder", the "Download Location" of categories also updated (if they are inside "
+  Default Download Location").
+- Issue on the "Add Multiple Download" page where the "Save Mode" set to "All in Same Location" was not functioning as
+  expected.
+- App does not start on boot when installation path contains space.
+
+### Improved
+
+- Redesigned "About" Page.
+- Translations updated.
+- "Extra Config" section on the "Add Download" page was not displaying correctly in some languages.
+
+## 1.4.4
+
+### Added
+
+- UI Scale option
+
+### Changed
+
+- The "Selection" cell in download list table can be hidden (optional)
+
+### Fixed
+
+- Improved "Open Folder" in Windows
+- Support third party file managers in Windows
+- "Download Progress" Window shows up even if the "Auto Show Progress Window" option is disabled
+- Improved "Confirm Delete Download" UX
+- Improved the readability of shortcut text in menus
+- Improved sort of download list by status
+- Resize handle moves in opposite direction for RTL languages
+- Improved "Home" page
+- Improved "About" page
+- Updated translations
+
+## 1.4.3
+
+### Added
+
+- "Download Completion" window
+- "Exit Confirmation" dialog when there is active download
+- An Option to automatically show "Download Completion" window (Optional)
+- An Option to automatically show "Download Progress" window when user presses on "Resume" (Optional)
+
+### Changed
+
+- Default thread count is now 8
+- Shape of filename of release binaries changed (added arch name after platform name)
+
+### Fixed
+
+- "Delete entire list" task does not remove all downloads
+- Filename not detected correctly from some download servers
+- Rename download changes state to paused if it was finished
+- Improved installation script for linux
+- Improved "Settings" page
+- Translations updated
+
+## 1.4.2
+
+### Added
+
+- Edit Download Page (Rename, Refresh links/credentials etc…)
+- Translators Credit Page
+- Traditional Chinese Language
+- Spanish Language
+- French Language
+- Turkish Language
+
+### Changed
+
+- Updated translations
+
+## 1.4.1
+
+### Added
+
+- Portuguese (Brazilian) Language
+
+### Changed
+
+- Updated some languages
+
+### Fixed
+
+- Language names not shown by their native names
+- Selected language not saved properly
+- Wrong text for "Close" button in "Batch Download" page
+
+## 1.4.0
+
+### Added
+
+- Localization Support
+- Persian Language
+- Arabic Language
+- Chinese (Simplified) Language
+- Ukrainian Language
+- Russian Language
+- Albanian Language
+- Bengali Language
+
+### Changed
+
+- Category Download Location is now optional
+
+### Fixed
+
+- A bug in Download Engine
+- "Add Queue" page will be shown properly when opened from "Import List" page
+
+## 1.3.0
+
+### Added
+
+- Proxy Support
+- Categories now can have URL patterns
+
+### Fixed
+
+- Application freezes a while when we drag(and drop) a large file on it
+- Improved category section in the home screen
+
+## 1.2.0
+
+- in this version we replaced Wix installer with Nsis for better customization and more control over the installation
+  process in Windows.
+- if you use Windows in order to install this version please first uninstall the previous msi version (your settings and
+  downloads will be safe)
+
+### Added
+
+- You can now create and customize categories
+- Pause/Resume in header actions
+
+### Changed
+
+- Change installer in Windows from Wix to Nsis
+- Improved import link page
+
 ## 1.1.0
 
 ### Added

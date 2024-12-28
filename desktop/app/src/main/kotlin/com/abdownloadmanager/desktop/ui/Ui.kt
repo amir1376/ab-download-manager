@@ -14,9 +14,6 @@ import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialog
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.theme.ABDownloaderTheme
 import com.abdownloadmanager.desktop.ui.widget.tray.ComposeTray
-import com.abdownloadmanager.desktop.ui.widget.ProvideNotificationManager
-import com.abdownloadmanager.desktop.ui.widget.ShowMessageDialogs
-import com.abdownloadmanager.desktop.ui.widget.useNotification
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
 import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
@@ -26,9 +23,16 @@ import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
+import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
+import com.abdownloadmanager.desktop.pages.confirmexit.ConfirmExit
+import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
+import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
+import com.abdownloadmanager.desktop.pages.updater.ShowUpdaterDialog
+import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.utils.compose.ProvideDebugInfo
+import ir.amirab.util.compose.localizationmanager.LanguageManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -44,46 +48,56 @@ object Ui : KoinComponent {
     ) {
         val appComponent: AppComponent = get()
         val themeManager: ThemeManager = get()
+        val languageManager: LanguageManager = get()
         themeManager.boot()
+        languageManager.boot()
         if (!appArguments.startSilent) {
             appComponent.openHome()
         }
         application {
             val theme by themeManager.currentThemeColor.collectAsState()
             ProvideDebugInfo(AppInfo.isInDebugMode()) {
-                ProvideNotificationManager {
-                    ABDownloaderTheme(
-                        myColors = theme,
-//                    uiScale = appComponent.uiScale.collectAsState().value
-                    ) {
-                        ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
-                            val trayState = rememberTrayState()
-                            HandleEffectsForApp(appComponent)
-                            SystemTray(appComponent, trayState)
-                            val showHomeSlot = appComponent.showHomeSlot.collectAsState().value
-                            showHomeSlot.child?.instance?.let {
-                                HomeWindow(it,appComponent::closeHome)
+                ProvideLanguageManager(languageManager) {
+                    ProvideNotificationManager {
+                        ABDownloaderTheme(
+                            myColors = theme,
+                            uiScale = appComponent.uiScale.collectAsState().value
+                        ) {
+                            ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
+                                val trayState = rememberTrayState()
+                                HandleEffectsForApp(appComponent)
+                                SystemTray(appComponent, trayState)
+                                val showHomeSlot = appComponent.showHomeSlot.collectAsState().value
+                                showHomeSlot.child?.instance?.let {
+                                    HomeWindow(it, appComponent::closeHome)
+                                }
+                                val showSettingSlot = appComponent.showSettingSlot.collectAsState().value
+                                showSettingSlot.child?.instance?.let {
+                                    SettingWindow(it, appComponent::closeSettings)
+                                }
+                                val showQueuesSlot = appComponent.showQueuesSlot.collectAsState().value
+                                showQueuesSlot.child?.instance?.let {
+                                    QueuesWindow(it)
+                                }
+                                val batchDownloadSlot = appComponent.batchDownloadSlot.collectAsState().value
+                                batchDownloadSlot.child?.instance?.let {
+                                    BatchDownloadWindow(it)
+                                }
+                                val editDownloadSlot = appComponent.editDownloadSlot.collectAsState().value
+                                editDownloadSlot.child?.instance?.let {
+                                    EditDownloadWindow(it)
+                                }
+                                ShowAddDownloadDialogs(appComponent)
+                                ShowDownloadDialogs(appComponent)
+                                ShowCategoryDialogs(appComponent)
+                                ShowUpdaterDialog(appComponent.updater)
+                                ShowAboutDialog(appComponent)
+                                NewQueueDialog(appComponent)
+                                ShowMessageDialogs(appComponent)
+                                ShowOpenSourceLibraries(appComponent)
+                                ShowTranslators(appComponent)
+                                ConfirmExit(appComponent)
                             }
-                            val showSettingSlot = appComponent.showSettingSlot.collectAsState().value
-                            showSettingSlot.child?.instance?.let {
-                                SettingWindow(it, appComponent::closeSettings)
-                            }
-                            val showQueuesSlot = appComponent.showQueuesSlot.collectAsState().value
-                            showQueuesSlot.child?.instance?.let {
-                                QueuesWindow(it)
-                            }
-                            val batchDownloadSlot = appComponent.batchDownloadSlot.collectAsState().value
-                            batchDownloadSlot.child?.instance?.let {
-                                BatchDownloadWindow(it)
-                            }
-                            ShowAddDownloadDialogs(appComponent)
-                            ShowDownloadDialogs(appComponent)
-                            //TODO Enable Updater
-                            //ShowUpdaterDialog(appComponent.updater)
-                            ShowAboutDialog(appComponent)
-                            NewQueueDialog(appComponent)
-                            ShowMessageDialogs(appComponent)
-                            ShowOpenSourceLibraries(appComponent)
                         }
                     }
                 }
@@ -123,7 +137,7 @@ private fun ApplicationScope.SystemTray(
             buildMenu {
                 +showDownloadList
                 +gotoSettingsAction
-                +exitAction
+                +requestExitAction
             }
         }
     )

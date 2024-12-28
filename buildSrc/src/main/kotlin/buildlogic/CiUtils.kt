@@ -1,21 +1,20 @@
 package buildlogic
 
 import io.github.z4kn4fein.semver.Version
+import ir.amirab.installer.InstallerTargetFormat
+import ir.amirab.util.platform.Arch
 import ir.amirab.util.platform.Platform
-import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.File
-
 
 object CiUtils {
     fun getTargetFileName(
         packageName: String,
         appVersion: Version,
-        target: TargetFormat,
+        target: InstallerTargetFormat?,
     ): String {
         val fileExtension = when (target) {
-            // we use archived for app image distribution
-            TargetFormat.AppImage -> {
+            // we use archived for app image distribution ( app image is a folder actually so there is no installer so we zip it instead)
+            null -> {
                 when (Platform.getCurrentPlatform()) {
                     Platform.Desktop.Linux -> "tar.gz"
                     Platform.Desktop.MacOS -> "tar.gz"
@@ -28,7 +27,7 @@ object CiUtils {
         }
 
         val platformName = when (target) {
-            TargetFormat.AppImage -> Platform.getCurrentPlatform()
+            null -> Platform.getCurrentPlatform()
             else -> {
                 val packageFileExt = target.fileExtensionWithoutDot()
                 requireNotNull(Platform.fromExecutableFileExtension(packageFileExt)) {
@@ -36,14 +35,16 @@ object CiUtils {
                 }
             }
         }.name.lowercase()
-        return "${packageName}_${appVersion}_${platformName}.${fileExtension}"
+        val archName = Arch.getCurrentArch().name
+        return "${packageName}_${appVersion}_${platformName}_${archName}.${fileExtension}"
     }
 
     fun getFileOfPackagedTarget(
         baseOutputDir: File,
-        target: TargetFormat,
+        target: InstallerTargetFormat,
     ): File {
-        val folder = baseOutputDir.resolve(target.outputDirName)
+        val folder = baseOutputDir
+//        val folder = baseOutputDir.resolve(target.outputDirName)
         val exeFile = kotlin.runCatching {
             folder.walk().first {
                 it.name.endsWith(target.fileExt)
@@ -89,7 +90,7 @@ object CiUtils {
     fun movePackagedAndCreateSignature(
         appVersion: Version,
         packageName: String,
-        target: TargetFormat,
+        target: InstallerTargetFormat,
         basePackagedAppsDir: File,
         outputDir: File,
     ) {
@@ -148,4 +149,4 @@ object CiUtils {
     */
 }
 
-private fun TargetFormat.fileExtensionWithoutDot() = fileExt.substring(".".length)
+private fun InstallerTargetFormat.fileExtensionWithoutDot() = fileExt.substring(".".length)

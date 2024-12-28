@@ -22,4 +22,12 @@ internal class JVMFileUtils : FileUtilsBase() {
         }
         return false
     }
+
+    override fun openFolderInternal(folder: File): Boolean {
+        kotlin.runCatching {
+            Desktop.getDesktop().open(folder)
+            return true
+        }
+        return false
+    }
 }

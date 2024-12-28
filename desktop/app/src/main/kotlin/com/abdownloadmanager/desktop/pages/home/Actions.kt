@@ -11,18 +11,24 @@ import com.abdownloadmanager.utils.compose.WithContentColor
 import ir.amirab.util.compose.action.MenuItem
 import com.abdownloadmanager.desktop.utils.div
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.utils.compose.LocalTextStyle
+import com.abdownloadmanager.utils.compose.widget.ScrollFade
+import org.http4k.routing.inspect.BackgroundColour
 
 @Composable
 fun Actions(list: List<MenuItem>) {
     val scrollState = rememberScrollState()
-    Box {
+    Column {
         Row(
             Modifier
                 .height(IntrinsicSize.Max)
@@ -31,12 +37,13 @@ fun Actions(list: List<MenuItem>) {
             for (a in list) {
                 when (a) {
                     MenuItem.Separator -> {
-                        Spacer(Modifier
-                            .padding(horizontal = 4.dp)
-                            .fillMaxHeight()
-                            .padding(vertical = 4.dp)
-                            .width(1.dp)
-                            .background(myColors.onBackground / 5)
+                        Spacer(
+                            Modifier
+                                .padding(horizontal = 4.dp)
+                                .fillMaxHeight()
+                                .padding(vertical = 4.dp)
+                                .width(1.dp)
+                                .background(myColors.onBackground / 5)
                         )
                     }
 
@@ -51,16 +58,23 @@ fun Actions(list: List<MenuItem>) {
             }
         }
         val adapter = rememberScrollbarAdapter(scrollState)
-        HorizontalScrollbar(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth(),
-
-            adapter = adapter
-        )
+        if (adapter.needScroll()) {
+            HorizontalScrollbar(
+                adapter = adapter,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp),
+                style = LocalScrollbarStyle.current.copy(
+                    thickness = 6.dp
+                ),
+            )
+        }
     }
 }
 
+private fun androidx.compose.foundation.v2.ScrollbarAdapter.needScroll(): Boolean {
+    return contentSize > viewportSize
+}
 
 @Composable
 private fun ActionButton(
@@ -87,7 +101,7 @@ private fun ActionButton(
                     MyIcon(it, null, Modifier.size(16.dp))
                 }
                 Spacer(Modifier.size(2.dp))
-                Text(title, maxLines = 1, fontSize = myTextSizes.sm)
+                Text(title.rememberString(), maxLines = 1, fontSize = myTextSizes.sm)
             }
         }
     }
@@ -120,7 +134,7 @@ private fun GroupActionButton(
                         MyIcon(it, null, Modifier.size(16.dp))
                     }
                     Spacer(Modifier.size(2.dp))
-                    Text(title, maxLines = 1, fontSize = myTextSizes.sm)
+                    Text(title.rememberString(), maxLines = 1, fontSize = myTextSizes.sm)
                 }
             }
         }

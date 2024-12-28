@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import ir.amirab.util.compose.StringSource
 
 
 @Composable
@@ -32,7 +33,7 @@ fun MyTab(
     selected: Boolean,
     onClick: () -> Unit,
     icon: IconSource,
-    title: String,
+    title: StringSource,
     selectionBackground: Color = myColors.background,
 ) {
     WithContentAlpha(
@@ -56,7 +57,7 @@ fun MyTab(
         ) {
             MyIcon(icon, null, Modifier.size(16.dp))
             Spacer(Modifier.width(4.dp))
-            Text(title, maxLines = 1, fontSize = myTextSizes.base)
+            Text(title.rememberString(), maxLines = 1, fontSize = myTextSizes.base)
         }
     }
 }

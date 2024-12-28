@@ -1,5 +1,8 @@
 package com.abdownloadmanager.desktop.pages.home.sections.category
 
+import androidx.compose.animation.*
+import androidx.compose.foundation.PointerMatcher
+import androidx.compose.foundation.background
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
@@ -8,45 +11,34 @@ import com.abdownloadmanager.desktop.ui.widget.ExpandableItem
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.ui.theme.myColors
+import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.rememberIconPainter
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
-
-abstract class DownloadTypeCategoryFilter(
-    val name: String,
-    val icon: IconSource,
-) {
-    abstract fun accept(iDownloadStatus: IDownloadItemState): Boolean
-}
-
-class DownloadTypeCategoryFilterByList(
-    name: String,
-    icon: IconSource,
-    acceptedTypes: List<String>,
-) : DownloadTypeCategoryFilter(name,icon) {
-    val acceptedTypes = acceptedTypes.map { it.lowercase() }
-    override fun accept(iDownloadStatus: IDownloadItemState): Boolean {
-        val extension = iDownloadStatus.name
-            .split(".")
-            .lastOrNull()
-            ?.lowercase() ?: return false
-        return extension in acceptedTypes
-    }
-}
-
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 
 class DownloadStatusCategoryFilterByList(
-    name: String,
+    name: StringSource,
     icon: IconSource,
     val acceptedStatus: List<DownloadStatus>,
 ) : DownloadStatusCategoryFilter(name, icon) {
@@ -58,7 +50,7 @@ class DownloadStatusCategoryFilterByList(
 }
 
 abstract class DownloadStatusCategoryFilter(
-    val name: String,
+    val name: StringSource,
     val icon: IconSource,
 ) {
     abstract fun accept(iDownloadStatus: IDownloadItemState): Boolean
@@ -69,18 +61,18 @@ object DefinedStatusCategories {
 
 
     val All = object : DownloadStatusCategoryFilter(
-        "All",
+        Res.string.all.asStringSource(),
         MyIcons.folder,
     ) {
         override fun accept(iDownloadStatus: IDownloadItemState): Boolean = true
     }
     val Finished = DownloadStatusCategoryFilterByList(
-        "Finished",
+        Res.string.finished.asStringSource(),
         MyIcons.folder,
         listOf(DownloadStatus.Completed)
     )
     val Unfinished = DownloadStatusCategoryFilterByList(
-        "Unfinished",
+        Res.string.Unfinished.asStringSource(),
         MyIcons.folder,
         listOf(
             DownloadStatus.Error,
@@ -91,88 +83,68 @@ object DefinedStatusCategories {
     )
 }
 
-object DefinedTypeCategories {
-    fun values() = listOf(
-        Image, Music, Video, App, Document, Compressed, Other
-    )
-
-    fun resolveCategoryForDownloadItem(item: IDownloadItemState): DownloadTypeCategoryFilter {
-        return values().first {
-            it.accept(item)
-        }
-    }
-
-
-    val Image = DownloadTypeCategoryFilterByList(
-        "Image",
-        MyIcons.pictureFile,
-        listOf("png", "jpg", "jpeg", "gif", "svg")
-    )
-    val Music = DownloadTypeCategoryFilterByList(
-        "Music",
-        MyIcons.musicFile,
-        listOf("mp3")
-    )
-    val Video = DownloadTypeCategoryFilterByList(
-        "Video",
-        MyIcons.videoFile,
-        listOf("mp4", "mkv", "3gp", "avi")
-    )
-    val App = DownloadTypeCategoryFilterByList(
-        "Apps",
-        MyIcons.applicationFile,
-        listOf("apk", "deb", "exe", "msi", "jar")
-    )
-    val Document = DownloadTypeCategoryFilterByList(
-        "Document",
-        MyIcons.documentFile,
-        listOf("txt", "docx", "pdf")
-    )
-    val Compressed = DownloadTypeCategoryFilterByList(
-        "Compressed",
-        MyIcons.zipFile,
-        listOf("zip", "rar", "tz")
-    )
-    val Other = object : DownloadTypeCategoryFilter(
-        "Other",
-        MyIcons.otherFile,
-    ) {
-        override fun accept(iDownloadStatus: IDownloadItemState): Boolean =true
-    }
-}
-
 
 @Composable
 private fun CategoryFilterItem(
     modifier: Modifier,
-    category: DownloadTypeCategoryFilter,
+    category: Category,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    Row(
+    Box(
         modifier
+            .background(
+                if (isSelected) {
+                    myColors.onBackground / 0.05f
+                } else Color.Transparent
+            )
             .selectable(
                 selected = isSelected,
                 onClick = onClick
-            )
-            .padding(start = 24.dp)
-            .padding(horizontal = 4.dp,vertical = 6.dp)
-        ,
-        verticalAlignment = Alignment.CenterVertically,
+            ),
     ) {
-        WithContentAlpha(if (isSelected)1f else 0.75f){
-            MyIcon(
-                category.icon,
-                null,
-                Modifier.size(16.dp),
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(
-                category.name,
-                Modifier.weight(1f),
-                maxLines = 1,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                fontSize = myTextSizes.base
+        Row(
+            modifier = Modifier
+                .padding(start = 24.dp)
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            WithContentAlpha(if (isSelected) 1f else 0.75f) {
+                val iconPainter = category.rememberIconPainter()
+                MyIcon(
+                    iconPainter ?: MyIcons.folder,
+                    null,
+                    Modifier.size(16.dp),
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    category.name,
+                    Modifier.weight(1f),
+                    maxLines = 1,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    fontSize = myTextSizes.base
+                )
+            }
+        }
+        AnimatedVisibility(
+            isSelected,
+            modifier = Modifier.align(Alignment.CenterStart),
+            enter = scaleIn(),
+            exit = scaleOut(),
+        ) {
+            Spacer(
+                Modifier
+                    .height(16.dp)
+                    .width(3.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 0.dp,
+                            bottomStart = 0.dp,
+                            bottomEnd = 12.dp,
+                            topEnd = 12.dp,
+                        )
+                    )
+                    .background(myColors.primary)
             )
         }
     }
@@ -182,22 +154,34 @@ private fun CategoryFilterItem(
 fun StatusFilterItem(
     isExpanded: Boolean,
     onRequestExpand: (Boolean) -> Unit,
-    currentTypeCategoryFilter: DownloadTypeCategoryFilter?,
+    currentTypeCategoryFilter: Category?,
     currentStatusCategoryFilter: DownloadStatusCategoryFilter?,
     statusFilter: DownloadStatusCategoryFilter,
-    typeFilter: List<DownloadTypeCategoryFilter>,
+    categories: List<Category>,
     onFilterChange: (
-        typeFilter: DownloadTypeCategoryFilter?,
+        typeFilter: Category?,
     ) -> Unit,
+    onRequestOpenOptionMenu: (Category?) -> Unit,
 ) {
     val isStatusSelected = currentStatusCategoryFilter == statusFilter
     val isSelected = isStatusSelected && currentTypeCategoryFilter == null
     ExpandableItem(
+        modifier = Modifier
+            .onClick(
+                matcher = PointerMatcher.mouse(PointerButton.Secondary),
+            ) {
+                onRequestOpenOptionMenu(null)
+            },
         isExpanded = isExpanded,
         header = {
-            Row(
+            Box(
                 Modifier
                     .height(IntrinsicSize.Max)
+                    .background(
+                        if (isSelected) {
+                            myColors.onBackground / 0.05f
+                        } else Color.Transparent
+                    )
                     .selectable(
                         selected = isSelected,
                         onClick = {
@@ -206,45 +190,74 @@ fun StatusFilterItem(
                             }
                             onFilterChange(null)
                         }
-                    ).padding(vertical = 4.dp)
-                    .padding(start = 16.dp)
-                    .padding(end = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    )
             ) {
-                WithContentAlpha(if (isSelected) 1f else 0.75f) {
-                    MyIcon(
-                        statusFilter.icon,
-                        null,
-                        Modifier.size(16.dp)
+                Row(
+                    Modifier.padding(vertical = 4.dp)
+                        .padding(start = 16.dp)
+                        .padding(end = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    WithContentAlpha(if (isSelected) 1f else 0.75f) {
+                        MyIcon(
+                            statusFilter.icon,
+                            null,
+                            Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            statusFilter.name.rememberString(),
+                            Modifier.weight(1f),
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            fontSize = myTextSizes.lg,
+                            maxLines = 1,
+                        )
+                        MyIcon(MyIcons.up, null, Modifier
+                            .fillMaxHeight().wrapContentHeight()
+                            .clip(CircleShape)
+                            .size(24.dp)
+                            .clickable {
+                                onRequestExpand(!isExpanded)
+                            }
+                            .padding(6.dp)
+                            .width(16.dp)
+                            .let {
+                                it.rotate(if (isExpanded) 180f else 0f)
+                            })
+                    }
+                }
+                AnimatedVisibility(
+                    isSelected,
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    enter = scaleIn(),
+                    exit = scaleOut(),
+                ) {
+                    Spacer(
+                        Modifier
+                            .height(16.dp)
+                            .width(3.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    bottomStart = 0.dp,
+                                    bottomEnd = 12.dp,
+                                    topEnd = 12.dp,
+                                )
+                            )
+                            .background(myColors.primary)
                     )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        statusFilter.name,
-                        Modifier.weight(1f),
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        fontSize = myTextSizes.lg,
-                        maxLines = 1,
-                    )
-                    MyIcon(MyIcons.up, null, Modifier
-                        .fillMaxHeight().wrapContentHeight()
-                        .clip(CircleShape)
-                        .size(24.dp)
-                        .clickable {
-                            onRequestExpand(!isExpanded)
-                        }
-                        .padding(6.dp)
-                        .width(16.dp)
-                        .let {
-                            it.rotate(if (isExpanded) 180f else 0f)
-                        })
                 }
             }
         },
         body = {
             Column(Modifier) {
-                typeFilter.forEach {
+                categories.forEach {
                     CategoryFilterItem(
-                        modifier = Modifier,
+                        modifier = Modifier.onClick(
+                            matcher = PointerMatcher.mouse(PointerButton.Secondary),
+                        ) {
+                            onRequestOpenOptionMenu(it)
+                        },
                         category = it,
                         isSelected = isStatusSelected && currentTypeCategoryFilter == it,
                         onClick = {

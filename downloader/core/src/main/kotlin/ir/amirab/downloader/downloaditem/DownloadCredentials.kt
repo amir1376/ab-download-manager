@@ -15,6 +15,21 @@ data class DownloadCredentials(
         fun empty()=DownloadCredentials(
             link = ""
         )
+        fun from(credentials: IDownloadCredentials): DownloadCredentials {
+            credentials.run {
+                return when (this) {
+                    is DownloadCredentials -> this
+                    else -> DownloadCredentials(
+                        link = link,
+                        headers = headers,
+                        username = username,
+                        password = password,
+                        downloadPage = downloadPage,
+                        userAgent = userAgent,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -25,17 +40,4 @@ interface IDownloadCredentials {
     val password: String?
     val downloadPage: String?
     val userAgent: String?
-}
-fun IDownloadCredentials.copy(): DownloadCredentials {
-    return when (this) {
-        is DownloadCredentials -> this
-        else -> DownloadCredentials(
-            link = link,
-            headers = headers,
-            username = username,
-            password = password,
-            downloadPage = downloadPage,
-            userAgent = userAgent,
-        )
-    }
 }

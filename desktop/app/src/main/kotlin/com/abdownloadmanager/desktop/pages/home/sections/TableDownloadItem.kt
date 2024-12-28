@@ -1,7 +1,6 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
 import com.abdownloadmanager.desktop.pages.home.sections.SortIndicatorMode.*
-import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedTypeCategories
 import com.abdownloadmanager.utils.compose.LocalContentColor
 import com.abdownloadmanager.utils.compose.widget.MyIcon
 import com.abdownloadmanager.desktop.ui.theme.myColors
@@ -20,17 +19,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.category.Category
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.util.compose.resources.MyStringResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.*
 
 val LocalDownloadItemProperties =
-        compositionLocalOf<DownloadItemProperties> { error("not provided download properties") }
+    compositionLocalOf<DownloadItemProperties> { error("not provided download properties") }
 
 
 data class DownloadItemProperties(
@@ -91,16 +96,16 @@ fun CheckCell(
 
 @Composable
 fun NameCell(
-    itemState: IDownloadItemState
+    itemState: IDownloadItemState,
+    category: Category?,
+    fileIconProvider: FileIconProvider,
 ) {
-    val typeCategoryFilter = remember(itemState.id) {
-        DefinedTypeCategories.resolveCategoryForDownloadItem(itemState)
-    }
+    val fileIcon = fileIconProvider.rememberIcon(itemState.name)
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         MyIcon(
-            icon = typeCategoryFilter.icon,
+            icon = fileIcon,
             modifier = Modifier.size(16.dp),
             contentDescription = null,
 //            tint = LocalContentColor.current / 75
@@ -113,7 +118,8 @@ fun NameCell(
                 fontSize = myTextSizes.base,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(typeCategoryFilter.name, maxLines = 1, fontSize = myTextSizes.xs,
+            Text(
+                category?.name ?: myStringResource(Res.string.general), maxLines = 1, fontSize = myTextSizes.xs,
                 color = LocalContentColor.current / 50
             )
         }
@@ -184,7 +190,7 @@ fun SizeCell(
 ) {
     item.contentLength.let {
         Text(
-            convertSizeToHumanReadable(it),
+            convertSizeToHumanReadable(it).rememberString(),
             maxLines = 1,
             fontSize = myTextSizes.base,
             overflow = TextOverflow.Ellipsis,
@@ -203,9 +209,9 @@ fun StatusCell(
                     ProgressAndPercent(
                         itemState.percent,
                         if (ExceptionUtils.isNormalCancellation(status.e)) {
-                            if (!itemState.gotAnyProgress){
+                            if (!itemState.gotAnyProgress) {
                                 DownloadProgressStatus.Added
-                            }else{
+                            } else {
                                 DownloadProgressStatus.Paused
                             }
                         } else {
@@ -218,9 +224,9 @@ fun StatusCell(
                 DownloadJobStatus.IDLE -> {
                     ProgressAndPercent(
                         itemState.percent,
-                        if (!itemState.gotAnyProgress){
+                        if (!itemState.gotAnyProgress) {
                             DownloadProgressStatus.Added
-                        }else{
+                        } else {
                             DownloadProgressStatus.Paused
                         },
                         itemState.gotAnyProgress
@@ -245,17 +251,69 @@ fun StatusCell(
 
                 DownloadJobStatus.Finished,
                 DownloadJobStatus.Resuming,
-                -> SimpleStatus(itemState.status.toString())
+                    -> SimpleStatus(myStringResource(itemState.status.toStringResource()))
             }
         }
 
         is CompletedDownloadItemState -> {
-            SimpleStatus("Finished")
+            SimpleStatus(myStringResource(Res.string.finished))
         }
     }
 
 }
 
+@Composable
+private fun DownloadJobStatus.toStringResource(): MyStringResource {
+    return when (this) {
+        is DownloadJobStatus.Canceled -> {
+            Res.string.canceled
+        }
+
+        DownloadJobStatus.Downloading -> {
+            Res.string.downloading
+        }
+
+        DownloadJobStatus.Finished -> {
+            Res.string.finished
+        }
+
+        DownloadJobStatus.IDLE -> {
+            Res.string.idle
+        }
+
+        is DownloadJobStatus.PreparingFile -> {
+            Res.string.preparing_file
+        }
+
+        DownloadJobStatus.Resuming -> {
+            Res.string.resuming
+        }
+    }
+}
+
+private fun DownloadProgressStatus.toStringResource(): MyStringResource {
+    return when (this) {
+        DownloadProgressStatus.Added -> {
+            Res.string.added
+        }
+
+        DownloadProgressStatus.Error -> {
+            Res.string.error
+        }
+
+        DownloadProgressStatus.Paused -> {
+            Res.string.paused
+        }
+
+        DownloadProgressStatus.CreatingFile -> {
+            Res.string.creating_file
+        }
+
+        DownloadProgressStatus.Downloading -> {
+            Res.string.downloading
+        }
+    }
+}
 
 @Composable
 private fun SimpleStatus(string: String) {
@@ -275,22 +333,23 @@ private enum class DownloadProgressStatus {
 private fun ProgressAndPercent(
     percent: Int?,
     status: DownloadProgressStatus,
-    gotAnyProgress:Boolean,
+    gotAnyProgress: Boolean,
 ) {
     val background = when (status) {
         DownloadProgressStatus.Error -> myColors.errorGradient
-        DownloadProgressStatus.Paused,DownloadProgressStatus.Added -> myColors.warningGradient
+        DownloadProgressStatus.Paused, DownloadProgressStatus.Added -> myColors.warningGradient
         DownloadProgressStatus.CreatingFile -> myColors.infoGradient
         DownloadProgressStatus.Downloading -> myColors.primaryGradient
     }
+    val statusString = myStringResource(status.toStringResource())
     Column {
-        val statusText = if (gotAnyProgress){
-            "${percent ?: "."}% $status"
-        }else{
-            "$status"
+        val statusText = if (gotAnyProgress) {
+            "${percent ?: "."}% $statusString"
+        } else {
+            statusString
         }
         SimpleStatus(statusText)
-        if (status != DownloadProgressStatus.Added){
+        if (status != DownloadProgressStatus.Added) {
             Spacer(Modifier.height(2.5.dp))
             ProgressStatus(
                 percent, background

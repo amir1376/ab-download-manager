@@ -38,95 +38,103 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
+import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.compose.useIsInDebugMode
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.part.PartDownloadStatus
 import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.resources.myStringResource
 
 enum class SingleDownloadPageSections(
+    val title: StringSource,
     val icon: IconSource,
 ) {
-    Info(MyIcons.info),
-    Settings(MyIcons.settings),
+    Info(
+        Res.string.info.asStringSource(),
+        MyIcons.info
+    ),
+    Settings(
+        Res.string.settings.asStringSource(),
+        MyIcons.settings
+    ),
 }
 
 private val tabs = SingleDownloadPageSections.entries.toList()
 
 @Composable
-fun SingleDownloadPage(singleDownloadComponent: SingleDownloadComponent) {
-    val itemState = singleDownloadComponent.itemStateFlow.collectAsState().value
+fun ProgressDownloadPage(singleDownloadComponent: SingleDownloadComponent, itemState: ProcessingDownloadItemState) {
     var selectedTab by remember { mutableStateOf(Info) }
     val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
     val setShowPartInfo = singleDownloadComponent::setShowPartInfo
-    if (itemState != null) {
+    Column(
+        Modifier.padding(horizontal = 16.dp)
+    ) {
         Column(
-            Modifier.padding(horizontal = 16.dp)
+            Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .background(myColors.surface)
+                .padding(1.dp),
         ) {
-            Column(
-                Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(myColors.surface)
-                    .padding(1.dp),
-            ) {
-                //tabs
-                MyTabRow {
-                    for (tab in tabs) {
-                        MyTab(
-                            selected = tab == selectedTab, {
-                                selectedTab = tab
-                            },
-                            icon = tab.icon,
-                            title = tab.toString()
-                        )
-                    }
-                }
-                val scrollState = rememberScrollState()
-                //info / settings ...
-                val tabContentModifier = Modifier
-
-                Box(
-                    Modifier.height(150.dp)
-                        .clip(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp))
-                        .background(myColors.background)
-                        .verticalScroll(scrollState)
-                ) {
-                    when (selectedTab) {
-                        Info -> RenderInfo(
-                            tabContentModifier,
-                            singleDownloadComponent
-                        )
-
-                        Settings -> RenderSettings(
-                            tabContentModifier.padding(end = 12.dp),
-                            singleDownloadComponent,
-                        )
-                    }
-                    VerticalScrollbar(
-                        adapter = rememberScrollbarAdapter(scrollState),
-                        modifier = Modifier.matchParentSize().wrapContentWidth(Alignment.End),
-                        style = LocalScrollbarStyle.current.copy(
-                            shape = RectangleShape
-                        )
+            //tabs
+            MyTabRow {
+                for (tab in tabs) {
+                    MyTab(
+                        selected = tab == selectedTab, {
+                            selectedTab = tab
+                        },
+                        icon = tab.icon,
+                        title = tab.title
                     )
                 }
             }
-            Spacer(Modifier.size(8.dp))
-            Column(Modifier) {
-                RenderProgressBar(itemState)
-                Spacer(Modifier.size(8.dp))
-                RenderActions(itemState, singleDownloadComponent, showPartInfo, setShowPartInfo)
-                Spacer(Modifier.size(8.dp))
-            }
-            val resizingState = LocalSingleDownloadPageSizing.current
-            LaunchedEffect(resizingState.resizingPartInfo){
-                if (resizingState.partInfoHeight<=0.dp){
-                    setShowPartInfo(false)
+            val scrollState = rememberScrollState()
+            //info / settings ...
+            val tabContentModifier = Modifier
+
+            Box(
+                Modifier.height(150.dp)
+                    .clip(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp))
+                    .background(myColors.background)
+                    .verticalScroll(scrollState)
+            ) {
+                when (selectedTab) {
+                    Info -> RenderInfo(
+                        tabContentModifier,
+                        singleDownloadComponent
+                    )
+
+                    Settings -> RenderSettings(
+                        tabContentModifier.padding(end = 12.dp),
+                        singleDownloadComponent,
+                    )
                 }
+                VerticalScrollbar(
+                    adapter = rememberScrollbarAdapter(scrollState),
+                    modifier = Modifier.matchParentSize().wrapContentWidth(Alignment.End),
+                    style = LocalScrollbarStyle.current.copy(
+                        shape = RectangleShape
+                    )
+                )
             }
-            if (showPartInfo && itemState is ProcessingDownloadItemState) {
-                RenderPartInfo(itemState)
+        }
+        Spacer(Modifier.size(8.dp))
+        Column(Modifier) {
+            RenderProgressBar(itemState)
+            Spacer(Modifier.size(8.dp))
+            RenderActions(itemState, singleDownloadComponent, showPartInfo, setShowPartInfo)
+            Spacer(Modifier.size(8.dp))
+        }
+        val resizingState = LocalSingleDownloadPageSizing.current
+        LaunchedEffect(resizingState.resizingPartInfo) {
+            if (resizingState.partInfoHeight <= 0.dp) {
+                setShowPartInfo(false)
             }
+        }
+        if (showPartInfo) {
+            RenderPartInfo(itemState)
         }
     }
 }
@@ -306,7 +314,7 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                             cells = PartInfoCells.all()
                         )
                     },
-                    wrapItem = { _, content ->
+                    wrapItem = { _, _, content ->
                         WithContentAlpha(1f) {
                             val interactionSource = remember { MutableInteractionSource() }
                             val isHovered by interactionSource.collectIsHoveredAsState()
@@ -330,22 +338,18 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                         }
 
                         PartInfoCells.Status -> {
-                            SimpleCellText("${prettifyStatus(it.value.status)}")
+                            SimpleCellText(prettifyStatus(it.value.status).rememberString())
                         }
 
                         PartInfoCells.Downloaded -> {
-                            SimpleCellText("${convertSizeToHumanReadable(it.value.howMuchProceed)}")
+                            SimpleCellText(convertSizeToHumanReadable(it.value.howMuchProceed).rememberString())
                         }
 
                         PartInfoCells.Total -> {
                             SimpleCellText(
-                                "${
-                                    it.value.length?.let { length ->
-                                        convertSizeToHumanReadable(
-                                            length
-                                        )
-                                    } ?: "Unknown"
-                                }",
+                                it.value.length?.let { length ->
+                                    convertSizeToHumanReadable(length).rememberString()
+                                } ?: myStringResource(Res.string.unknown),
                             )
                         }
                     }
@@ -368,7 +372,7 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
         val singleDownloadPageSizing = LocalSingleDownloadPageSizing.current
         val mutableInteractionSource = remember { MutableInteractionSource() }
         val isDraggingHandle by mutableInteractionSource.collectIsDraggedAsState()
-        LaunchedEffect(isDraggingHandle){
+        LaunchedEffect(isDraggingHandle) {
             singleDownloadPageSizing.resizingPartInfo = isDraggingHandle
         }
         Handle(
@@ -381,14 +385,14 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
     }
 }
 
-fun prettifyStatus(status: PartDownloadStatus): String {
+fun prettifyStatus(status: PartDownloadStatus): StringSource {
     return when (status) {
-        is PartDownloadStatus.Canceled -> "Disconnected"
-        PartDownloadStatus.IDLE -> "IDLE"
-        PartDownloadStatus.Completed -> "Completed"
-        PartDownloadStatus.ReceivingData -> "Receiving Data"
-        PartDownloadStatus.SendGet -> "Send Get"
-    }
+        is PartDownloadStatus.Canceled -> Res.string.disconnected
+        PartDownloadStatus.IDLE -> Res.string.idle
+        PartDownloadStatus.Completed -> Res.string.finished
+        PartDownloadStatus.ReceivingData -> Res.string.receiving_data
+        PartDownloadStatus.SendGet -> Res.string.connecting
+    }.asStringSource()
 }
 
 @Composable
@@ -398,22 +402,26 @@ private fun SimpleCellText(text: String) {
 
 sealed class PartInfoCells : TableCell<IndexedValue<UiPart>> {
     data object Number : PartInfoCells() {
-        override val name: String = "#"
+        override val id: String = "#"
+        override val name: StringSource = "#".asStringSource()
         override val size: CellSize = CellSize.Fixed(26.dp)
     }
 
     data object Status : PartInfoCells() {
-        override val name: String = "Status"
+        override val id: String = "Status"
+        override val name: StringSource = Res.string.status.asStringSource()
         override val size: CellSize = CellSize.Resizeable(100.dp..200.dp)
     }
 
     data object Downloaded : PartInfoCells() {
-        override val name: String = "Downloaded"
+        override val id: String = "Downloaded"
+        override val name: StringSource = Res.string.parts_info_downloaded_size.asStringSource()
         override val size: CellSize = CellSize.Resizeable(90.dp..200.dp)
     }
 
     data object Total : PartInfoCells() {
-        override val name: String = "Total"
+        override val id: String = "Total"
+        override val name: StringSource = Res.string.parts_info_total_size.asStringSource()
         override val size: CellSize = CellSize.Resizeable(90.dp..200.dp)
     }
 
@@ -440,7 +448,7 @@ fun RenderPropertyItem(propertyItem: SingleDownloadPagePropertyItem) {
     ) {
         WithContentAlpha(0.75f) {
             Text(
-                text = "$title:",
+                text = "${title.rememberString()}:",
                 modifier = Modifier.weight(0.3f),
                 maxLines = 1,
                 fontSize = myTextSizes.base
@@ -448,7 +456,7 @@ fun RenderPropertyItem(propertyItem: SingleDownloadPagePropertyItem) {
         }
         WithContentAlpha(1f) {
             Text(
-                text = "$value",
+                text = value.rememberString(),
                 modifier = Modifier
                     .basicMarquee()
                     .weight(0.7f),
@@ -474,7 +482,7 @@ fun RenderInfo(
             .padding(horizontal = 16.dp)
             .padding(top = 8.dp)
     ) {
-        for (propertyItem in singleDownloadComponent.extraDownloadInfo.collectAsState().value) {
+        for (propertyItem in singleDownloadComponent.extraDownloadProgressInfo.collectAsState().value) {
             Spacer(Modifier.height(2.dp))
             RenderPropertyItem(propertyItem)
         }
@@ -532,7 +540,7 @@ private fun PartInfoButton(
         onClick = {
             onClick(!showing)
         },
-        text = "Part Info",
+        text = myStringResource(Res.string.parts_info),
         icon = if (showing) {
             MyIcons.up
         } else {
@@ -565,7 +573,7 @@ private fun CloseButton(close: () -> Unit) {
         {
             close()
         },
-        text = "Close"
+        text = myStringResource(Res.string.close)
     )
 }
 
@@ -576,7 +584,7 @@ private fun OpenFileButton(open: () -> Unit) {
             open()
         },
         icon = MyIcons.fileOpen,
-        text = "Open"
+        text = myStringResource(Res.string.open_file)
     )
 }
 
@@ -587,7 +595,7 @@ private fun OpenFolderButton(open: () -> Unit) {
             open()
         },
         icon = MyIcons.folderOpen,
-        text = "Folder",
+        text = myStringResource(Res.string.open_folder),
     )
 }
 
@@ -605,11 +613,11 @@ private fun ToggleButton(
     val isResumeSupported = itemState.supportResume == true
     val (icon, text) = when (itemState.status) {
         is DownloadJobStatus.CanBeResumed -> {
-            MyIcons.resume to "Resume"
+            MyIcons.resume to Res.string.resume
         }
 
         is DownloadJobStatus.IsActive -> {
-            MyIcons.pause to "Pause"
+            MyIcons.pause to Res.string.pause
         }
 
         else -> return
@@ -629,7 +637,7 @@ private fun ToggleButton(
                 }
             },
             icon = icon,
-            text = text,
+            text = myStringResource(text),
             color = if (isResumeSupported) {
                 LocalContentColor.current
             } else {
@@ -670,13 +678,13 @@ private fun ToggleButton(
                 ) {
                     Text(buildAnnotatedString {
                         withStyle(SpanStyle(color = myColors.warning)) {
-                            append("WARNING:\n")
+                            append("${myStringResource(Res.string.warning)}:\n")
                         }
-                        append("This download doesn't support resuming! You may have to RESTART it later in the Download List")
+                        append(myStringResource(Res.string.unsupported_resume_warning))
                     })
                     Spacer(Modifier.height(8.dp))
                     ActionButton(
-                        "Stop Anyway",
+                        myStringResource(Res.string.stop_anyway),
                         onClick = {
                             closePopup()
                             pause()

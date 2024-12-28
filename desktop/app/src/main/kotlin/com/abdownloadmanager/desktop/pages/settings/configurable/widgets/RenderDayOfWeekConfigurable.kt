@@ -18,7 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import kotlinx.datetime.DayOfWeek
+import java.time.DayOfWeek.*
 
 @Composable
 fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Modifier) {
@@ -31,7 +35,7 @@ fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Modifier) 
     }
 
     fun selectDay(dayOfWeek: DayOfWeek, select: Boolean) {
-        if (!enabled)return
+        if (!enabled) return
         if (select) {
             setValue(
                 value.plus(dayOfWeek).sorted().toSet()
@@ -52,7 +56,7 @@ fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Modifier) 
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    Modifier.ifThen(!enabled){
+                    Modifier.ifThen(!enabled) {
                         alpha(0.5f)
                     }
                 ) {
@@ -61,7 +65,7 @@ fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Modifier) 
                             col.forEach { dayOfWeek ->
                                 RenderDayOfWeek(
                                     modifier = Modifier.fillMaxWidth(),
-                                    enabled=enabled,
+                                    enabled = enabled,
                                     dayOfWeek = dayOfWeek,
                                     selected = isSelected(dayOfWeek),
                                     onSelect = { s, isSelected ->
@@ -83,7 +87,7 @@ fun RenderDayOfWeek(
     dayOfWeek: DayOfWeek,
     selected: Boolean,
     onSelect: (DayOfWeek, Boolean) -> Unit,
-    enabled: Boolean=true,
+    enabled: Boolean = true,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -93,7 +97,7 @@ fun RenderDayOfWeek(
             .ifThen(selected) {
                 background(myColors.onBackground / 10)
             }
-            .clickable(enabled=enabled) {
+            .clickable(enabled = enabled) {
                 onSelect(dayOfWeek, !selected)
             }
             .padding(vertical = 2.dp)
@@ -104,16 +108,26 @@ fun RenderDayOfWeek(
             MyIcons.check,
             null,
             Modifier.size(8.dp)
-                .alpha(if (selected)1f else 0f ),
+                .alpha(if (selected) 1f else 0f),
         )
         Spacer(Modifier.width(2.dp))
         Text(
-            text = dayOfWeek.toString(),
+            text = dayOfWeek.asStringSource().rememberString(),
             modifier = Modifier.alpha(
-                if(selected) 1f
+                if (selected) 1f
                 else 0.5f
             ),
             fontSize = myTextSizes.xs,
         )
     }
 }
+
+private fun DayOfWeek.asStringSource() = when (this) {
+    MONDAY -> Res.string.monday
+    TUESDAY -> Res.string.tuesday
+    WEDNESDAY -> Res.string.wednesday
+    THURSDAY -> Res.string.thursday
+    FRIDAY -> Res.string.friday
+    SATURDAY -> Res.string.saturday
+    SUNDAY -> Res.string.sunday
+}.asStringSource()

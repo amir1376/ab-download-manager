@@ -23,6 +23,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.swapped
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +55,8 @@ sealed interface CellSize {
 
 @Stable
 interface TableCell<Item> {
-    val name: String
+    val id: String
+    val name: StringSource
     val size: CellSize
 }
 
@@ -64,7 +66,7 @@ interface CustomCellRenderer {
 }
 
 interface SortableCell<Item> : TableCell<Item> {
-    fun sortBy(item: Item): Comparable<*>
+    fun comparator(): Comparator<Item>
 }
 
 
@@ -86,7 +88,7 @@ fun DefaultRenderHeader(cell: TableCell<*>) {
         cell.drawHeader()
     } else {
         Text(
-            cell.name,
+            cell.name.rememberString(),
             Modifier.fillMaxWidth(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -318,7 +320,7 @@ class TableState<Item, Cell : TableCell<Item>>(
 
     fun save(): SerializableTableState {
         val sizes = customSizes.value.mapKeys {
-            it.key.name
+            it.key.id
         }.mapValues {
             it.value.value
         }
@@ -326,37 +328,37 @@ class TableState<Item, Cell : TableCell<Item>>(
         return SerializableTableState(
             sizes = sizes,
             sortBy = sortBy?.let {
-                SortBy(sortBy.cell.name, sortBy.isUp())
+                SortBy(sortBy.cell.id, sortBy.isUp())
             },
-            order = order.value.map { it.name },
-            visibleCells = visibleCells.value.map { it.name }
+            order = order.value.map { it.id },
+            visibleCells = visibleCells.value.map { it.id }
         )
     }
 
     fun load(s: SerializableTableState) {
         setCustomSizes {
-            val cellsThatHaveCustomWidth = findCellByName(s.sizes.keys)
-            cellsThatHaveCustomWidth.associateWith { s.sizes[it.name]!!.dp }
+            val cellsThatHaveCustomWidth = findCellById(s.sizes.keys)
+            cellsThatHaveCustomWidth.associateWith { s.sizes[it.id]!!.dp }
         }
-        setOrder(findCellByName(s.order))
+        setOrder(findCellById(s.order))
         setSortBy(
             s.sortBy?.let { sortBy ->
-                findCellByName(sortBy.name)?.let {
+                findCellById(sortBy.name)?.let {
                     Sort(it as SortableCell<Item>, sortBy.descending)
                 }
             }
         )
-        setVisibleCells(findCellByName(s.visibleCells))
+        setVisibleCells(findCellById(s.visibleCells))
     }
 
 
-    private fun findCellByName(name: String): Cell? {
-        return cells.find { it.name == name }
+    private fun findCellById(name: String): Cell? {
+        return cells.find { it.id == name }
     }
 
-    private fun findCellByName(list: Iterable<String>): List<Cell> {
+    private fun findCellById(list: Iterable<String>): List<Cell> {
         return list.mapNotNull { name ->
-            findCellByName(name)
+            findCellById(name)
         }
     }
 
@@ -366,7 +368,7 @@ class TableState<Item, Cell : TableCell<Item>>(
                 list
             } else {
                 list.sortedWith(
-                    compareBy(sortedBy.cell::sortBy)
+                    sortedBy.cell.comparator()
                         .let {
                             if (sortedBy.isUp()) {
                                 it.reversed()

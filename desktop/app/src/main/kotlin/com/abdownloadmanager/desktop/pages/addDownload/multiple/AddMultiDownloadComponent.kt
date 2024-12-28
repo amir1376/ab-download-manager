@@ -4,11 +4,18 @@ import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.DownloadUiChecker
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
-import com.abdownloadmanager.desktop.utils.DownloadSystem
+import com.abdownloadmanager.utils.DownloadSystem
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemSaveMode.*
+import com.abdownloadmanager.desktop.utils.asState
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.CategoryItem
+import com.abdownloadmanager.utils.category.CategoryManager
+import com.abdownloadmanager.utils.category.CategorySelectionMode
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
@@ -25,10 +32,11 @@ class AddMultiDownloadComponent(
     id: String,
     private val onRequestClose: () -> Unit,
     private val onRequestAdd: OnRequestAdd,
+    private val onRequestAddCategory: () -> Unit,
 ) : AddDownloadComponent(ctx, id),
     KoinComponent {
 
-    val tableState= TableState(
+    val tableState = TableState(
         cells = AddMultiItemTableCells.all(),
         forceVisibleCells = listOf(
             AddMultiItemTableCells.Check,
@@ -38,13 +46,39 @@ class AddMultiDownloadComponent(
     private val appSettings by inject<AppRepository>()
     private val client by inject<DownloaderClient>()
     val downloadSystem by inject<DownloadSystem>()
-    private val _folder=MutableStateFlow(appSettings.saveLocation.value)
+    val fileIconProvider: FileIconProvider by inject()
+
+
+    private val _folder = MutableStateFlow(appSettings.saveLocation.value)
     val folder = _folder.asStateFlow()
-    fun setFolder(folder:String) {
+    fun setFolder(folder: String) {
         this._folder.update { folder }
         list.forEach {
             it.folder.update { folder }
         }
+    }
+
+    // when we select all files in one location let user option to auto categorize items
+    private val _alsoAutoCategorize = MutableStateFlow(true)
+    val alsoAutoCategorize = _alsoAutoCategorize.asStateFlow()
+    fun setAlsoAutoCategorize(value: Boolean) {
+        _alsoAutoCategorize.update { value }
+    }
+
+
+    private val categoryManager: CategoryManager by inject()
+    val categories = categoryManager.categoriesFlow
+    private val _selectedCategory = MutableStateFlow(categories.value.firstOrNull())
+    val selectedCategory = _selectedCategory.asStateFlow()
+
+    fun setSelectedCategory(category: Category) {
+        _selectedCategory.update {
+            category
+        }
+    }
+
+    fun requestAddCategory() {
+        onRequestAddCategory()
     }
 
     private fun newChecker(iDownloadCredentials: DownloadCredentials) = DownloadUiChecker(
@@ -69,6 +103,12 @@ class AddMultiDownloadComponent(
     }
 
     var list: List<DownloadUiChecker> by mutableStateOf(emptyList())
+    private val _saveMode = MutableStateFlow(EachFileInTheirOwnCategory)
+    val saveMode = _saveMode.asStateFlow()
+    fun setSaveMode(saveMode: AddMultiItemSaveMode) {
+        _saveMode.update { saveMode }
+    }
+
 
     private val checkList = MutableSharedFlow<DownloadUiChecker>()
     private fun enqueueCheck(links: List<DownloadUiChecker>) {
@@ -121,15 +161,68 @@ class AddMultiDownloadComponent(
         }
     }
 
+    val isCategoryModeHasValidState by run {
+        val category by selectedCategory.asState(scope)
+        val saveMode by saveMode.asState(scope)
+        derivedStateOf {
+            when (saveMode) {
+                EachFileInTheirOwnCategory -> true
+                AllInOneCategory -> category != null
+                InSameLocation -> true
+            }
+        }
+    }
     val canClickAdd by derivedStateOf {
-        selectionList.isNotEmpty()
+        selectionList.isNotEmpty() && isCategoryModeHasValidState
     }
     private val queueManager: QueueManager by inject()
     val queueList = queueManager.queues
 
+    private fun getFolderForItem(
+        categorySelectionMode: CategorySelectionMode?,
+        allInSameLocation: Boolean,
+        url: String,
+        fleName: String,
+        defaultFolder: String,
+    ): String {
+        if (allInSameLocation) return defaultFolder
+        return when (categorySelectionMode) {
+            CategorySelectionMode.Auto -> {
+                downloadSystem.categoryManager
+                    .getCategoryOf(
+                        CategoryItem(
+                            url = url,
+                            fileName = fleName,
+                        )
+                    )?.getDownloadPath()
+                    ?: defaultFolder
+            }
+
+            is CategorySelectionMode.Fixed -> {
+                downloadSystem.categoryManager
+                    .getCategoryById(categorySelectionMode.categoryId)?.getDownloadPath()
+                    ?: defaultFolder
+            }
+
+            null -> defaultFolder
+        }
+    }
+
     fun requestAddDownloads(
-        queueId: Long?
+        queueId: Long?,
     ) {
+        val saveMode = saveMode.value
+        val categorySelectionMode = when (saveMode) {
+            EachFileInTheirOwnCategory -> CategorySelectionMode.Auto
+            AllInOneCategory -> selectedCategory.value?.let {
+                CategorySelectionMode.Fixed(it.id)
+            }
+
+            InSameLocation -> {
+                if (alsoAutoCategorize.value) CategorySelectionMode.Auto
+                else null
+            }
+        }
         val itemsToAdd = list
             .filter { it.credentials.value.link in selectionList }
             .filter {
@@ -139,7 +232,13 @@ class AddMultiDownloadComponent(
             .map {
                 DownloadItem(
                     id = -1,
-                    folder = it.folder.value,
+                    folder = getFolderForItem(
+                        categorySelectionMode = categorySelectionMode,
+                        url = it.credentials.value.link,
+                        fleName = it.name.value,
+                        defaultFolder = it.folder.value,
+                        allInSameLocation = saveMode == InSameLocation
+                    ),
                     name = it.name.value,
                     link = it.credentials.value.link,
                     contentLength = it.length.value ?: -1,
@@ -149,9 +248,13 @@ class AddMultiDownloadComponent(
             onRequestAdd(
                 items = itemsToAdd,
                 onDuplicateStrategy = { OnDuplicateStrategy.AddNumbered },
-                queueId = queueId
+                queueId = queueId,
+                categorySelectionMode = categorySelectionMode
             )
-            addToLastUsedLocations(folder.value)
+            val folder = folder.value
+            if (this.saveMode.value == InSameLocation) {
+                addToLastUsedLocations(folder)
+            }
             requestClose()
         }
     }
@@ -176,6 +279,7 @@ fun interface OnRequestAdd {
     operator fun invoke(
         items: List<DownloadItem>,
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
-        queueId: Long?
+        queueId: Long?,
+        categorySelectionMode: CategorySelectionMode?,
     )
 }

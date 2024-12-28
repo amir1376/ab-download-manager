@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 
-//val LocalUiScale = staticCompositionLocalOf { null as Float? }
+val LocalSystemDensity = staticCompositionLocalOf<Density?> { null }
+val LocalUiScale = staticCompositionLocalOf<Float?> { null }
 
 val LocalTextSizes = compositionLocalOf<TextSizes> {
     error("LocalTextSizes not provided")

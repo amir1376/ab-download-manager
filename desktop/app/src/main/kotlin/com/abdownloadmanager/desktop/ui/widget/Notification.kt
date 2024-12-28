@@ -21,6 +21,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.*
 
 private val LocalNotification = compositionLocalOf<NotificationManager> {
@@ -43,13 +45,13 @@ sealed interface NotificationType {
 @Stable
 class NotificationModel(
     val tag: Any,
-    initialTitle: String = "",
-    initialDescription: String = "",
-    initialNotificationType: NotificationType = NotificationType.Info
+    initialTitle: StringSource = "".asStringSource(),
+    initialDescription: StringSource = "".asStringSource(),
+    initialNotificationType: NotificationType = NotificationType.Info,
 ) {
     var notificationType: NotificationType by mutableStateOf(initialNotificationType)
-    var title: String by mutableStateOf(initialTitle)
-    var description: String by mutableStateOf(initialDescription)
+    var title: StringSource by mutableStateOf(initialTitle)
+    var description: StringSource by mutableStateOf(initialDescription)
 }
 
 @Composable
@@ -66,10 +68,10 @@ fun ProvideNotificationManager(
 
 @Composable
 fun ShowNotification(
-    title: String,
-    description: String,
-    type:NotificationType,
-    tag: Any = currentCompositeKeyHash
+    title: StringSource,
+    description: StringSource,
+    type: NotificationType,
+    tag: Any = currentCompositeKeyHash,
 ) {
     val notification = remember(tag) {
         NotificationModel(
@@ -156,7 +158,7 @@ private fun RenderNotification(
 private fun NotificationDescription(notificationModel: NotificationModel) {
     WithContentAlpha(0.75f) {
         Text(
-            text = notificationModel.description,
+            text = notificationModel.description.rememberString(),
             fontSize = myTextSizes.base
         )
     }
@@ -166,7 +168,7 @@ private fun NotificationDescription(notificationModel: NotificationModel) {
 private fun NotificationTitle(notificationModel: NotificationModel) {
     WithContentAlpha(1f) {
         Text(
-            text = notificationModel.title,
+            text = notificationModel.title.rememberString(),
             fontSize = myTextSizes.base,
             fontWeight = FontWeight.Bold,
         )
@@ -247,10 +249,10 @@ class NotificationManager {
     }
 
     suspend fun showNotification(
-        title: String,
-        description: String,
+        title: StringSource,
+        description: StringSource,
         delay: Long = -1,
-        tag: Double = Math.random()
+        tag: Double = Math.random(),
     ) {
         val notification = NotificationModel(
             tag = tag,

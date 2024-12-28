@@ -22,7 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import org.jetbrains.skiko.Cursor
 
 @Composable
@@ -78,9 +80,12 @@ fun Modifier.resizeHandle(
             latestOnDrag(it.toDp())
         }
     }
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val reverseDirection = orientation == Orientation.Horizontal && isRtl
     draggable(
         state = draggableState,
         orientation = orientation,
         interactionSource = interactionSource,
+        reverseDirection = reverseDirection
     )
 }

@@ -1,5 +1,6 @@
 package ir.amirab.util.osfileutil
 
+import ir.amirab.util.execAndWait
 import java.io.File
 
 internal class LinuxFileUtils : FileUtilsBase() {
@@ -28,4 +29,7 @@ internal class LinuxFileUtils : FileUtilsBase() {
         return xdgOpenResult
     }
 
+    override fun openFolderInternal(folder: File): Boolean {
+        return execAndWait(arrayOf("xdg-open", folder.parent))
+    }
 }

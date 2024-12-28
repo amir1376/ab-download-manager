@@ -1,12 +1,19 @@
 package ir.amirab.downloader.connection
 
+import ir.amirab.downloader.connection.proxy.ProxyStrategy
+import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
+import ir.amirab.downloader.connection.proxy.ProxyType
 import ir.amirab.downloader.connection.response.ResponseInfo
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.utils.await
 import okhttp3.*
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.net.ProxySelector
 
 class OkHttpDownloaderClient(
     private val okHttpClient: OkHttpClient,
+    private val proxyStrategyProvider: ProxyStrategyProvider,
 ) : DownloaderClient() {
     private fun newCall(
         downloadCredentials: IDownloadCredentials,
@@ -15,38 +22,84 @@ class OkHttpDownloaderClient(
         extraBuilder: Request.Builder.() -> Unit,
     ): Call {
         val rangeHeader = createRangeHeader(start, end)
-        return okHttpClient.newCall(
-            Request.Builder()
-                .url(downloadCredentials.link)
-                .apply {
-                    defaultHeadersInFirst().forEach { (k, v) ->
-                        header(k, v)
-                    }
-                    downloadCredentials.headers
-                        ?.filter {
-                            //OkHttp handles this header and if we override it,
-                            //makes redirected links to have this "Host" instead of their own!, and cause error
-                            !it.key.equals("Host", true)
-                        }
-                        ?.forEach { (k, v) ->
+        return okHttpClient
+            .applyProxy(downloadCredentials)
+            .newCall(
+                Request.Builder()
+                    .url(downloadCredentials.link)
+                    .apply {
+                        defaultHeadersInFirst().forEach { (k, v) ->
                             header(k, v)
                         }
-                    defaultHeadersInLast().forEach { (k, v) ->
-                        header(k, v)
+                        downloadCredentials.headers
+                            ?.filter {
+                                //OkHttp handles this header and if we override it,
+                                //makes redirected links to have this "Host" instead of their own!, and cause error
+                                !it.key.equals("Host", true)
+                            }
+                            ?.forEach { (k, v) ->
+                                header(k, v)
+                            }
+                        defaultHeadersInLast().forEach { (k, v) ->
+                            header(k, v)
+                        }
+                        val username = downloadCredentials.username
+                        val password = downloadCredentials.password
+                        if (username?.isNotBlank() == true && password?.isNotBlank() == true) {
+                            header("Authorization", Credentials.basic(username, password))
+                        }
+                        downloadCredentials.userAgent?.let { userAgent ->
+                            header("User-Agent", userAgent)
+                        }
                     }
-                    val username = downloadCredentials.username
-                    val password = downloadCredentials.password
-                    if (username?.isNotBlank() == true && password?.isNotBlank() == true) {
-                        header("Authorization", Credentials.basic(username, password))
-                    }
-                    downloadCredentials.userAgent?.let { userAgent ->
-                        header("User-Agent", userAgent)
-                    }
-                }
-                .apply(extraBuilder)
-                .header(rangeHeader.first, rangeHeader.second)
-                .build()
-        )
+                    .apply(extraBuilder)
+                    .header(rangeHeader.first, rangeHeader.second)
+                    .build()
+            )
+    }
+
+    private fun OkHttpClient.applyProxy(
+        downloadCredentials: IDownloadCredentials,
+    ): OkHttpClient {
+        return when (
+            val strategy = proxyStrategyProvider.getProxyStrategyFor(downloadCredentials.link)
+        ) {
+            ProxyStrategy.Direct -> return this
+            ProxyStrategy.UseSystem -> {
+                newBuilder()
+                    .proxySelector(ProxySelector.getDefault())
+                    .build()
+            }
+
+            is ProxyStrategy.ManualProxy -> {
+                val proxy = strategy.proxy
+                return newBuilder()
+                    .proxy(
+                        Proxy(
+                            when (proxy.type) {
+                                ProxyType.HTTP -> Proxy.Type.HTTP
+                                ProxyType.SOCKS -> Proxy.Type.SOCKS
+                            },
+                            InetSocketAddress(proxy.host, proxy.port)
+                        )
+                    ).let {
+                        if (proxy.username != null && proxy.type == ProxyType.HTTP) {
+                            it.proxyAuthenticator { _, r ->
+                                val credentials = Credentials.basic(
+                                    proxy.username,
+                                    proxy.password.orEmpty()
+                                )
+                                r.request
+                                    .newBuilder()
+                                    .header("Proxy-Authorization", credentials)
+                                    .build()
+                            }
+                        } else {
+                            it
+                        }
+                    }.build()
+            }
+        }
     }
 
 

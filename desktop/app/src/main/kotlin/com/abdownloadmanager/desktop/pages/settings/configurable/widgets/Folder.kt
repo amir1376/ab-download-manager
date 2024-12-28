@@ -23,7 +23,7 @@ fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
     val setValue = cfg::set
 
     val pickFolderLauncher = rememberDirectoryPickerLauncher(
-        title = cfg.title,
+        title = cfg.title.rememberString(),
         initialDirectory = remember(value) {
             runCatching {
                 File(value).canonicalPath
@@ -51,7 +51,7 @@ fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
                 },
                 shape = RectangleShape,
                 textPadding = PaddingValues(4.dp),
-                placeholder = cfg.title,
+                placeholder = cfg.title.rememberString(),
                 end = {
                     MyIcon(
                         icon = MyIcons.folder,

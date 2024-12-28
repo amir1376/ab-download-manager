@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -33,6 +34,8 @@ fun IntTextField(
     keyboardOptions: KeyboardOptions,
     prettify: (Int) -> String = { it.toString() },
     placeholder: String = "",
+    textPadding: PaddingValues = PaddingValues(4.dp),
+    shape: Shape = RectangleShape,
 ) {
     NumberTextField(
         value = value,
@@ -53,6 +56,8 @@ fun IntTextField(
         keyboardOptions = keyboardOptions,
         interactionSource = interactionSource,
         placeholder = placeholder,
+        textPadding = textPadding,
+        shape = shape,
     )
 }
 
@@ -103,7 +108,7 @@ fun DoubleTextField(
     },
     enabled: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    placeholder: String = ""
+    placeholder: String = "",
 ) {
     NumberTextField(
         value = value,
@@ -177,10 +182,11 @@ fun <T : Comparable<T>> NumberTextField(
     keyboardOptions: KeyboardOptions,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     placeholder: String = "",
+    textPadding: PaddingValues = PaddingValues(4.dp),
+    shape: Shape = RectangleShape,
 ) {
 
     val value by rememberUpdatedState(value)
-    val shape = RectangleShape
     val isFocused by interactionSource.collectIsFocusedAsState()
     var haveWrongValue by remember(value) {
         mutableStateOf(false)
@@ -203,7 +209,7 @@ fun <T : Comparable<T>> NumberTextField(
             myText = prettify(value)
         }
     }
-    fun set(v:T,prettify: Boolean):Boolean{
+    fun set(v: T, prettify: Boolean): Boolean {
         val isInRange = v in range
         val valueInRange = if (isInRange) v else v.coerceIn(range)
         lastEmittedValueByMe = if (prettify || !isInRange) {
@@ -224,7 +230,7 @@ fun <T : Comparable<T>> NumberTextField(
         }
     }
     MyTextField(
-        textPadding = PaddingValues(4.dp),
+        textPadding = textPadding,
         shape = shape,
         modifier = modifier.onKeyEvent {
             when (it.key) {
@@ -258,7 +264,7 @@ fun <T : Comparable<T>> NumberTextField(
                     myText = it
                 } else {
                     val wasInRange = set(v, false)
-                    if (wasInRange){
+                    if (wasInRange) {
                         myText = it
                     }
                 }

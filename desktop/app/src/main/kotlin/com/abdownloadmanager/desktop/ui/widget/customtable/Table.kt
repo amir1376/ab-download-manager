@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberCursorPositionProvider
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
 import kotlinx.coroutines.flow.*
 
 val LocalCellPadding = compositionLocalOf {
@@ -51,8 +53,8 @@ fun <T, C : TableCell<T>> Table(
     renderHeaderCell: @Composable (C) -> Unit = { DefaultRenderHeader(it) },
     drawOnEmpty: @Composable BoxScope.() -> Unit = {},
     wrapHeader: @Composable TableScope.(rowContent: @Composable () -> Unit) -> Unit = { content -> content() },
-    wrapItem: @Composable TableScope.(item: T, rowContent: @Composable () -> Unit) -> Unit = { _, content -> content() },
-    renderCell: @Composable TableScope.(C, T) -> Unit
+    wrapItem: @Composable TableScope.(index: Int, item: T, rowContent: @Composable () -> Unit) -> Unit = { _, _, content -> content() },
+    renderCell: @Composable TableScope.(C, T) -> Unit,
 ) {
     val scope = TableScope
 
@@ -149,8 +151,11 @@ fun <T, C : TableCell<T>> Table(
                                 .fillMaxHeight(),
                             state = state,
                         ) {
-                            items(sortedList, key = key) { item ->
-                                scope.wrapItem(item) {
+                            itemsIndexed(
+                                sortedList,
+                                key = if (key != null) { _, item -> key(item) } else null
+                            ) { index, item ->
+                                scope.wrapItem(index, item) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -241,13 +246,13 @@ private fun <T, C : TableCell<T>> ShowColumnConfigMenu(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Customize Columns",
+                    myStringResource(Res.string.customize_columns),
                     fontSize = myTextSizes.base
                 )
                 Spacer(Modifier.width(8.dp))
                 IconActionButton(
                     MyIcons.undo,
-                    "Reset",
+                    myStringResource(Res.string.reset),
                     onClick = {
                         tableState.reset()
                     }
@@ -329,7 +334,7 @@ private fun <T, Cell : TableCell<T>> CellConfigItem(
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            cell.name,
+            cell.name.rememberString(),
             Modifier
                 .weight(1f)
                 .ifThen(!isVisible || isForceVisible) {

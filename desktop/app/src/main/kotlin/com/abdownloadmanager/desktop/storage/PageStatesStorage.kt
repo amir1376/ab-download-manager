@@ -84,7 +84,7 @@ data class PageStatesModel(
 
 class PageStatesStorage(
     settings: DataStore<MapConfig>,
-) : ConfigBaseSettings<PageStatesModel>(settings, PageStatesModel.ConfigLens) {
+) : ConfigBaseSettingsByMapConfig<PageStatesModel>(settings, PageStatesModel.ConfigLens) {
     val lastUsedSaveLocations = from(PageStatesModel.global.lastSavedLocations)
     val downloadPage = from(PageStatesModel.downloadPage)
     val homePageStorage = from(PageStatesModel.home)

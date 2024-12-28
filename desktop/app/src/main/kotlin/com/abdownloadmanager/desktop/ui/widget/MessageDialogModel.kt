@@ -19,6 +19,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 import java.util.UUID
 
@@ -32,8 +37,8 @@ sealed class MessageDialogType {
 
 data class MessageDialogModel(
     val id: String = UUID.randomUUID().toString(),
-    val title: String,
-    val description: String,
+    val title: StringSource,
+    val description: StringSource,
     val type: MessageDialogType = MessageDialogType.Info,
 )
 
@@ -58,8 +63,9 @@ fun MessageDialog(
     msgContent: MessageDialogModel,
     onConfirm: () -> Unit,
 ) {
-    val h = 200
-    val w = 400
+    val uiScale = LocalUiScale.current
+    val h = 200.applyUiScale(uiScale)
+    val w = 400.applyUiScale(uiScale)
     val state = rememberWindowState(
         size = DpSize(w.dp, h.dp)
     )
@@ -70,8 +76,8 @@ fun MessageDialog(
         onCloseRequest = onConfirm,
         alwaysOnTop = true,
     ) {
-        LaunchedEffect(Unit){
-            window.minimumSize = Dimension(w,h)
+        LaunchedEffect(Unit) {
+            window.minimumSize = Dimension(w, h)
         }
         val typeName = msgContent.type.toString()
         WindowTitle(typeName)
@@ -94,13 +100,13 @@ fun MessageDialog(
             )
             Column {
                 Text(
-                    msgContent.title,
+                    msgContent.title.rememberString(),
                     fontSize = myTextSizes.xl,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    msgContent.description,
+                    msgContent.description.rememberString(),
                     fontSize = myTextSizes.base,
                     modifier = Modifier
                         .weight(1f)
@@ -112,7 +118,10 @@ fun MessageDialog(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                 ) {
-                    ActionButton("Ok", onClick = onConfirm)
+                    ActionButton(
+                        myStringResource(Res.string.ok),
+                        onClick = onConfirm
+                    )
                 }
             }
         }

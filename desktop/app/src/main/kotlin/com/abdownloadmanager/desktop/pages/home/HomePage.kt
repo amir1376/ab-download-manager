@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.*
-import com.abdownloadmanager.desktop.utils.externaldraggable.onExternalDrag
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -32,25 +31,47 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.window.Dialog
 import com.abdownloadmanager.desktop.ui.customwindow.*
-import com.abdownloadmanager.desktop.utils.externaldraggable.DragData
+import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.utils.category.rememberIconPainter
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
+import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
+import java.awt.datatransfer.DataFlavor
+import java.io.File
 
 
 @Composable
 fun HomePage(component: HomeComponent) {
     val listState by component.downloadList.collectAsState()
-    WindowTitle(AppInfo.name)
     var isDragging by remember { mutableStateOf(false) }
 
     var showDeletePromptState by remember {
         mutableStateOf(null as DeletePromptState?)
+    }
+
+    var showDeleteCategoryPromptState by remember {
+        mutableStateOf(null as CategoryDeletePromptState?)
+    }
+
+    var showConfirmPrompt by remember {
+        mutableStateOf(null as ConfirmPromptState?)
     }
 
     LaunchedEffect(Unit) {
@@ -58,8 +79,32 @@ fun HomePage(component: HomeComponent) {
             when (it) {
                 is HomeEffects.DeleteItems -> {
                     if (it.list.isNotEmpty()) {
-                        showDeletePromptState = DeletePromptState(it.list)
+                        showDeletePromptState = DeletePromptState(
+                            downloadList = it.list,
+                            finishedCount = it.finishedCount,
+                            unfinishedCount = it.unfinishedCount,
+                        )
                     }
+                }
+
+                is HomeEffects.DeleteCategory -> {
+                    showDeleteCategoryPromptState = CategoryDeletePromptState(it.category)
+                }
+
+                is HomeEffects.AutoCategorize -> {
+                    showConfirmPrompt = ConfirmPromptState(
+                        title = Res.string.confirm_auto_categorize_downloads_title.asStringSource(),
+                        description = Res.string.confirm_auto_categorize_downloads_description.asStringSource(),
+                        onConfirm = component::onConfirmAutoCategorize
+                    )
+                }
+
+                is HomeEffects.ResetCategoriesToDefault -> {
+                    showConfirmPrompt = ConfirmPromptState(
+                        title = Res.string.confirm_reset_to_default_categories_title.asStringSource(),
+                        description = Res.string.confirm_reset_to_default_categories_description.asStringSource(),
+                        onConfirm = component::onConfirmResetCategories
+                    )
                 }
 
                 else -> {}
@@ -77,6 +122,29 @@ fun HomePage(component: HomeComponent) {
                 showDeletePromptState = null
                 component.confirmDelete(it)
             })
+    }
+    showDeleteCategoryPromptState?.let {
+        ShowDeleteCategoryPrompt(
+            deletePromptState = it,
+            onCancel = {
+                showDeleteCategoryPromptState = null
+            },
+            onConfirm = {
+                showDeleteCategoryPromptState = null
+                component.onConfirmDeleteCategory(it)
+            })
+    }
+    showConfirmPrompt?.let {
+        ShowConfirmPrompt(
+            promptState = it,
+            onCancel = {
+                showConfirmPrompt = null
+            },
+            onConfirm = {
+                showConfirmPrompt?.onConfirm?.invoke()
+                showConfirmPrompt = null
+            }
+        )
     }
     val mergeTopBar = shouldMergeTopBarWithTitleBar(component)
     if (mergeTopBar) {
@@ -107,27 +175,40 @@ fun HomePage(component: HomeComponent) {
     Box(
         Modifier
             .fillMaxSize()
-            .onExternalDrag(
-                onDragStart = {
-                    isDragging = true
-                    it.availableDragData.get<DragData.Text>()?.also {
-                        component.onExternalTextDraggedIn { it.readText() }
-                        return@onExternalDrag
-                    }
-                    it.availableDragData.get<DragData.FilesList>()?.also {
-                        //Caution FileList::readFiles sometimes throws exception
-                        component.onExternalFilesDraggedIn { it.readFiles() }
-                        return@onExternalDrag
-                    }
+            .dragAndDropTarget(
+                shouldStartDragAndDrop = {
+                    it.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor) ||
+                            it.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)
                 },
-                onDragExit = {
-                    isDragging = false
-                    component.onDragExit()
+                target = remember {
+                    object : DragAndDropTarget {
+                        override fun onStarted(event: DragAndDropEvent) {
+                            isDragging = true
+                            if (event.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                                component.onExternalTextDraggedIn { (event.awtTransferable.getTransferData(DataFlavor.stringFlavor) as String) }
+                                return
+                            }
+                            if (event.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                                component.onExternalFilesDraggedIn {
+                                    (event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>)
+                                }
+                                return
+                            }
+                        }
+
+                        override fun onEnded(event: DragAndDropEvent) {
+                            isDragging = false
+                            component.onDragExit()
+                        }
+
+                        override fun onDrop(event: DragAndDropEvent): Boolean {
+                            isDragging = false
+                            component.onDropped()
+                            return true
+                        }
+                    }
                 }
-            ) {
-                isDragging = false
-                component.onDropped()
-            }
+            )
     ) {
         Column(
             Modifier.alpha(
@@ -135,9 +216,11 @@ fun HomePage(component: HomeComponent) {
             )
         ) {
             if (!mergeTopBar) {
-                Spacer(Modifier.height(4.dp))
-                TopBar(component)
-                Spacer(Modifier.height(6.dp))
+                WithTitleBarDirection {
+                    Spacer(Modifier.height(4.dp))
+                    TopBar(component)
+                    Spacer(Modifier.height(6.dp))
+                }
             }
             Spacer(
                 Modifier.fillMaxWidth()
@@ -147,8 +230,9 @@ fun HomePage(component: HomeComponent) {
             Row() {
                 val categoriesWidth by component.categoriesWidth.collectAsState()
                 Categories(
-                    Modifier.padding(top = 8.dp)
-                        .width(categoriesWidth), component
+                    modifier = Modifier.padding(top = 8.dp)
+                        .width(categoriesWidth),
+                    component = component
                 )
                 Spacer(Modifier.size(8.dp))
                 //split pane
@@ -195,6 +279,8 @@ fun HomePage(component: HomeComponent) {
                         },
                         lastSelectedId = lastSelected,
                         tableState = component.tableState,
+                        fileIconProvider = component.fileIconProvider,
+                        categoryManager = component.categoryManager,
                     )
                     Spacer(
                         Modifier
@@ -265,36 +351,65 @@ private fun ShowDeletePrompts(
                 .widthIn(max = 260.dp)
         ) {
             Text(
-                "Confirm Delete",
+                myStringResource(Res.string.confirm_delete_download_items_title),
                 fontWeight = FontWeight.Bold,
                 fontSize = myTextSizes.xl,
                 color = myColors.onBackground,
             )
             Spacer(Modifier.height(12.dp))
+            val finishedCount = deletePromptState.finishedCount
+            val unfinishedCount = deletePromptState.unfinishedCount
             Text(
-                "Are you sure you want to delete ${deletePromptState.downloadList.size} item ?",
+                when {
+                    deletePromptState.hasBothFinishedAndUnfinished() -> {
+                        Res.string.confirm_delete_download_finished_and_unfinished_items_description.asStringSourceWithARgs(
+                            Res.string.confirm_delete_download_finished_and_unfinished_items_description_createArgs(
+                                finishedCount = finishedCount.toString(),
+                                unfinishedCount = unfinishedCount.toString(),
+                            )
+                        )
+                    }
+
+                    deletePromptState.hasUnfinishedDownloads -> {
+                        Res.string.confirm_delete_download_unfinished_items_description.asStringSourceWithARgs(
+                            Res.string.confirm_delete_download_unfinished_items_description_createArgs(
+                                count = unfinishedCount.toString(),
+                            )
+                        )
+                    }
+
+                    else -> {
+                        Res.string.confirm_delete_download_items_description.asStringSourceWithARgs(
+                            Res.string.confirm_delete_download_items_description_createArgs(
+                                count = finishedCount.toString()
+                            ),
+                        )
+                    }
+                }.rememberString(),
                 fontSize = myTextSizes.base,
                 color = myColors.onBackground,
             )
-            Spacer(Modifier.height(12.dp))
-            Row(
-                Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
+            if (deletePromptState.hasFinishedDownloads) {
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        deletePromptState.alsoDeleteFile = !deletePromptState.alsoDeleteFile
+                    },
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    deletePromptState.alsoDeleteFile = !deletePromptState.alsoDeleteFile
-                },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CheckBox(deletePromptState.alsoDeleteFile, {
-                    deletePromptState.alsoDeleteFile = it
-                })
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    "Also delete file from disk",
-                    fontSize = myTextSizes.base,
-                    color = myColors.onBackground,
-                )
+                    CheckBox(deletePromptState.alsoDeleteFile, {
+                        deletePromptState.alsoDeleteFile = it
+                    })
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        myStringResource(Res.string.also_delete_file_from_disk),
+                        fontSize = myTextSizes.base,
+                        color = myColors.onBackground,
+                    )
+                }
             }
             Spacer(Modifier.height(12.dp))
             Row(
@@ -303,13 +418,138 @@ private fun ShowDeletePrompts(
             ) {
                 Spacer(Modifier.weight(1f))
                 ActionButton(
-                    text = "Delete",
+                    text = myStringResource(Res.string.delete),
                     onClick = onConfirm,
                     borderColor = SolidColor(myColors.error),
                     contentColor = myColors.error,
                 )
                 Spacer(Modifier.width(8.dp))
-                ActionButton(text = "Cancel", onClick = onCancel)
+                ActionButton(text = myStringResource(Res.string.cancel), onClick = onCancel)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShowConfirmPrompt(
+    promptState: ConfirmPromptState,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    val shape = RoundedCornerShape(6.dp)
+    Dialog(onDismissRequest = onCancel) {
+        Column(
+            Modifier
+                .clip(shape)
+                .border(2.dp, myColors.onBackground / 10, shape)
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            myColors.surface,
+                            myColors.background,
+                        )
+                    )
+                )
+                .padding(16.dp)
+                .width(IntrinsicSize.Max)
+                .widthIn(max = 260.dp)
+        ) {
+            Text(
+                text = promptState.title.rememberString(),
+                fontWeight = FontWeight.Bold,
+                fontSize = myTextSizes.xl,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = promptState.description.rememberString(),
+                fontSize = myTextSizes.base,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Spacer(Modifier.weight(1f))
+                ActionButton(
+                    text = myStringResource(Res.string.ok),
+                    onClick = onConfirm,
+                    contentColor = myColors.error,
+                )
+                Spacer(Modifier.width(8.dp))
+                ActionButton(text = myStringResource(Res.string.cancel), onClick = onCancel)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShowDeleteCategoryPrompt(
+    deletePromptState: CategoryDeletePromptState,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    val shape = RoundedCornerShape(6.dp)
+    Dialog(onDismissRequest = onCancel) {
+        Column(
+            Modifier
+                .clip(shape)
+                .border(2.dp, myColors.onBackground / 10, shape)
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            myColors.surface,
+                            myColors.background,
+                        )
+                    )
+                )
+                .padding(16.dp)
+                .width(IntrinsicSize.Max)
+                .widthIn(max = 260.dp)
+        ) {
+            Text(
+                myStringResource(
+                    Res.string.confirm_delete_category_item_title,
+                    Res.string.confirm_delete_category_item_title_createArgs(
+                        name = deletePromptState.category.name
+                    ),
+                ),
+                fontWeight = FontWeight.Bold,
+                fontSize = myTextSizes.xl,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                myStringResource(
+                    Res.string.confirm_delete_category_item_description,
+                    Res.string.confirm_delete_category_item_description_createArgs(
+                        value = deletePromptState.category.name
+                    )
+                ),
+                fontSize = myTextSizes.base,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                myStringResource(Res.string.your_download_will_not_be_deleted),
+                fontSize = myTextSizes.base,
+                color = myColors.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Spacer(Modifier.weight(1f))
+                ActionButton(
+                    text = myStringResource(Res.string.delete),
+                    onClick = onConfirm,
+                    borderColor = SolidColor(myColors.error),
+                    contentColor = myColors.error,
+                )
+                Spacer(Modifier.width(8.dp))
+                ActionButton(text = myStringResource(Res.string.cancel), onClick = onCancel)
             }
         }
     }
@@ -318,9 +558,29 @@ private fun ShowDeletePrompts(
 @Stable
 class DeletePromptState(
     val downloadList: List<Long>,
+    val finishedCount: Int,
+    val unfinishedCount: Int,
 ) {
+    val hasFinishedDownloads = finishedCount > 0
+    var hasUnfinishedDownloads = unfinishedCount > 0
     var alsoDeleteFile by mutableStateOf(false)
+
+    fun hasBothFinishedAndUnfinished(): Boolean {
+        return hasFinishedDownloads && hasUnfinishedDownloads
+    }
 }
+
+@Immutable
+data class CategoryDeletePromptState(
+    val category: Category,
+)
+
+@Immutable
+data class ConfirmPromptState(
+    val title: StringSource,
+    val description: StringSource,
+    val onConfirm: () -> Unit,
+)
 
 @Composable
 fun DragWidget(
@@ -350,21 +610,26 @@ fun DragWidget(
             Modifier.size(36.dp),
         )
         Text(
-            text = "Drop link or file here.",
+            text = myStringResource(Res.string.drop_link_or_file_here),
             fontSize = myTextSizes.xl
         )
         if (linkCount != null) {
             when {
                 linkCount > 0 -> {
                     Text(
-                        "$linkCount links will be imported",
+                        myStringResource(
+                            Res.string.n_links_will_be_imported,
+                            Res.string.n_links_will_be_imported_createArgs(
+                                count = linkCount.toString()
+                            )
+                        ),
                         fontSize = myTextSizes.base,
                         color = myColors.success,
                     )
                 }
 
                 linkCount == 0 -> {
-                    Text("Nothing will be imported")
+                    Text(myStringResource(Res.string.nothing_will_be_imported))
                 }
             }
 
@@ -375,20 +640,32 @@ fun DragWidget(
 
 }
 
+
 @Composable
 private fun Categories(
     modifier: Modifier,
     component: HomeComponent,
 ) {
+
     val currentTypeFilter = component.filterState.typeCategoryFilter
     val currentStatusFilter = component.filterState.statusFilter
+    val categories by component.categoryManager.categoriesFlow.collectAsState()
+    val clipShape = RoundedCornerShape(6.dp)
+    val showCategoryOption by component.categoryActions.collectAsState()
 
-    val clipShape = RoundedCornerShape(12.dp)
+    fun showCategoryOption(item: Category?) {
+        component.showCategoryOptions(item)
+    }
+
+    fun closeCategoryOptions() {
+        component.closeCategoryOptions()
+    }
     Column(
         modifier
             .padding(start = 16.dp)
             .clip(clipShape)
             .border(1.dp, myColors.surface, clipShape)
+            .padding(1.dp)
             .verticalScroll(rememberScrollState())
     ) {
         var expendedItem: DownloadStatusCategoryFilter? by remember { mutableStateOf(currentStatusFilter) }
@@ -398,16 +675,42 @@ private fun Categories(
                 currentTypeCategoryFilter = currentTypeFilter,
                 currentStatusCategoryFilter = currentStatusFilter,
                 statusFilter = statusCategoryFilter,
-                typeFilter = DefinedTypeCategories.values(),
+                categories = categories,
                 onFilterChange = {
                     component.onFilterChange(statusCategoryFilter, it)
                 },
                 onRequestExpand = { expand ->
                     expendedItem = statusCategoryFilter.takeIf { expand }
+                },
+                onRequestOpenOptionMenu = {
+                    showCategoryOption(it)
                 }
             )
         }
     }
+    showCategoryOption?.let {
+        CategoryOption(
+            categoryOptionMenuState = it,
+            onDismiss = {
+                closeCategoryOptions()
+            }
+        )
+    }
+}
+
+@Composable
+fun CategoryOption(
+    categoryOptionMenuState: CategoryActions,
+    onDismiss: () -> Unit,
+) {
+    ShowOptionsInDropDown(
+        MenuItem.SubMenu(
+            icon = categoryOptionMenuState.categoryItem?.rememberIconPainter(),
+            title = categoryOptionMenuState.categoryItem?.name.orEmpty().asStringSource(),
+            categoryOptionMenuState.menu,
+        ),
+        onDismiss
+    )
 }
 
 @Composable
@@ -487,20 +790,22 @@ fun HomeSearch(
     val searchBoxInteractionSource = remember { MutableInteractionSource() }
 
     val isFocused by searchBoxInteractionSource.collectIsFocusedAsState()
-    SearchBox(
-        text = component.filterState.textToSearch,
-        onTextChange = {
-            component.filterState.textToSearch = it
-        },
-        textPadding = textPadding,
-        interactionSource = searchBoxInteractionSource,
-        modifier = modifier
-            .width(
-                animateDpAsState(
-                    if (isFocused) 220.dp else 180.dp
-                ).value
-            )
-    )
+    WithLanguageDirection {
+        SearchBox(
+            text = component.filterState.textToSearch,
+            onTextChange = {
+                component.filterState.textToSearch = it
+            },
+            textPadding = textPadding,
+            interactionSource = searchBoxInteractionSource,
+            modifier = modifier
+                .width(
+                    animateDpAsState(
+                        if (isFocused) 220.dp else 180.dp
+                    ).value
+                )
+        )
+    }
 }
 
 

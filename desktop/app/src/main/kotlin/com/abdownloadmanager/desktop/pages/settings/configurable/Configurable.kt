@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.Color
 import com.abdownloadmanager.desktop.pages.settings.ThemeInfo
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable.RenderMode
 import com.abdownloadmanager.desktop.ui.theme.MyColors
+import com.abdownloadmanager.utils.proxy.ProxyData
+import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,11 +18,11 @@ private val DefaultEnabledValue get() = MutableStateFlow(true)
 private val DefaultVisibleValue get() = MutableStateFlow(true)
 
 sealed class Configurable<T>(
-    val title: String,
-    val description: String,
+    val title: StringSource,
+    val description: StringSource,
     val backedBy: MutableStateFlow<T>,
     val validate: (T) -> Boolean = { true },
-    val describe: (T) -> String,
+    val describe: (T) -> StringSource,
     val enabled: StateFlow<Boolean> = DefaultEnabledValue,
     val visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) {
@@ -38,10 +40,10 @@ sealed class Configurable<T>(
 
 //primitives
 class IntConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<Int>,
-    describe: ((Int) -> String),
+    describe: ((Int) -> StringSource),
     val range: IntRange,
     val renderMode: RenderMode = RenderMode.TextField,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
@@ -61,10 +63,10 @@ class IntConfigurable(
 }
 
 sealed class BaseLongConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<Long>,
-    describe: ((Long) -> String),
+    describe: ((Long) -> StringSource),
     val range: LongRange,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
@@ -81,10 +83,10 @@ sealed class BaseLongConfigurable(
 )
 
 class LongConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<Long>,
-    describe: ((Long) -> String),
+    describe: ((Long) -> StringSource),
     range: LongRange,
     val renderMode: RenderMode = RenderMode.TextField,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
@@ -104,10 +106,10 @@ class LongConfigurable(
 }
 
 class BooleanConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<Boolean>,
-    describe: ((Boolean) -> String),
+    describe: ((Boolean) -> StringSource),
     val renderMode: RenderMode = RenderMode.Switch,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
@@ -126,14 +128,14 @@ class BooleanConfigurable(
 }
 
 class FloatConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<Float>,
     val range: ClosedFloatingPointRange<Float>,
     val steps: Int = 0,
     val renderMode: RenderMode = RenderMode.TextField,
 
-    describe: ((Float) -> String),
+    describe: ((Float) -> StringSource),
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : Configurable<Float>(
@@ -151,10 +153,10 @@ class FloatConfigurable(
 }
 
 open class StringConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<String>,
-    describe: ((String) -> String),
+    describe: ((String) -> StringSource),
     validate: (String) -> Boolean = { true },
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
@@ -169,10 +171,10 @@ open class StringConfigurable(
 )
 
 class FolderConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<String>,
-    describe: ((String) -> String),
+    describe: ((String) -> StringSource),
     validate: (String) -> Boolean,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
@@ -187,10 +189,10 @@ class FolderConfigurable(
 )
 
 sealed class BaseEnumConfigurable<T>(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<T>,
-    describe: ((T) -> String),
+    describe: ((T) -> StringSource),
     val possibleValues: List<T>,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
@@ -208,10 +210,10 @@ sealed class BaseEnumConfigurable<T>(
 
 //more complex
 open class EnumConfigurable<T>(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<T>,
-    describe: ((T) -> String),
+    describe: ((T) -> StringSource),
     possibleValues: List<T>,
     val renderMode: RenderMode = RenderMode.Spinner,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
@@ -231,10 +233,10 @@ open class EnumConfigurable<T>(
 }
 
 class ThemeConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<ThemeInfo>,
-    describe: (ThemeInfo) -> String,
+    describe: (ThemeInfo) -> StringSource,
     possibleValues: List<ThemeInfo>,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
@@ -249,10 +251,10 @@ class ThemeConfigurable(
 )
 
 class SpeedLimitConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<Long>,
-    describe: (Long) -> String,
+    describe: (Long) -> StringSource,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : BaseLongConfigurable(
@@ -266,10 +268,10 @@ class SpeedLimitConfigurable(
 )
 
 class TimeConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<LocalTime>,
-    describe: (LocalTime) -> String,
+    describe: (LocalTime) -> StringSource,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : Configurable<LocalTime>(
@@ -282,14 +284,32 @@ class TimeConfigurable(
 )
 
 class DayOfWeekConfigurable(
-    title: String,
-    description: String,
+    title: StringSource,
+    description: StringSource,
     backedBy: MutableStateFlow<Set<DayOfWeek>>,
-    describe: (Set<DayOfWeek>) -> String,
+    describe: (Set<DayOfWeek>) -> StringSource,
     validate: (Set<DayOfWeek>) -> Boolean,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : Configurable<Set<DayOfWeek>>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
+    validate = validate,
+    enabled = enabled,
+    visible = visible,
+)
+
+class ProxyConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<ProxyData>,
+    describe: (ProxyData) -> StringSource,
+    validate: (ProxyData) -> Boolean,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : Configurable<ProxyData>(
     title = title,
     description = description,
     backedBy = backedBy,

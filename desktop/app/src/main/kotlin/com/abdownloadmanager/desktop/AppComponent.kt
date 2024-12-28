@@ -5,10 +5,14 @@ import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadConfig
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadComponent
+import com.abdownloadmanager.desktop.pages.category.CategoryComponent
+import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
+import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadComponent
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.SettingsComponent
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadComponent
+import com.abdownloadmanager.desktop.pages.updater.UpdateComponent
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.ui.widget.MessageDialogModel
@@ -35,7 +39,17 @@ import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
+import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.utils.DownloadSystem
+import com.abdownloadmanager.utils.category.CategoryManager
+import com.abdownloadmanager.utils.category.CategorySelectionMode
+import com.arkivanov.decompose.childContext
 import ir.amirab.downloader.exception.TooManyErrorException
+import ir.amirab.downloader.monitor.isDownloadActiveFlow
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.combineStringSources
+import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -52,8 +66,8 @@ sealed interface AppEffects {
 }
 
 interface NotificationSender {
-    fun sendDialogNotification(title: String, description: String, type: MessageDialogType)
-    fun sendNotification(tag: Any, title: String, description: String, type: NotificationType)
+    fun sendDialogNotification(title: StringSource, description: StringSource, type: MessageDialogType)
+    fun sendNotification(tag: Any, title: StringSource, description: StringSource, type: NotificationType)
 }
 
 class AppComponent(
@@ -61,6 +75,8 @@ class AppComponent(
 ) : BaseComponent(ctx),
     DownloadDialogManager,
     AddDownloadDialogManager,
+    CategoryDialogManager,
+    EditDownloadDialogManager,
     NotificationSender,
     DownloadItemOpener,
     ContainsEffects<AppEffects> by supportEffects(),
@@ -101,7 +117,9 @@ class AppComponent(
                 downloadItemOpener = this,
                 downloadDialogManager = this,
                 addDownloadDialogManager = this,
-                notificationSender = this
+                categoryDialogManager = this,
+                notificationSender = this,
+                editDownloadDialogManager = this,
             )
         }
     ).subscribeAsStateFlow()
@@ -140,6 +158,43 @@ class AppComponent(
         }
     ).subscribeAsStateFlow()
 
+    private val editDownload = SlotNavigation<Long>()
+    val editDownloadSlot = childSlot(
+        editDownload,
+        serializer = null,
+        key = "editDownload",
+        childFactory = { editDownloadConfig: Long, componentContext: ComponentContext ->
+            EditDownloadComponent(
+                ctx = componentContext,
+                onRequestClose = {
+                    closeEditDownloadDialog()
+                },
+                onEdited = {
+                    scope.launch {
+                        downloadSystem.editDownload(it)
+                        closeEditDownloadDialog()
+                    }
+                },
+                downloadId = editDownloadConfig,
+                acceptEdit = downloadSystem.downloadMonitor
+                    .isDownloadActiveFlow(editDownloadConfig)
+                    .mapStateFlow { !it },
+            )
+        }
+    ).subscribeAsStateFlow()
+
+    override fun openEditDownloadDialog(id: Long) {
+        val currentComponent = editDownloadSlot.value.child?.instance
+        if (currentComponent != null && currentComponent.downloadId == id) {
+            currentComponent.bringToFront()
+        } else {
+            editDownload.activate(id)
+        }
+    }
+
+    override fun closeEditDownloadDialog() {
+        editDownload.dismiss()
+    }
 
     fun openSettings() {
         scope.launch {
@@ -192,12 +247,24 @@ class AppComponent(
                         onRequestClose = {
                             closeAddDownloadDialog(config.id)
                         },
-                        onRequestAddToQueue = { item, queueId, onDuplicate ->
-                            addDownload(item = item, queueId = queueId, onDuplicateStrategy = onDuplicate)
+                        onRequestAddToQueue = { item, queueId, onDuplicate, categoryId ->
+                            addDownload(
+                                item = item,
+                                queueId = queueId,
+                                categoryId = categoryId,
+                                onDuplicateStrategy = onDuplicate,
+                            )
                             closeAddDownloadDialog(dialogId = config.id)
                         },
-                        onRequestDownload = { item, onDuplicate ->
-                            startNewDownload(item, onDuplicate, true)
+                        onRequestAddCategory = {
+                            openCategoryDialog(-1)
+                        },
+                        onRequestDownload = { item, onDuplicate, categoryId ->
+                            startNewDownload(
+                                item = item,
+                                onDuplicateStrategy = onDuplicate,
+                                categoryId = categoryId,
+                            )
                             closeAddDownloadDialog(config.id)
                         },
                         openExistingDownload = {
@@ -213,16 +280,20 @@ class AppComponent(
 
                 is AddDownloadConfig.MultipleAddConfig -> {
                     AddMultiDownloadComponent(
-                        ctx,
-                        config.id,
-                        { closeAddDownloadDialog(config.id) },
-                        { items, strategy, queueId ->
+                        ctx = ctx,
+                        id = config.id,
+                        onRequestClose = { closeAddDownloadDialog(config.id) },
+                        onRequestAdd = { items, strategy, queueId, categorySelectionMode ->
                             addDownload(
                                 items = items,
                                 onDuplicateStrategy = strategy,
                                 queueId = queueId,
+                                categorySelectionMode = categorySelectionMode
                             )
                             closeAddDownloadDialog(config.id)
+                        },
+                        onRequestAddCategory = {
+                            openCategoryDialog(-1)
                         }
                     ).apply { addItems(config.links) }
                 }
@@ -263,6 +334,77 @@ class AppComponent(
         .map { it.items.mapNotNull { it.instance } }
         .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
+    private val categoryManager: CategoryManager by inject()
+
+    private val categoryPageControl = PagesNavigation<Long>()
+    private val _openedCategoryDialogs = childPages(
+        key = "openedCategoryDialogs",
+        source = categoryPageControl,
+        serializer = null,
+        initialPages = { Pages() },
+        pageStatus = { _, _ ->
+            ChildNavState.Status.RESUMED
+        },
+        childFactory = { cfg, ctx ->
+            CategoryComponent(
+                ctx = ctx,
+                close = {
+                    closeCategoryDialog(cfg)
+                },
+                submit = { submittedCategory ->
+                    if (submittedCategory.id < 0) {
+                        categoryManager.addCustomCategory(submittedCategory)
+                    } else {
+                        categoryManager.updateCategory(
+                            submittedCategory.id
+                        ) {
+                            submittedCategory.copy(
+                                items = it.items
+                            )
+                        }
+                    }
+                    closeCategoryDialog(cfg)
+                },
+                id = cfg
+            )
+        }
+    ).subscribeAsStateFlow()
+    override val openedCategoryDialogs: StateFlow<List<CategoryComponent>> = _openedCategoryDialogs
+        .map {
+            it.items.mapNotNull { it.instance }
+        }.stateIn(scope, SharingStarted.Eagerly, emptyList())
+
+    override fun openCategoryDialog(categoryId: Long) {
+        scope.launch {
+            val component = openedCategoryDialogs.value.find {
+                it.id == categoryId
+            }
+            if (component != null) {
+//                component.bringToFront()
+            } else {
+                categoryPageControl.navigate {
+                    val newItems = (it.items.toSet() + categoryId).toList()
+                    val copy = it.copy(
+                        items = newItems,
+                        selectedIndex = newItems.lastIndex
+                    )
+                    copy
+                }
+            }
+        }
+    }
+
+    override fun closeCategoryDialog(categoryId: Long) {
+        scope.launch {
+            categoryPageControl.navigate {
+                val newItems = it.items.filter { config ->
+                    config != categoryId
+                }
+                it.copy(items = newItems, selectedIndex = newItems.lastIndex)
+            }
+        }
+    }
+
     init {
         downloadSystem.downloadEvents
             .filterIsInstance<DownloadManagerEvents.OnJobRemoved>()
@@ -271,14 +413,14 @@ class AppComponent(
             }.launchIn(scope)
     }
 
-    override fun sendNotification(tag: Any, title: String, description: String, type: NotificationType) {
+    override fun sendNotification(tag: Any, title: StringSource, description: StringSource, type: NotificationType) {
         beep()
         showNotification(tag = tag, title = title, description = description, type = type)
     }
 
     override fun sendDialogNotification(
-        title: String,
-        description: String,
+        title: StringSource,
+        description: StringSource,
         type: MessageDialogType,
     ) {
         beep()
@@ -293,8 +435,8 @@ class AppComponent(
 
     private fun showNotification(
         tag: Any,
-        title: String,
-        description: String,
+        title: StringSource,
+        description: StringSource,
         type: NotificationType = NotificationType.Info,
     ) {
         sendEffect(
@@ -324,9 +466,9 @@ class AppComponent(
                     is IntegrationResult.Fail -> {
                         IntegrationPortBroadcaster.setIntegrationPortInFile(null)
                         sendDialogNotification(
-                            title = "Can't run browser integration",
+                            title = Res.string.cant_run_browser_integration.asStringSource(),
                             type = MessageDialogType.Error,
-                            description = it.throwable.localizedMessage
+                            description = it.throwable.localizedMessage.asStringSource()
                         )
                     }
 
@@ -373,22 +515,30 @@ class AppComponent(
                 "Too Many Error: "
             } else {
                 "Error: "
-            }
-            val reason = actualCause.message ?: "Unknown"
+            }.asStringSource()
+            val reason = actualCause.message?.asStringSource() ?: Res.string.unknown.asStringSource()
             sendNotification(
                 "downloadId=${it.downloadItem.id}",
-                title = it.downloadItem.name,
-                description = prefix + reason,
+                title = it.downloadItem.name.asStringSource(),
+                description = listOf(prefix, reason).combineStringSources(),
                 type = NotificationType.Error,
             )
         }
         if (it is DownloadManagerEvents.OnJobCompleted) {
             sendNotification(
                 tag = "downloadId=${it.downloadItem.id}",
-                title = it.downloadItem.name,
-                description = "Finished",
+                title = it.downloadItem.name.asStringSource(),
+                description = Res.string.finished.asStringSource(),
                 type = NotificationType.Success,
             )
+            if (appSettings.showDownloadCompletionDialog.value) {
+                openDownloadDialog(it.downloadItem.id)
+            }
+        }
+        if (it is DownloadManagerEvents.OnJobStarting) {
+            if (appSettings.showDownloadProgressDialog.value) {
+                openDownloadDialog(it.downloadItem.id)
+            }
         }
     }
 
@@ -396,9 +546,9 @@ class AppComponent(
         val item = downloadSystem.getDownloadItemById(id)
         if (item == null) {
             sendNotification(
-                "Open File",
-                "Can't open file",
-                "Download Item not found",
+                Res.string.open_file,
+                Res.string.cant_open_file.asStringSource(),
+                Res.string.download_item_not_found.asStringSource(),
                 NotificationType.Error,
             )
             return
@@ -411,9 +561,9 @@ class AppComponent(
             FileUtils.openFile(downloadSystem.getDownloadFile(downloadItem))
         }.onFailure {
             sendNotification(
-                "Open File",
-                "Can't open file",
-                it.localizedMessage ?: "Unknown Error",
+                Res.string.open_file,
+                Res.string.cant_open_file.asStringSource(),
+                it.localizedMessage?.asStringSource() ?: Res.string.unknown_error.asStringSource(),
                 NotificationType.Error,
             )
             println("Can't open file:${it.message}")
@@ -424,9 +574,9 @@ class AppComponent(
         val item = downloadSystem.getDownloadItemById(id)
         if (item == null) {
             sendNotification(
-                "Open Folder",
-                "Can't open folder",
-                "Download Item not found",
+                Res.string.open_folder,
+                Res.string.cant_open_folder.asStringSource(),
+                Res.string.download_item_not_found.asStringSource(),
                 NotificationType.Error,
             )
             return
@@ -439,12 +589,24 @@ class AppComponent(
             FileUtils.openFolderOfFile(downloadSystem.getDownloadFile(downloadItem))
         }.onFailure {
             sendNotification(
-                "Open Folder",
-                "Can't open folder",
-                it.localizedMessage ?: "Unknown Error",
+                Res.string.open_folder,
+                Res.string.cant_open_folder.asStringSource(),
+                it.localizedMessage?.asStringSource() ?: Res.string.unknown_error.asStringSource(),
                 NotificationType.Error,
             )
             println("Can't open folder:${it.message}")
+        }
+    }
+
+    fun externalCredentialComingIntoApp(list: List<DownloadCredentials>) {
+        val editDownloadComponent = editDownloadSlot.value.child?.instance
+        if (editDownloadComponent != null) {
+            list.firstOrNull()?.let {
+                editDownloadComponent.importCredential(it)
+                editDownloadComponent.bringToFront()
+            }
+        } else {
+            openAddDownloadDialog(list)
         }
     }
 
@@ -518,6 +680,7 @@ class AppComponent(
     fun addDownload(
         items: List<DownloadItem>,
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
+        categorySelectionMode: CategorySelectionMode?,
         queueId: Long?,
     ) {
         scope.launch {
@@ -525,6 +688,7 @@ class AppComponent(
                 newItemsToAdd = items,
                 onDuplicateStrategy = onDuplicateStrategy,
                 queueId = queueId,
+                categorySelectionMode = categorySelectionMode,
             )
         }
     }
@@ -532,6 +696,7 @@ class AppComponent(
     fun addDownload(
         item: DownloadItem,
         queueId: Long?,
+        categoryId: Long?,
         onDuplicateStrategy: OnDuplicateStrategy,
     ) {
         scope.launch {
@@ -539,6 +704,7 @@ class AppComponent(
                 downloadItem = item,
                 onDuplicateStrategy = onDuplicateStrategy,
                 queueId = queueId,
+                categoryId = categoryId,
             )
         }
     }
@@ -546,27 +712,44 @@ class AppComponent(
     fun startNewDownload(
         item: DownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
-        openDownloadDialog: Boolean,
+        categoryId: Long?,
     ) {
         scope.launch {
             val id = downloadSystem.addDownload(
-                item,
-                onDuplicateStrategy,
-                DefaultQueueInfo.ID,
+                downloadItem = item,
+                onDuplicateStrategy = onDuplicateStrategy,
+                queueId = DefaultQueueInfo.ID,
+                categoryId = categoryId,
             )
             launch {
                 downloadSystem.manualResume(id)
             }
-            if (openDownloadDialog) {
-                launch {
-                    openDownloadDialog(id)
-                }
-            }
         }
     }
 
-    fun requestClose() {
+    private val _showConfirmExitDialog = MutableStateFlow(false)
+    val showConfirmExitDialog = _showConfirmExitDialog.asStateFlow()
+
+    fun exitAppAsync() {
+        scope.launch { exitApp() }
+    }
+
+    suspend fun exitApp() {
+        downloadSystem.stopAnything()
         exitProcess(0)
+    }
+
+    fun closeConfirmExit() {
+        _showConfirmExitDialog.value = false
+    }
+
+    suspend fun requestExitApp() {
+        val hasActiveDownloads = downloadSystem.downloadMonitor.activeDownloadCount.value > 0
+        if (hasActiveDownloads) {
+            _showConfirmExitDialog.value = true
+            return
+        }
+        exitApp()
     }
 
     fun openAbout() {
@@ -583,6 +766,14 @@ class AppComponent(
 
     fun closeOpenSourceLibraries() {
         showOpenSourceLibraries.update { false }
+    }
+
+    fun openTranslatorsPage() {
+        showTranslators.update { true }
+    }
+
+    fun closeTranslatorsPage() {
+        showTranslators.update { false }
     }
 
     fun openQueues() {
@@ -658,18 +849,26 @@ class AppComponent(
         ).all { it }
     }
 
-    //    TODO enable updater
-//    val updater = UpdateComponent(childContext("updater"))
+    val updater = UpdateComponent(
+        childContext("updater"),
+        this,
+    )
     val showAboutPage = MutableStateFlow(false)
     val showOpenSourceLibraries = MutableStateFlow(false)
+    val showTranslators = MutableStateFlow(false)
     val theme = appRepository.theme
-//    val uiScale = appRepository.uiScale
+    val uiScale = appRepository.uiScale
 }
 
 interface DownloadDialogManager {
     val openedDownloadDialogs: StateFlow<List<SingleDownloadComponent>>
     fun openDownloadDialog(id: Long)
     fun closeDownloadDialog(id: Long)
+}
+
+interface EditDownloadDialogManager {
+    fun openEditDownloadDialog(id: Long)
+    fun closeEditDownloadDialog()
 }
 
 interface AddDownloadDialogManager {

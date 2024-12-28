@@ -16,7 +16,7 @@ data class DownloadItem(
     var name: String,
 
     var contentLength: Long = LENGTH_UNKNOWN,
-    var serverETag:String? = null,
+    var serverETag: String? = null,
 
     var dateAdded: Long = 0,
     var startTime: Long? = null,
@@ -28,6 +28,29 @@ data class DownloadItem(
     companion object {
         const val LENGTH_UNKNOWN = -1L
     }
+}
+
+fun DownloadItem.applyFrom(other: DownloadItem) {
+    link = other.link
+    headers = other.headers
+    username = other.username
+    password = other.password
+    downloadPage = other.downloadPage
+    userAgent = other.userAgent
+
+    id = other.id
+    folder = other.folder
+    name = other.name
+
+    contentLength = other.contentLength
+    serverETag = other.serverETag
+
+    dateAdded = other.dateAdded
+    startTime = other.startTime
+    completeTime = other.completeTime
+    status = other.status
+    preferredConnectionCount = other.preferredConnectionCount
+    speedLimit = other.speedLimit
 }
 
 fun DownloadItem.withCredentials(credentials: IDownloadCredentials) = apply {

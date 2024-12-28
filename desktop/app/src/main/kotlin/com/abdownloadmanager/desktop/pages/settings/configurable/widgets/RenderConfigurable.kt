@@ -48,6 +48,7 @@ fun RenderConfigurable(
             }
 
             is DayOfWeekConfigurable -> RenderDayOfWeekConfigurable(cfg,modifier)
+            is ProxyConfigurable -> RenderProxyConfig(cfg, modifier)
         }
     }
 }

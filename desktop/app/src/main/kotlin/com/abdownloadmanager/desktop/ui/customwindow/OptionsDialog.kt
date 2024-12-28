@@ -10,7 +10,7 @@ import java.awt.event.WindowFocusListener
 fun BaseOptionDialog(
     onCloseRequest: () -> Unit,
     state: DialogState = rememberDialogState(),
-    resizeable:Boolean=true,
+    resizeable: Boolean = true,
     content: @Composable WindowScope.() -> Unit,
 ) {
     DialogWindow(
@@ -21,7 +21,7 @@ fun BaseOptionDialog(
         resizable = resizeable,
         onCloseRequest = onCloseRequest,
     ) {
-        val focusListener=remember {
+        val focusListener = remember {
             object : WindowFocusListener {
                 override fun windowGainedFocus(e: WindowEvent?) {
                     //do nothing
@@ -32,16 +32,18 @@ fun BaseOptionDialog(
                 }
             }
         }
-        DisposableEffect(window){
+        DisposableEffect(window) {
             window.addWindowFocusListener(focusListener);
-            window.isAlwaysOnTop=true
+            window.isAlwaysOnTop = true
             //we need this to allow click outside
-            window.modalityType=java.awt.Dialog.ModalityType.MODELESS
-            onDispose{
+            window.modalityType = java.awt.Dialog.ModalityType.MODELESS
+            onDispose {
                 window.removeWindowFocusListener(focusListener)
             }
         }
 //        window.subtractInset()
-        content()
+        UiScaledContent {
+            content()
+        }
     }
 }

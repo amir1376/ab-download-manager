@@ -3,6 +3,7 @@ import ir.amirab.util.platform.Platform
 object MyPlugins {
     private const val namespace = "myPlugins"
     const val kotlin = "$namespace.kotlin"
+    const val kotlinMultiplatform = "$namespace.kotlinMultiplatform"
     const val composeDesktop = "$namespace.composeDesktop"
     const val composeBase = "$namespace.composeBase"
     const val proguardDesktop = "$namespace.proguardDesktop"
@@ -22,4 +23,6 @@ object Plugins {
     const val changeLog = "org.jetbrains.changelog"
     const val buildConfig = "com.github.gmazzo.buildconfig"
     const val aboutLibraries = "com.mikepenz.aboutlibraries.plugin"
+
+    const val multiplatformResources = "dev.icerock.mobile.multiplatform-resources"
 }

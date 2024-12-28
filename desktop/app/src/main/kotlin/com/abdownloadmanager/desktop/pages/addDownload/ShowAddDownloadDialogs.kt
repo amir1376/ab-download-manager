@@ -5,7 +5,6 @@ import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownload
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemPage
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPage
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
-import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadEffects
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
@@ -19,6 +18,10 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 
 @Composable
@@ -29,10 +32,11 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
         val onRequestClose = {
             component.closeAddDownloadDialog(addDownloadComponent.id)
         }
+        val uiScale = LocalUiScale.current
         when (addDownloadComponent) {
             is AddSingleDownloadComponent -> {
-                val h = 220
-                val w = 500
+                val h = 265.applyUiScale(uiScale)
+                val w = 500.applyUiScale(uiScale)
                 val size = remember {
                     DpSize(
                         height = h.dp,
@@ -53,15 +57,15 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
                         window.minimumSize = Dimension(w, h)
                     }
 //                    BringToFront()
-                    WindowTitle("Add download")
+                    WindowTitle(myStringResource(Res.string.add_download))
                     WindowIcon(MyIcons.appIcon)
                     AddDownloadPage(addDownloadComponent)
                 }
             }
 
             is AddMultiDownloadComponent -> {
-                val h = 400
-                val w = 600
+                val h = 450
+                val w = 800
                 val state = rememberWindowState(
                     height = h.dp,
                     width = w.dp,
@@ -76,7 +80,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
                         window.minimumSize = Dimension(w, h)
                     }
 //                    BringToFront()
-                    WindowTitle("Add download")
+                    WindowTitle(myStringResource(Res.string.add_download))
                     WindowIcon(MyIcons.appIcon)
                     AddMultiItemPage(addDownloadComponent)
                 }

@@ -2,6 +2,7 @@ on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+*"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,7 +22,7 @@ jobs:
           set -Eeuo pipefail
           jdksPath="$HOME/.jdks"
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
-          jdkFileName="jbrsdk_jcef-17.0.10-$os-b1207.14"
+          jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
           jdkFileNameWithExt="$jdkFileName.tar.gz"
           link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
           curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileNameWithExt"
@@ -90,6 +91,7 @@ jobs:
         with:
           prerelease: ${{ !steps.version.outputs.is_stable }}
           make_latest: legacy
+          draft: true
           files: |
             release/binaries/*
           body_path: release/release-notes.md

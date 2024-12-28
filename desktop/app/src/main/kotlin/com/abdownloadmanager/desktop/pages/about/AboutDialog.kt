@@ -1,14 +1,21 @@
 package com.abdownloadmanager.desktop.pages.about
 
 import com.abdownloadmanager.desktop.AppComponent
-import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
 import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
+import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
 fun ShowAboutDialog(appComponent: AppComponent) {
@@ -19,6 +26,9 @@ fun ShowAboutDialog(appComponent: AppComponent) {
             },
             onRequestShowOpenSourceLibraries = {
                 appComponent.openOpenSourceLibraries()
+            },
+            onRequestShowTranslators = {
+                appComponent.openTranslatorsPage()
             }
         )
     }
@@ -28,19 +38,25 @@ fun ShowAboutDialog(appComponent: AppComponent) {
 fun AboutDialog(
     onClose: () -> Unit,
     onRequestShowOpenSourceLibraries: () -> Unit,
+    onRequestShowTranslators: () -> Unit,
 ) {
     CustomWindow(
         resizable = false,
         onRequestToggleMaximize = null,
+        alwaysOnTop = false,
+        onRequestMinimize = null,
         state = rememberWindowState(
-            size = DpSize(400.dp, 300.dp)
+            position = WindowPosition.Aligned(Alignment.Center),
+            size = DpSize(600.dp, 310.dp)
+                .applyUiScale(LocalUiScale.current)
         ),
         onCloseRequest = onClose
     ) {
-        WindowTitle("About")
+        WindowTitle(myStringResource(Res.string.about))
+        WindowIcon(MyIcons.info)
         AboutPage(
-            close = onClose,
-            onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries
+            onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
+            onRequestShowTranslators = onRequestShowTranslators
         )
     }
 }

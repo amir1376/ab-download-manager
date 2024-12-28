@@ -1,6 +1,7 @@
 package ir.amirab.downloader.monitor
 
 import androidx.compose.runtime.Immutable
+import java.io.File
 
 @Immutable
 sealed interface IDownloadItemState {
@@ -13,4 +14,6 @@ sealed interface IDownloadItemState {
     val startTime: Long
     val completeTime: Long
     val downloadLink:String
+
+    fun getFullPath() = File(folder, name)
 }

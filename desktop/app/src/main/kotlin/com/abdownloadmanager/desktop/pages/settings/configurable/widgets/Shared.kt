@@ -33,7 +33,6 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
 
 
-
 @Composable
 fun <T> RenderSpinner(
     possibleValues: List<T>,
@@ -70,8 +69,7 @@ fun <T> RenderSpinner(
                 .border(borderWidth, borderColor, shape)
                 .clickable(enabled = enabled) {
                     isOpen = true
-                }
-            ,
+                },
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             WithContentAlpha(1f) {
@@ -117,8 +115,7 @@ fun <T> RenderSpinner(
                                             .clickable(onClick = {
                                                 isOpen = false
                                                 onSelect(p)
-                                            })
-                                        ,
+                                            }),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         val selected = p == value
@@ -135,7 +132,7 @@ fun <T> RenderSpinner(
                                         Spacer(
                                             Modifier.width(borderWidth)
                                         )
-                                        if(selected){
+                                        if (selected) {
                                             MyIcon(MyIcons.check, null, Modifier.padding(4.dp).size(12.dp))
                                         }
                                     }
@@ -177,23 +174,29 @@ fun <T> TitleAndDescription(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                cfg.title,
+                cfg.title.rememberString(),
                 fontSize = myTextSizes.base,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f, false)
             )
-            if (cfg.description.isNotBlank()) {
+            if (cfg.description.rememberString().isNotBlank()) {
                 Spacer(Modifier.size(4.dp))
-                Help(cfg)
+                Help(
+                    Modifier.align(Alignment.Top),
+                    cfg
+                )
             }
         }
         if (describe) {
             val value = cfg.backedBy.collectAsState().value
-            val describeContent = remember(value) {
+            val describedStringSource = remember(value) {
                 cfg.describe(value)
             }
+            val describeContent = describedStringSource.rememberString()
             if (describeContent.isNotBlank()) {
-                WithContentAlpha(0.75f){
-                    Text(describeContent,
+                WithContentAlpha(0.75f) {
+                    Text(
+                        describeContent,
                         fontSize = myTextSizes.base,
                     )
                 }
@@ -223,7 +226,7 @@ fun isConfigEnabled(): Boolean {
 fun ConfigurationWrapper(
     configurable: Configurable<*>,
     groupInfo: ConfigGroupInfo? = null,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val enabled by configurable.enabled.collectAsState()
     val visible by configurable.visible.collectAsState()
@@ -257,7 +260,7 @@ fun ConfigTemplate(
             horizontalArrangement = Arrangement.Center,
         ) {
             Column(
-                Modifier.weight(1f, true),
+                Modifier.weight(2f, true),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start,
             ) {
@@ -294,19 +297,20 @@ fun ConfigTemplate(
 
 @Composable
 private fun Help(
+    modifier: Modifier = Modifier,
     cfg: Configurable<*>,
-){
+) {
     var showHelpContent by remember { mutableStateOf(false) }
     val onRequestCloseShowHelpContent = {
         showHelpContent = false
     }
-    Column {
+    Column(modifier) {
         MyIcon(
             MyIcons.question,
             "Hint",
             Modifier
                 .clip(CircleShape)
-                .clickable{
+                .clickable {
                     showHelpContent = !showHelpContent
                 }
                 .border(
@@ -320,7 +324,7 @@ private fun Help(
                 .size(12.dp),
             tint = myColors.onSurface,
         )
-        if (showHelpContent){
+        if (showHelpContent) {
             Popup(
                 popupPositionProvider = rememberComponentRectPositionProvider(
                     anchor = Alignment.TopCenter,
@@ -341,7 +345,7 @@ private fun Help(
                 ) {
                     WithContentColor(myColors.onSurface) {
                         Text(
-                            cfg.description,
+                            cfg.description.rememberString(),
                             fontSize = myTextSizes.base,
                         )
                     }

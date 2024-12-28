@@ -32,7 +32,7 @@ fun RenderConfigurableGroup(
         .padding(start = verticalPadding.dp)
         .padding(horizontal = 4.dp)
     ) {
-        title?.let {
+        title?.rememberString()?.let {
             Text(
                 text = it,
                 fontSize = myTextSizes.base,

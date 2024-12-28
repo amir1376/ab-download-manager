@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -47,7 +48,7 @@ fun MyTextField(
     modifier: Modifier,
     background: Color = myColors.surface,
     contentColor: Color = myColors.getContentColorFor(background).takeIf { it.isSpecified }
-            ?: LocalContentColor.current,
+        ?: LocalContentColor.current,
     focusedBorderColor: Color = myColors.primary,
     borderColor: Color = myColors.onBackground / 0.1f,
     shape: Shape = RoundedCornerShape(12.dp),
@@ -57,7 +58,9 @@ fun MyTextField(
     enabled: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-
+    singleLine: Boolean = true,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
     start: @Composable (RowScope.() -> Unit)? = null,
     end: @Composable (RowScope.() -> Unit)? = null,
 ) {
@@ -68,10 +71,16 @@ fun MyTextField(
     val textSize = fontSize.takeOrElse { LocalTextStyle.current.fontSize }
     Row(
         modifier
+            .ifThen(!enabled) {
+                alpha(0.5f)
+            }
             .clip(shape)
             .height(IntrinsicSize.Max)
 //            .height(32.dp)
-            .pointerHoverIcon(PointerIcon.Text)
+            .pointerHoverIcon(
+                if (enabled) PointerIcon.Text
+                else PointerIcon.Default
+            )
             .onKeyEvent {
                 if (it.key == Key.Escape) {
                     fm.clearFocus()
@@ -98,7 +107,9 @@ fun MyTextField(
 
         BasicTextField(
             value = text,
-            singleLine = true,
+            singleLine = singleLine,
+            maxLines = maxLines,
+            minLines = minLines,
             onValueChange = onTextChange,
             interactionSource = interactionSource,
             enabled = enabled,

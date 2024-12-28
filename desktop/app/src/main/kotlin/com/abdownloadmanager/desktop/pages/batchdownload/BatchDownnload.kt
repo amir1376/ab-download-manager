@@ -27,16 +27,21 @@ import com.abdownloadmanager.desktop.ui.util.ifThen
 import com.abdownloadmanager.desktop.ui.widget.*
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
 import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.compose.LocalContentColor
 import com.abdownloadmanager.utils.compose.WithContentAlpha
 import com.abdownloadmanager.utils.compose.widget.MyIcon
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.IconSource
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 
 @Composable
 fun BatchDownload(
     component: BatchDownloadComponent,
 ) {
-    WindowTitle("Batch Download")
+    WindowTitle(myStringResource(Res.string.batch_download))
     val link by component.link.collectAsState()
     val setLink = component::setLink
     val start by component.start.collectAsState()
@@ -59,13 +64,13 @@ fun BatchDownload(
             ) {
                 LabeledContent(
                     label = {
-                        Text("Enter a link that contains wildcards (use *)")
+                        Text(myStringResource(Res.string.batch_download_link_help))
                     },
                     content = {
                         BatchDownloadPageTextField(
                             text = link,
                             onTextChange = setLink,
-                            placeholder = "Link: https://example.com/photo-*.png",
+                            placeholder = "https://example.com/photo-*.png",
                             modifier = Modifier
                                 .focusRequester(linkFocusRequester)
                                 .fillMaxWidth(),
@@ -82,10 +87,15 @@ fun BatchDownload(
                             },
                             errorText = when (val v = validationResult) {
                                 BatchDownloadValidationResult.URLInvalid -> {
-                                    "Invalid URL"
+                                    myStringResource(Res.string.invalid_url)
                                 }
 
-                                is BatchDownloadValidationResult.MaxRangeExceed -> "List is too large! maximum ${v.allowed} items allowed"
+                                is BatchDownloadValidationResult.MaxRangeExceed -> myStringResource(
+                                    Res.string.list_is_too_large_maximum_n_items_allowed,
+                                    Res.string.list_is_too_large_maximum_n_items_allowed_createArgs(
+                                        count = v.allowed.toString()
+                                    )
+                                )
                                 BatchDownloadValidationResult.Others -> null
                                 BatchDownloadValidationResult.Ok -> null
                             }
@@ -95,7 +105,7 @@ fun BatchDownload(
                 Spacer(Modifier.height(8.dp))
                 LabeledContent(
                     label = {
-                        Text("Enter range")
+                        Text(myStringResource(Res.string.enter_range))
                     },
                     content = {
                         Row(
@@ -107,7 +117,10 @@ fun BatchDownload(
                                 placeholder = "",
                                 modifier = Modifier.width(90.dp),
                                 start = {
-                                    Text("From:", Modifier.padding(horizontal = 8.dp))
+                                    Text(
+                                        "${myStringResource(Res.string.range_from)}:",
+                                        Modifier.padding(horizontal = 8.dp)
+                                    )
                                 }
                             )
                             Spacer(Modifier.width(8.dp))
@@ -120,7 +133,10 @@ fun BatchDownload(
                                 placeholder = "",
                                 modifier = Modifier.width(90.dp),
                                 start = {
-                                    Text("To:", Modifier.padding(horizontal = 8.dp))
+                                    Text(
+                                        "${myStringResource(Res.string.range_to)}:",
+                                        Modifier.padding(horizontal = 8.dp)
+                                    )
                                 }
                             )
                         }
@@ -129,7 +145,7 @@ fun BatchDownload(
                 Spacer(Modifier.height(8.dp))
                 LabeledContent(
                     label = {
-                        Text("Wildcard length")
+                        Text(myStringResource(Res.string.batch_download_wildcard_length))
                     },
                     content = {
                         WildcardLengthUi(
@@ -152,7 +168,7 @@ fun BatchDownload(
                 Spacer(Modifier.height(8.dp))
                 LabeledContent(
                     label = {
-                        Text("First Link")
+                        Text(myStringResource(Res.string.first_link))
                     },
                     content = {
                         LinkPreview(component.startLinkResult.collectAsState().value)
@@ -161,7 +177,7 @@ fun BatchDownload(
                 Spacer(Modifier.height(8.dp))
                 LabeledContent(
                     label = {
-                        Text("Last Link")
+                        Text(myStringResource(Res.string.last_link))
                     },
                     content = {
                         LinkPreview(component.endLinkResult.collectAsState().value)
@@ -175,12 +191,12 @@ fun BatchDownload(
             modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.End)
         ) {
             ActionButton(
-                text = "OK",
+                text = myStringResource(Res.string.ok),
                 enabled = component.canConfirm.collectAsState().value,
                 onClick = component::confirm
             )
             Spacer(Modifier.width(8.dp))
-            ActionButton("Cancel", onClick = component.onClose)
+            ActionButton(myStringResource(Res.string.close), onClick = component.onClose)
         }
     }
 }
@@ -197,8 +213,12 @@ fun LinkPreview(link: String) {
     )
 }
 
-enum class WildcardSelect {
-    Auto, Unspecified, Custom;
+enum class WildcardSelect(
+    val text: StringSource,
+) {
+    Auto(Res.string.auto.asStringSource()),
+    Unspecified(Res.string.unspecified.asStringSource()),
+    Custom(Res.string.custom.asStringSource());
 
     companion object {
         fun fromWildcardLength(wildcardLength: WildcardLength): WildcardSelect {
@@ -223,7 +243,7 @@ private fun WildcardLengthUi(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Multiselect(
-            selections = WildcardSelect.entries,
+            selections = entries,
             selectedItem = WildcardSelect.fromWildcardLength(wildcardLength),
             onSelectionChange = {
                 onChangeWildcardLength(
@@ -235,7 +255,7 @@ private fun WildcardLengthUi(
                 )
             },
             render = {
-                Text(it.toString())
+                Text(it.text.rememberString())
             }
         )
         AnimatedVisibility(wildcardLength is WildcardLength.Custom) {
@@ -253,48 +273,6 @@ private fun WildcardLengthUi(
                     keyboardOptions = KeyboardOptions.Default,
                     modifier = Modifier.width(72.dp)
                 )
-            }
-        }
-    }
-}
-
-@Composable
-private fun <T> Multiselect(
-    selections: List<T>,
-    selectedItem: T,
-    onSelectionChange: (T) -> Unit,
-    render: @Composable (T) -> Unit,
-) {
-    val shape = RoundedCornerShape(6.dp)
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clip(shape)
-            .background(myColors.surface)
-    ) {
-        for (item in selections) {
-            val isSelected = item == selectedItem
-            Box(
-                Modifier
-                    .padding(vertical = 4.dp, horizontal = 4.dp)
-                    .clip(shape)
-                    .ifThen(isSelected) {
-                        background(LocalContentColor.current / 10)
-                    }
-                    .clickable {
-                        onSelectionChange(item)
-                    }
-                    .padding(vertical = 2.dp, horizontal = 4.dp)
-            ) {
-                WithContentAlpha(
-                    if (isSelected) {
-                        1f
-                    } else {
-                        0.5f
-                    }
-                ) {
-                    render(item)
-                }
             }
         }
     }

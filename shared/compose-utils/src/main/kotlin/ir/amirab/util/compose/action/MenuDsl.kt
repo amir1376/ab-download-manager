@@ -1,6 +1,7 @@
 package ir.amirab.util.compose.action
 
 import ir.amirab.util.compose.IconSource
+import ir.amirab.util.compose.StringSource
 
 @DslMarker
 private annotation class MenuDsl
@@ -9,7 +10,7 @@ private annotation class MenuDsl
 class MenuScope {
     private val list = mutableListOf<MenuItem>()
     fun item(
-        title: String,
+        title: StringSource,
         icon: IconSource? = null,
         onClick: AnAction.() -> Unit,
     ) {
@@ -18,7 +19,7 @@ class MenuScope {
     }
 
     fun subMenu(
-        title: String,
+        title: StringSource,
         icon: IconSource? = null,
         block: MenuScope.() -> Unit,
     ) {

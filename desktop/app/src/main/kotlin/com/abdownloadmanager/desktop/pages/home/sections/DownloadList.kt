@@ -25,10 +25,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.dp
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.remainingOrNull
-import ir.amirab.downloader.monitor.speedOrNull
-import ir.amirab.downloader.monitor.statusOrFinished
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.utils.category.CategoryManager
+import com.abdownloadmanager.utils.category.rememberCategoryOf
+import ir.amirab.downloader.monitor.*
+import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.delay
 
 
@@ -63,6 +67,8 @@ fun DownloadList(
     onRequestOpenDownload: (Long) -> Unit,
     onNewSelection: (List<Long>) -> Unit,
     lastSelectedId: Long?,
+    fileIconProvider: FileIconProvider,
+    categoryManager: CategoryManager,
 ) {
     val state = rememberLazyListState()
     ShowDownloadOptions(
@@ -138,13 +144,13 @@ fun DownloadList(
                 ),
             drawOnEmpty = {
                 WithContentAlpha(0.75f) {
-                    Text("List is empty.", Modifier.align(Alignment.Center))
+                    Text(myStringResource(Res.string.list_is_empty), Modifier.align(Alignment.Center))
                 }
             },
             wrapHeader = {
                 MyStyledTableHeader(itemHorizontalPadding = itemHorizontalPadding, content = it)
             },
-            wrapItem = { item, rowContent ->
+            wrapItem = { _, item, rowContent ->
                 val isSelected = selectionList.contains(item.id)
                 var shouldWaitForSecondClick by remember {
                     mutableStateOf(false)
@@ -249,7 +255,11 @@ fun DownloadList(
                 }
 
                 DownloadListCells.Name -> {
-                    NameCell(item)
+                    NameCell(
+                        itemState = item,
+                        category = categoryManager.rememberCategoryOf(item.id),
+                        fileIconProvider = fileIconProvider,
+                    )
                 }
 
                 DownloadListCells.DateAdded -> {
@@ -279,7 +289,8 @@ fun DownloadList(
 sealed interface DownloadListCells : TableCell<IDownloadItemState> {
     data object Check : DownloadListCells,
         CustomCellRenderer {
-        override val name: String = "#"
+        override val id: String = "#"
+        override val name: StringSource = "#".asStringSource()
         override val size: CellSize = CellSize.Fixed(26.dp)
 
         @Composable
@@ -297,49 +308,64 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object Name : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.name
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.name }
 
-        override val name: String = "Name"
+        override val id: String = "Name"
+        override val name: StringSource = Res.string.name.asStringSource()
         override val size: CellSize = CellSize.Resizeable(50.dp..1000.dp, 200.dp)
     }
 
     data object Status : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.statusOrFinished().order
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy(
+            {
+                it.statusOrFinished().order
+            }, {
+                when (it) {
+                    is CompletedDownloadItemState -> 100
+                    is ProcessingDownloadItemState -> it.percent ?: 0
+                }
+            }
+        )
 
-        override val name: String = "Status"
+        override val id: String = "Status"
+        override val name: StringSource = Res.string.status.asStringSource()
         override val size: CellSize = CellSize.Resizeable(100.dp..140.dp, 120.dp)
     }
 
     data object Size : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.contentLength
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.contentLength }
 
-        override val name: String = "Size"
+        override val id: String = "Size"
+        override val name: StringSource = Res.string.size.asStringSource()
         override val size: CellSize = CellSize.Resizeable(70.dp..110.dp, 70.dp)
     }
 
     data object Speed : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.speedOrNull() ?: 0L
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.speedOrNull() ?: 0L }
 
-        override val name: String = "Speed"
+        override val id: String = "Speed"
+        override val name: StringSource = Res.string.speed.asStringSource()
         override val size: CellSize = CellSize.Resizeable(70.dp..110.dp, 80.dp)
     }
 
     data object TimeLeft : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.remainingOrNull() ?: Long.MAX_VALUE
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.remainingOrNull() ?: Long.MAX_VALUE }
 
-        override val name: String = "Time Left"
+        override val id: String = "Time Left"
+        override val name: StringSource = Res.string.time_left.asStringSource()
         override val size: CellSize = CellSize.Resizeable(70.dp..150.dp, 100.dp)
     }
 
     data object DateAdded : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun sortBy(item: IDownloadItemState): Comparable<*> = item.dateAdded
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.dateAdded }
 
-        override val name: String = "Date Added"
+        override val id: String = "Date Added"
+        override val name: StringSource = Res.string.date_added.asStringSource()
         override val size: CellSize = CellSize.Resizeable(90.dp..150.dp, 100.dp)
     }
 }

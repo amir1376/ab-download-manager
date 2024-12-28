@@ -1,4 +1,5 @@
 package ir.amirab.util.customwindow
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -6,16 +7,17 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.FrameWindowScope
 import ir.amirab.util.customwindow.util.CustomWindowDecorationAccessing
+import ir.amirab.util.desktop.GlobalDensity
 import java.awt.Rectangle
 import java.awt.Shape
 import java.awt.Window
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import kotlin.math.roundToInt
 
 object HitSpots {
     const val NO_HIT_SPOT = 0
@@ -56,7 +58,9 @@ context (FrameWindowScope)
 private fun Modifier.onPositionInRect(
     onChange: (Rectangle) -> Unit,
 ) = composed {
-    val density = LocalDensity.current
+    // we use Global for sake of awt here.
+    // because we want to calculate height and pass it to awt
+    val density = GlobalDensity
     onGloballyPositioned {
         onChange(
             it.positionInWindow().toDpRectangle(
@@ -114,8 +118,10 @@ context (FrameWindowScope)
 fun ProvideWindowSpotContainer(
     content: @Composable () -> Unit,
 ) {
-    val density = LocalDensity.current
-    val windowSize =getCurrentWindowSize()
+    // we use Global for sake of awt here.
+    // because we want to calculate height and pass it to awt
+    val density = GlobalDensity
+    val windowSize = getCurrentWindowSize()
     val containerSize = with(density) {
         LocalWindowInfo.current.containerSize.let {
             DpSize(it.width.toDp(), it.height.toDp())
@@ -142,10 +148,15 @@ fun ProvideWindowSpotContainer(
         //
         if (CustomWindowDecorationAccessing.isSupported) {
             val startOffset = (windowSize - containerSize) / 2
-            val startWidthOffsetInDp = startOffset.width.value.toInt()
-//          val startHeightInDp=delta.height.value.toInt() //it seems no need here
+            val startWidthOffsetInDp = startOffset.width.value.roundToInt()
+//            val startHeightOffsetInDp = startOffset.width.value.roundToInt() //it seems no need here
             val spots: Map<Shape, Int> = spotsWithInfo.values.associate { (rect, spot) ->
-                Rectangle(rect.x + startWidthOffsetInDp, rect.y, rect.width, rect.height) to spot
+                Rectangle(
+                    rect.x + startWidthOffsetInDp,
+                    rect.y /*+ startHeightOffsetInDp*/,
+                    rect.width,
+                    rect.height
+                ) to spot
             }
             placeHitSpots(window, spots, toolbarHeight)
         }

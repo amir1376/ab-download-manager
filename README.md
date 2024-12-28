@@ -6,9 +6,10 @@
 <h1 align="center">AB Download Manager</h1>
 <p align="center">
     <a href="https://github.com/amir1376/ab-download-manager/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/amir1376/ab-download-manager?color=greenlight&label=latest%20release"></a>
-    <a href="https://t.me/abdownloadmanager"><img alt="AB Download Manager Website" src="https://img.shields.io/badge/project-website-purple?&labelColor=gray"></a>
+    <a href="https://abdownloadmanager.com"><img alt="AB Download Manager Website" src="https://img.shields.io/badge/project-website-purple?&labelColor=gray"></a>
     <a href="https://t.me/abdownloadmanager_discussion"><img alt="Telegram Group" src="https://img.shields.io/badge/Telegram-Group-blue?logo=telegram&labelColor=gray"></a>
     <a href="https://t.me/abdownloadmanager"><img alt="Telegram Channel" src="https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram&labelColor=gray"></a>
+    <a href="https://crowdin.com/project/ab-download-manager"><img alt="Crowdin" src="https://badges.crowdin.net/ab-download-manager/localized.svg"></a>
 </p>
 
 <a href="https://abdownloadmanager.com" target="_blank">
@@ -33,31 +34,39 @@ Please visit [Project Website](https://abdownloadmanager.com) for more info
 
 ## Installation
 
+[Download Instructions](https://abdownloadmanager.com)
+
+[GitHub Releases](https://github.com/amir1376/ab-download-manager/releases/latest)
+
 in order to download and install the app
 
-- You can visit [Project Website](https://abdownloadmanager.com) for Download Instructions
-- using an installation script
-  - <details>
-    <summary>bash script (Linux)</summary>
+### installation script (Linux)
 
-    you can run this to install or update existing installed version
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh | bash
-    ```
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh)
+```
 
-    </details>
-- using a package manager
-  - <details>
-    <summary>scoop (for Windows)</summary>
+### winget or scoop (for Windows)
 
-    ```bash
-    scoop install extras/abdownloadmanager
-    ```
+**winget**:
 
-    </details>
-- Or you can find download links for your OS
-  from [GitHub Releases](https://github.com/amir1376/ab-download-manager/releases/latest)
+```bash
+winget install amir1376.ABDownloadManager
+```
 
+**scoop**:
+
+```bash
+scoop install extras/abdownloadmanager
+```
+
+## Uninstall
+
+perform below command to uninstall
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/uninstall.sh)
+```
 
 ## Screenshots
 
@@ -75,10 +84,10 @@ in order to download and install the app
 </picture>
 </div>
 
-## Acknowledgements
+## Project Status & Feedback
 
 Please keep in mind that this project is in the beginning of its journey.
-**lots of features** are on the way!. 
+**lots of features** are on the way!.
 
 **But**, in the meantime you may face **Bugs or Problems**. so.
 Please report them (by [Community chat](#community) or `GitHub Issues`) to me,And I'll do my best to fix them ASAP
@@ -141,7 +150,7 @@ In case you don't want to package it or your OS does not support those package t
 ```bash
 ./gradlew
 
-./gradle createReleaseDistributable
+./gradlew createReleaseDistributable
 ```
 It will create an output folder
 

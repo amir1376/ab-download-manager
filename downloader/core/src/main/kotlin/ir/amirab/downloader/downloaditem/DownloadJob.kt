@@ -52,15 +52,18 @@ class DownloadJob(
 
     private val _isDownloadActive = MutableStateFlow(false)
     val isDownloadActive = _isDownloadActive.asStateFlow()
+    private fun initializeDestination() {
+        val outFile = downloadManager.calculateOutputFile(downloadItem)
+        destination = SimpleDownloadDestination(
+            file = outFile,
+            diskStat = downloadManager.diskStat,
+            emptyFileCreator = downloadManager.emptyFileCreator
+        )
+    }
 
     suspend fun boot() {
         if (!booted) {
-            val outFile = downloadManager.calculateOutputFile(downloadItem)
-            destination = SimpleDownloadDestination(
-                file = outFile,
-                diskStat = downloadManager.diskStat,
-                emptyFileCreator = downloadManager.emptyFileCreator
-            )
+            initializeDestination()
             loadPartState()
             supportsConcurrent = when (getParts().size) {
                 in 2..Int.MAX_VALUE -> true
@@ -226,6 +229,13 @@ class DownloadJob(
     suspend fun changeConfig(updater: (DownloadItem) -> Unit): DownloadItem {
         val last = downloadItem.copy()
         downloadItem.apply(updater)
+        if (downloadManager.calculateOutputFile(last) != downloadManager.calculateOutputFile(downloadItem)) {
+            if (isDownloadActive.value) {
+                pause()
+            }
+            // destination should be closed for now!
+            initializeDestination()
+        }
         if (last.preferredConnectionCount != downloadItem.preferredConnectionCount) {
             onPreferredConnectionCountChanged()
         }

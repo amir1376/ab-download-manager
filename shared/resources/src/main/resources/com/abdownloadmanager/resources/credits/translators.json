@@ -1,0 +1,182 @@
+{
+  "ar": [
+    {
+      "name": "Hani Rouatbi (lamjed001)",
+      "link": "https://crowdin.com/profile/lamjed001"
+    },
+    {
+      "name": "abuda7m (abuda7mx)",
+      "link": "https://crowdin.com/profile/abuda7mx"
+    },
+    {
+      "name": "Mohamed Mahmoud (master3lwa)",
+      "link": "https://crowdin.com/profile/master3lwa"
+    },
+    {
+      "name": "amirhosseinshammari (hosseinSh1379)",
+      "link": "https://crowdin.com/profile/hosseinSh1379"
+    }
+  ],
+  "bn": [
+    {
+      "name": "Md Shariful Islam (Shariful7972)",
+      "link": "https://crowdin.com/profile/Shariful7972"
+    }
+  ],
+  "de": [
+    {
+      "name": "u!^DEV (uDEV)",
+      "link": "https://crowdin.com/profile/uDEV"
+    },
+    {
+      "name": "Lukas (lukasitaly)",
+      "link": "https://github.com/lukasitaly"
+    }
+  ],
+  "es-ES": [
+    {
+      "name": "c-sanchez",
+      "link": "https://crowdin.com/profile/c-sanchez"
+    },
+    {
+      "name": "seniordevops",
+      "link": "https://crowdin.com/profile/seniordevops"
+    }
+  ],
+  "fa": [
+    {
+      "name": "AmirHossein Abdolmotallebi (amira1376)",
+      "link": "https://crowdin.com/profile/amira1376"
+    }
+  ],
+  "fr": [
+    {
+      "name": "Gooseman (realgooseman)",
+      "link": "https://crowdin.com/profile/realgooseman"
+    },
+    {
+      "name": "Hani Rouatbi (lamjed001)",
+      "link": "https://crowdin.com/profile/lamjed001"
+    }
+  ],
+  "id": [
+    {
+      "name": "Christian Elbrianno (crse)",
+      "link": "https://crowdin.com/profile/crse"
+    },
+    {
+      "name": "kuydukuy (hilmy2nd)",
+      "link": "https://crowdin.com/profile/hilmy2nd"
+    }
+  ],
+  "it": [
+    {
+      "name": "Lukas (lukasitaly)",
+      "link": "https://github.com/lukasitaly"
+    }
+  ],
+  "pt-BR": [
+    {
+      "name": "Guilherme (whatahelll)",
+      "link": "https://crowdin.com/profile/whatahelll"
+    },
+    {
+      "name": "Davy J. (deaveipslon)",
+      "link": "https://crowdin.com/profile/deaveipslon"
+    },
+    {
+      "name": "Jean Pereira (JeanxPereira)",
+      "link": "https://crowdin.com/profile/JeanxPereira"
+    }
+  ],
+  "ru": [
+    {
+      "name": "in-ferno",
+      "link": "https://crowdin.com/profile/in-ferno"
+    }
+  ],
+  "sq": [
+    {
+      "name": "Mario Balla (marjob1234)",
+      "link": "https://crowdin.com/profile/marjob1234"
+    }
+  ],
+  "tr": [
+    {
+      "name": "𝗦𝗵𝗟𝗲𝗿𝗣 (mikropsoft)",
+      "link": "https://crowdin.com/profile/mikropsoft"
+    }
+  ],
+  "uk": [
+    {
+      "name": "YALdysse",
+      "link": "https://crowdin.com/profile/YALdysse"
+    },
+    {
+      "name": "Misha Dyshlenko (lony_official)",
+      "link": "https://crowdin.com/profile/lony_official"
+    }
+  ],
+  "vi": [
+    {
+      "name": "Zenfast",
+      "link": "https://crowdin.com/profile/Zenfast"
+    },
+    {
+      "name": "allehS (shellawa)",
+      "link": "https://crowdin.com/profile/shellawa"
+    }
+  ],
+  "zh-CN": [
+    {
+      "name": "Ipmlosion",
+      "link": "https://crowdin.com/profile/Ipmlosion"
+    },
+    {
+      "name": "Pylogmon (pylogmon)",
+      "link": "https://crowdin.com/profile/pylogmon"
+    },
+    {
+      "name": "Pesy Wu (GamerNoTitle)",
+      "link": "https://crowdin.com/profile/GamerNoTitle"
+    },
+    {
+      "name": "Sendevia",
+      "link": "https://crowdin.com/profile/Sendevia"
+    },
+    {
+      "name": "none2003",
+      "link": "https://crowdin.com/profile/none2003"
+    },
+    {
+      "name": "Aira_Nadih",
+      "link": "https://crowdin.com/profile/Aira_Nadih"
+    },
+    {
+      "name": "pompurin404",
+      "link": "https://github.com/pompurin404"
+    }
+  ],
+  "zh-TW": [
+    {
+      "name": "ɴᴇᴋᴏ (NeKoOuO)",
+      "link": "https://crowdin.com/profile/NeKoOuO"
+    },
+    {
+      "name": "notlin4",
+      "link": "https://crowdin.com/profile/notlin4"
+    },
+    {
+      "name": "塔可努丨TechNoob (TN_TechNoob)",
+      "link": "https://crowdin.com/profile/TN_TechNoob"
+    },
+    {
+      "name": "none2003",
+      "link": "https://crowdin.com/profile/none2003"
+    },
+    {
+      "name": "jrthsr700tmax",
+      "link": "https://crowdin.com/profile/jrthsr700tmax"
+    }
+  ]
+}

@@ -20,15 +20,13 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
     val queueManager by inject<QueueManager>()
     val appSettings by inject<AppRepository>()
     override suspend fun addDownload(list: List<NewDownloadInfoFromIntegration>) {
-        appComponent.openAddDownloadDialog(
-                list.map {
-                    DownloadCredentials(
-                            link = it.link,
-                            headers = it.headers,
-                            downloadPage = it.downloadPage,
-                    )
-                }
-        )
+        appComponent.externalCredentialComingIntoApp(list.map {
+            DownloadCredentials(
+                link = it.link,
+                headers = it.headers,
+                downloadPage = it.downloadPage,
+            )
+        })
     }
     override fun listQueues(): List<QueueModel> {
         return queueManager.getAll().map { downloadQueue ->
