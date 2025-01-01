@@ -462,7 +462,7 @@ private fun RenderFileTypeAndSize(
                                     iconModifier
                                 )
                                 val size = fileInfo.totalLength?.let {
-                                    convertSizeToHumanReadable(it)
+                                    convertPositiveSizeToHumanReadable(it, LocalSizeUnit.current)
                                 }.takeIf {
                                     // this is a length of a html page (error)
                                     fileInfo.isSuccessFul

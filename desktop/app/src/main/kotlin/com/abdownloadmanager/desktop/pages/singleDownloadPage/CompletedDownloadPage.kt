@@ -2,14 +2,10 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.onClick
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.ui.icon.MyIcons
@@ -17,7 +13,8 @@ import com.abdownloadmanager.desktop.ui.theme.myColors
 import com.abdownloadmanager.desktop.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
 import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.utils.convertSizeToHumanReadable
+import com.abdownloadmanager.desktop.utils.LocalSizeUnit
+import com.abdownloadmanager.desktop.utils.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.desktop.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.compose.WithContentColor
@@ -150,8 +147,10 @@ private fun RenderFileIconAndSize(
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = convertSizeToHumanReadable(itemState.contentLength)
-                .rememberString(),
+            text = convertPositiveSizeToHumanReadable(
+                itemState.contentLength,
+                LocalSizeUnit.current,
+            ).rememberString(),
         )
     }
 }

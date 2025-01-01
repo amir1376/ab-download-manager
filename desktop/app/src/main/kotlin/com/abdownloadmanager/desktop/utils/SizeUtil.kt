@@ -1,70 +1,64 @@
 package com.abdownloadmanager.desktop.utils
 
+import ir.amirab.util.datasize.CommonSizeConvertConfigs
+import ir.amirab.util.datasize.ConvertSizeConfig
+import ir.amirab.util.datasize.SizeWithUnit
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import com.abdownloadmanager.resources.Res
-import ir.amirab.downloader.utils.ByteConverter
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.datasize.*
 
-data class HumanReadableSize(
-    val value:Double,
-    val unit:Long,
-)
-
-fun baseConvertBytesToHumanReadable(size: Long):HumanReadableSize?{
-    return ByteConverter.run {
-        when (size) {
-            in Long.MIN_VALUE until 0 -> null
-
-            in 0 until K_BYTES -> {
-                HumanReadableSize(
-                    size.toDouble(),
-                    BYTES,
-                )
-            }
-
-            in K_BYTES until M_BYTES -> {
-                HumanReadableSize(
-                    byteTo(size, K_BYTES),
-                    K_BYTES,
-                )
-            }
-
-            in M_BYTES until G_BYTES -> {
-                HumanReadableSize(
-                    byteTo(size, M_BYTES),
-                    M_BYTES
-                )
-            }
-
-            in G_BYTES..Long.MAX_VALUE -> {
-                HumanReadableSize(
-                    byteTo(size, G_BYTES),
-                    G_BYTES,
-                )
-            }
-
-            else -> error("should not happened! we covered all range but not this ? $size")
-        }
-    }
+val LocalSpeedUnit = compositionLocalOf {
+    CommonSizeConvertConfigs.BinaryBytes
 }
-fun convertBytesToHumanReadable(size: Long): String? {
-    ByteConverter.run {
-        return baseConvertBytesToHumanReadable(size)?.let {
-            "${prettify(it.value)} ${unitPrettify(it.unit)}"
-        }
-    }
+val LocalSizeUnit = compositionLocalOf {
+    CommonSizeConvertConfigs.BinaryBytes
 }
 
-fun convertSizeToHumanReadable(size: Long): StringSource {
-    return convertBytesToHumanReadable(size)?.asStringSource()
+@Composable
+fun ProvideSizeAndSpeedUnit(
+    sizeUnitConfig: ConvertSizeConfig,
+    speedUnitConfig: ConvertSizeConfig,
+    content: @Composable () -> Unit,
+) {
+    CompositionLocalProvider(
+        LocalSpeedUnit provides speedUnitConfig,
+        LocalSizeUnit provides sizeUnitConfig,
+        content = content
+    )
+}
+
+
+// they are used for ui
+// size == -1 means that its unknown
+
+fun convertPositiveBytesToSizeUnit(
+    size: Long,
+    target: ConvertSizeConfig,
+): SizeWithUnit? {
+    if (size < 0) return null
+    return SizeConverter.bytesToSize(
+        bytes = size,
+        target = target,
+    )
+}
+
+fun convertPositiveBytesToHumanReadable(size: Long, target: ConvertSizeConfig): String? {
+    return convertPositiveBytesToSizeUnit(size, target)
+        ?.let { "${it.formatedValue()} ${it.unit}" }
+}
+
+fun convertPositiveSizeToHumanReadable(size: Long, target: ConvertSizeConfig): StringSource {
+    return convertPositiveBytesToHumanReadable(size, target)
+        ?.asStringSource()
         ?: Res.string.unknown.asStringSource()
 }
 
-fun convertSpeedToHumanReadable(size: Long, perUnit: String="s"): String {
-    return convertBytesToHumanReadable(size)?.let {
-        "$it/$perUnit"
-    } ?: "-"
+fun convertPositiveSpeedToHumanReadable(size: Long, target: ConvertSizeConfig, perUnit: String = "s"): String {
+    return convertPositiveBytesToHumanReadable(size, target)
+        ?.let { "$it/$perUnit" }
+        ?: "-"
 }
-//fun main() {
-//    println(convertBytesToHumanReadable(2048000))
-//}

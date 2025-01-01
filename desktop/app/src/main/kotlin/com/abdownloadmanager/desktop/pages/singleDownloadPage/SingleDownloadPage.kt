@@ -342,13 +342,18 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                         }
 
                         PartInfoCells.Downloaded -> {
-                            SimpleCellText(convertSizeToHumanReadable(it.value.howMuchProceed).rememberString())
+                            SimpleCellText(
+                                convertPositiveSizeToHumanReadable(
+                                    it.value.howMuchProceed,
+                                    LocalSizeUnit.current
+                                ).rememberString()
+                            )
                         }
 
                         PartInfoCells.Total -> {
                             SimpleCellText(
                                 it.value.length?.let { length ->
-                                    convertSizeToHumanReadable(length).rememberString()
+                                    convertPositiveSizeToHumanReadable(length, LocalSizeUnit.current).rememberString()
                                 } ?: myStringResource(Res.string.unknown),
                             )
                         }

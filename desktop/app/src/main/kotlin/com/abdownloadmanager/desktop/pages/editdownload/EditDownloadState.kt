@@ -3,9 +3,10 @@ package com.abdownloadmanager.desktop.pages.editdownload
 import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigurable
+import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.FileNameValidator
 import com.abdownloadmanager.desktop.utils.LinkChecker
-import com.abdownloadmanager.desktop.utils.convertSpeedToHumanReadable
+import com.abdownloadmanager.desktop.utils.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.utils.isValidUrl
 import ir.amirab.downloader.connection.DownloaderClient
@@ -16,7 +17,6 @@ import ir.amirab.downloader.downloaditem.withCredentials
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
-import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import ir.amirab.util.flow.onEachLatest
@@ -126,6 +126,7 @@ class EditDownloadState(
     val currentDownloadItem: MutableStateFlow<DownloadItem>,
     val editedDownloadItem: MutableStateFlow<DownloadItem>,
     val downloaderClient: DownloaderClient,
+    val appRepository: AppRepository,
     conflictDetector: DownloadConflictDetector,
     scope: CoroutineScope,
 ) {
@@ -165,7 +166,7 @@ class EditDownloadState(
             ),
             describe = {
                 if (it == 0L) Res.string.unlimited.asStringSource()
-                else convertSpeedToHumanReadable(it).asStringSource()
+                else convertPositiveSpeedToHumanReadable(it, appRepository.speedUnit.value).asStringSource()
             }
         ),
         IntConfigurable(

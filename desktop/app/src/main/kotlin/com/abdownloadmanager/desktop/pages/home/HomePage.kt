@@ -26,7 +26,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ir.amirab.downloader.utils.ByteConverter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import com.abdownloadmanager.desktop.ui.widget.ActionButton
@@ -735,14 +734,10 @@ private fun Footer(component: HomeComponent) {
         val activeCount by component.activeDownloadCountFlow.collectAsState()
         FooterItem(MyIcons.activeCount, activeCount.toString(), "")
         val size by component.globalSpeedFlow.collectAsState(0)
-        val speed = baseConvertBytesToHumanReadable(size)
+        val speed = convertPositiveBytesToSizeUnit(size, LocalSpeedUnit.current)
         if (speed != null) {
-            val speedText = ByteConverter.prettify(speed.value)
-            val unitText = ByteConverter.unitPrettify(speed.unit)
-                ?.let {
-                    "$it/s"
-                }
-                .orEmpty()
+            val speedText = speed.formatedValue()
+            val unitText = speed.unit.toString() + "/s"
             FooterItem(MyIcons.speed, speedText, unitText)
         }
     }
