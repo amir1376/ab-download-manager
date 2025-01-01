@@ -10,7 +10,17 @@ I welcome the following types of contributions:
 
 - **Feature Requests**: Have an idea for a new feature? Let me know by opening an issue or starting a discussion.
 
+- **Translations**: You can translate AB Download Manager into other languages on Crowdin. See the Translations section
+  below for more information.
+
 - **Pull Requests**: If you’d like to contribute code, feel free to submit a pull request. Just make sure to read the guidelines below before you start.
+
+## Translations
+
+If you’d like to help translate AB Download Manager into another language, you can do so on Crowdin. Here’s how:
+
+- You can find the project here: [AB Download Manager on Crowdin](https://crowdin.com/project/ab-download-manager)
+- Please DO NOT submit translations via pull requests.
 
 ## Pull Requests
 
