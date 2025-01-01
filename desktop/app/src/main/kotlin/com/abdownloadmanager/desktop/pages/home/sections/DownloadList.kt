@@ -169,7 +169,7 @@ fun DownloadList(
                     )
                 ) {
                     WithContentAlpha(1f) {
-                        val shape = RoundedCornerShape(12.dp)
+                        val shape = RoundedCornerShape(6.dp)
                         Box(
                             Modifier
                                 .widthIn(min = getTableSize().visibleWidth)
@@ -228,7 +228,7 @@ fun DownloadList(
                                                 myColors.selectionGradient(0.10f, 0.05f, selectionColor),
                                                 shape
                                             )
-                                            .background(myColors.selectionGradient(0.15f, 0f, selectionColor))
+                                            .background(myColors.selectionGradient(0.15f, 0.03f, selectionColor))
                                     } else {
                                         it.border(1.dp, Color.Transparent)
                                     }
