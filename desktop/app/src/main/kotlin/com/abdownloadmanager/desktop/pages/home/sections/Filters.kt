@@ -33,7 +33,7 @@ fun SearchBox(
     placeholder: String = myStringResource(Res.string.search_in_the_list),
     modifier: Modifier,
 ) {
-    val shape = RoundedCornerShape(12.dp)
+    val shape = RoundedCornerShape(6.dp)
     val textSize = myTextSizes.base
     MyTextField(
         text = text,

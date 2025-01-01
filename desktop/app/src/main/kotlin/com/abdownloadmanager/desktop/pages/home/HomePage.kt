@@ -245,7 +245,7 @@ fun HomePage(component: HomeComponent) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Spacer(Modifier.size(8.dp))
+                        Spacer(Modifier.size(4.dp))
                         AddUrlButton {
                             component.requestAddNewDownload()
                         }

@@ -22,7 +22,7 @@ fun AddUrlButton(
     modifier: Modifier=Modifier,
     onClick:()->Unit
 ) {
-    val shape = RoundedCornerShape(12.dp)
+    val shape = RoundedCornerShape(6.dp)
     val addUrlIcon = MyIcons.link
     val downloadIcon = MyIcons.download
     Row(
