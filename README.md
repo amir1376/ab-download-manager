@@ -169,6 +169,15 @@ The output will be created in
 > **Note**. This project is compiled and published by GitHub actions [here](./.github/workflows/publish.yml), so if you
 > faced any problem you can check that too
 
+## Translations
+
+If you’d like to help translate AB Download Manager into another language, or improve existing translations, you can do
+so on Crowdin. Here’s how:
+
+- Visit the project in [Crowdin](https://crowdin.com/project/ab-download-manager)
+- Please DO NOT submit translations via pull requests.
+- If you want to add a new language, please see [here](https://github.com/amir1376/ab-download-manager/issues/144)
+
 ## Contribution
 
 Contributions to this project are very welcome!

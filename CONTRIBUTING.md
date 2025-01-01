@@ -17,10 +17,12 @@ I welcome the following types of contributions:
 
 ## Translations
 
-If you’d like to help translate AB Download Manager into another language, you can do so on Crowdin. Here’s how:
+If you’d like to help translate AB Download Manager into another language, or improve existing translations, you can do
+so on Crowdin. Here’s how:
 
-- You can find the project here: [AB Download Manager on Crowdin](https://crowdin.com/project/ab-download-manager)
+- Visit the project in [Crowdin](https://crowdin.com/project/ab-download-manager)
 - Please DO NOT submit translations via pull requests.
+- If you want to add a new language, please see [here](https://github.com/amir1376/ab-download-manager/issues/144)
 
 ## Pull Requests
 
