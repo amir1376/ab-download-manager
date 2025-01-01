@@ -1,5 +1,6 @@
 package com.abdownloadmanager.desktop.pages.editdownload
 
+import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
 import com.abdownloadmanager.desktop.utils.mvi.supportEffects
@@ -30,6 +31,7 @@ class EditDownloadComponent(
     private val downloaderClient: DownloaderClient by inject()
     val iconProvider: FileIconProvider by inject()
     val downloadSystem: DownloadSystem by inject()
+    private val appRepository: AppRepository by inject()
     val editDownloadUiChecker = MutableStateFlow(null as EditDownloadState?)
 
     init {
@@ -73,7 +75,8 @@ class EditDownloadComponent(
                         .contains(editedDownloadFile)
                 }
             },
-            scope,
+            scope = scope,
+            appRepository = appRepository,
         )
         editDownloadUiChecker.value = editDownloadState
         pendingCredential?.let { credentials ->

@@ -296,7 +296,7 @@ private fun SizeCell(
     val length by downloadChecker.length.collectAsState()
     CellText(
         length?.let {
-            convertSizeToHumanReadable(it).rememberString()
+            convertPositiveSizeToHumanReadable(it, LocalSizeUnit.current).rememberString()
         } ?: ""
     )
 }

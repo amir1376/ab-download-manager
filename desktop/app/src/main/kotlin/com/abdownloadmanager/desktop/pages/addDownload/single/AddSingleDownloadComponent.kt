@@ -257,7 +257,9 @@ class AddSingleDownloadComponent(
             backedBy = speedLimit,
             describe = {
                 if (it == 0L) Res.string.unlimited.asStringSource()
-                else convertSpeedToHumanReadable(it).asStringSource()
+                else convertPositiveSpeedToHumanReadable(
+                    it, appSettings.speedUnit.value
+                ).asStringSource()
             }
         ),
         IntConfigurable(

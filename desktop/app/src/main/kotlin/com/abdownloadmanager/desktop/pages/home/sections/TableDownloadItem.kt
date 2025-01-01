@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.abdownloadmanager.utils.FileIconProvider
 import com.abdownloadmanager.utils.category.Category
 import ir.amirab.util.compose.resources.myStringResource
@@ -175,7 +174,10 @@ fun SpeedCell(
     (itemState as? ProcessingDownloadItemState)?.speed?.let { remaining ->
         if (itemState.status == DownloadJobStatus.Downloading) {
             Text(
-                text = convertSpeedToHumanReadable(remaining),
+                text = convertPositiveSpeedToHumanReadable(
+                    remaining,
+                    LocalSpeedUnit.current,
+                ),
                 maxLines = 1,
                 fontSize = myTextSizes.base,
                 overflow = TextOverflow.Ellipsis,
@@ -190,7 +192,10 @@ fun SizeCell(
 ) {
     item.contentLength.let {
         Text(
-            convertSizeToHumanReadable(it).rememberString(),
+            convertPositiveSizeToHumanReadable(
+                it,
+                LocalSizeUnit.current
+            ).rememberString(),
             maxLines = 1,
             fontSize = myTextSizes.base,
             overflow = TextOverflow.Ellipsis,

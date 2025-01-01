@@ -81,7 +81,7 @@ class AppComponent(
     DownloadItemOpener,
     ContainsEffects<AppEffects> by supportEffects(),
     KoinComponent {
-    private val appRepository: AppRepository by inject()
+    val appRepository: AppRepository by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val integration: Integration by inject()
 
