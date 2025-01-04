@@ -30,38 +30,33 @@ paths:
                   type: string
                   description: Optional download page URL
       responses:
-        '200':
-          description: Successfully added the download source
+        "200":
+          description: Successfully added the download
           content:
-            application/json:
+            plain/text:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    description: Whether the operation was successful
+                type: string
+                description: OK on success
+
   /queues:
     get:
       summary: Get list of download queues
       responses:
-        '200':
+        "200":
           description: List of download queues
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  body:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                          description: The unique ID of the queue
-                        name:
-                          type: string
-                          description: The name of the queue
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: The unique ID of the queue
+                    name:
+                      type: string
+                      description: The name of the queue
   /start-headless-download:
     post:
       summary: Add a new download task
@@ -96,13 +91,10 @@ paths:
                   type: integer
                   description: Optional queue ID to associate the task with
       responses:
-        '200':
+        "200":
           description: Successfully added the download task
           content:
-            application/json:
+            plain/text:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    description: Whether the operation was successful
+                type: string
+                description: OK on success
