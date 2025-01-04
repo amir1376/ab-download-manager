@@ -6,7 +6,7 @@ import com.abdownloadmanager.utils.DownloadSystem
 import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.integration.NewDownloadInfoFromIntegration
 import com.abdownloadmanager.integration.NewDownloadTask
-import com.abdownloadmanager.integration.QueueModel
+import com.abdownloadmanager.integration.ApiQueueModel
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.queue.QueueManager
@@ -28,10 +28,10 @@ class IntegrationHandlerImp: IntegrationHandler,KoinComponent{
             )
         })
     }
-    override fun listQueues(): List<QueueModel> {
+    override fun listQueues(): List<ApiQueueModel> {
         return queueManager.getAll().map { downloadQueue ->
             val queueModel = downloadQueue.getQueueModel()
-            QueueModel(id = queueModel.id, name = queueModel.name)
+            ApiQueueModel(id = queueModel.id, name = queueModel.name)
         }
     }
     override suspend fun addDownloadTask(task: NewDownloadTask) {

@@ -118,11 +118,11 @@ class Integration(
             get("/queues") {
                 runBlocking {
                     val queues = integrationHandler.listQueues()
-                    val jsonResponse = customJson.encodeToString(ListSerializer(QueueModel.serializer()), queues)
+                    val jsonResponse = customJson.encodeToString(ListSerializer(ApiQueueModel.serializer()), queues)
                     MyResponse.Text(jsonResponse)
                 }
             }
-            post("/add-download-task") {
+            post("/start-headless-download") {
                 runBlocking {
                     val itemsToAdd = kotlin.runCatching {
                         val message = it.getBody().orEmpty()
