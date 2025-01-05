@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: Download Service API
+  version: 1.0.0
+  description: API for managing download tasks and queues.
+servers:
+  - url: http://localhost:15151
+    description: Default server running on port 15151
+
+paths:
+  /add:
+    post:
+      summary: Add a new download source
+      requestBody:
+        description: Data for adding a download source
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                link:
+                  type: string
+                  description: The link to the download source
+                headers:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Optional headers for the request
+                downloadPage:
+                  type: string
+                  description: Optional download page URL
+      responses:
+        "200":
+          description: Successfully added the download
+          content:
+            plain/text:
+              schema:
+                type: string
+                description: OK on success
+
+  /queues:
+    get:
+      summary: Get list of download queues
+      responses:
+        "200":
+          description: List of download queues
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: The unique ID of the queue
+                    name:
+                      type: string
+                      description: The name of the queue
+  /start-headless-download:
+    post:
+      summary: Add a new download task
+      requestBody:
+        description: Data for adding a download task
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                downloadSource:
+                  type: object
+                  properties:
+                    link:
+                      type: string
+                      description: The link to the download source
+                    headers:
+                      type: object
+                      additionalProperties:
+                        type: string
+                      description: Optional headers for the request
+                    downloadPage:
+                      type: string
+                      description: Optional download page URL
+                folder:
+                  type: string
+                  description: Optional folder to save the download (Unix style path)
+                name:
+                  type: string
+                  description: Optional name for the download task
+                queueId:
+                  type: integer
+                  description: Optional queue ID to associate the task with
+      responses:
+        "200":
+          description: Successfully added the download task
+          content:
+            plain/text:
+              schema:
+                type: string
+                description: OK on success

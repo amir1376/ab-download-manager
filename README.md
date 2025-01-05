@@ -125,6 +125,7 @@ follow these steps.
 
 1. Clone the project
 2. Install the [JBR](https://github.com/JetBrains/JetBrainsRuntime/releases)
+   1. If you extract it to your home directory and don't want to modify global `JAVA_HOME` environment variable you can set `JAVA_HOME` to the extracted directory e.g. `export JAVA_HOME=~/jbrsdk_jcef-21.0.4-linux-x64-b620.4` for linux or `$env:JAVA_HOME="C:\path\to\jbr"` on Windows
 3. cd into the project, open your terminal and execute the following commands
 4. select which way you want to compile the app
 <details>
