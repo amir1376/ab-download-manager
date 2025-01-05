@@ -65,11 +65,10 @@ dependencies {
 
     implementation(project(":desktop:tray:common"))
     if (Platform.getCurrentPlatform() == Platform.Desktop.Windows) {
-        implementation(project(":desktop:tray:windows"))
+        implementation(project(":desktop:tray:linux"))
+//        implementation(project(":desktop:tray:windows"))
     } else {
-        // TODO use external library for linux and remove this line
-        implementation(project(":desktop:tray:windows"))
-//        implementation(project(":desktop:tray:linux"))
+        implementation(project(":desktop:tray:linux"))
     }
 
     implementation(project(":shared:app"))
