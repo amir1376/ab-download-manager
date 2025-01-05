@@ -6,16 +6,16 @@ import com.abdownloadmanager.desktop.pages.home.sections.DownloadListCells
 import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
 import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadStatusCategoryFilter
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.widget.NotificationType
-import com.abdownloadmanager.desktop.ui.widget.customtable.Sort
-import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.ui.widget.NotificationType
+import com.abdownloadmanager.shared.ui.widget.customtable.Sort
+import com.abdownloadmanager.shared.ui.widget.customtable.TableState
 import com.abdownloadmanager.desktop.utils.*
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.action.simpleAction
-import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
-import com.abdownloadmanager.desktop.utils.mvi.supportEffects
+import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
+import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -23,14 +23,13 @@ import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
-import com.abdownloadmanager.desktop.ui.widget.MessageDialogType
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.DownloadSystem
-import com.abdownloadmanager.utils.FileIconProvider
-import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.CategoryItemWithId
-import com.abdownloadmanager.utils.category.CategoryManager
-import com.abdownloadmanager.utils.category.DefaultCategories
+import com.abdownloadmanager.shared.utils.*
+import com.abdownloadmanager.shared.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.category.Category
+import com.abdownloadmanager.shared.utils.category.CategoryItemWithId
+import com.abdownloadmanager.shared.utils.category.CategoryManager
+import com.abdownloadmanager.shared.utils.category.DefaultCategories
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
@@ -40,7 +39,7 @@ import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
-import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.util.AppVersionTracker
@@ -956,7 +955,7 @@ class HomeComponent(
         categoryActions.value = null
     }
 
-    override val shortcutManager = ShortcutManager().apply {
+    override val shortcutManager = DesktopShortcutManager().apply {
         "ctrl N" to newDownloadAction
         "ctrl V" to newDownloadFromClipboardAction
         "ctrl C" to downloadActions.copyDownloadLinkAction

@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import com.abdownloadmanager.desktop.DownloadDialogManager
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
-import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.WindowIcon
+import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.mvi.HandleEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
@@ -14,7 +14,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState

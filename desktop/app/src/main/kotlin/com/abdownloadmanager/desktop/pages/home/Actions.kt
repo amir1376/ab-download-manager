@@ -1,29 +1,23 @@
 package com.abdownloadmanager.desktop.pages.home
 
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.util.ifThen
-import com.abdownloadmanager.desktop.ui.widget.menu.MyDropDown
-import com.abdownloadmanager.desktop.ui.widget.menu.SubMenu
-import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.utils.compose.WithContentColor
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import ir.amirab.util.ifThen
+import com.abdownloadmanager.shared.ui.widget.menu.MyDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.SubMenu
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import ir.amirab.util.compose.action.MenuItem
-import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.shared.utils.div
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.utils.compose.LocalTextStyle
-import com.abdownloadmanager.utils.compose.widget.ScrollFade
-import org.http4k.routing.inspect.BackgroundColour
 
 @Composable
 fun Actions(list: List<MenuItem>) {

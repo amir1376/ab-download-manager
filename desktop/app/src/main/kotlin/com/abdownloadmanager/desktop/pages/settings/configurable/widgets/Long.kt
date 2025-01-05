@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.LongConfigurable
-import com.abdownloadmanager.desktop.ui.widget.LongTextField
+import com.abdownloadmanager.shared.ui.widget.LongTextField
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions

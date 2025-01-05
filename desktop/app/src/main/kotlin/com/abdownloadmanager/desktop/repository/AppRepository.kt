@@ -3,13 +3,13 @@ package com.abdownloadmanager.desktop.repository
 import ir.amirab.util.datasize.CommonSizeConvertConfigs
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.utils.AutoStartManager
-import com.abdownloadmanager.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.DownloadSystem
 import ir.amirab.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
-import com.abdownloadmanager.utils.autoremove.RemovedDownloadsFromDiskTracker
-import com.abdownloadmanager.utils.category.CategoryManager
-import com.abdownloadmanager.utils.proxy.ProxyManager
+import com.abdownloadmanager.shared.utils.autoremove.RemovedDownloadsFromDiskTracker
+import com.abdownloadmanager.shared.utils.category.CategoryManager
+import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.util.datasize.BaseSize

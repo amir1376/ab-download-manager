@@ -8,8 +8,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable

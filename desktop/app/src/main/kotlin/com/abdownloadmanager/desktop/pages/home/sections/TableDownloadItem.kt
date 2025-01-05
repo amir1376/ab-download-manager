@@ -1,12 +1,9 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
-import com.abdownloadmanager.desktop.pages.home.sections.SortIndicatorMode.*
-import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.*
-import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.shared.utils.ui.LocalContentColor
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -19,9 +16,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.ui.widget.CheckBox
+import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.FileIconProvider
-import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.shared.utils.*
+import com.abdownloadmanager.shared.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.category.Category
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
@@ -46,34 +46,6 @@ data class DownloadItemProperties(
 @Composable
 private fun isSelected(): Boolean {
     return LocalDownloadItemProperties.current.isSelected
-}
-
-enum class SortIndicatorMode {
-    None,
-    Ascending,
-    Descending,
-}
-
-fun SortIndicatorMode.isAscending(): Boolean {
-    return when (this) {
-        Ascending -> true
-        else -> false
-    }
-}
-
-fun SortIndicatorMode.isDescending(): Boolean {
-    return when (this) {
-        Descending -> true
-        else -> false
-    }
-}
-
-fun SortIndicatorMode.next(): SortIndicatorMode {
-    return when (this) {
-        None -> Ascending
-        Ascending -> Descending
-        Descending -> Ascending
-    }
 }
 
 

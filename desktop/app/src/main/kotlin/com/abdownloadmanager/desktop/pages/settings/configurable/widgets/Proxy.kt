@@ -15,17 +15,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.abdownloadmanager.desktop.pages.settings.configurable.ProxyConfigurable
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.*
-import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.ui.widget.*
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.utils.proxy.ProxyMode
-import com.abdownloadmanager.utils.proxy.ProxyRules
-import com.abdownloadmanager.utils.proxy.ProxyWithRules
+import com.abdownloadmanager.shared.utils.ui.LocalContentColor
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.proxy.ProxyMode
+import com.abdownloadmanager.shared.utils.proxy.ProxyRules
+import com.abdownloadmanager.shared.utils.proxy.ProxyWithRules
 import ir.amirab.downloader.connection.proxy.Proxy
 import ir.amirab.downloader.connection.proxy.ProxyType
 import ir.amirab.util.compose.resources.myStringResource
@@ -303,7 +303,7 @@ private fun ProxyEditDialog(
                                 Row {
                                     Text(myStringResource(Res.string.proxy_do_not_use_proxy_for))
                                     Spacer(Modifier.width(8.dp))
-                                    Help(
+                                    com.abdownloadmanager.shared.ui.widget.Help(
                                         myStringResource(Res.string.proxy_do_not_use_proxy_for_description)
                                     )
                                 }

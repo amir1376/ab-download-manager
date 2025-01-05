@@ -13,7 +13,8 @@ import com.abdownloadmanager.desktop.pages.updater.UpdateDownloaderViaDownloadSy
 import ir.amirab.downloader.queue.QueueManager
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.*
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.theme.ISystemThemeDetector
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
@@ -42,18 +43,18 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import com.abdownloadmanager.updatechecker.GithubUpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateChecker
-import com.abdownloadmanager.utils.DownloadFoldersRegistry
-import com.abdownloadmanager.utils.DownloadSystem
-import com.abdownloadmanager.utils.FileIconProvider
-import com.abdownloadmanager.utils.FileIconProviderUsingCategoryIcons
+import com.abdownloadmanager.shared.utils.DownloadFoldersRegistry
+import com.abdownloadmanager.shared.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.FileIconProviderUsingCategoryIcons
 import ir.amirab.util.AppVersionTracker
-import com.abdownloadmanager.utils.appinfo.PreviousVersion
-import com.abdownloadmanager.utils.autoremove.RemovedDownloadsFromDiskTracker
-import com.abdownloadmanager.utils.category.*
-import com.abdownloadmanager.utils.compose.IMyIcons
-import com.abdownloadmanager.utils.proxy.IProxyStorage
-import com.abdownloadmanager.utils.proxy.ProxyData
-import com.abdownloadmanager.utils.proxy.ProxyManager
+import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
+import com.abdownloadmanager.shared.utils.autoremove.RemovedDownloadsFromDiskTracker
+import com.abdownloadmanager.shared.utils.category.*
+import com.abdownloadmanager.shared.utils.ui.IMyIcons
+import com.abdownloadmanager.shared.utils.proxy.IProxyStorage
+import com.abdownloadmanager.shared.utils.proxy.ProxyData
+import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.utils.EmptyFileCreator
@@ -91,6 +92,9 @@ val downloaderModule = module {
     }
     single<IDiskStat> {
         DesktopDiskStat()
+    }
+    single<ISystemThemeDetector> {
+        DesktopSystemThemeDetector()
     }
     single {
         QueueManager(get(), get())
@@ -265,7 +269,7 @@ val appModule = module {
         AppRepository()
     }
     single {
-        ThemeManager(get(), get())
+        ThemeManager(get(), get(), get())
     }
     single {
         LanguageManager(get())

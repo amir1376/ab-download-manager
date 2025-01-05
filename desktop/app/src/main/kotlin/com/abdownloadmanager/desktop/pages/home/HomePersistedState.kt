@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.pages.home
 
-import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
+import com.abdownloadmanager.shared.ui.widget.customtable.TableState
 import arrow.optics.Lens
 import ir.amirab.util.config.floatKeyOf
 import ir.amirab.util.config.getDecoded

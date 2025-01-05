@@ -1,13 +1,11 @@
 package com.abdownloadmanager.desktop.storage
 
-import com.abdownloadmanager.desktop.utils.*
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
-import com.abdownloadmanager.desktop.App
+import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.*
-import ir.amirab.util.datasize.BaseSize
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import java.io.File

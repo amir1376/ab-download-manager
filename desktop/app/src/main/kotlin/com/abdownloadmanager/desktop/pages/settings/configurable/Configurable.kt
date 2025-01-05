@@ -1,16 +1,11 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable
 
-import androidx.compose.runtime.Stable
-import androidx.compose.ui.graphics.Color
 import com.abdownloadmanager.desktop.pages.settings.ThemeInfo
-import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable.RenderMode
-import com.abdownloadmanager.desktop.ui.theme.MyColors
-import com.abdownloadmanager.utils.proxy.ProxyData
+import com.abdownloadmanager.shared.utils.proxy.ProxyData
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 

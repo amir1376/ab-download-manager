@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable.RenderMode.*
-import com.abdownloadmanager.desktop.ui.widget.IntTextField
+import com.abdownloadmanager.shared.ui.widget.IntTextField
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions

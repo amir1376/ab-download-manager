@@ -1,8 +1,8 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable
-import com.abdownloadmanager.desktop.ui.widget.CheckBox
-import com.abdownloadmanager.desktop.ui.widget.Switch
+import com.abdownloadmanager.shared.ui.widget.CheckBox
+import com.abdownloadmanager.shared.ui.widget.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier

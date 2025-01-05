@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.integration
 
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.repository.AppRepository
-import com.abdownloadmanager.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.integration.NewDownloadInfoFromIntegration
 import com.abdownloadmanager.integration.NewDownloadTask

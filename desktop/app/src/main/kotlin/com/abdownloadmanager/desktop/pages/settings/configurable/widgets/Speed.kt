@@ -1,16 +1,16 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
-import com.abdownloadmanager.desktop.ui.widget.CheckBox
-import com.abdownloadmanager.desktop.ui.widget.DoubleTextField
+import com.abdownloadmanager.shared.ui.widget.CheckBox
+import com.abdownloadmanager.shared.ui.widget.DoubleTextField
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.utils.LocalSpeedUnit
+import com.abdownloadmanager.shared.utils.LocalSpeedUnit
 import ir.amirab.util.datasize.*
 
 @Composable

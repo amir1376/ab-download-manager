@@ -4,18 +4,18 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.background
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.ExpandableItem
-import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.ui.widget.ExpandableItem
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,12 +25,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
-import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.rememberIconPainter
+import com.abdownloadmanager.shared.utils.category.Category
+import com.abdownloadmanager.shared.utils.category.rememberIconPainter
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
@@ -212,7 +211,8 @@ fun StatusFilterItem(
                             fontSize = myTextSizes.lg,
                             maxLines = 1,
                         )
-                        MyIcon(MyIcons.up, null, Modifier
+                        MyIcon(
+                            MyIcons.up, null, Modifier
                             .fillMaxHeight().wrapContentHeight()
                             .clip(CircleShape)
                             .size(24.dp)
