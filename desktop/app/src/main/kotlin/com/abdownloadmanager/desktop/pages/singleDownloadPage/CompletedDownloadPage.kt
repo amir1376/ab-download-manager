@@ -8,17 +8,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.ActionButton
-import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.utils.LocalSizeUnit
-import com.abdownloadmanager.desktop.utils.convertPositiveSizeToHumanReadable
-import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.ui.widget.ActionButton
+import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.utils.LocalSizeUnit
+import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
+import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.compose.WithContentColor
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.WithContentColor
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.util.compose.resources.myStringResource
 

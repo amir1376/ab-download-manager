@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.pages.addDownload.multiple
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.onClick
@@ -8,17 +7,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.CategoryAddButton
 import com.abdownloadmanager.desktop.pages.addDownload.shared.CategorySelect
 import com.abdownloadmanager.desktop.pages.addDownload.shared.LocationTextField
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ShowAddToQueueDialog
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.*
-import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.shared.utils.category.Category
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable

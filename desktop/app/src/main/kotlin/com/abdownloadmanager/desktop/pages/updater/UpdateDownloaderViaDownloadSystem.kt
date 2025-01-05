@@ -3,7 +3,7 @@ package com.abdownloadmanager.desktop.pages.updater
 import com.abdownloadmanager.UpdateDownloadLocationProvider
 import com.abdownloadmanager.updateapplier.UpdateDownloader
 import com.abdownloadmanager.updatechecker.UpdateSource
-import com.abdownloadmanager.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.DownloadSystem
 import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.utils.OnDuplicateStrategy

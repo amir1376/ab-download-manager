@@ -4,11 +4,11 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigurable
 import com.abdownloadmanager.desktop.repository.AppRepository
-import com.abdownloadmanager.desktop.utils.FileNameValidator
-import com.abdownloadmanager.desktop.utils.LinkChecker
-import com.abdownloadmanager.desktop.utils.convertPositiveSpeedToHumanReadable
+import com.abdownloadmanager.shared.utils.FileNameValidator
+import com.abdownloadmanager.shared.utils.LinkChecker
+import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.isValidUrl
+import com.abdownloadmanager.shared.utils.isValidUrl
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem

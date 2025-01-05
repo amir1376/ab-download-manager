@@ -11,14 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.*
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.util.ifThen
-import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.utils.div
-import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.rememberIconPainter
-import com.abdownloadmanager.utils.compose.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import ir.amirab.util.ifThen
+import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.category.Category
+import com.abdownloadmanager.shared.utils.category.rememberIconPainter
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 
 @Composable
 fun CategorySelect(

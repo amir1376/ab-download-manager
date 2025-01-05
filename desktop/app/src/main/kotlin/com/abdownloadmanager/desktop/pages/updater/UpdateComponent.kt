@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.updater
 
 import com.abdownloadmanager.desktop.utils.AppVersion
-import com.abdownloadmanager.desktop.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.BaseComponent
 import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.NotificationSender
 import com.abdownloadmanager.desktop.ui.widget.MessageDialogType
@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.abdownloadmanager.updatechecker.UpdateInfo
 import ir.amirab.util.compose.asStringSource
 
 class UpdateComponent(

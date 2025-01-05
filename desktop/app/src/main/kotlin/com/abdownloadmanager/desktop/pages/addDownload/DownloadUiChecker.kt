@@ -1,7 +1,8 @@
 package com.abdownloadmanager.desktop.pages.addDownload
 
-import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.AddDownloadChecker
+import com.abdownloadmanager.shared.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.LinkChecker
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.util.flow.onEachLatest

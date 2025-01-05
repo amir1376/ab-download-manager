@@ -6,13 +6,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.desktop.actions.LocalShortCutManager
-import com.abdownloadmanager.desktop.actions.handle
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.customwindow.rememberWindowController
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.LocalShortCutManager
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.AppInfo
-import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
+import com.abdownloadmanager.shared.utils.mvi.HandleEffects
 import java.awt.Dimension
 
 @Composable

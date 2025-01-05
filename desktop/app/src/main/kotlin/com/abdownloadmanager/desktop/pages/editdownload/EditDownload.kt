@@ -2,13 +2,12 @@ package com.abdownloadmanager.desktop.pages.editdownload
 
 import androidx.compose.runtime.Composable
 
-import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.*
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
@@ -30,15 +29,19 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
-import com.abdownloadmanager.desktop.ui.util.ifThen
-import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import ir.amirab.util.ifThen
+import com.abdownloadmanager.shared.utils.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.FileIconProvider
-import com.abdownloadmanager.utils.compose.WithContentColor
+import com.abdownloadmanager.shared.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.LocalSizeUnit
+import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
+import com.abdownloadmanager.shared.utils.ui.WithContentColor
+import com.abdownloadmanager.shared.utils.div
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.asStringSource

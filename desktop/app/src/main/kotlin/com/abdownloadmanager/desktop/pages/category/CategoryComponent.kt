@@ -1,10 +1,10 @@
 package com.abdownloadmanager.desktop.pages.category
 
 import com.abdownloadmanager.desktop.repository.AppRepository
-import com.abdownloadmanager.desktop.utils.BaseComponent
-import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.CategoryManager
-import com.abdownloadmanager.utils.category.iconSource
+import com.abdownloadmanager.shared.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.category.Category
+import com.abdownloadmanager.shared.utils.category.CategoryManager
+import com.abdownloadmanager.shared.utils.category.iconSource
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.uriOrNull

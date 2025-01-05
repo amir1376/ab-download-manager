@@ -3,10 +3,10 @@ package com.abdownloadmanager.desktop.pages.settings
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
-import com.abdownloadmanager.desktop.ui.theme.MyColors
-import com.abdownloadmanager.desktop.ui.theme.SystemThemeDetector
-import com.abdownloadmanager.desktop.ui.theme.darkColors
-import com.abdownloadmanager.desktop.ui.theme.lightColors
+import com.abdownloadmanager.shared.utils.ui.theme.ISystemThemeDetector
+import com.abdownloadmanager.shared.utils.ui.MyColors
+import com.abdownloadmanager.shared.ui.theme.darkColors
+import com.abdownloadmanager.shared.ui.theme.lightColors
 import com.abdownloadmanager.resources.Res
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.*
 class ThemeManager(
     private val scope: CoroutineScope,
     private val appSettings: AppSettingsStorage,
+    private val osThemeDetector: ISystemThemeDetector,
 ) {
     companion object {
         val defaultThemes = listOf(
@@ -73,7 +74,6 @@ class ThemeManager(
 
 
 
-    private val osThemeDetector = SystemThemeDetector()
     private var osDarkModeFlow = MutableStateFlow(true)
 
     val currentThemeColor = combineStateFlows(

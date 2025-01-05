@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.actions
 
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.di.Di
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.ui.widget.MessageDialogType
 import ir.amirab.util.compose.action.AnAction
 import ir.amirab.util.compose.action.MenuItem
