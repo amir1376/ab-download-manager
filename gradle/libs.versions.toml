@@ -128,6 +128,8 @@ kotlinFileWatcher = { module = "io.github.irgaly.kfswatch:kfswatch", version.ref
 autoService-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoServiceKsp" }
 autoService-annoations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
 
+systemTray = "com.dorkbox:SystemTray:4.4"
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
