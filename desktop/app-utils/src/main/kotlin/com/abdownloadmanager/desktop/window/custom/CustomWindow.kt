@@ -39,6 +39,8 @@ import ir.amirab.util.customwindow.HitSpots
 import ir.amirab.util.customwindow.util.CustomWindowDecorationAccessing
 import ir.amirab.util.customwindow.windowFrameItem
 import ir.amirab.util.ifThen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 // a window frame which totally rendered with compose
@@ -318,11 +320,13 @@ fun CustomWindow(
         val isLight = myColors.isLight
         val background = myColors.background
         LaunchedEffect(background) {
-            //I set window background fix window edge flickering on window resize
-            window.background = background.takeOrElse {
-                if (isLight) Color.White
-                else Color.Black
-            }.toWindowColorType()
+            withContext(Dispatchers.Main) {
+                //I set window background fix window edge flickering on window resize
+                window.background = background.takeOrElse {
+                    if (isLight) Color.White
+                    else Color.Black
+                }.toWindowColorType()
+            }
         }
         UiScaledContent {
             CompositionLocalProvider(
