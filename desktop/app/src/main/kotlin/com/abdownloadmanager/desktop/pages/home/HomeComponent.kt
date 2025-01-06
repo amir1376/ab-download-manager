@@ -218,8 +218,7 @@ class DownloadActions(
     val copyDownloadLinkAction = simpleAction(
         title = Res.string.copy_link.asStringSource(),
         icon = MyIcons.copy,
-        checkEnable =
-        selections.mapStateFlow { it.isNotEmpty() },
+        checkEnable = selections.mapStateFlow { it.isNotEmpty() },
         onActionPerformed = {
             scope.launch {
                 ClipboardUtil.copy(
@@ -426,6 +425,14 @@ class HomeComponent(
     val categoryManager: CategoryManager by inject()
     private val defaultCategories: DefaultCategories by inject()
     val fileIconProvider: FileIconProvider by inject()
+
+    init {
+        HomeComponent.homeComponentCreationCount++
+    }
+
+    private fun isFirstVisitInThisSession(): Boolean {
+        return HomeComponent.homeComponentCreationCount == 1
+    }
 
     init {
         homePageStateToPersist
@@ -820,31 +827,33 @@ class HomeComponent(
                 downloads.any { it.id == previouslySelectedItem }
             }
         }.launchIn(scope)
-        // if the app is updated then clean downloaded files
-        if (appVersionTracker.isUpgraded()) {
-            // clean update files
-            scope.launch {
-                // temporary fix:
-                // at the moment we relly on DownloadMonitor for getting the list of downloads by their folder
-                // so wait for the download list to be updated by the download monitor
-                delay(1000)
-                // then clean up the downloaded files
-                updateManager.cleanDownloadedFiles()
-            }
-            // show user about update
-            scope.launch {
-                // let user focus to the app
-                delay(1000)
-                notificationSender.sendNotification(
-                    title = Res.string.update_updater.asStringSource(),
-                    description = Res.string.update_app_updated_to_version_n.asStringSourceWithARgs(
-                        Res.string.update_app_updated_to_version_n_createArgs(
-                            version = appVersionTracker.currentVersion.toString()
-                        )
-                    ),
-                    type = NotificationType.Success,
-                    tag = "Updater"
-                )
+        if (isFirstVisitInThisSession()) {
+            // if the app is updated then clean downloaded files
+            if (appVersionTracker.isUpgraded()) {
+                // clean update files
+                scope.launch {
+                    // temporary fix:
+                    // at the moment we relly on DownloadMonitor for getting the list of downloads by their folder
+                    // so wait for the download list to be updated by the download monitor
+                    delay(1000)
+                    // then clean up the downloaded files
+                    updateManager.cleanDownloadedFiles()
+                }
+                // show user about update
+                scope.launch {
+                    // let user focus to the app
+                    delay(1000)
+                    notificationSender.sendNotification(
+                        title = Res.string.update_updater.asStringSource(),
+                        description = Res.string.update_app_updated_to_version_n.asStringSourceWithARgs(
+                            Res.string.update_app_updated_to_version_n_createArgs(
+                                version = appVersionTracker.currentVersion.toString()
+                            )
+                        ),
+                        type = NotificationType.Success,
+                        tag = "Updater"
+                    )
+                }
             }
         }
     }
@@ -986,6 +995,7 @@ class HomeComponent(
     }
 
     companion object {
+        private var homeComponentCreationCount = 0
         val CATEGORIES_SIZE_RANGE = 0.dp..500.dp
     }
 }
