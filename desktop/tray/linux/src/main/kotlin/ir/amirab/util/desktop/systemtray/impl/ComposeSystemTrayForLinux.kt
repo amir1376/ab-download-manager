@@ -19,7 +19,7 @@ class ComposeSystemTrayForLinux : IComposeSystemTray {
     @Composable
     override fun ComposeSystemTray(
         icon: IconSource,
-        title: StringSource,
+        tooltip: StringSource,
         menu: List<MenuItem>,
         onClick: () -> Unit
     ) {
@@ -36,7 +36,7 @@ class ComposeSystemTrayForLinux : IComposeSystemTray {
                 GlobalLayoutDirection,
             )
         }
-        val tooltipString = title.rememberString()
+        val tooltipString = tooltip.rememberString()
 
         LaunchedEffect(awtImage) {
             systemTray.setImage(awtImage)

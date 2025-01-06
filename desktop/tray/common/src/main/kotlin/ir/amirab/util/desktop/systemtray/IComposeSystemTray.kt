@@ -10,7 +10,7 @@ interface IComposeSystemTray {
     @Composable
     fun ComposeSystemTray(
         icon: IconSource,
-        title: StringSource,
+        tooltip: StringSource,
         menu: List<MenuItem>,
         onClick: () -> Unit,
     )

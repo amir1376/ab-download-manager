@@ -19,14 +19,14 @@ class ComposeSystemTrayForWindows : IComposeSystemTray {
     @Composable
     override fun ComposeSystemTray(
         icon: IconSource,
-        title: StringSource,
+        tooltip: StringSource,
         menu: List<MenuItem>,
         onClick: () -> Unit,
     ) {
         var popUpPosition by remember { mutableStateOf(null as DpOffset?) }
         val closeOptions = { popUpPosition = null }
         AwtTray(
-            tooltip = title.rememberString(),
+            tooltip = tooltip.rememberString(),
             icon = icon.rememberPainter(),
             onClick = onClick,
             onRightClick = {

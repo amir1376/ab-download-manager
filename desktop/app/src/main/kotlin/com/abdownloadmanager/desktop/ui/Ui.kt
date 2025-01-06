@@ -146,7 +146,7 @@ private fun ApplicationScope.SystemTray(
     IComposeSystemTray.Instance.ComposeSystemTray(
         icon = MyIcons.appIcon,
         onClick = showDownloadList,
-        title = AppInfo.displayName.asStringSource(),
+        tooltip = AppInfo.displayName.asStringSource(),
         menu = remember {
             buildMenu {
                 +showDownloadList
