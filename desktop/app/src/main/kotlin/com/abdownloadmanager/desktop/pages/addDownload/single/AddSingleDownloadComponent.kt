@@ -8,6 +8,8 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigura
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.runtime.*
+import com.abdownloadmanager.desktop.pages.settings.configurable.FileChecksumConfigurable
+import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderFileChecksumConfig
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import com.abdownloadmanager.resources.Res
@@ -214,6 +216,7 @@ class AddSingleDownloadComponent(
     //extra settings
     private var threadCount = MutableStateFlow(null as Int?)
     private var speedLimit = MutableStateFlow(0L)
+    private var fileChecksum = MutableStateFlow(null as FileChecksum?)
 
 
     val downloadItem = combineStateFlows(
@@ -222,7 +225,8 @@ class AddSingleDownloadComponent(
         this.name,
         this.length,
         this.speedLimit,
-        this.threadCount
+        this.threadCount,
+        this.fileChecksum,
     ) {
             credentials,
             folder,
@@ -230,6 +234,7 @@ class AddSingleDownloadComponent(
             length,
             speedLimit,
             threadCount,
+            fileChecksum,
         ->
         DownloadItem(
             id = -1,
@@ -242,7 +247,8 @@ class AddSingleDownloadComponent(
             completeTime = null,
             status = DownloadStatus.Added,
             preferredConnectionCount = threadCount,
-            speedLimit = speedLimit
+            speedLimit = speedLimit,
+            fileChecksum = fileChecksum?.toString()
         ).withCredentials(credentials)
     }
 
@@ -261,6 +267,12 @@ class AddSingleDownloadComponent(
                     it, appSettings.speedUnit.value
                 ).asStringSource()
             }
+        ),
+        FileChecksumConfigurable(
+            Res.string.download_item_settings_file_checksum.asStringSource(),
+            Res.string.download_item_settings_file_checksum_description.asStringSource(),
+            backedBy = fileChecksum,
+            describe = { "".asStringSource() }
         ),
         IntConfigurable(
             Res.string.settings_download_thread_count.asStringSource(),

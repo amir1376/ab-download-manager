@@ -1,6 +1,8 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable
 
 import com.abdownloadmanager.desktop.pages.settings.ThemeInfo
+import com.abdownloadmanager.shared.utils.FileChecksum
+import com.abdownloadmanager.shared.utils.FileChecksumAlgorithm
 import com.abdownloadmanager.shared.utils.proxy.ProxyData
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +28,7 @@ sealed class Configurable<T>(
         if (validate(value)) {
             // don't use update function here maybe this is a mappedByTwoWayMutableStateFlow
             // IMPROVE
-            backedBy.value=value
+            backedBy.value = value
             return true
         }
         return false
@@ -141,7 +143,7 @@ class FloatConfigurable(
     describe = describe,
     enabled = enabled,
     visible = visible,
-){
+) {
     enum class RenderMode {
         TextField,
     }
@@ -258,6 +260,22 @@ class SpeedLimitConfigurable(
     backedBy = backedBy,
     describe = describe,
     range = 0..Long.MAX_VALUE,
+    enabled = enabled,
+    visible = visible,
+)
+
+class FileChecksumConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<FileChecksum?>,
+    describe: (FileChecksum?) -> StringSource,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : Configurable<FileChecksum?>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
     enabled = enabled,
     visible = visible,
 )

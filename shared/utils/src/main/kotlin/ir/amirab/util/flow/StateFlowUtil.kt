@@ -221,7 +221,7 @@ fun <T1, T2, T3, T4, T5, T6, T7, R> combineStateFlows(
         getValue = {
             transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value)
         },
-        flow = combine(a, b, c, d, e, f) { array ->
+        flow = combine(a, b, c, d, e, f, g) { array ->
             @Suppress("UNCHECKED_CAST")
             transform(
                 array[0] as T1,

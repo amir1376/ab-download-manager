@@ -84,6 +84,7 @@ class DownloadActions(
     downloadSystem: DownloadSystem,
     downloadDialogManager: DownloadDialogManager,
     editDownloadDialogManager: EditDownloadDialogManager,
+    fileChecksumDialogManager: FileChecksumDialogManager,
     val selections: StateFlow<List<IDownloadItemState>>,
     private val mainItem: StateFlow<Long?>,
     private val queueManager: QueueManager,
@@ -236,6 +237,18 @@ class DownloadActions(
                 downloadDialogManager.openDownloadDialog(id)
             }
     }
+    private val fileChecksumAction = simpleAction(
+        title = Res.string.file_checksum.asStringSource(), MyIcons.info,
+        checkEnable = selections.mapStateFlow { list ->
+            list.any { iiDownloadItemState ->
+                iiDownloadItemState.isFinished()
+            }
+        }
+    ) {
+        fileChecksumDialogManager.openFileChecksumPage(
+            selections.value.map { it.id }
+        )
+    }
 
     private val moveToQueueItems = MenuItem.SubMenu(
         title = Res.string.move_to_queue.asStringSource(),
@@ -290,6 +303,7 @@ class DownloadActions(
         separator()
         +(copyDownloadLinkAction)
         +editDownloadAction
+        +fileChecksumAction
         +(openDownloadDialogAction)
     }
 }
@@ -405,6 +419,7 @@ class HomeComponent(
     private val downloadDialogManager: DownloadDialogManager,
     private val editDownloadDialogManager: EditDownloadDialogManager,
     private val addDownloadDialogManager: AddDownloadDialogManager,
+    private val fileChecksumDialogManager: FileChecksumDialogManager,
     private val categoryDialogManager: CategoryDialogManager,
     private val notificationSender: NotificationSender,
 ) : BaseComponent(ctx),
@@ -917,6 +932,7 @@ class HomeComponent(
         downloadSystem = downloadSystem,
         downloadDialogManager = downloadDialogManager,
         editDownloadDialogManager = editDownloadDialogManager,
+        fileChecksumDialogManager = fileChecksumDialogManager,
         selections = selectionListItems,
         mainItem = mainItem,
         queueManager = queueManager,
