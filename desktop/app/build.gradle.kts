@@ -65,8 +65,7 @@ dependencies {
 
     implementation(project(":desktop:tray:common"))
     if (Platform.getCurrentPlatform() == Platform.Desktop.Windows) {
-        implementation(project(":desktop:tray:linux"))
-//        implementation(project(":desktop:tray:windows"))
+        implementation(project(":desktop:tray:windows"))
     } else {
         implementation(project(":desktop:tray:linux"))
     }
