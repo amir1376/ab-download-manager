@@ -10,7 +10,7 @@ import java.io.File
 
 internal class WindowsFileUtils : FileUtilsBase() {
     override fun openFileInternal(file: File): Boolean {
-        return execAndWait(arrayOf("cmd", "/c", "start", "/B", "", file.path))
+        return execAndWait(arrayOf("cmd", "/c", "start", "/B", "", file.path.quoted()))
     }
 
     override fun openFolderOfFileInternal(file: File): Boolean {
@@ -19,7 +19,7 @@ internal class WindowsFileUtils : FileUtilsBase() {
             return true
         }
         //fallback to use explorer
-        return execAndWait(arrayOf("cmd", "/c", "explorer.exe", "/select,", file.path))
+        return execAndWait(arrayOf("cmd", "/c", "explorer.exe", "/select,", file.path.quoted()))
     }
 
     override fun openFolderInternal(folder: File): Boolean {
@@ -28,7 +28,7 @@ internal class WindowsFileUtils : FileUtilsBase() {
             return true
         }
         //fallback to use explorer
-        return execAndWait(arrayOf("cmd", "/c", "explorer.exe", folder.path))
+        return execAndWait(arrayOf("cmd", "/c", "explorer.exe", folder.path.quoted()))
     }
 
     private fun showFileInFolderViaNative(
@@ -72,6 +72,9 @@ internal class WindowsFileUtils : FileUtilsBase() {
             return false
         }
     }
+
+    private fun String.quoted() = "\"$this\""
+
 }
 
 
