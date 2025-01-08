@@ -24,6 +24,17 @@
 > [!CAUTION]
 > This is a forked project from [amir1376/ab-download-manager](https://github.com/amir1376/ab-download-manager), aiming to provide the latest **macos** package of AB Download Manager, you can download from [GitHub Releases](https://github.com/peanut996/ab-download-manager-macos/releases/latest), but it is not recommended to use it, take the responsibility of using it at your own risk!
 
+#### Application Signing
+
+*AB Download Manager* is not signed (due to its costs and me not owning supported Apple device) so you will need to use a workaround for the first run. The workaround
+depends on if you're running an Intel or Apple Silicon chip.
+
+- **Intel Chips**: [Open a Mac app from an unidentified developer](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac).
+- **Apple Chips**: Open a terminal and run this command:
+
+```bash
+sudo xattr -r -d com.apple.quarantine /Applications/ABDownloadManager.app.app
+```
 
 ## Features
 
