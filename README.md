@@ -33,7 +33,7 @@ depends on if you're running an Intel or Apple Silicon chip.
 - **Apple Chips**: Open a terminal and run this command:
 
 ```bash
-sudo xattr -r -d com.apple.quarantine /Applications/ABDownloadManager.app.app
+sudo xattr -r -d com.apple.quarantine /Applications/ABDownloadManager.app
 ```
 
 ## Features
