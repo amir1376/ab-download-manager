@@ -1,12 +1,11 @@
 package com.abdownloadmanager.desktop.utils
 
 import com.abdownloadmanager.desktop.ui.error.ErrorWindow
-import com.abdownloadmanager.desktop.ui.theme.ABDownloaderTheme
+import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.*
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import kotlinx.coroutines.flow.MutableStateFlow

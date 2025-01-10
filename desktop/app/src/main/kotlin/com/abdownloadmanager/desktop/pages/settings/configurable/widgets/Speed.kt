@@ -1,45 +1,57 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
-import com.abdownloadmanager.desktop.ui.widget.CheckBox
-import com.abdownloadmanager.desktop.ui.widget.DoubleTextField
-import com.abdownloadmanager.desktop.utils.baseConvertBytesToHumanReadable
+import com.abdownloadmanager.shared.ui.widget.CheckBox
+import com.abdownloadmanager.shared.ui.widget.DoubleTextField
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ir.amirab.downloader.utils.ByteConverter
-import ir.amirab.downloader.utils.ByteConverter.BYTES
-import ir.amirab.downloader.utils.ByteConverter.K_BYTES
-import ir.amirab.downloader.utils.ByteConverter.M_BYTES
+import com.abdownloadmanager.shared.utils.LocalSpeedUnit
+import ir.amirab.util.datasize.*
 
 @Composable
 fun RenderSpeedConfig(cfg: SpeedLimitConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
-    val units = listOf(
-        BYTES,
-        K_BYTES,
-        M_BYTES,
+
+    val speedUnit = LocalSpeedUnit.current
+    val allowedFactors = listOf(
+        SizeFactors.FactorValue.Kilo,
+        SizeFactors.FactorValue.Mega,
     )
-    val enabled= isConfigEnabled()
-    val hasLimitSpeed = value != 0L
-    
-    var currentUnit by remember(hasLimitSpeed) { mutableStateOf(baseConvertBytesToHumanReadable(value)?.unit ?: BYTES) }
+    val units = allowedFactors.map {
+        SizeUnit(
+            factorValue = it,
+            baseSize = speedUnit.baseSize,
+            factors = speedUnit.factors
+        )
+    }
+    val enabled = isConfigEnabled()
+    val hasLimitSpeed = value > 0L
+
+    var currentUnit by remember(hasLimitSpeed) {
+        mutableStateOf(
+            SizeConverter.bytesToSize(
+                value,
+                speedUnit.copy(acceptedFactors = allowedFactors)
+            ).unit
+        )
+    }
     var currentValue by remember(value) {
-        val v = ByteConverter.run {
-            prettify(
-                byteTo(value, currentUnit)
-            ).toDouble()
-        }
+        val v = SizeConverter.bytesToSize(
+            value, currentUnit.asConverterConfig()
+        ).formatedValue().toDouble()
         mutableStateOf(v)
     }
     LaunchedEffect(currentValue, currentUnit) {
         setValue(
-            ByteConverter.unitToByte(currentValue, currentUnit)
+            SizeConverter.sizeToBytes(
+                SizeWithUnit(currentValue, currentUnit),
+            )
         )
     }
     ConfigTemplate(
@@ -77,7 +89,7 @@ fun RenderSpeedConfig(cfg: SpeedLimitConfigurable, modifier: Modifier) {
                             }
                         ) {
                             val prettified = remember(it) {
-                                ByteConverter.unitPrettify(it) + "/s"
+                                "$it/s"
                             }
                             Text(prettified)
                         }
@@ -90,12 +102,22 @@ fun RenderSpeedConfig(cfg: SpeedLimitConfigurable, modifier: Modifier) {
                 value = hasLimitSpeed,
                 enabled = enabled,
                 onValueChange = {
-                if (it) {
-                    setValue(ByteConverter.unitToByte(10.0, K_BYTES))
-                } else {
-                    setValue(0)
-                }
-            })
+                    if (it) {
+                        setValue(
+                            SizeConverter.sizeToBytes(
+                                SizeWithUnit(
+                                    256.0, SizeUnit(
+                                        SizeFactors.FactorValue.Kilo,
+                                        BaseSize.Bytes,
+                                        SizeFactors.BinarySizeFactors,
+                                    )
+                                )
+                            )
+                        )
+                    } else {
+                        setValue(0)
+                    }
+                })
         }
     )
 }

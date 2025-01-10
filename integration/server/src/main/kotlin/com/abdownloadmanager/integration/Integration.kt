@@ -4,6 +4,7 @@ import com.abdownloadmanager.integration.http4k.MyHttp4KServer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.builtins.ListSerializer
 
 //val scope = CoroutineScope(SupervisorJob())
 
@@ -111,6 +112,24 @@ class Integration(
                     }
                     itemsToAdd.onFailure { it.printStackTrace() }
                     integrationHandler.addDownload(itemsToAdd.getOrThrow())
+                }
+                MyResponse.Text("OK")
+            }
+            get("/queues") {
+                runBlocking {
+                    val queues = integrationHandler.listQueues()
+                    val jsonResponse = customJson.encodeToString(ListSerializer(ApiQueueModel.serializer()), queues)
+                    MyResponse.Text(jsonResponse)
+                }
+            }
+            post("/start-headless-download") {
+                runBlocking {
+                    val itemsToAdd = kotlin.runCatching {
+                        val message = it.getBody().orEmpty()
+                        customJson.decodeFromString<NewDownloadTask>(message)
+                    }
+                    itemsToAdd.onFailure { it.printStackTrace() }
+                    integrationHandler.addDownloadTask(itemsToAdd.getOrThrow())
                 }
                 MyResponse.Text("OK")
             }

@@ -140,6 +140,7 @@ follow these steps.
 
 1. Clone the project
 2. Install the [JBR](https://github.com/JetBrains/JetBrainsRuntime/releases)
+   1. If you extract it to your home directory and don't want to modify global `JAVA_HOME` environment variable you can set `JAVA_HOME` to the extracted directory e.g. `export JAVA_HOME=~/jbrsdk_jcef-21.0.4-linux-x64-b620.4` for linux or `$env:JAVA_HOME="C:\path\to\jbr"` on Windows
 3. cd into the project, open your terminal and execute the following commands
 4. select which way you want to compile the app
 <details>
@@ -183,6 +184,15 @@ The output will be created in
 
 > **Note**. This project is compiled and published by GitHub actions [here](./.github/workflows/publish.yml), so if you
 > faced any problem you can check that too
+
+## Translations
+
+If you’d like to help translate AB Download Manager into another language, or improve existing translations, you can do
+so on Crowdin. Here’s how:
+
+- Visit the project in [Crowdin](https://crowdin.com/project/ab-download-manager)
+- Please DO NOT submit translations via pull requests.
+- If you want to add a new language, please see [here](https://github.com/amir1376/ab-download-manager/issues/144)
 
 ## Contribution
 

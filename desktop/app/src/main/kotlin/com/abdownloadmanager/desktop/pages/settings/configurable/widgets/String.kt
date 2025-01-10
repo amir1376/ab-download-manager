@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigurable
-import com.abdownloadmanager.desktop.ui.widget.MyTextField
+import com.abdownloadmanager.shared.ui.widget.MyTextField
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable

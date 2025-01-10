@@ -1,8 +1,8 @@
 package com.abdownloadmanager.desktop.pages.updater
 
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.widget.NotificationType
-import com.abdownloadmanager.desktop.ui.widget.ShowNotification
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.shared.ui.widget.NotificationType
+import com.abdownloadmanager.shared.ui.widget.ShowNotification
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.UpdateCheckStatus
-import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource

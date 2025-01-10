@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.MyTextField
-import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.ui.widget.MyTextField
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
@@ -21,7 +21,6 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -33,7 +32,7 @@ fun SearchBox(
     placeholder: String = myStringResource(Res.string.search_in_the_list),
     modifier: Modifier,
 ) {
-    val shape = RoundedCornerShape(12.dp)
+    val shape = RoundedCornerShape(6.dp)
     val textSize = myTextSizes.base
     MyTextField(
         text = text,

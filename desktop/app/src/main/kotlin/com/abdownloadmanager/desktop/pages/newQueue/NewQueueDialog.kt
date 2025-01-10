@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.newQueue
 
 import com.abdownloadmanager.desktop.AppComponent
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable

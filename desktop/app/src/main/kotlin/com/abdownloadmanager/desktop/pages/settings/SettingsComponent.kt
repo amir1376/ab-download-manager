@@ -5,21 +5,23 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.utils.BaseComponent
-import com.abdownloadmanager.desktop.utils.convertSpeedToHumanReadable
-import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
-import com.abdownloadmanager.desktop.utils.mvi.supportEffects
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable
+import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
+import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import androidx.compose.runtime.*
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.proxy.ProxyManager
-import com.abdownloadmanager.utils.proxy.ProxyMode
+import com.abdownloadmanager.shared.utils.proxy.ProxyManager
+import com.abdownloadmanager.shared.utils.proxy.ProxyMode
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.compose.localizationmanager.LanguageInfo
 import ir.amirab.util.compose.localizationmanager.LanguageManager
+import ir.amirab.util.datasize.CommonSizeConvertConfigs
+import ir.amirab.util.datasize.ConvertSizeConfig
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
@@ -121,6 +123,26 @@ fun trackDeletedFilesOnDisk(appRepository: AppRepository): BooleanConfigurable {
     )
 }
 
+fun speedUnit(appRepository: AppRepository, scope: CoroutineScope): EnumConfigurable<ConvertSizeConfig> {
+    return EnumConfigurable(
+        title = Res.string.settings_download_speed_unit.asStringSource(),
+        description = Res.string.settings_download_speed_unit_description.asStringSource(),
+        backedBy = createMutableStateFlowFromStateFlow(
+            appRepository.speedUnit,
+            updater = { appRepository.setSpeedUnit(it) },
+            scope = scope
+        ),
+        possibleValues = listOf(
+            CommonSizeConvertConfigs.BinaryBytes,
+            CommonSizeConvertConfigs.BinaryBits,
+        ),
+        describe = {
+            val u = it.baseSize.longString()
+            "$u/s".asStringSource()
+        },
+    )
+}
+
 fun showDownloadFinishWindow(settingsStorage: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_show_completion_dialog.asStringSource(),
@@ -152,7 +174,7 @@ fun speedLimitConfig(appRepository: AppRepository): SpeedLimitConfigurable {
             if (it == 0L) {
                 Res.string.unlimited.asStringSource()
             } else {
-                convertSpeedToHumanReadable(it).asStringSource()
+                convertPositiveSpeedToHumanReadable(it, appRepository.speedUnit.value).asStringSource()
             }
         }
     )
@@ -398,6 +420,7 @@ class SettingsComponent(
                     uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
                     mergeTopBarWithTitleBarConfig(appSettings),
+                    speedUnit(appRepository, scope),
                     playSoundNotification(appSettings),
                 )
 

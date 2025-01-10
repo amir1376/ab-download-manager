@@ -1,10 +1,10 @@
 package com.abdownloadmanager.desktop.pages.batchdownload
 
-import com.abdownloadmanager.desktop.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.BaseComponent
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
-import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
-import com.abdownloadmanager.desktop.utils.mvi.supportEffects
-import com.abdownloadmanager.utils.isValidUrl
+import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
+import com.abdownloadmanager.shared.utils.mvi.supportEffects
+import com.abdownloadmanager.shared.utils.isValidUrl
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow

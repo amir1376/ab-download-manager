@@ -1,16 +1,15 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
-import DOUBLE_CLICK_DELAY
-import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.widget.CheckBox
-import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.ui.widget.customtable.Table
-import com.abdownloadmanager.desktop.ui.widget.customtable.*
-import com.abdownloadmanager.desktop.ui.widget.customtable.styled.MyStyledTableHeader
-import com.abdownloadmanager.desktop.ui.widget.menu.LocalMenuDisabledItemBehavior
-import com.abdownloadmanager.desktop.ui.widget.menu.MenuDisabledItemBehavior
-import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.utils.DOUBLE_CLICK_DELAY
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.ui.widget.CheckBox
+import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.customtable.Table
+import com.abdownloadmanager.shared.ui.widget.customtable.styled.MyStyledTableHeader
+import com.abdownloadmanager.shared.ui.widget.menu.LocalMenuDisabledItemBehavior
+import com.abdownloadmanager.shared.ui.widget.menu.MenuDisabledItemBehavior
+import com.abdownloadmanager.shared.ui.widget.menu.ShowOptionsInDropDown
 import ir.amirab.util.compose.action.MenuItem
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,10 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.ui.widget.customtable.*
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.FileIconProvider
-import com.abdownloadmanager.utils.category.CategoryManager
-import com.abdownloadmanager.utils.category.rememberCategoryOf
+import com.abdownloadmanager.shared.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.category.CategoryManager
+import com.abdownloadmanager.shared.utils.category.rememberCategoryOf
 import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
@@ -169,7 +169,7 @@ fun DownloadList(
                     )
                 ) {
                     WithContentAlpha(1f) {
-                        val shape = RoundedCornerShape(12.dp)
+                        val shape = RoundedCornerShape(6.dp)
                         Box(
                             Modifier
                                 .widthIn(min = getTableSize().visibleWidth)
@@ -228,7 +228,7 @@ fun DownloadList(
                                                 myColors.selectionGradient(0.10f, 0.05f, selectionColor),
                                                 shape
                                             )
-                                            .background(myColors.selectionGradient(0.15f, 0f, selectionColor))
+                                            .background(myColors.selectionGradient(0.15f, 0.03f, selectionColor))
                                     } else {
                                         it.border(1.dp, Color.Transparent)
                                     }

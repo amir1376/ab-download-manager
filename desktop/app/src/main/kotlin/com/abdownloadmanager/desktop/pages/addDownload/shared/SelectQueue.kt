@@ -1,16 +1,16 @@
 package com.abdownloadmanager.desktop.pages.addDownload.shared
 
 import com.abdownloadmanager.desktop.actions.newQueueAction
-import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.ActionButton
-import com.abdownloadmanager.desktop.ui.widget.IconActionButton
-import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.utils.compose.WithContentColor
-import com.abdownloadmanager.desktop.utils.div
-import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
+import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.ui.widget.ActionButton
+import com.abdownloadmanager.shared.ui.widget.IconActionButton
+import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.utils.ui.WithContentColor
+import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.desktop.window.moveSafe
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,9 +24,8 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
-import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.util.desktop.screen.applyUiScale

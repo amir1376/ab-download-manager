@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.storage
 
 import com.abdownloadmanager.desktop.pages.home.HomePageStateToPersist
-import com.abdownloadmanager.desktop.utils.*
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageStateToPersist
+import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
 import ir.amirab.util.config.getDecoded
 import ir.amirab.util.config.keyOfEncoded
 import ir.amirab.util.config.putEncoded

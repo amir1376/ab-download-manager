@@ -1,13 +1,13 @@
 package com.abdownloadmanager.desktop.pages.about
 
 import androidx.compose.foundation.*
-import com.abdownloadmanager.utils.compose.LocalTextStyle
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.shared.utils.ui.LocalTextStyle
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.desktop.utils.AppInfo
-import com.abdownloadmanager.utils.compose.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
@@ -28,11 +28,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.SharedConstants
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.util.ifThen
-import com.abdownloadmanager.desktop.ui.widget.IconActionButton
-import com.abdownloadmanager.desktop.ui.widget.Tooltip
-import com.abdownloadmanager.desktop.utils.div
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import ir.amirab.util.ifThen
+import com.abdownloadmanager.shared.ui.widget.IconActionButton
+import com.abdownloadmanager.shared.ui.widget.Tooltip
+import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.IconSource

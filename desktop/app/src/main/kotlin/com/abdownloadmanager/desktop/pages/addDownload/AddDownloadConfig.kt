@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.addDownload
 
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
-import com.abdownloadmanager.desktop.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.BaseComponent
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import java.util.*
 abstract class AddDownloadComponent(
     ctx: ComponentContext,
     val id: String,
-) :BaseComponent(ctx),KoinComponent{
+) : BaseComponent(ctx), KoinComponent {
     companion object{
         const val lastLocationsCacheSize = 4
 

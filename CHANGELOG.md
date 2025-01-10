@@ -14,6 +14,29 @@
 
 ### Security
 
+## 1.5.1
+
+### Added
+
+- Italian Language
+- German Language
+- Georgian Language
+- Indonesian Language
+- An option to change download speed unit
+- An ability to start new download using Rest-Api
+
+### Fixed
+
+- System tray in Linux now has correct icon and native option menu
+- App crashes when changing theme in Linux
+- Open file/folder action fails sometimes in Windows
+
+### Improved
+
+- Translations updated
+- Split category and location configuration options in multi download page
+- Home page minor UI improvements
+
 ## 1.5.0
 
 ### Added

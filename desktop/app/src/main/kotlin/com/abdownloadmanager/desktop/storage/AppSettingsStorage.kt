@@ -1,10 +1,9 @@
 package com.abdownloadmanager.desktop.storage
 
-import com.abdownloadmanager.desktop.utils.*
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
-import com.abdownloadmanager.desktop.App
+import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.*
 import kotlinx.serialization.Serializable
@@ -34,6 +33,7 @@ data class AppSettingsModel(
     val browserIntegrationEnabled: Boolean = true,
     val browserIntegrationPort: Int = 15151,
     val trackDeletedFilesOnDisk: Boolean = false,
+    val useBitsForSpeed: Boolean = false,
 ) {
     companion object {
         val default: AppSettingsModel get() = AppSettingsModel()
@@ -59,6 +59,7 @@ data class AppSettingsModel(
             val browserIntegrationEnabled = booleanKeyOf("browserIntegrationEnabled")
             val browserIntegrationPort = intKeyOf("browserIntegrationPort")
             val trackDeletedFilesOnDisk = booleanKeyOf("trackDeletedFilesOnDisk")
+            val useBitsForSpeed = booleanKeyOf("useBitsForSpeed")
         }
 
 
@@ -87,6 +88,7 @@ data class AppSettingsModel(
                     ?: default.browserIntegrationEnabled,
                 browserIntegrationPort = source.get(Keys.browserIntegrationPort) ?: default.browserIntegrationPort,
                 trackDeletedFilesOnDisk = source.get(Keys.trackDeletedFilesOnDisk) ?: default.trackDeletedFilesOnDisk,
+                useBitsForSpeed = source.get(Keys.useBitsForSpeed) ?: default.useBitsForSpeed,
             )
         }
 
@@ -110,6 +112,7 @@ data class AppSettingsModel(
                 put(Keys.browserIntegrationEnabled, focus.browserIntegrationEnabled)
                 put(Keys.browserIntegrationPort, focus.browserIntegrationPort)
                 put(Keys.trackDeletedFilesOnDisk, focus.trackDeletedFilesOnDisk)
+                put(Keys.useBitsForSpeed, focus.useBitsForSpeed)
             }
         }
     }
@@ -148,4 +151,5 @@ class AppSettingsStorage(
     val browserIntegrationEnabled = from(AppSettingsModel.browserIntegrationEnabled)
     val browserIntegrationPort = from(AppSettingsModel.browserIntegrationPort)
     val trackDeletedFilesOnDisk = from(AppSettingsModel.trackDeletedFilesOnDisk)
+    val useBitsForSpeed = from(AppSettingsModel.useBitsForSpeed)
 }

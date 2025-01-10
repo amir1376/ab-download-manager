@@ -4,6 +4,7 @@ plugins{
 }
 
 dependencies {
+    implementation(project(":shared:app"))
     implementation(project(":shared:app-utils"))
     implementation(project(":shared:utils"))
 }

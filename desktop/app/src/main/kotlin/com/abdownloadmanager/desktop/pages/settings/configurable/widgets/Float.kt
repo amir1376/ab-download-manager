@@ -2,8 +2,7 @@ package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.FloatConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.FloatConfigurable.RenderMode.*
-import com.abdownloadmanager.desktop.ui.widget.FloatTextField
-import com.abdownloadmanager.desktop.ui.widget.IntTextField
+import com.abdownloadmanager.shared.ui.widget.FloatTextField
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions

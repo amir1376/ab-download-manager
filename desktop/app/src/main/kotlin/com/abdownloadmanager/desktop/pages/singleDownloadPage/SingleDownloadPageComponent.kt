@@ -3,16 +3,16 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 import androidx.compose.runtime.Immutable
 import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
-import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
-import com.abdownloadmanager.desktop.utils.mvi.supportEffects
+import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
+import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import arrow.optics.copy
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable
+import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.DownloadSystem
-import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.*
+import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
@@ -55,6 +55,7 @@ class SingleDownloadComponent(
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
     private val appSettings: AppSettingsStorage by inject()
+    private val appRepository: AppRepository by inject()
     val fileIconProvider: FileIconProvider by inject()
     private val singleDownloadPageStateToPersist by lazy {
         get<PageStatesStorage>().downloadPage
@@ -122,19 +123,19 @@ class SingleDownloadComponent(
                 add(
                     SingleDownloadPagePropertyItem(
                         Res.string.size.asStringSource(),
-                        convertSizeToHumanReadable(it.contentLength)
+                        convertPositiveSizeToHumanReadable(it.contentLength, appRepository.sizeUnit.value)
                     )
                 )
                 add(
                     SingleDownloadPagePropertyItem(
                         Res.string.download_page_downloaded_size.asStringSource(),
-                        convertBytesToHumanReadable(it.progress).orEmpty().asStringSource()
+                        convertPositiveSizeToHumanReadable(it.progress, appRepository.sizeUnit.value)
                     )
                 )
                 add(
                     SingleDownloadPagePropertyItem(
                         Res.string.speed.asStringSource(),
-                        convertSpeedToHumanReadable(it.speed).asStringSource()
+                        convertPositiveSpeedToHumanReadable(it.speed, appRepository.speedUnit.value).asStringSource()
                     )
                 )
                 add(
@@ -331,7 +332,7 @@ class SingleDownloadComponent(
                     if (it == 0L) {
                         Res.string.unlimited.asStringSource()
                     } else {
-                        convertSpeedToHumanReadable(it).asStringSource()
+                        convertPositiveSpeedToHumanReadable(it, appRepository.speedUnit.value).asStringSource()
                     }
                 },
             ),

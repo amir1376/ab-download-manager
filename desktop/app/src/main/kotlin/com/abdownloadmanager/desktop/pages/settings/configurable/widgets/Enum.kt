@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.EnumConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.EnumConfigurable.RenderMode.*
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier

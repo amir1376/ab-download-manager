@@ -9,8 +9,8 @@ import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.singleInstance.*
 import com.abdownloadmanager.integration.Integration
-import com.abdownloadmanager.utils.DownloadSystem
-import com.abdownloadmanager.utils.appinfo.PreviousVersion
+import com.abdownloadmanager.shared.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
 import ir.amirab.util.platform.Platform
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
