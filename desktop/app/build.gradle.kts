@@ -64,10 +64,10 @@ dependencies {
     implementation(project(":desktop:app-utils"))
 
     implementation(project(":desktop:tray:common"))
-    if (Platform.getCurrentPlatform() == Platform.Desktop.Windows) {
-        implementation(project(":desktop:tray:windows"))
-    } else {
+    if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
         implementation(project(":desktop:tray:linux"))
+    } else {
+        implementation(project(":desktop:tray:windows"))
     }
 
     implementation(project(":shared:app"))
