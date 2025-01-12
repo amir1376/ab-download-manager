@@ -106,7 +106,7 @@ jna-core = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 
 pluginComposeMultiplatform = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
-pluginComposeCopmiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+pluginComposeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 pluginKotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 pluginSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 pluginChangeLog = { module = "org.jetbrains.intellij.plugins:gradle-changelog-plugin", version.ref = "changelog" }

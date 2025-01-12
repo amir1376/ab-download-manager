@@ -7,7 +7,7 @@ repositories {
 }
 dependencies{
     implementation(libs.pluginKotlin)
-    implementation(libs.pluginComposeCopmiler)
+    implementation(libs.pluginComposeCompiler)
     implementation(libs.pluginKsp)
     implementation(libs.pluginSerialization)
     implementation(libs.pluginComposeMultiplatform)
