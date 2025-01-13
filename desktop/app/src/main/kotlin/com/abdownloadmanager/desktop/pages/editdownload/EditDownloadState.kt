@@ -1,14 +1,12 @@
 package com.abdownloadmanager.desktop.pages.editdownload
 
+import com.abdownloadmanager.desktop.pages.settings.configurable.FileChecksumConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigurable
 import com.abdownloadmanager.desktop.repository.AppRepository
-import com.abdownloadmanager.shared.utils.FileNameValidator
-import com.abdownloadmanager.shared.utils.LinkChecker
-import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.isValidUrl
+import com.abdownloadmanager.shared.utils.*
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem
@@ -168,6 +166,25 @@ class EditDownloadState(
                 if (it == 0L) Res.string.unlimited.asStringSource()
                 else convertPositiveSpeedToHumanReadable(it, appRepository.speedUnit.value).asStringSource()
             }
+        ),
+        FileChecksumConfigurable(
+            Res.string.download_item_settings_file_checksum.asStringSource(),
+            Res.string.download_item_settings_file_checksum_description.asStringSource(),
+            backedBy = editedDownloadItem.mapTwoWayStateFlow(
+                map = {
+                    it.fileChecksum?.let {
+                        runCatching {
+                            FileChecksum.fromString(it)
+                        }.onFailure {
+                            println(it.printStackTrace())
+                        }.getOrNull()
+                    }
+                },
+                unMap = {
+                    copy(fileChecksum = it?.toString())
+                }
+            ),
+            describe = { "".asStringSource() }
         ),
         IntConfigurable(
             Res.string.settings_download_thread_count.asStringSource(),

@@ -24,6 +24,8 @@ data class DownloadItem(
     var status: DownloadStatus = DownloadStatus.Added,
     var preferredConnectionCount: Int? = null,
     var speedLimit: Long = 0,//0 is unlimited
+
+    var fileChecksum: String? = null,
 ) : IDownloadCredentials {
     companion object {
         const val LENGTH_UNKNOWN = -1L
@@ -51,6 +53,8 @@ fun DownloadItem.applyFrom(other: DownloadItem) {
     status = other.status
     preferredConnectionCount = other.preferredConnectionCount
     speedLimit = other.speedLimit
+
+    fileChecksum = other.fileChecksum
 }
 
 fun DownloadItem.withCredentials(credentials: IDownloadCredentials) = apply {

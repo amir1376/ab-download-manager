@@ -25,6 +25,7 @@ import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
 import com.abdownloadmanager.desktop.pages.confirmexit.ConfirmExit
 import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
+import com.abdownloadmanager.desktop.pages.filehash.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import com.abdownloadmanager.desktop.pages.updater.ShowUpdaterDialog
@@ -93,6 +94,7 @@ object Ui : KoinComponent {
                                     ShowAddDownloadDialogs(appComponent)
                                     ShowDownloadDialogs(appComponent)
                                     ShowCategoryDialogs(appComponent)
+                                    FileChecksumWindow(appComponent)
                                     ShowUpdaterDialog(appComponent.updater)
                                     ShowAboutDialog(appComponent)
                                     NewQueueDialog(appComponent)
