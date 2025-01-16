@@ -49,10 +49,9 @@ dependencies {
     implementation(libs.osThemeDetector) {
         exclude(group = "net.java.dev.jna")
     }
-
-    // at the moment I don't use jna but some libraries does
-    // filekit and osThemeDetector both use jna but with different versions
-    // I excluded jna from both of them and add it here!
+    implementation(libs.proxyVole) {
+        exclude(group = "net.java.dev.jna")
+    }
     implementation(libs.jna.core)
     implementation(libs.jna.platform)
 

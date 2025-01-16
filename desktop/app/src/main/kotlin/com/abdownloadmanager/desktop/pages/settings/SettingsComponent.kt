@@ -231,6 +231,15 @@ fun proxyConfig(proxyManager: ProxyManager, scope: CoroutineScope): ProxyConfigu
                             value = it.proxyWithRules.proxy.run { "$type $host:$port" }
                         )
                     )
+
+                ProxyMode.Pac -> {
+                    Res.string.settings_use_proxy_describe_pac_proxy
+                        .asStringSourceWithARgs(
+                            Res.string.settings_use_proxy_describe_pac_proxy_createArgs(
+                                value = it.pac.uri
+                            )
+                        )
+                }
             }
         }
     )

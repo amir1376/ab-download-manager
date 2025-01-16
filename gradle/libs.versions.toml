@@ -29,6 +29,7 @@ kotlinFileWatcher = "1.3.0"
 markdownRenderer = "0.27.0"
 autoServiceKsp = "1.2.0"
 autoService = "1.1.1"
+proxyVole = "1.1.6"
 
 [libraries]
 
@@ -129,6 +130,7 @@ autoService-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", versi
 autoService-annoations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
 
 systemTray = "com.dorkbox:SystemTray:4.4"
+proxyVole = { module = "org.bidib.com.github.markusbernhardt:proxy-vole", version.ref = "proxyVole" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
