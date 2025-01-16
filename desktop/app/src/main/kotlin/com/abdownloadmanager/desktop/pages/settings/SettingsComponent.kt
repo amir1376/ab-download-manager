@@ -4,7 +4,6 @@ import com.abdownloadmanager.desktop.pages.settings.SettingSections.*
 import com.abdownloadmanager.desktop.pages.settings.configurable.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
-import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.BaseComponent
 import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable
@@ -15,9 +14,7 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import com.abdownloadmanager.shared.utils.proxy.ProxyMode
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
+import ir.amirab.util.compose.*
 import ir.amirab.util.compose.localizationmanager.LanguageInfo
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.datasize.CommonSizeConvertConfigs
@@ -45,20 +42,34 @@ interface SettingSectionGetter {
     operator fun get(key: SettingSections): List<Configurable<*>>
 }
 
+object ThreadCountLimitation {
+    const val MAX_ALLOWED_THREAD_COUNT = 256
+    const val MAX_NORMAL_VALUE = 32
+}
+
 fun threadCountConfig(appRepository: AppRepository): IntConfigurable {
     return IntConfigurable(
         title = Res.string.settings_download_thread_count.asStringSource(),
         description = Res.string.settings_download_thread_count_description.asStringSource(),
         backedBy = appRepository.threadCount,
-        range = 1..32,
+        range = 1..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
         renderMode = IntConfigurable.RenderMode.TextField,
         describe = {
-            Res.string.settings_download_thread_count_describe
-                .asStringSourceWithARgs(
-                    Res.string.settings_download_thread_count_describe_createArgs(
-                        count = it.toString()
-                    )
+            buildList {
+                add(
+                    Res.string.settings_download_thread_count_describe
+                        .asStringSourceWithARgs(
+                            Res.string.settings_download_thread_count_describe_createArgs(
+                                count = it.toString()
+                            )
+                        )
                 )
+                if (it > ThreadCountLimitation.MAX_NORMAL_VALUE) {
+                    add(
+                        Res.string.settings_download_thread_count_with_large_value_describe.asStringSource()
+                    )
+                }
+            }.combineStringSources("\n")
         },
     )
 }

@@ -8,6 +8,7 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigura
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.runtime.*
+import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
 import com.abdownloadmanager.desktop.pages.settings.configurable.FileChecksumConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderFileChecksumConfig
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
@@ -285,7 +286,7 @@ class AddSingleDownloadComponent(
                     it.takeIf { it > 1 }
                 }
             ),
-            range = 0..32,
+            range = 0..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
             describe = {
                 if (it == 0) Res.string.use_global_settings.asStringSource()
                 else Res.string.download_item_settings_thread_count_describe
