@@ -18,6 +18,8 @@ import com.abdownloadmanager.shared.utils.ui.theme.ISystemThemeDetector
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
+import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvider
+import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import ir.amirab.downloader.DownloadManagerMinimalControl
@@ -56,6 +58,7 @@ import com.abdownloadmanager.shared.utils.proxy.IProxyStorage
 import com.abdownloadmanager.shared.utils.proxy.ProxyData
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
+import ir.amirab.downloader.connection.proxy.SystemProxySelectorProvider
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.util.compose.localizationmanager.LanguageManager
@@ -112,6 +115,12 @@ val downloaderModule = module {
             get()
         )
     }.bind<ProxyStrategyProvider>()
+    single {
+        ProxyCachingConfig.default()
+    }
+    single<SystemProxySelectorProvider> {
+        DesktopSystemProxySelectorProvider(get())
+    }
     single<DownloaderClient> {
         OkHttpDownloaderClient(
             OkHttpClient
@@ -121,7 +130,8 @@ val downloaderModule = module {
                     maxRequests = Int.MAX_VALUE
                     maxRequestsPerHost = Int.MAX_VALUE
                 }).build(),
-            get()
+            get(),
+            get(),
         )
     }
     single {

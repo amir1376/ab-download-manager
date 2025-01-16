@@ -32,6 +32,7 @@ enum class ProxyMode {
             return listOf(
                 Direct,
                 Manual,
+                UseSystem,
             )
         }
     }

@@ -3,6 +3,7 @@ package ir.amirab.downloader.connection
 import ir.amirab.downloader.connection.proxy.ProxyStrategy
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
 import ir.amirab.downloader.connection.proxy.ProxyType
+import ir.amirab.downloader.connection.proxy.SystemProxySelectorProvider
 import ir.amirab.downloader.connection.response.ResponseInfo
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.utils.await
@@ -14,6 +15,7 @@ import java.net.ProxySelector
 class OkHttpDownloaderClient(
     private val okHttpClient: OkHttpClient,
     private val proxyStrategyProvider: ProxyStrategyProvider,
+    private val systemProxySelectorProvider: SystemProxySelectorProvider,
 ) : DownloaderClient() {
     private fun newCall(
         downloadCredentials: IDownloadCredentials,
@@ -67,7 +69,10 @@ class OkHttpDownloaderClient(
             ProxyStrategy.Direct -> return this
             ProxyStrategy.UseSystem -> {
                 newBuilder()
-                    .proxySelector(ProxySelector.getDefault())
+                    .proxySelector(
+                        systemProxySelectorProvider.getSystemProxySelector()
+                            ?: ProxySelector.getDefault()
+                    )
                     .build()
             }
 
