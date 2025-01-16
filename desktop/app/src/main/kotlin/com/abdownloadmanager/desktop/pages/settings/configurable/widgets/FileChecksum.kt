@@ -36,19 +36,9 @@ fun RenderFileChecksumConfig(cfg: FileChecksumConfigurable, modifier: Modifier) 
                     value?.let { value ->
                         Row(
                             Modifier
-                                .padding(vertical = 8.dp)
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            MyTextField(
-                                text = value.value,
-                                onTextChange = {
-                                    setValue(value.copy(value = it))
-                                },
-                                shape = RectangleShape,
-                                textPadding = PaddingValues(4.dp),
-                                enabled = enabled,
-                                modifier = Modifier.weight(1f),
-                                placeholder = myStringResource(Res.string.file_checksum),
-                            )
                             RenderSpinner(
                                 possibleValues = FileChecksumAlgorithm
                                     .all()
@@ -62,6 +52,18 @@ fun RenderFileChecksumConfig(cfg: FileChecksumConfigurable, modifier: Modifier) 
                             ) {
                                 Text(it)
                             }
+                            Text(":", Modifier.padding(horizontal = 4.dp))
+                            MyTextField(
+                                text = value.value,
+                                onTextChange = {
+                                    setValue(value.copy(value = it))
+                                },
+                                shape = RectangleShape,
+                                textPadding = PaddingValues(4.dp),
+                                enabled = enabled,
+                                modifier = Modifier.weight(1f),
+                                placeholder = myStringResource(Res.string.file_checksum),
+                            )
                         }
                     }
                 }
