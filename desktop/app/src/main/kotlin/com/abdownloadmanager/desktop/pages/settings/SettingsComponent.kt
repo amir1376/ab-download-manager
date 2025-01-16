@@ -10,6 +10,9 @@ import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import com.abdownloadmanager.shared.utils.proxy.ProxyMode
@@ -22,7 +25,9 @@ import ir.amirab.util.datasize.ConvertSizeConfig
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
+import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -427,6 +432,7 @@ class SettingsComponent(
     KoinComponent,
     ContainsEffects<SettingPageEffects> by supportEffects() {
     val appSettings by inject<AppSettingsStorage>()
+    private val pageStorage by inject<PageStatesStorage>()
     val appRepository by inject<AppRepository>()
     val proxyManager by inject<ProxyManager>()
     val themeManager by inject<ThemeManager>()
@@ -469,6 +475,32 @@ class SettingsComponent(
 
     fun toFront() {
         sendEffect(SettingPageEffects.BringToFront)
+    }
+
+    val settingsPageStateToPersist = MutableStateFlow(pageStorage.settingsPageStorage.value)
+    private val _windowSize = settingsPageStateToPersist.mapTwoWayStateFlow(
+        map = {
+            it.windowSize.let { (x, y) ->
+                DpSize(x.dp, y.dp)
+            }
+        },
+        unMap = {
+            copy(
+                windowSize = it.width.value to it.height.value
+            )
+        }
+    )
+    val windowSize = _windowSize.asStateFlow()
+    fun setWindowSize(dpSize: DpSize) {
+        _windowSize.value = dpSize
+    }
+
+    init {
+        settingsPageStateToPersist
+            .debounce(500)
+            .onEach { newValue ->
+                pageStorage.settingsPageStorage.update { newValue }
+            }.launchIn(scope)
     }
 
     var pages = listOf(
