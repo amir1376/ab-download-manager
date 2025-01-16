@@ -15,6 +15,15 @@ data class ProxyWithRules(
     val rules: ProxyRules,
 )
 
+@Serializable
+data class PACProxy(
+    val uri: String,// an uri to get script path of the PAC
+) {
+    companion object {
+        fun default() = PACProxy("http://localhost/some.pac")
+    }
+}
+
 enum class ProxyMode {
     @SerialName("direct")
     Direct,
@@ -23,7 +32,10 @@ enum class ProxyMode {
     UseSystem,
 
     @SerialName("manual")
-    Manual;
+    Manual,
+
+    @SerialName("pac")
+    Pac;
 
     companion object {
         fun usableValues(): List<ProxyMode> {
@@ -31,8 +43,9 @@ enum class ProxyMode {
             // so we filter it for now.
             return listOf(
                 Direct,
-                Manual,
                 UseSystem,
+                Pac,
+                Manual,
             )
         }
     }
@@ -42,7 +55,10 @@ enum class ProxyMode {
 @Serializable
 data class ProxyData(
     val proxyMode: ProxyMode,
+    //manual proxy config
     val proxyWithRules: ProxyWithRules,
+    //configuration script config
+    val pac: PACProxy,
 ) {
     companion object {
         fun default() = ProxyData(
@@ -50,7 +66,8 @@ data class ProxyData(
             proxyWithRules = ProxyWithRules(
                 proxy = Proxy.default(),
                 rules = ProxyRules(emptyList())
-            )
+            ),
+            pac = PACProxy.default()
         )
     }
 }

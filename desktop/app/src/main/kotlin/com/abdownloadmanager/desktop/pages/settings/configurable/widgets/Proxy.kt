@@ -21,13 +21,14 @@ import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.utils.isValidUrl
+import com.abdownloadmanager.shared.utils.proxy.*
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import com.abdownloadmanager.shared.utils.proxy.ProxyMode
-import com.abdownloadmanager.shared.utils.proxy.ProxyRules
-import com.abdownloadmanager.shared.utils.proxy.ProxyWithRules
 import ir.amirab.downloader.connection.proxy.Proxy
 import ir.amirab.downloader.connection.proxy.ProxyType
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.DesktopUtils
 
@@ -43,82 +44,50 @@ fun RenderProxyConfig(cfg: ProxyConfigurable, modifier: Modifier) {
             TitleAndDescription(cfg, true)
         },
         value = {
-            RenderSpinner(
-                enabled = enabled,
-                possibleValues = ProxyMode.usableValues(),
-                value = value.proxyMode,
-                onSelect = {
-                    setValue(
-                        value.copy(
-                            proxyMode = it
-                        )
-                    )
-                },
-                modifier = Modifier.widthIn(min = 120.dp),
-                render = {
-                    val text = myStringResource(
-                        when (it) {
-                            ProxyMode.Direct -> Res.string.proxy_no
-                            ProxyMode.UseSystem -> Res.string.proxy_system
-                            ProxyMode.Manual -> Res.string.proxy_manual
-                        }
-                    )
-                    Text(text)
-                },
+            RenderChangeProxyConfig(
+                proxyWithRules = value,
+                setProxyWithRules = { setValue(it) }
             )
         },
-        nestedContent = {
-            AnimatedContent(value.proxyMode.takeIf { enabled }) {
-                when (it) {
-                    ProxyMode.Direct -> {}
-                    ProxyMode.UseSystem -> {
-                        ActionButton(
-                            myStringResource(Res.string.proxy_open_system_proxy_settings),
-                            onClick = {
-                                DesktopUtils.openSystemProxySettings()
-                            },
-                        )
-                    }
-
-                    ProxyMode.Manual -> {
-                        RenderManualProxyConfig(
-                            proxyWithRules = value.proxyWithRules,
-                            setProxyWithRules = {
-                                setValue(
-                                    value.copy(
-                                        proxyWithRules = it
-                                    )
-                                )
-                            }
-                        )
-                    }
-
-                    null -> {}
-                }
-            }
-        }
     )
 }
 
 @Stable
 private class ProxyEditState(
-    private val proxyWithRules: ProxyWithRules,
-    private val setProxyWithRules: (ProxyWithRules) -> Unit,
+    private val proxyData: ProxyData,
+    private val setProxyData: (ProxyData) -> Unit,
 ) {
-    var proxyType = mutableStateOf(proxyWithRules.proxy.type)
+    var proxyMode = mutableStateOf(proxyData.proxyMode)
 
-    var proxyHost = mutableStateOf(proxyWithRules.proxy.host)
-    var proxyPort = mutableStateOf(proxyWithRules.proxy.port)
+    //pac
+    var pacURL = mutableStateOf(proxyData.pac.uri)
 
-    var useAuth = mutableStateOf(proxyWithRules.proxy.username != null)
-    var proxyUsername = mutableStateOf(proxyWithRules.proxy.username.orEmpty())
-    var proxyPassword = mutableStateOf(proxyWithRules.proxy.password.orEmpty())
+    //manual
+    var proxyType = mutableStateOf(proxyData.proxyWithRules.proxy.type)
 
-    var excludeURLPatterns = mutableStateOf(proxyWithRules.rules.excludeURLPatterns.joinToString(" "))
+    var proxyHost = mutableStateOf(proxyData.proxyWithRules.proxy.host)
+    var proxyPort = mutableStateOf(proxyData.proxyWithRules.proxy.port)
+
+    var useAuth = mutableStateOf(proxyData.proxyWithRules.proxy.username != null)
+    var proxyUsername = mutableStateOf(proxyData.proxyWithRules.proxy.username.orEmpty())
+    var proxyPassword = mutableStateOf(proxyData.proxyWithRules.proxy.password.orEmpty())
+
+    var excludeURLPatterns = mutableStateOf(proxyData.proxyWithRules.rules.excludeURLPatterns.joinToString(" "))
 
     val canSave: Boolean by derivedStateOf {
-        val hostValid = proxyHost.value.isNotBlank()
-        hostValid
+        when (proxyMode.value) {
+            ProxyMode.Direct -> true
+            ProxyMode.UseSystem -> true
+            ProxyMode.Manual -> {
+                val hostValid = proxyHost.value.isNotBlank()
+                hostValid
+            }
+
+            ProxyMode.Pac -> {
+                isValidUrl(pacURL.value)
+            }
+        }
+
     }
 
     fun save() {
@@ -126,20 +95,24 @@ private class ProxyEditState(
         if (!canSave) {
             return
         }
-        setProxyWithRules(
-            proxyWithRules.copy(
-                proxy = Proxy(
-                    type = proxyType.value,
-                    host = proxyHost.value.trim(),
-                    port = proxyPort.value,
-                    username = proxyUsername.value.takeIf { it.isNotEmpty() && useAuth },
-                    password = proxyPassword.value.takeIf { it.isNotEmpty() && useAuth },
-                ),
-                rules = ProxyRules(
-                    excludeURLPatterns = excludeURLPatterns.value
-                        .split(" ")
-                        .map { it.trim() }
-                        .filterNot { it.isEmpty() },
+        setProxyData(
+            proxyData.copy(
+                proxyMode = proxyMode.value,
+                pac = proxyData.pac.copy(pacURL.value),
+                proxyWithRules = proxyData.proxyWithRules.copy(
+                    proxy = Proxy(
+                        type = proxyType.value,
+                        host = proxyHost.value.trim(),
+                        port = proxyPort.value,
+                        username = proxyUsername.value.takeIf { it.isNotEmpty() && useAuth },
+                        password = proxyPassword.value.takeIf { it.isNotEmpty() && useAuth },
+                    ),
+                    rules = ProxyRules(
+                        excludeURLPatterns = excludeURLPatterns.value
+                            .split(" ")
+                            .map { it.trim() }
+                            .filterNot { it.isEmpty() },
+                    )
                 )
             )
         )
@@ -147,27 +120,27 @@ private class ProxyEditState(
 }
 
 @Composable
-fun RenderManualProxyConfig(
-    proxyWithRules: ProxyWithRules,
-    setProxyWithRules: (ProxyWithRules) -> Unit,
+fun RenderChangeProxyConfig(
+    proxyWithRules: ProxyData,
+    setProxyWithRules: (ProxyData) -> Unit,
 ) {
-    var showManualProxyConfig by remember {
+    var showProxyConfig by remember {
         mutableStateOf(false)
     }
     ActionButton(
         myStringResource(Res.string.change_proxy),
         onClick = {
-            showManualProxyConfig = true
+            showProxyConfig = true
         },
     )
-    if (showManualProxyConfig) {
+    if (showProxyConfig) {
         val dismiss = {
-            showManualProxyConfig = false
+            showProxyConfig = false
         }
         val state = remember(setProxyWithRules) {
             ProxyEditState(
-                proxyWithRules = proxyWithRules,
-                setProxyWithRules = {
+                proxyData = proxyWithRules,
+                setProxyData = {
                     setProxyWithRules(it)
                     dismiss()
                 }
@@ -177,6 +150,7 @@ fun RenderManualProxyConfig(
     }
 }
 
+
 @Composable
 private fun ProxyEditDialog(
     state: ProxyEditState,
@@ -185,142 +159,74 @@ private fun ProxyEditDialog(
     Dialog(
         onDismissRequest = (onDismiss),
         content = {
-            val (type, setType) = state.proxyType
-            val (host, setHost) = state.proxyHost
-            val (port, setPort) = state.proxyPort
-            val (useAuth, setUseAuth) = state.useAuth
-            val (username, setUsername) = state.proxyUsername
-            val (password, setPassword) = state.proxyPassword
-            val (excludeURLPatterns, setExcludeURLPatterns) = state.excludeURLPatterns
-
+            val (mode, setMode) = state.proxyMode
             SettingsDialog(
                 headerTitle = myStringResource(Res.string.proxy_change_title),
                 onDismiss = onDismiss,
                 content = {
+                    val shape = RoundedCornerShape(6.dp)
                     Column(
                         Modifier
                             .verticalScroll(rememberScrollState())
                     ) {
-                        val spacer = @Composable {
-                            Spacer(Modifier.height(8.dp))
-                        }
-                        DialogConfigItem(
-                            modifier = Modifier,
-                            title = {
-                                Text(myStringResource(Res.string.proxy_type))
-                            },
-                            value = {
-                                Multiselect(
-                                    selections = ProxyType.entries.toList(),
-                                    selectedItem = type,
-                                    onSelectionChange = setType,
-                                    modifier = Modifier,
-                                    render = {
-                                        Text(
-                                            it.name,
-                                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-                                        )
-                                    },
-                                    selectedColor = LocalContentColor.current / 15,
-                                    unselectedAlpha = 0.8f,
-                                )
-                            }
-                        )
-                        spacer()
-                        DialogConfigItem(
-                            modifier = Modifier,
-                            title = {
-                                Text(myStringResource(Res.string.address_and_port))
-                            },
-                            value = {
+                        Accordion(
+                            possibleValues = ProxyMode.usableValues(),
+                            selectedItem = mode,
+                            renderHeader = {
+                                val selected = it == mode
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically,
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .clip(shape)
+                                        .clickable { setMode(it) }
+                                        .padding(8.dp)
                                 ) {
-                                    MyTextField(
-                                        text = host,
-                                        onTextChange = setHost,
-                                        placeholder = "127.0.0.1",
-                                        modifier = Modifier.weight(1f),
+                                    RadioButton(
+                                        value = selected,
+                                        onValueChange = {},
                                     )
-                                    Text(":", Modifier.padding(horizontal = 8.dp))
-                                    IntTextField(
-                                        value = port,
-                                        onValueChange = setPort,
-                                        placeholder = myStringResource(Res.string.port),
-                                        range = 1..65535,
-                                        modifier = Modifier.width(96.dp),
-                                        keyboardOptions = KeyboardOptions(),
-                                        textPadding = PaddingValues(8.dp),
-                                        shape = RoundedCornerShape(12.dp),
-                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(it.asStringSource().rememberString())
                                 }
-                            }
-                        )
-                        spacer()
-                        DialogConfigItem(
-                            modifier = Modifier,
-                            title = {
-                                Row(
-                                    modifier = Modifier.onClick {
-                                        setUseAuth(!useAuth)
+                            },
+                            renderContent = {
+                                val cm = Modifier
+                                    .fillMaxWidth()
+                                    .clip(shape)
+                                    .border(1.dp, myColors.onBackground / 0.15f, shape)
+                                    .background(myColors.background / 25)
+                                    .padding(8.dp)
+                                when (it) {
+                                    ProxyMode.Direct -> {
+
                                     }
-                                ) {
-                                    CheckBox(
-                                        value = useAuth,
-                                        onValueChange = setUseAuth,
-                                        size = 16.dp
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(myStringResource(Res.string.use_authentication))
-                                }
-                            },
-                            value = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    MyTextField(
-                                        text = username,
-                                        onTextChange = setUsername,
-                                        placeholder = myStringResource(Res.string.username),
-                                        modifier = Modifier.weight(1f),
-                                        enabled = useAuth,
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    MyTextField(
-                                        text = password,
-                                        onTextChange = setPassword,
-                                        placeholder = myStringResource(Res.string.password),
-                                        modifier = Modifier.weight(1f),
-                                        enabled = useAuth,
-                                    )
+
+                                    ProxyMode.UseSystem -> {
+                                        Column(cm) {
+                                            ActionButton(
+                                                myStringResource(Res.string.proxy_open_system_proxy_settings),
+                                                onClick = {
+                                                    DesktopUtils.openSystemProxySettings()
+                                                },
+                                            )
+                                        }
+                                    }
+
+                                    ProxyMode.Manual -> {
+                                        Column(cm) {
+                                            RenderManualConfig(state)
+                                        }
+                                    }
+
+                                    ProxyMode.Pac -> {
+                                        Column(cm) {
+                                            RenderPACConfig(state)
+                                        }
+                                    }
                                 }
                             }
                         )
-                        spacer()
-                        DialogConfigItem(
-                            modifier = Modifier,
-                            title = {
-                                Row {
-                                    Text(myStringResource(Res.string.proxy_do_not_use_proxy_for))
-                                    Spacer(Modifier.width(8.dp))
-                                    com.abdownloadmanager.shared.ui.widget.Help(
-                                        myStringResource(Res.string.proxy_do_not_use_proxy_for_description)
-                                    )
-                                }
-                            },
-                            value = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    MyTextField(
-                                        text = excludeURLPatterns,
-                                        onTextChange = setExcludeURLPatterns,
-                                        placeholder = "example.com 192.168.1.*",
-                                        modifier = Modifier,
-                                    )
-                                }
-                            }
-                        )
+                        ProxyConfigSpacer()
                     }
                 },
                 actions = {
@@ -336,6 +242,163 @@ private fun ProxyEditDialog(
                     })
                 }
             )
+        }
+    )
+}
+
+@Composable
+private fun RenderPACConfig(
+    state: ProxyEditState,
+) {
+    Column {
+        val (url, setPacUrl) = state.pacURL
+        DialogConfigItem(
+            modifier = Modifier,
+            title = {
+                Text(myStringResource(Res.string.proxy_pac_url))
+            },
+            value = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    MyTextField(
+                        text = url,
+                        onTextChange = setPacUrl,
+                        placeholder = "http://path/to/file.pac",
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun RenderManualConfig(
+    state: ProxyEditState,
+) {
+    val (type, setType) = state.proxyType
+    val (host, setHost) = state.proxyHost
+    val (port, setPort) = state.proxyPort
+    val (useAuth, setUseAuth) = state.useAuth
+    val (username, setUsername) = state.proxyUsername
+    val (password, setPassword) = state.proxyPassword
+    val (excludeURLPatterns, setExcludeURLPatterns) = state.excludeURLPatterns
+    DialogConfigItem(
+        modifier = Modifier,
+        title = {
+            Text(myStringResource(Res.string.proxy_type))
+        },
+        value = {
+            Multiselect(
+                selections = ProxyType.entries.toList(),
+                selectedItem = type,
+                onSelectionChange = setType,
+                modifier = Modifier,
+                render = {
+                    Text(
+                        it.name,
+                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
+                    )
+                },
+                selectedColor = LocalContentColor.current / 15,
+                unselectedAlpha = 0.8f,
+            )
+        }
+    )
+    ProxyConfigSpacer()
+    DialogConfigItem(
+        modifier = Modifier,
+        title = {
+            Text(myStringResource(Res.string.address_and_port))
+        },
+        value = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                MyTextField(
+                    text = host,
+                    onTextChange = setHost,
+                    placeholder = "127.0.0.1",
+                    modifier = Modifier.weight(1f),
+                )
+                Text(":", Modifier.padding(horizontal = 8.dp))
+                IntTextField(
+                    value = port,
+                    onValueChange = setPort,
+                    placeholder = myStringResource(Res.string.port),
+                    range = 1..65535,
+                    modifier = Modifier.width(96.dp),
+                    keyboardOptions = KeyboardOptions(),
+                    textPadding = PaddingValues(8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                )
+            }
+        }
+    )
+    ProxyConfigSpacer()
+    DialogConfigItem(
+        modifier = Modifier,
+        title = {
+            Row(
+                modifier = Modifier.onClick {
+                    setUseAuth(!useAuth)
+                }
+            ) {
+                CheckBox(
+                    value = useAuth,
+                    onValueChange = setUseAuth,
+                    size = 16.dp
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(myStringResource(Res.string.use_authentication))
+            }
+        },
+        value = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                MyTextField(
+                    text = username,
+                    onTextChange = setUsername,
+                    placeholder = myStringResource(Res.string.username),
+                    modifier = Modifier.weight(1f),
+                    enabled = useAuth,
+                )
+                Spacer(Modifier.width(8.dp))
+                MyTextField(
+                    text = password,
+                    onTextChange = setPassword,
+                    placeholder = myStringResource(Res.string.password),
+                    modifier = Modifier.weight(1f),
+                    enabled = useAuth,
+                )
+            }
+        }
+    )
+    ProxyConfigSpacer()
+    DialogConfigItem(
+        modifier = Modifier,
+        title = {
+            Row {
+                Text(myStringResource(Res.string.proxy_do_not_use_proxy_for))
+                Spacer(Modifier.width(8.dp))
+                com.abdownloadmanager.shared.ui.widget.Help(
+                    myStringResource(Res.string.proxy_do_not_use_proxy_for_description)
+                )
+            }
+        },
+        value = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                MyTextField(
+                    text = excludeURLPatterns,
+                    onTextChange = setExcludeURLPatterns,
+                    placeholder = "example.com 192.168.1.*",
+                    modifier = Modifier,
+                )
+            }
         }
     )
 }
@@ -362,7 +425,6 @@ private fun SettingsDialog(
             )
             .padding(16.dp)
             .width(450.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -385,7 +447,9 @@ private fun SettingsDialog(
             )
         }
         Spacer(Modifier.height(8.dp))
-        content()
+        Box(Modifier.weight(1f, false)) {
+            content()
+        }
         actions?.let {
             Spacer(Modifier.height(8.dp))
             Row(
@@ -396,6 +460,11 @@ private fun SettingsDialog(
             }
         }
     }
+}
+
+@Composable
+private fun ProxyConfigSpacer() {
+    Spacer(Modifier.height(8.dp))
 }
 
 @Composable
@@ -424,6 +493,38 @@ private fun DialogConfigItem(
             ) {
                 value()
             }
+        }
+    }
+}
+
+private fun ProxyMode.asStringSource(): StringSource {
+    return when (this) {
+        ProxyMode.Direct -> Res.string.proxy_no
+        ProxyMode.UseSystem -> Res.string.proxy_system
+        ProxyMode.Manual -> Res.string.proxy_manual
+        ProxyMode.Pac -> Res.string.proxy_pac
+    }.asStringSource()
+}
+
+@Composable
+private fun <T> Accordion(
+    possibleValues: List<T>,
+    selectedItem: T,
+    renderHeader: @Composable (T) -> Unit,
+    renderContent: @Composable (T) -> Unit,
+) {
+    Column {
+        possibleValues.forEach {
+            ExpandableItem(
+                modifier = Modifier,
+                isExpanded = selectedItem == it,
+                header = {
+                    renderHeader(it)
+                },
+                body = {
+                    renderContent(it)
+                },
+            )
         }
     }
 }
