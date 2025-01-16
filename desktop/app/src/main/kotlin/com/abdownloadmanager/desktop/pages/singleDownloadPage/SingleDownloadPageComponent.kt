@@ -6,6 +6,7 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfi
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import arrow.optics.copy
+import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
@@ -321,7 +322,7 @@ class SingleDownloadComponent(
                             )
                     }
                 },
-                range = 0..32,
+                range = 0..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
                 renderMode = IntConfigurable.RenderMode.TextField,
             ),
             SpeedLimitConfigurable(

@@ -100,26 +100,26 @@ sealed interface StringSource {
         override fun rememberString(): String {
             return values.map {
                 it.rememberString()
-            }.joinToString()
+            }.joinToString(separator)
         }
 
         @Composable
         override fun rememberString(args: Map<String, String>): String {
             return values.map {
                 it.rememberString(args)
-            }.joinToString()
+            }.joinToString(separator)
         }
 
         override fun getString(): String {
             return values.map {
                 it.getString()
-            }.joinToString()
+            }.joinToString(separator)
         }
 
         override fun getString(args: Map<String, String>): String {
             return values.map {
                 it.getString(args)
-            }.joinToString()
+            }.joinToString(separator)
         }
     }
 }
