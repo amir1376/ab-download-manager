@@ -196,7 +196,7 @@ class EditDownloadState(
                 },
                 unMap = {
                     copy(
-                        preferredConnectionCount = it.takeIf { it > 1 }
+                        preferredConnectionCount = it.takeIf { it >= 1 }
                     )
                 }
             ),
