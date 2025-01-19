@@ -283,7 +283,7 @@ class AddSingleDownloadComponent(
                     it ?: 0
                 },
                 unMap = {
-                    it.takeIf { it > 1 }
+                    it.takeIf { it >= 1 }
                 }
             ),
             range = 0..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
