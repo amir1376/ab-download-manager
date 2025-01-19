@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -31,6 +31,7 @@ import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.DesktopUtils
+import ir.amirab.util.ifThen
 
 
 @Composable
@@ -170,6 +171,19 @@ private fun ProxyEditDialog(
                             .verticalScroll(rememberScrollState())
                     ) {
                         Accordion(
+                            wrapItem = { item, content ->
+                                val selected = item == mode
+                                Box(
+                                    Modifier.ifThen(selected) {
+                                        Modifier
+                                            .clip(shape)
+                                            .border(1.dp, myColors.onBackground / 0.15f, shape)
+                                            .background(myColors.background / 25)
+                                    }
+                                ) {
+                                    content()
+                                }
+                            },
                             possibleValues = ProxyMode.usableValues(),
                             selectedItem = mode,
                             renderHeader = {
@@ -180,22 +194,39 @@ private fun ProxyEditDialog(
                                         .clip(shape)
                                         .clickable { setMode(it) }
                                         .padding(8.dp)
+                                        .padding(
+                                            animateDpAsState(
+                                                if (selected) 4.dp else 0.dp
+                                            ).value
+                                        )
                                 ) {
                                     RadioButton(
                                         value = selected,
                                         onValueChange = {},
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Text(it.asStringSource().rememberString())
+                                    Text(
+                                        text = it.asStringSource().rememberString(),
+                                        fontSize = if (selected) {
+                                            myTextSizes.lg
+                                        } else {
+                                            myTextSizes.base
+                                        },
+                                        fontWeight = if (selected) {
+                                            FontWeight.Bold
+                                        } else {
+                                            null
+                                        }
+                                    )
                                 }
                             },
                             renderContent = {
                                 val cm = Modifier
                                     .fillMaxWidth()
-                                    .clip(shape)
-                                    .border(1.dp, myColors.onBackground / 0.15f, shape)
-                                    .background(myColors.background / 25)
-                                    .padding(8.dp)
+                                    .padding(
+                                        vertical = 12.dp,
+                                        horizontal = 16.dp
+                                    )
                                 when (it) {
                                     ProxyMode.Direct -> {
 
@@ -383,7 +414,7 @@ private fun RenderManualConfig(
             Row {
                 Text(myStringResource(Res.string.proxy_do_not_use_proxy_for))
                 Spacer(Modifier.width(8.dp))
-                com.abdownloadmanager.shared.ui.widget.Help(
+                Help(
                     myStringResource(Res.string.proxy_do_not_use_proxy_for_description)
                 )
             }
@@ -510,21 +541,23 @@ private fun ProxyMode.asStringSource(): StringSource {
 private fun <T> Accordion(
     possibleValues: List<T>,
     selectedItem: T,
+    wrapItem: @Composable (T, @Composable () -> Unit) -> Unit = { _, content -> content() },
     renderHeader: @Composable (T) -> Unit,
     renderContent: @Composable (T) -> Unit,
 ) {
     Column {
         possibleValues.forEach {
-            ExpandableItem(
-                modifier = Modifier,
-                isExpanded = selectedItem == it,
-                header = {
-                    renderHeader(it)
-                },
-                body = {
-                    renderContent(it)
-                },
-            )
+            wrapItem(it) {
+                ExpandableItem(
+                    isExpanded = selectedItem == it,
+                    header = {
+                        renderHeader(it)
+                    },
+                    body = {
+                        renderContent(it)
+                    },
+                )
+            }
         }
     }
 }
