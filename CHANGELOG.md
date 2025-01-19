@@ -14,6 +14,27 @@
 
 ### Security
 
+## 1.5.2
+
+### Added
+
+- An ability to validate downloads with File Checksum
+- System Proxy support
+- Proxy Auto Configuration (pac) support
+
+### Changed
+
+- Maximum allowed thread count has been increased
+
+### Fixed
+
+- Fixed the incorrect System Tray name on Linux.
+
+### Improved
+
+- Translations Updated
+- Settings window size will be remembered now
+
 ## 1.5.1
 
 ### Added
