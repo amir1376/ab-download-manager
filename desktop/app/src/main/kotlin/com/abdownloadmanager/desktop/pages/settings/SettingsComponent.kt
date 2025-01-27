@@ -318,26 +318,36 @@ fun themeConfig(
 fun languageConfig(
     languageManager: LanguageManager,
     scope: CoroutineScope,
-): EnumConfigurable<LanguageInfo> {
-    val currentLanguageName = languageManager.selectedLanguage
-    val allLanguages = languageManager.languageList
+): EnumConfigurable<LanguageInfo?> {
+    val currentLanguageName = languageManager.selectedLanguageInStorage
+    val allLanguages = languageManager.languageList.value
     return EnumConfigurable(
         title = Res.string.settings_language.asStringSource(),
         description = "".asStringSource(),
         backedBy = createMutableStateFlowFromStateFlow(
-            flow = currentLanguageName.mapStateFlow { l ->
-                allLanguages.value.find {
-                    it.toLocaleString() == l
-                } ?: LanguageManager.DefaultLanguageInfo
+            flow = currentLanguageName.mapStateFlow { language ->
+                language?.let {
+                    allLanguages.find {
+                        it.toLocaleString() == language
+                    }
+                }
             },
             updater = { languageInfo ->
                 languageManager.selectLanguage(languageInfo)
             },
             scope = scope,
         ),
-        possibleValues = allLanguages.value,
+        possibleValues = listOf(null).plus(allLanguages),
         describe = {
-            it.nativeName.asStringSource()
+            val isAuto = it == null
+            val language = it ?: languageManager.systemLanguageOrDefault
+            val languageName = language.nativeName
+            if (isAuto) {
+                // always use english here!
+                "System ($languageName)".asStringSource()
+            } else {
+                languageName.asStringSource()
+            }
         },
     )
 }
