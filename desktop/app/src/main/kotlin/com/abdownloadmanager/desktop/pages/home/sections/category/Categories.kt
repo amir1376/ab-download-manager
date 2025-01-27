@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.div
@@ -120,6 +121,7 @@ private fun CategoryFilterItem(
                     category.name,
                     Modifier.weight(1f),
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     fontSize = myTextSizes.base
                 )
@@ -209,6 +211,7 @@ fun StatusFilterItem(
                             Modifier.weight(1f),
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             fontSize = myTextSizes.lg,
+                            overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
                         )
                         MyIcon(
