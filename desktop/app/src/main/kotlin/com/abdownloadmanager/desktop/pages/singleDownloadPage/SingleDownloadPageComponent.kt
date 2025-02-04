@@ -81,9 +81,10 @@ class SingleDownloadComponent(
     init {
         downloadMonitor
             .downloadListFlow
-//            .conflate()
+            .map { it.firstOrNull { it.id == downloadId } }
+            .distinctUntilChanged()
             .onEach {
-                val item = it.firstOrNull { it.id == downloadId }
+                val item = it
                 val previous = itemStateFlow.value
                 if (previous is ProcessingDownloadItemState && item is CompletedDownloadItemState) {
                     // if It was opened to show progress
