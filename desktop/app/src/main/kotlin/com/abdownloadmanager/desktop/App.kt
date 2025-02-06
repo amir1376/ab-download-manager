@@ -12,6 +12,7 @@ import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 import org.koin.core.component.KoinComponent
@@ -176,7 +177,7 @@ private fun defaultApp(
             System.getProperty("skiko.renderApi") != null
 
     if (!customRenderApiRequested) {
-        if (Platform.getCurrentPlatform() == Platform.Desktop.Windows) {
+        if (Platform.isWindows()) {
             // At the moment default render api have some problems on windows!
             // - when I resize a window, the contents of the window will be stretched
             // - sometimes when I close a window, the window flashes on exiting

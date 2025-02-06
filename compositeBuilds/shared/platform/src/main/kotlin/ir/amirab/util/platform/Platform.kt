@@ -2,6 +2,7 @@ package ir.amirab.util.platform
 
 import ir.amirab.util.platform.Platform.Android
 import ir.amirab.util.platform.Platform.Desktop
+import kotlin.contracts.contract
 
 sealed class Platform(val name: String) {
     data object Android : Platform("Android")
@@ -67,4 +68,30 @@ private class JvmPlatformFinder : PlatformFInder {
 sealed interface DesktopPlatform
 
 
+/**
+ * use this only in desktop environments
+ */
+fun PlatformFInder.asDesktop(): Desktop {
+    val platform = getCurrentPlatform()
+    if (platform is Desktop) {
+        return platform
+    } else {
+        error("Current platform is not a desktop platform")
+    }
+}
 
+fun PlatformFInder.isWindows(): Boolean {
+    return getCurrentPlatform() == Desktop.Windows
+}
+
+fun PlatformFInder.isMac(): Boolean {
+    return getCurrentPlatform() == Desktop.MacOS
+}
+
+fun PlatformFInder.isLinux(): Boolean {
+    return getCurrentPlatform() == Desktop.Linux
+}
+
+fun PlatformFInder.isAndroid(): Boolean {
+    return getCurrentPlatform() == Android
+}
