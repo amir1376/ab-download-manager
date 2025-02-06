@@ -32,6 +32,7 @@ import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.util.startup.Startup
 import com.abdownloadmanager.integration.Integration
+import com.abdownloadmanager.shared.utils.*
 import com.abdownloadmanager.updateapplier.DesktopUpdateApplier
 import com.abdownloadmanager.updateapplier.UpdateApplier
 import ir.amirab.downloader.DownloadManager
@@ -46,10 +47,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import com.abdownloadmanager.updatechecker.GithubUpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateChecker
-import com.abdownloadmanager.shared.utils.DownloadFoldersRegistry
-import com.abdownloadmanager.shared.utils.DownloadSystem
-import com.abdownloadmanager.shared.utils.FileIconProvider
-import com.abdownloadmanager.shared.utils.FileIconProviderUsingCategoryIcons
 import ir.amirab.util.AppVersionTracker
 import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.utils.autoremove.RemovedDownloadsFromDiskTracker
@@ -128,13 +125,7 @@ val downloaderModule = module {
     }
     single<DownloaderClient> {
         OkHttpDownloaderClient(
-            OkHttpClient
-                .Builder()
-                .dispatcher(Dispatcher().apply {
-                    //bypass limit on concurrent connections!
-                    maxRequests = Int.MAX_VALUE
-                    maxRequestsPerHost = Int.MAX_VALUE
-                }).build(),
+            get(),
             get(),
             get(),
             get(),
@@ -346,6 +337,28 @@ val appModule = module {
             },
             currentVersion = AppInfo.version,
         )
+    }
+
+    single {
+        val appSettingsStorage: AppSettingsStorage = get()
+        AppSSLFactoryProvider(
+            ignoreSSLCertificates = appSettingsStorage.ignoreSSLCertificates
+        )
+    }
+    single<OkHttpClient> {
+        val appSSLFactoryProvider: AppSSLFactoryProvider = get()
+        OkHttpClient
+            .Builder()
+            .dispatcher(Dispatcher().apply {
+                //bypass limit on concurrent connections!
+                maxRequests = Int.MAX_VALUE
+                maxRequestsPerHost = Int.MAX_VALUE
+            })
+            .sslSocketFactory(
+                appSSLFactoryProvider.createSSLSocketFactory(),
+                appSSLFactoryProvider.trustManager,
+            )
+            .build()
     }
 
 }

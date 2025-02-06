@@ -139,6 +139,21 @@ fun trackDeletedFilesOnDisk(appRepository: AppRepository): BooleanConfigurable {
     )
 }
 
+fun ignoreSSLCertificates(appSettingsStorage: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_ignore_ssl_certificates.asStringSource(),
+        description = Res.string.settings_ignore_ssl_certificates_description.asStringSource(),
+        backedBy = appSettingsStorage.ignoreSSLCertificates,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
 fun speedUnit(appRepository: AppRepository, scope: CoroutineScope): EnumConfigurable<ConvertSizeConfig> {
     return EnumConfigurable(
         title = Res.string.settings_download_speed_unit.asStringSource(),
@@ -478,6 +493,7 @@ class SettingsComponent(
                     useServerLastModified(appRepository),
                     useSparseFileAllocation(appRepository),
                     trackDeletedFilesOnDisk(appRepository),
+                    ignoreSSLCertificates(appSettings),
                 )
             }
         }
