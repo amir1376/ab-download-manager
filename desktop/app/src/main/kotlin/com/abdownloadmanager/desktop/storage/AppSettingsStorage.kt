@@ -35,6 +35,7 @@ data class AppSettingsModel(
     val trackDeletedFilesOnDisk: Boolean = false,
     val useBitsForSpeed: Boolean = false,
     val ignoreSSLCertificates: Boolean = false,
+    val useCategoryByDefault: Boolean = true,
 ) {
     companion object {
         val default: AppSettingsModel get() = AppSettingsModel()
@@ -62,6 +63,7 @@ data class AppSettingsModel(
             val trackDeletedFilesOnDisk = booleanKeyOf("trackDeletedFilesOnDisk")
             val useBitsForSpeed = booleanKeyOf("useBitsForSpeed")
             val ignoreSSLCertificates = booleanKeyOf("ignoreSSLCertificates")
+            val useCategoryByDefault = booleanKeyOf("useCategoryByDefault")
         }
 
 
@@ -92,6 +94,7 @@ data class AppSettingsModel(
                 trackDeletedFilesOnDisk = source.get(Keys.trackDeletedFilesOnDisk) ?: default.trackDeletedFilesOnDisk,
                 useBitsForSpeed = source.get(Keys.useBitsForSpeed) ?: default.useBitsForSpeed,
                 ignoreSSLCertificates = source.get(Keys.ignoreSSLCertificates) ?: default.ignoreSSLCertificates,
+                useCategoryByDefault = source.get(Keys.useCategoryByDefault) ?: default.useCategoryByDefault,
             )
         }
 
@@ -117,6 +120,7 @@ data class AppSettingsModel(
                 put(Keys.trackDeletedFilesOnDisk, focus.trackDeletedFilesOnDisk)
                 put(Keys.useBitsForSpeed, focus.useBitsForSpeed)
                 put(Keys.ignoreSSLCertificates, focus.ignoreSSLCertificates)
+                put(Keys.useCategoryByDefault, focus.useCategoryByDefault)
             }
         }
     }
@@ -166,4 +170,5 @@ class AppSettingsStorage(
     val trackDeletedFilesOnDisk = from(AppSettingsModel.trackDeletedFilesOnDisk)
     val useBitsForSpeed = from(AppSettingsModel.useBitsForSpeed)
     val ignoreSSLCertificates = from(AppSettingsModel.ignoreSSLCertificates)
+    val useCategoryByDefault = from(AppSettingsModel.useCategoryByDefault)
 }

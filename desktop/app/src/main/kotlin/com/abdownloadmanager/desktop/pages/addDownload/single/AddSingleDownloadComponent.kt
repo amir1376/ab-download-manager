@@ -10,7 +10,7 @@ import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.runtime.*
 import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
 import com.abdownloadmanager.desktop.pages.settings.configurable.FileChecksumConfigurable
-import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderFileChecksumConfig
+import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import com.abdownloadmanager.resources.Res
@@ -56,7 +56,8 @@ class AddSingleDownloadComponent(
     KoinComponent,
     ContainsEffects<AddSingleDownloadPageEffects> by supportEffects() {
 
-    private val appSettings: AppRepository by inject()
+    private val appSettings: AppSettingsStorage by inject()
+    private val appRepository: AppRepository by inject()
     private val client: DownloaderClient by inject()
     val downloadSystem: DownloadSystem by inject()
     val iconProvider: FileIconProvider by inject()
@@ -95,7 +96,7 @@ class AddSingleDownloadComponent(
     }
 
     private fun useDefaultFolder() {
-        setFolder(appSettings.saveLocation.value)
+        setFolder(appRepository.saveLocation.value)
     }
 
 
@@ -112,7 +113,7 @@ class AddSingleDownloadComponent(
 
 
     private val downloadChecker = DownloadUiChecker(
-        initialFolder = appSettings.saveLocation.value,
+        initialFolder = appRepository.saveLocation.value,
         downloadSystem = downloadSystem,
         scope = scope,
         downloaderClient = client,
@@ -150,7 +151,8 @@ class AddSingleDownloadComponent(
             .onEachLatest { onDuplicateStrategy.update { null } }
             .launchIn(scope)
         combine(
-            name, credentials.map { it.link }
+            name,
+            credentials.map { it.link },
         ) { name, link ->
             val category = categoryManager.getCategoryOf(
                 CategoryItem(
@@ -158,11 +160,16 @@ class AddSingleDownloadComponent(
                     url = link,
                 )
             )
+            val globalUseCategoryByDefault = appSettings.useCategoryByDefault.value
+            val suggestedUseCategory: Boolean
             if (category == null) {
-                setUseCategory(false)
+                suggestedUseCategory = false
             } else {
                 setSelectedCategory(category)
-                setUseCategory(true)
+                suggestedUseCategory = true
+            }
+            if (globalUseCategoryByDefault) {
+                setUseCategory(suggestedUseCategory)
             }
         }.launchIn(scope)
     }
@@ -265,7 +272,7 @@ class AddSingleDownloadComponent(
             describe = {
                 if (it == 0L) Res.string.unlimited.asStringSource()
                 else convertPositiveSpeedToHumanReadable(
-                    it, appSettings.speedUnit.value
+                    it, appRepository.speedUnit.value
                 ).asStringSource()
             }
         ),
