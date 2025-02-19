@@ -43,7 +43,7 @@ in order to download and install the app
 ### installation script (Linux)
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh)
+curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh | bash
 ```
 
 ### winget or scoop (for Windows)
