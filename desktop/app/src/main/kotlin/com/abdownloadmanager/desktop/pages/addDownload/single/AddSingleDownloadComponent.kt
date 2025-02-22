@@ -27,10 +27,7 @@ import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.downloader.utils.orDefault
 import ir.amirab.util.flow.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.abdownloadmanager.shared.utils.category.Category
@@ -38,6 +35,7 @@ import com.abdownloadmanager.shared.utils.category.CategoryItem
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
+import kotlinx.coroutines.*
 
 sealed interface AddSingleDownloadPageEffects {
     data class SuggestUrl(val link: String) : AddSingleDownloadPageEffects
@@ -378,16 +376,23 @@ class AddSingleDownloadComponent(
 
     fun onRequestAddToQueue(
         queueId: Long?,
+        startQueue: Boolean,
     ) {
         val downloadItem = downloadItem.value
         consumeDialog {
             saveLocationIfNecessary(downloadItem.folder)
             onRequestAddToQueue(
-                downloadItem,
-                queueId,
-                onDuplicateStrategy.value.orDefault(),
-                selectedCategory.value?.id
+                item = downloadItem,
+                queueId = queueId,
+                onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
+                categoryId = selectedCategory.value?.id,
             )
+            if (queueId != null && startQueue) {
+                GlobalScope.launch {
+                    downloadSystem.startQueue(queueId)
+                }
+            }
+            onRequestClose()
         }
     }
 

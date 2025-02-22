@@ -20,6 +20,7 @@ import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -197,7 +198,7 @@ class AddMultiDownloadComponent(
     }
 
     fun requestAddDownloads(
-        queueId: Long?,
+        queueId: Long?, startQueue: Boolean,
     ) {
 
         val categorySelectionMode = when {
@@ -237,6 +238,11 @@ class AddMultiDownloadComponent(
             val folder = folder.value
             if (allInSameLocation.value) {
                 addToLastUsedLocations(folder)
+            }
+            if (startQueue && queueId != null) {
+                scope.launch {
+                    downloadSystem.startQueue(queueId)
+                }
             }
             requestClose()
         }

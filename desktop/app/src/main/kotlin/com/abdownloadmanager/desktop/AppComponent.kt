@@ -261,7 +261,6 @@ class AppComponent(
                                 categoryId = categoryId,
                                 onDuplicateStrategy = onDuplicate,
                             )
-                            closeAddDownloadDialog(dialogId = config.id)
                         },
                         onRequestAddCategory = {
                             openCategoryDialog(-1)
@@ -297,7 +296,6 @@ class AppComponent(
                                 queueId = queueId,
                                 categorySelectionMode = categorySelectionMode
                             )
-                            closeAddDownloadDialog(config.id)
                         },
                         onRequestAddCategory = {
                             openCategoryDialog(-1)
