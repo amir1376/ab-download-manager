@@ -7,6 +7,6 @@ class UserAgentProviderFromSettings(
     private val appSettingsStorage: AppSettingsStorage
 ) : UserAgentProvider {
     override fun getUserAgent(): String? {
-        return appSettingsStorage.defaultUserAgent.value.takeIf { it.isNotBlank() }
+        return appSettingsStorage.userAgent.value.takeIf { it.isNotBlank() }
     }
 }
