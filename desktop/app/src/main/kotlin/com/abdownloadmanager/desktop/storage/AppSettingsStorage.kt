@@ -36,6 +36,7 @@ data class AppSettingsModel(
     val useBitsForSpeed: Boolean = false,
     val ignoreSSLCertificates: Boolean = false,
     val useCategoryByDefault: Boolean = true,
+    val userAgent: String = "",
 ) {
     companion object {
         val default: AppSettingsModel get() = AppSettingsModel()
@@ -64,6 +65,7 @@ data class AppSettingsModel(
             val useBitsForSpeed = booleanKeyOf("useBitsForSpeed")
             val ignoreSSLCertificates = booleanKeyOf("ignoreSSLCertificates")
             val useCategoryByDefault = booleanKeyOf("useCategoryByDefault")
+            val userAgent = stringKeyOf("userAgent")
         }
 
 
@@ -95,6 +97,7 @@ data class AppSettingsModel(
                 useBitsForSpeed = source.get(Keys.useBitsForSpeed) ?: default.useBitsForSpeed,
                 ignoreSSLCertificates = source.get(Keys.ignoreSSLCertificates) ?: default.ignoreSSLCertificates,
                 useCategoryByDefault = source.get(Keys.useCategoryByDefault) ?: default.useCategoryByDefault,
+                userAgent = source.get(Keys.userAgent) ?: default.userAgent,
             )
         }
 
@@ -121,6 +124,7 @@ data class AppSettingsModel(
                 put(Keys.useBitsForSpeed, focus.useBitsForSpeed)
                 put(Keys.ignoreSSLCertificates, focus.ignoreSSLCertificates)
                 put(Keys.useCategoryByDefault, focus.useCategoryByDefault)
+                put(Keys.userAgent, focus.userAgent)
             }
         }
     }
@@ -171,4 +175,5 @@ class AppSettingsStorage(
     val useBitsForSpeed = from(AppSettingsModel.useBitsForSpeed)
     val ignoreSSLCertificates = from(AppSettingsModel.ignoreSSLCertificates)
     val useCategoryByDefault = from(AppSettingsModel.useCategoryByDefault)
+    val userAgent = from(AppSettingsModel.userAgent)
 }

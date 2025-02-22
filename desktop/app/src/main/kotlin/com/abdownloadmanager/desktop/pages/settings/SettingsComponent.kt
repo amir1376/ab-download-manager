@@ -154,6 +154,21 @@ fun ignoreSSLCertificates(appSettingsStorage: AppSettingsStorage): BooleanConfig
     )
 }
 
+fun userAgent(appSettingsStorage: AppSettingsStorage): StringConfigurable {
+    return StringConfigurable(
+        title = Res.string.settings_default_user_agent.asStringSource(),
+        description = Res.string.settings_default_user_agent_description.asStringSource(),
+        backedBy = appSettingsStorage.userAgent,
+        describe = {
+            if (it.isBlank()) {
+                Res.string.disabled.asStringSource()
+            } else {
+                "".asStringSource()
+            }
+        },
+    )
+}
+
 fun useCategoryByDefault(appSettingsStorage: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_use_category_by_default.asStringSource(),
@@ -510,6 +525,7 @@ class SettingsComponent(
                     useSparseFileAllocation(appRepository),
                     trackDeletedFilesOnDisk(appRepository),
                     ignoreSSLCertificates(appSettings),
+                    userAgent(appSettings),
                 )
             }
         }

@@ -55,6 +55,7 @@ import com.abdownloadmanager.shared.utils.ui.IMyIcons
 import com.abdownloadmanager.shared.utils.proxy.IProxyStorage
 import com.abdownloadmanager.shared.utils.proxy.ProxyData
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
+import ir.amirab.downloader.connection.UserAgentProvider
 import ir.amirab.downloader.connection.proxy.AutoConfigurableProxyProvider
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
 import ir.amirab.downloader.connection.proxy.SystemProxySelectorProvider
@@ -123,8 +124,12 @@ val downloaderModule = module {
     single<SystemProxySelectorProvider> {
         DesktopSystemProxySelectorProvider(get())
     }
+    single<UserAgentProvider> {
+        UserAgentProviderFromSettings(get())
+    }
     single<DownloaderClient> {
         OkHttpDownloaderClient(
+            get(),
             get(),
             get(),
             get(),
