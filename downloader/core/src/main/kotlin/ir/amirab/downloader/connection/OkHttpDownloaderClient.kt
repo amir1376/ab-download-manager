@@ -129,7 +129,7 @@ class OkHttpDownloaderClient(
         newCall(
             downloadCredentials = credentials,
             start = 0,
-            end = 255,
+            end = null,
             extraBuilder = {
 //                head()
             }
