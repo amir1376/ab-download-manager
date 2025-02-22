@@ -178,8 +178,8 @@ fun AddDownloadPage(
             ShowAddToQueueDialog(
                 queueList = component.queues.collectAsState().value,
                 onClose = { component.shouldShowAddToQueue = false },
-                onQueueSelected = {
-                    component.onRequestAddToQueue(it)
+                onQueueSelected = { queue, startQueue ->
+                    component.onRequestAddToQueue(queue, startQueue)
                 }
             )
         }
@@ -600,13 +600,15 @@ fun MyTextFieldIcon(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    MyIcon(icon, null, Modifier
-        .pointerHoverIcon(PointerIcon.Default)
-        .fillMaxHeight()
-        .clickable(enabled = enabled, onClick = onClick)
-        .wrapContentHeight()
-        .padding(horizontal = 8.dp)
-        .size(16.dp))
+    MyIcon(
+        icon, null, Modifier
+            .pointerHoverIcon(PointerIcon.Default)
+            .fillMaxHeight()
+            .clickable(enabled = enabled, onClick = onClick)
+            .wrapContentHeight()
+            .padding(horizontal = 8.dp)
+            .size(16.dp)
+    )
 }
 
 @Composable

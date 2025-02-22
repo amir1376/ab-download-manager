@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
 import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.widget.CheckBox
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.util.desktop.screen.applyUiScale
@@ -34,7 +35,7 @@ import java.awt.MouseInfo
 @Composable
 fun ShowAddToQueueDialog(
     queueList: List<DownloadQueue>,
-    onQueueSelected: (Long?) -> Unit,
+    onQueueSelected: (Long?, Boolean) -> Unit,
     onClose: () -> Unit,
 ) {
     val h = 210
@@ -48,12 +49,15 @@ fun ShowAddToQueueDialog(
     val close = {
         onClose()
     }
+    val (startQueue, setStartQueue) = remember {
+        mutableStateOf(false)
+    }
     BaseOptionDialog(
         onCloseRequest = close,
         state = state,
         resizeable = false,
     ) {
-        LaunchedEffect(window){
+        LaunchedEffect(window) {
             window.moveSafe(
                 MouseInfo.getPointerInfo().location.run {
                     DpOffset(
@@ -120,7 +124,7 @@ fun ShowAddToQueueDialog(
                                             modifier = addToQueueModifier,
                                             name = queueModel.name,
                                             onSelect = {
-                                                onQueueSelected(queueModel.id)
+                                                onQueueSelected(queueModel.id, startQueue)
                                             }
                                         )
                                     }
@@ -132,14 +136,31 @@ fun ShowAddToQueueDialog(
                                     .align(Alignment.CenterEnd)
                             )
                         }
-                        Row (
+                        Spacer(Modifier.height(4.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .onClick {
+                                    setStartQueue(!startQueue)
+                                }
+                                .padding(vertical = 4.dp)
+                                .padding(start = 2.dp)
+                        ) {
+                            CheckBox(
+                                size = 14.dp,
+                                value = startQueue,
+                                onValueChange = setStartQueue
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(myStringResource(Res.string.start_queue))
+                        }
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                            ,
+                                .padding(vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
-                        ){
+                        ) {
                             IconActionButton(
                                 MyIcons.add,
                                 contentDescription = myStringResource(Res.string.add_new_queue),
@@ -149,7 +170,7 @@ fun ShowAddToQueueDialog(
                                 text = myStringResource(Res.string.without_queue),
                                 modifier = Modifier,
                                 onClick = {
-                                    onQueueSelected(null)
+                                    onQueueSelected(null, startQueue)
                                 }
                             )
                         }
@@ -166,10 +187,11 @@ fun QueueItemToSelect(
     name: String,
     onSelect: () -> Unit,
 ) {
-    Row(modifier
-        .clickable(onClick = onSelect)
-        .padding(vertical = 4.dp)
-        .padding(horizontal = 4.dp)
+    Row(
+        modifier
+            .clickable(onClick = onSelect)
+            .padding(vertical = 4.dp)
+            .padding(horizontal = 4.dp)
     ) {
         Text(
             "$name",
@@ -177,6 +199,7 @@ fun QueueItemToSelect(
         )
     }
 }
+
 @Composable
 private fun Divider() {
     Spacer(

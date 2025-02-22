@@ -51,9 +51,9 @@ fun AddMultiItemPage(
     if (addMultiDownloadComponent.showAddToQueue) {
         ShowAddToQueueDialog(
             queueList = addMultiDownloadComponent.queueList.collectAsState().value,
-            onQueueSelected = {
+            onQueueSelected = { queue, startQueue ->
                 addMultiDownloadComponent.requestAddDownloads(
-                    it
+                    queue, startQueue
                 )
             },
             onClose = {
