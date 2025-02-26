@@ -3,27 +3,30 @@ package com.abdownloadmanager.desktop.actions
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.desktop.di.Di
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
-import ir.amirab.util.compose.action.AnAction
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.action.buildMenu
-import ir.amirab.util.compose.action.simpleAction
-import com.abdownloadmanager.shared.utils.getIcon
-import com.abdownloadmanager.shared.utils.getName
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.category.Category
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.utils.getIcon
+import com.abdownloadmanager.shared.utils.getName
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.inactiveQueuesFlow
-import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import ir.amirab.util.UrlUtils
+import ir.amirab.util.compose.action.AnAction
+import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.action.buildMenu
+import ir.amirab.util.compose.action.simpleAction
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.get
 
@@ -54,7 +57,12 @@ val newDownloadFromClipboardAction = simpleAction(
     if (contentsInClipboard.isNullOrEmpty()) {
         return@simpleAction
     }
-    val items = DownloadCredentialFromStringExtractor
+    val curlItems = DownloadCredentialFromStringExtractor.parseCurlCommands(contentsInClipboard)
+    if (curlItems.isNotEmpty()) {
+        appComponent.openAddDownloadDialog(curlItems)
+        return@simpleAction
+    }
+    val items: List<DownloadCredentials> = DownloadCredentialFromStringExtractor
         .extract(contentsInClipboard)
         .distinctBy { it.link }
     if (items.isEmpty()) {
