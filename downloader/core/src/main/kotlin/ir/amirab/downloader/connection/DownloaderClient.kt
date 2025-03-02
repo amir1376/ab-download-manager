@@ -7,7 +7,7 @@ abstract class DownloaderClient {
     /**
      * these headers will be placed at first and maybe overridden by another header
      */
-    fun defaultHeadersInFirst() = linkedMapOf<String,String>(
+    fun defaultHeadersInFirst() = linkedMapOf<String, String>(
         //empty for now!
     )
 
@@ -19,12 +19,26 @@ abstract class DownloaderClient {
     )
 
 
-    abstract suspend fun head(credentials: IDownloadCredentials): ResponseInfo
+    abstract suspend fun head(
+        credentials: IDownloadCredentials,
+        start: Long?,
+        end: Long?,
+    ): ResponseInfo
+
     abstract suspend fun connect(
         credentials: IDownloadCredentials,
-        start: Long,
+        start: Long?,
         end: Long?,
     ): Connection
+
+    suspend fun test(credentials: IDownloadCredentials): ResponseInfo {
+        val response = head(credentials, 0, null)
+        if (response.isSuccessFul && response.totalLength != 0L) {
+            return response
+        }
+        // server may return un-standard response we use headless (without resuming support)
+        return head(credentials, null, null)
+    }
 
     companion object {
         fun createRangeHeader(start: Long, end: Long?) = "Range" to "bytes=$start-${end ?: ""}"

@@ -18,11 +18,13 @@ class OkHttpDownloaderClient(
 ) : DownloaderClient() {
     private fun newCall(
         downloadCredentials: IDownloadCredentials,
-        start: Long,
+        start: Long?,
         end: Long?,
         extraBuilder: Request.Builder.() -> Unit,
     ): Call {
-        val rangeHeader = createRangeHeader(start, end)
+        val rangeHeader = start?.let {
+            createRangeHeader(start, end)
+        }
         return okHttpClient
             .applyProxy(downloadCredentials)
             .newCall(
@@ -61,7 +63,11 @@ class OkHttpDownloaderClient(
                         }
                     }
                     .apply(extraBuilder)
-                    .header(rangeHeader.first, rangeHeader.second)
+                    .apply {
+                        if (rangeHeader != null) {
+                            header(rangeHeader.first, rangeHeader.second)
+                        }
+                    }
                     .build()
             )
     }
@@ -125,7 +131,11 @@ class OkHttpDownloaderClient(
     }
 
 
-    override suspend fun head(credentials: IDownloadCredentials): ResponseInfo {
+    override suspend fun head(
+        credentials: IDownloadCredentials,
+        start: Long?,
+        end: Long?,
+    ): ResponseInfo {
         newCall(
             downloadCredentials = credentials,
             start = 0,
@@ -155,7 +165,7 @@ class OkHttpDownloaderClient(
 
     override suspend fun connect(
         credentials: IDownloadCredentials,
-        start: Long,
+        start: Long?,
         end: Long?,
     ): Connection {
         val response = newCall(

@@ -54,7 +54,7 @@ class LinkChecker(
         }
         _isLoading.update { true }
         val info = runCatching {
-            client.head(downloadCredentials)
+            client.test(downloadCredentials)
         }.getOrNull()
         _isLoading.update { false }
         setInfo(info)
