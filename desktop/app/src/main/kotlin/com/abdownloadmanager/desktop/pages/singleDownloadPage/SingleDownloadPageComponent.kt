@@ -81,7 +81,11 @@ class SingleDownloadComponent(
     init {
         downloadMonitor
             .downloadListFlow
-            .map { it.firstOrNull { it.id == downloadId } }
+            // downloadListFlow (combinedStateFlow { active + completed } downloads) emits null sometimes when download item removed from active downloads and also not exists in completed downloads yet (exactly at the moment that download finishes)
+            // however if the download removed by user (item == null)  this component will be closed outside of this component we don't need to handle this case here
+            // I explicitly filter nulls here to make onEach function predictable
+            // if I fix downloadListFlow to not emit nulls I can remove this filter later
+            .mapNotNull { it.firstOrNull { it.id == downloadId } }
             .distinctUntilChanged()
             .onEach {
                 val item = it
