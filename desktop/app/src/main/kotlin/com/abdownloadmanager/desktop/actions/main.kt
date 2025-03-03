@@ -69,7 +69,7 @@ val batchDownloadAction = simpleAction(
     appComponent.openBatchDownload()
 }
 val stopQueueGroupAction = MenuItem.SubMenu(
-    icon = MyIcons.stop,
+    icon = MyIcons.queueStop,
     title = Res.string.stop_queue.asStringSource(),
     items = emptyList()
 ).apply {
@@ -83,7 +83,7 @@ val stopQueueGroupAction = MenuItem.SubMenu(
 
 
 val startQueueGroupAction = MenuItem.SubMenu(
-    icon = MyIcons.resume,
+    icon = MyIcons.queueStart,
     title = Res.string.start_queue.asStringSource(),
     items = emptyList()
 ).apply {

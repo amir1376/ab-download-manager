@@ -1002,11 +1002,12 @@ class HomeComponent(
         separator()
         +startQueueGroupAction
         +stopQueueGroupAction
+        +openQueuesAction
+        separator()
         +stopAllAction
         separator()
         +downloadActions.deleteAction
         separator()
-        +openQueuesAction
         +gotoSettingsAction
     }
 
