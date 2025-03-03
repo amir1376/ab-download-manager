@@ -62,21 +62,21 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
     for (singleDownloadComponent in openedDownloadDialogs) {
         val itemState by singleDownloadComponent.itemStateFlow.collectAsState()
         itemState?.let {
-
-            when (it) {
-                is CompletedDownloadItemState -> {
-                    CompletedWindow(
-                        singleDownloadComponent,
-                        it,
-
+            key(it.id) {
+                when (it) {
+                    is CompletedDownloadItemState -> {
+                        CompletedWindow(
+                            singleDownloadComponent,
+                            it,
                         )
-                }
+                    }
 
-                is ProcessingDownloadItemState -> {
-                    ProgressWindow(
-                        singleDownloadComponent = singleDownloadComponent,
-                        itemState = it,
-                    )
+                    is ProcessingDownloadItemState -> {
+                        ProgressWindow(
+                            singleDownloadComponent = singleDownloadComponent,
+                            itemState = it,
+                        )
+                    }
                 }
             }
         }
