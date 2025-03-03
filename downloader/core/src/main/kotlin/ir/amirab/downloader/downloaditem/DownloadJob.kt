@@ -552,7 +552,7 @@ class DownloadJob(
 //        println("fetch download ")
 
 //        thisLogger().info("fetchDownloadInfoAndValidate")
-        val response = client.head(downloadItem).expectSuccess()
+        val response = client.test(downloadItem).expectSuccess()
         supportsConcurrent = response.resumeSupport
         serverLastModified = kotlin.runCatching {
             response.lastModified?.let(TimeUtils::convertLastModifiedHeaderToTimestamp)
