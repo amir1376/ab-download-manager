@@ -254,7 +254,7 @@ fun HomePage(component: HomeComponent) {
                         AddUrlButton {
                             component.requestAddNewDownload()
                         }
-                        Actions(component.headerActions)
+                        Actions(component.headerActions, component.showLabels.collectAsState().value)
                     }
                     var lastSelected by remember { mutableStateOf(null as Long?) }
                     DownloadList(

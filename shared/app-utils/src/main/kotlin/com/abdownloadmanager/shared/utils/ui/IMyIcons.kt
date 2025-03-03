@@ -49,6 +49,8 @@ interface IMyIcons {
     val pause: IconSource
     val stop: IconSource
     val queue: IconSource
+    val queueStart: IconSource
+    val queueStop: IconSource
     val remove: IconSource
     val clear: IconSource
     val add: IconSource
