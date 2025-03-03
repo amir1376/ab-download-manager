@@ -14,6 +14,31 @@
 
 ### Security
 
+## 1.5.3
+
+### Added
+
+- Vietnamese language.
+- An option to "Select Queue" dialog to start the queue immediately.
+- An option to allow user set custom User-agent in the settings.
+- An option to not "Use Category" by default.
+- An option to disable SSL Certificate Verification.
+- An option to show/hide icon labels in the main toolbar (you can hover over them to see their labels).
+- An option to not use System Tray.
+
+### Fixed
+
+- Sometimes Thread count not applied correctly.
+- The download completion dialog appeared even when its option is disabled.
+- Some servers return 256 Bytes instead of full size
+
+### Improved
+
+- Translations updated
+- Minor UI improvements
+- Use system language as default language
+- Proxy Settings page improved
+
 ## 1.5.2
 
 ### Added
