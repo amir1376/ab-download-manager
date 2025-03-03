@@ -10,13 +10,14 @@ import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import java.io.File
 
-@optics
+@optics([arrow.optics.OpticsTarget.LENS])
 @Serializable
 data class AppSettingsModel(
     val theme: String = "dark",
     val language: String? = null,
     val uiScale: Float? = null,
     val mergeTopBarWithTitleBar: Boolean = false,
+    val showIconLabels: Boolean = true,
     val threadCount: Int = 8,
     val dynamicPartCreation: Boolean = true,
     val useServerLastModifiedTime: Boolean = false,
@@ -48,6 +49,7 @@ data class AppSettingsModel(
             val language = stringKeyOf("language")
             val uiScale = floatKeyOf("uiScale")
             val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
+            val showIconLabels = booleanKeyOf("showIconLabels")
             val threadCount = intKeyOf("threadCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
@@ -76,6 +78,7 @@ data class AppSettingsModel(
                 language = source.get(Keys.language) ?: default.language,
                 uiScale = source.get(Keys.uiScale) ?: default.uiScale,
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
+                showIconLabels = source.get(Keys.showIconLabels) ?: default.showIconLabels,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
                 useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime)
@@ -107,6 +110,7 @@ data class AppSettingsModel(
                 putNullable(Keys.language, focus.language)
                 putNullable(Keys.uiScale, focus.uiScale)
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
+                put(Keys.showIconLabels, focus.showIconLabels)
                 put(Keys.threadCount, focus.threadCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
@@ -158,6 +162,7 @@ class AppSettingsStorage(
     override val selectedLanguage = from(languageLens)
     var uiScale = from(uiScaleLens)
     var mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
+    var showIconLabels = from(AppSettingsModel.showIconLabels)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
