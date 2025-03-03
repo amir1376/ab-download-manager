@@ -427,11 +427,11 @@ fun showIconLabels(appSettings: AppSettingsStorage): BooleanConfigurable {
     )
 }
 
-fun showSystemTray(appSettings: AppSettingsStorage): BooleanConfigurable {
+fun useSystemTray(appSettings: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
-        title = Res.string.settings_show_system_tray.asStringSource(),
-        description = Res.string.settings_show_system_tray_description.asStringSource(),
-        backedBy = appSettings.showSystemTray,
+        title = Res.string.settings_use_system_tray.asStringSource(),
+        description = Res.string.settings_use_system_tray_description.asStringSource(),
+        backedBy = appSettings.useSystemTray,
         describe = {
             if (it) {
                 Res.string.enabled.asStringSource()
@@ -534,7 +534,7 @@ class SettingsComponent(
                     showIconLabels(appSettings),
                     speedUnit(appRepository, scope),
                     playSoundNotification(appSettings),
-                    showSystemTray(appSettings),
+                    useSystemTray(appSettings),
                 )
 
 //                Network -> listOf()

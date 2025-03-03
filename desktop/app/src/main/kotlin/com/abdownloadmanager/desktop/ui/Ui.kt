@@ -145,8 +145,8 @@ private fun HandleEffectsForApp(appComponent: AppComponent) {
 private fun ApplicationScope.SystemTray(
     component: AppComponent,
 ) {
-    val showSystemTray by component.showSystemTray.collectAsState()
-    if (showSystemTray) {
+    val useSystemTray by component.useSystemTray.collectAsState()
+    if (useSystemTray) {
         IComposeSystemTray.Instance.ComposeSystemTray(
             icon = MyIcons.appIcon,
             onClick = showDownloadList,

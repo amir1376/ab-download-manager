@@ -18,7 +18,7 @@ data class AppSettingsModel(
     val uiScale: Float? = null,
     val mergeTopBarWithTitleBar: Boolean = false,
     val showIconLabels: Boolean = true,
-    val showSystemTray: Boolean = true,
+    val useSystemTray: Boolean = true,
     val threadCount: Int = 8,
     val dynamicPartCreation: Boolean = true,
     val useServerLastModifiedTime: Boolean = false,
@@ -51,7 +51,7 @@ data class AppSettingsModel(
             val uiScale = floatKeyOf("uiScale")
             val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
             val showIconLabels = booleanKeyOf("showIconLabels")
-            val showSystemTray = booleanKeyOf("showSystemTray")
+            val useSystemTray = booleanKeyOf("useSystemTray")
             val threadCount = intKeyOf("threadCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
@@ -81,7 +81,7 @@ data class AppSettingsModel(
                 uiScale = source.get(Keys.uiScale) ?: default.uiScale,
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
                 showIconLabels = source.get(Keys.showIconLabels) ?: default.showIconLabels,
-                showSystemTray = source.get(Keys.showSystemTray) ?: default.showSystemTray,
+                useSystemTray = source.get(Keys.useSystemTray) ?: default.useSystemTray,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
                 useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime)
@@ -114,7 +114,7 @@ data class AppSettingsModel(
                 putNullable(Keys.uiScale, focus.uiScale)
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
                 put(Keys.showIconLabels, focus.showIconLabels)
-                put(Keys.showSystemTray, focus.showSystemTray)
+                put(Keys.useSystemTray, focus.useSystemTray)
                 put(Keys.threadCount, focus.threadCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
@@ -167,7 +167,7 @@ class AppSettingsStorage(
     var uiScale = from(uiScaleLens)
     var mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
     var showIconLabels = from(AppSettingsModel.showIconLabels)
-    var showSystemTray = from(AppSettingsModel.showSystemTray)
+    val useSystemTray = from(AppSettingsModel.useSystemTray)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
