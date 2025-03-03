@@ -138,8 +138,8 @@ class OkHttpDownloaderClient(
     ): ResponseInfo {
         newCall(
             downloadCredentials = credentials,
-            start = 0,
-            end = null,
+            start = start,
+            end = end,
             extraBuilder = {
 //                head()
             }
