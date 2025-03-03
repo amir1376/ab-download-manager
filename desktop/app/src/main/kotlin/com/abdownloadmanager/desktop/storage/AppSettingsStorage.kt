@@ -162,11 +162,11 @@ class AppSettingsStorage(
 ) :
     ConfigBaseSettingsByMapConfig<AppSettingsModel>(settings, AppSettingsModel.ConfigLens),
     LanguageStorage {
-    var theme = from(AppSettingsModel.theme)
+    val theme = from(AppSettingsModel.theme)
     override val selectedLanguage = from(languageLens)
-    var uiScale = from(uiScaleLens)
-    var mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
-    var showIconLabels = from(AppSettingsModel.showIconLabels)
+    val uiScale = from(uiScaleLens)
+    val mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
+    val showIconLabels = from(AppSettingsModel.showIconLabels)
     val useSystemTray = from(AppSettingsModel.useSystemTray)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
