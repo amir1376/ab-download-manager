@@ -145,16 +145,19 @@ private fun HandleEffectsForApp(appComponent: AppComponent) {
 private fun ApplicationScope.SystemTray(
     component: AppComponent,
 ) {
-    IComposeSystemTray.Instance.ComposeSystemTray(
-        icon = MyIcons.appIcon,
-        onClick = showDownloadList,
-        tooltip = AppInfo.displayName.asStringSource(),
-        menu = remember {
-            buildMenu {
-                +showDownloadList
-                +gotoSettingsAction
-                +requestExitAction
+    val showSystemTray by component.showSystemTray.collectAsState()
+    if (showSystemTray) {
+        IComposeSystemTray.Instance.ComposeSystemTray(
+            icon = MyIcons.appIcon,
+            onClick = showDownloadList,
+            tooltip = AppInfo.displayName.asStringSource(),
+            menu = remember {
+                buildMenu {
+                    +showDownloadList
+                    +gotoSettingsAction
+                    +requestExitAction
+                }
             }
-        }
-    )
+        )
+    }
 }

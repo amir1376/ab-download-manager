@@ -90,6 +90,7 @@ class AppComponent(
     val appRepository: AppRepository by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val integration: Integration by inject()
+    val showSystemTray = appSettings.showSystemTray
 
     fun openHome() {
         scope.launch {
