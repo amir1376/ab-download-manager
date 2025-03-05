@@ -32,8 +32,12 @@ abstract class DownloaderClient {
     ): Connection
 
     suspend fun test(credentials: IDownloadCredentials): ResponseInfo {
-        val response = head(credentials, 0, null)
-        if (response.isSuccessFul && response.totalLength != 0L) {
+        val rangeStart = 0L
+        val rangeEnd = 255L
+        val rangeLength = rangeEnd - rangeStart + 1 // 256
+        val response = head(credentials, rangeStart, rangeEnd)
+
+        if (response.isSuccessFul && response.totalLength != rangeLength) {
             return response
         }
         // server may return un-standard response we use headless (without resuming support)
