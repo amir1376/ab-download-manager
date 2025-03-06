@@ -87,6 +87,7 @@ FunctionEnd
 
 ;Uninstallation Pages
 !insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_COMPONENTS
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
@@ -148,6 +149,10 @@ FunctionEnd
 	RmDir /r "$SMPROGRAMS\${APP_DISPLAY_NAME}"
 !macroend
 
+!macro RemoveUserConfig
+	RMDir /r "$PROFILE\.abdm"
+!macroend
+
 !macro CreateDesktopShortcut
     CreateShortcut "$DESKTOP\${APP_DISPLAY_NAME}.lnk" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe" "" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.ico"
 !macroend
@@ -204,6 +209,8 @@ Section "Desktop Shortcut"
 SectionEnd
 
 Section "Uninstall"
+    SectionInstType RO
+
     !insertmacro closeApp
     !insertmacro clearFiles
 
@@ -215,4 +222,8 @@ Section "Uninstall"
 
     ; remove auto start on boot registry
     DeleteRegValue SHCTX "${REG_RUN_KEY}" "${APP_NAME}"
+SectionEnd
+
+Section /o "un.Remove User Config"
+    !insertmacro RemoveUserConfig
 SectionEnd
