@@ -352,15 +352,20 @@ class AddSingleDownloadComponent(
             onRequestDownload(
                 item,
                 onDuplicateStrategy.value.orDefault(),
-                selectedCategory.value?.id
+                getCategoryIfUseCategoryIsOn()?.id
             )
         }
     }
 
+    private fun getCategoryIfUseCategoryIsOn(): Category? {
+        return if (useCategory.value)
+            selectedCategory.value
+        else
+            null
+    }
+
     private fun saveLocationIfNecessary(folder: String) {
-        val category = selectedCategory.value?.takeIf {
-            useCategory.value
-        }
+        val category = getCategoryIfUseCategoryIsOn()
         val shouldAdd = if (category == null) {
             // always add if user don't use category
             true
@@ -385,7 +390,7 @@ class AddSingleDownloadComponent(
                 item = downloadItem,
                 queueId = queueId,
                 onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
-                categoryId = selectedCategory.value?.id,
+                categoryId = getCategoryIfUseCategoryIsOn()?.id,
             )
             if (queueId != null && startQueue) {
                 GlobalScope.launch {

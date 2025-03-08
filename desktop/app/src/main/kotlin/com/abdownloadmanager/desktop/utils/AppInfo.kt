@@ -34,6 +34,26 @@ object AppInfo {
                 }?.path
             }
     }
+
+    private fun getPortableDataDir(): File? {
+        val dataDirName = SharedConstants.dataDirName
+        if (installationFolder != null) {
+            val portableDataDir = File(installationFolder, dataDirName)
+            if (portableDataDir.exists() && portableDataDir.canWrite()) {
+                return portableDataDir
+            }
+        }
+        return null
+    }
+
+    private fun getUserDataDir(): File {
+        val dataDirName = SharedConstants.dataDirName
+        return File(System.getProperty("user.home"), dataDirName)
+    }
+
+    val dataDir by lazy {
+        getPortableDataDir() ?: getUserDataDir()
+    }
 }
 
 fun AppInfo.isAppInstalled(): Boolean {
@@ -48,12 +68,9 @@ fun AppInfo.isInDebugMode(): Boolean {
     return AppArguments.get().debug || AppProperties.isDebugMode() || isInIDE()
 }
 
-val AppInfo.configDir: File get() = File(AppProperties.getConfigDirectory())
-val AppInfo.systemDir: File get() = File(AppProperties.getSystemDirectory())
+val AppInfo.configDir: File get() = dataDir.resolve("config")
+val AppInfo.systemDir: File get() = dataDir.resolve("system")
 val AppInfo.updateDir: File get() = AppInfo.systemDir.resolve("update")
 val AppInfo.logDir: File get() = AppInfo.systemDir.resolve("log")
 val AppInfo.optionsDir: File get() = AppInfo.configDir.resolve("options")
 val AppInfo.downloadDbDir: File get() = AppInfo.configDir.resolve("download_db")
-fun AppInfo.extensions() {
-
-}

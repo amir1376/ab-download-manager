@@ -53,6 +53,8 @@ override val back get() = "/icons/back.svg".asIconSource()
     override val stop get() = "/icons/stop.svg".asIconSource()
 
     override val queue get() = "/icons/queue.svg".asIconSource()
+    override val queueStart get() = "/icons/queue_start.svg".asIconSource()
+    override val queueStop get() = "/icons/queue_stop.svg".asIconSource()
 
     override val remove get() = "/icons/delete.svg".asIconSource()
     override val clear get() = "/icons/clear.svg".asIconSource()

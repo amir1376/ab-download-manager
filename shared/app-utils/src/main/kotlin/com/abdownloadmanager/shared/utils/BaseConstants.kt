@@ -4,6 +4,7 @@ interface BaseConstants {
     val appName: String
     val appDisplayName: String
     val packageName: String
+    val dataDirName: String
     val projectWebsite: String
     val projectSourceCode: String
     val projectTranslations: String

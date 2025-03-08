@@ -155,6 +155,7 @@ installerPlugin {
         appDisplayName = getPrettifiedAppName()
         appVersion = getAppVersionStringForPackaging(Exe)
         appDisplayVersion = getAppVersionString()
+        appDataDirName = getAppDataDirName()
         inputDir = project.file("build/compose/binaries/main-release/app/${getAppName()}")
         outputFileName = getAppName()
         licenceFile = rootProject.file("LICENSE")
@@ -186,6 +187,10 @@ buildConfig {
     buildConfigField(
         "APP_DISPLAY_NAME",
         provider { getPrettifiedAppName() }
+    )
+    buildConfigField(
+        "DATA_DIR_NAME",
+        provider { getAppDataDirName() }
     )
     buildConfigField(
         "APP_VERSION",

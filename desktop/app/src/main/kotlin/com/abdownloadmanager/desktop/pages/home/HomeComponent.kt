@@ -1011,6 +1011,7 @@ class HomeComponent(
         "DELETE" to downloadActions.deleteAction
         "ctrl I" to downloadActions.openDownloadDialogAction
     }
+    val showLabels = appSettings.showIconLabels
     val headerActions = buildMenu {
         separator()
         +downloadActions.resumeAction
@@ -1018,11 +1019,12 @@ class HomeComponent(
         separator()
         +startQueueGroupAction
         +stopQueueGroupAction
+        +openQueuesAction
+        separator()
         +stopAllAction
         separator()
         +downloadActions.deleteAction
         separator()
-        +openQueuesAction
         +gotoSettingsAction
     }
 
