@@ -1,50 +1,54 @@
 package com.abdownloadmanager.desktop.pages.home
 
-import com.abdownloadmanager.desktop.*
-import com.abdownloadmanager.desktop.actions.*
-import com.abdownloadmanager.desktop.pages.home.sections.DownloadListCells
-import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
-import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadStatusCategoryFilter
-import com.abdownloadmanager.desktop.storage.PageStatesStorage
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.ui.widget.NotificationType
-import com.abdownloadmanager.shared.ui.widget.customtable.Sort
-import com.abdownloadmanager.shared.ui.widget.customtable.TableState
-import com.abdownloadmanager.desktop.utils.*
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.action.buildMenu
-import ir.amirab.util.compose.action.simpleAction
-import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
-import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.UpdateManager
+import com.abdownloadmanager.desktop.*
+import com.abdownloadmanager.desktop.actions.*
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
+import com.abdownloadmanager.desktop.pages.home.sections.DownloadListCells
+import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
+import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadStatusCategoryFilter
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
+import com.abdownloadmanager.desktop.storage.PageStatesStorage
+import com.abdownloadmanager.desktop.utils.AppInfo
+import com.abdownloadmanager.desktop.utils.ClipboardUtil
+import com.abdownloadmanager.desktop.utils.DesktopShortcutManager
+import com.abdownloadmanager.desktop.utils.isInDebugMode
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.widget.NotificationType
+import com.abdownloadmanager.shared.ui.widget.customtable.Sort
+import com.abdownloadmanager.shared.ui.widget.customtable.TableState
 import com.abdownloadmanager.shared.utils.*
-import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.CategoryItemWithId
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.DefaultCategories
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
+import com.abdownloadmanager.shared.utils.mvi.supportEffects
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.downloaditem.DownloadStatus
-import ir.amirab.downloader.monitor.*
+import ir.amirab.downloader.downloaditem.contexts.RemovedBy
+import ir.amirab.downloader.downloaditem.contexts.User
+import ir.amirab.downloader.monitor.IDownloadItemState
+import ir.amirab.downloader.monitor.isFinished
+import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.queue.QueueManager
+import ir.amirab.util.AppVersionTracker
+import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.action.buildMenu
+import ir.amirab.util.compose.action.simpleAction
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
-import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
-import ir.amirab.downloader.downloaditem.contexts.RemovedBy
-import ir.amirab.downloader.downloaditem.contexts.User
-import ir.amirab.util.AppVersionTracker
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -222,14 +226,26 @@ class DownloadActions(
         checkEnable = selections.mapStateFlow { it.isNotEmpty() },
         onActionPerformed = {
             scope.launch {
-                ClipboardUtil.copy(
-                    selections.value
-                        .map { it.downloadLink }
-                        .joinToString(System.lineSeparator())
-                )
+                val credentialsList = selections.value
+                    .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
+                    .map { DownloadCredentials.from(it) }
+                ClipboardUtil.copy(generateCurlCommands(credentialsList).joinToString("\n"))
+//                val json = Json.encodeToString(credentialsList)
+//                ClipboardUtil.copy(json)
             }
         }
     )
+
+    fun generateCurlCommands(credentialsList: List<DownloadCredentials>): List<String> {
+        return credentialsList.map { credentials ->
+            val curlCommand = StringBuilder("curl \"${credentials.link}\"")
+            credentials.headers?.forEach { (headerName, headerValue) ->
+                curlCommand.append(" -H \"${headerName}: ${headerValue}\"")
+            }
+            curlCommand.append(" -O")
+            curlCommand.toString()
+        }
+    }
 
     val openDownloadDialogAction = simpleAction(Res.string.show_properties.asStringSource(), MyIcons.info) {
         selections.value.map { it.id }
