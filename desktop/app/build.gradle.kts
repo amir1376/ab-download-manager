@@ -188,6 +188,10 @@ buildConfig {
         provider { getPrettifiedAppName() }
     )
     buildConfigField(
+        "DATA_DIR_NAME",
+        provider { ".abdm" }
+    )
+    buildConfigField(
         "APP_VERSION",
         provider { getAppVersionString() }
     )
