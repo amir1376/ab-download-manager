@@ -40,6 +40,7 @@ import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromStringExtractor
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.util.AppVersionTracker
@@ -222,11 +223,10 @@ class DownloadActions(
         checkEnable = selections.mapStateFlow { it.isNotEmpty() },
         onActionPerformed = {
             scope.launch {
-                ClipboardUtil.copy(
-                    selections.value
-                        .map { it.downloadLink }
-                        .joinToString(System.lineSeparator())
-                )
+                val credentialsList = selections.value
+                    .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
+                    .map { DownloadCredentials.from(it) }
+                ClipboardUtil.copy(DownloadCredentialsFromStringExtractor.generateCurlCommands(credentialsList).joinToString("\n"))
             }
         }
     )
