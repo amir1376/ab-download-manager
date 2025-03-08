@@ -14,6 +14,22 @@
 
 ### Security
 
+## 1.5.4
+
+### Added
+
+- The app now supports full portability by creating an empty `.abdm` directory in the installation folder.
+- An option to delete user data (configuration files) when using Windows Uninstaller.
+
+### Fixed
+
+- Unchecked "Use Category" didn't work as expected.
+
+### Improved
+
+- Download engine improvements.
+- Translation updated.
+
 ## 1.5.3
 
 ### Added
