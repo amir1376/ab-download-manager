@@ -19,7 +19,7 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.inactiveQueuesFlow
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
-import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromStringExtractor
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
@@ -55,7 +55,7 @@ val newDownloadFromClipboardAction = simpleAction(
     if (contentsInClipboard.isNullOrEmpty()) {
         return@simpleAction
     }
-    val curlItems = DownloadCredentialsFromStringExtractor.extract(contentsInClipboard)
+    val curlItems = DownloadCredentialsFromCurl.extract(contentsInClipboard)
     if (curlItems.isNotEmpty()) {
         appComponent.openAddDownloadDialog(curlItems)
         return@simpleAction

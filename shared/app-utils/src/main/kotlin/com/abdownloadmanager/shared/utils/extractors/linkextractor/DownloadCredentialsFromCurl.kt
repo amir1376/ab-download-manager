@@ -3,13 +3,7 @@ package com.abdownloadmanager.shared.utils.extractors.linkextractor
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import com.abdownloadmanager.shared.utils.extractors.Extractor
 
-
-interface DownloadCredentialsFromCurl<T>: Extractor<T, List<DownloadCredentials>> {
-    override fun extract(input: T): List<DownloadCredentials>
-    fun generateCurlCommands(credentialsList: List<DownloadCredentials>): List<String>
-}
-
-object DownloadCredentialsFromStringExtractor : DownloadCredentialsFromCurl<String> {
+object DownloadCredentialsFromCurl : Extractor<String, List<DownloadCredentials>> {
     override fun extract(input: String): List<DownloadCredentials> {
         val curlCommands = input.split("\n").filter { it.trim().startsWith("curl") }
         return curlCommands.map { command ->
@@ -36,7 +30,7 @@ object DownloadCredentialsFromStringExtractor : DownloadCredentialsFromCurl<Stri
         }
     }
 
-    override fun generateCurlCommands(credentialsList: List<DownloadCredentials>): List<String> {
+    fun generateCurlCommands(credentialsList: List<DownloadCredentials>): List<String> {
         return credentialsList.map { credentials ->
             val curlCommand = StringBuilder("curl \"${credentials.link}\"")
             credentials.headers?.forEach { (headerName, headerValue) ->

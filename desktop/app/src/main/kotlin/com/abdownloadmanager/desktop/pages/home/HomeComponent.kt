@@ -40,7 +40,7 @@ import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
-import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromStringExtractor
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.util.AppVersionTracker
@@ -226,7 +226,7 @@ class DownloadActions(
                 val credentialsList = selections.value
                     .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
                     .map { DownloadCredentials.from(it) }
-                ClipboardUtil.copy(DownloadCredentialsFromStringExtractor.generateCurlCommands(credentialsList).joinToString("\n"))
+                ClipboardUtil.copy(DownloadCredentialsFromCurl.generateCurlCommands(credentialsList).joinToString("\n"))
             }
         }
     )
