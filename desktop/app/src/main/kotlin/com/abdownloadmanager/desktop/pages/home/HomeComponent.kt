@@ -223,6 +223,21 @@ class DownloadActions(
         checkEnable = selections.mapStateFlow { it.isNotEmpty() },
         onActionPerformed = {
             scope.launch {
+                ClipboardUtil.copy(
+                    selections.value
+                        .map { it.downloadLink }
+                        .joinToString(System.lineSeparator())
+                )
+            }
+        }
+    )
+
+    val copyDownloadLinkAsCurlAction = simpleAction(
+        title = Res.string.copy_as_curl.asStringSource(),
+        icon = MyIcons.copy,
+        checkEnable = selections.mapStateFlow { it.isNotEmpty() },
+        onActionPerformed = {
+            scope.launch {
                 val credentialsList = selections.value
                     .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
                     .map { DownloadCredentials.from(it) }
@@ -302,6 +317,7 @@ class DownloadActions(
         +moveToCategoryAction
         separator()
         +(copyDownloadLinkAction)
+        +(copyDownloadLinkAsCurlAction)
         +editDownloadAction
         +fileChecksumAction
         +(openDownloadDialogAction)
