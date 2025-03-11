@@ -40,6 +40,7 @@ import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.util.AppVersionTracker
@@ -231,6 +232,20 @@ class DownloadActions(
         }
     )
 
+    val copyDownloadLinkAsCurlAction = simpleAction(
+        title = Res.string.copy_as_curl.asStringSource(),
+        icon = MyIcons.copy,
+        checkEnable = selections.mapStateFlow { it.isNotEmpty() },
+        onActionPerformed = {
+            scope.launch {
+                val credentialsList = selections.value
+                    .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
+                    .map { DownloadCredentials.from(it) }
+                ClipboardUtil.copy(DownloadCredentialsFromCurl.generateCurlCommands(credentialsList).joinToString("\n"))
+            }
+        }
+    )
+
     val openDownloadDialogAction = simpleAction(Res.string.show_properties.asStringSource(), MyIcons.info) {
         selections.value.map { it.id }
             .forEach { id ->
@@ -302,6 +317,7 @@ class DownloadActions(
         +moveToCategoryAction
         separator()
         +(copyDownloadLinkAction)
+        +(copyDownloadLinkAsCurlAction)
         +editDownloadAction
         +fileChecksumAction
         +(openDownloadDialogAction)
