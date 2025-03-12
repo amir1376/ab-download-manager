@@ -12,11 +12,14 @@ import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isLinux
+import ir.amirab.util.platform.isMac
 import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.awt.SystemTray
 import kotlin.system.exitProcess
 
 
@@ -84,6 +87,7 @@ fun main(args: Array<String>) {
             singleInstance = singleInstance,
             appArguments = appArguments,
         )
+
     } catch (e: Throwable) {
         System.err.println("Fail to start the ${AppInfo.displayName} app because:")
         e.printStackTrace()

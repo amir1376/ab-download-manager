@@ -12,7 +12,7 @@ jobs:
   create-packages:
     strategy:
       matrix:
-        os: [ "ubuntu-latest" , "windows-latest" ]
+        os: [ "ubuntu-latest", "windows-latest", "macos-latest" ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -44,9 +44,9 @@ jobs:
           chmod 755 ./gradlew
         shell: "bash"
       - name: Gradle
-#          at the current version of compose plugin
-#          first attempt to init gradle always fails because of "BuildScopeServices has been closed"
-#          remove this after this bug is fixed
+        #          at the current version of compose plugin
+        #          first attempt to init gradle always fails because of "BuildScopeServices has been closed"
+        #          remove this after this bug is fixed
         continue-on-error: true
         run: |
           ./gradlew
@@ -70,7 +70,7 @@ jobs:
 
   release:
     runs-on: "ubuntu-latest"
-    needs: ["create-packages"]
+    needs: [ "create-packages" ]
     steps:
       - uses: "actions/download-artifact@v4"
         name: "Download All Artifacts Into One Directory"
