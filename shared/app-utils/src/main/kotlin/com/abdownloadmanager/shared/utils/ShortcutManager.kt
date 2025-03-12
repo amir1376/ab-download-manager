@@ -3,6 +3,7 @@ package com.abdownloadmanager.shared.utils
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.key
+import javax.swing.KeyStroke
 
 abstract class ShortcutManager {
     private val shortcuts = mutableMapOf<PlatformKeyStroke, () -> Unit>()
@@ -12,9 +13,16 @@ abstract class ShortcutManager {
 
     abstract fun stringToKeyStroke(keyStrokeString: String): PlatformKeyStroke
     abstract fun getKeyStrokeFromEvent(s: KeyEvent): PlatformKeyStroke?
+    abstract fun getKeyStrokeFromKeyCode(keyCode: Int): PlatformKeyStroke?
 
     infix fun String.to(action: () -> Unit) {
         register(stringToKeyStroke(this), action)
+    }
+
+    infix fun Int.to(action: () -> Unit) {
+        getKeyStrokeFromKeyCode(this)?.let {
+            register(it, action)
+        }
     }
 
     fun executeShortcut(

@@ -21,6 +21,12 @@ class DesktopShortcutManager : ShortcutManager() {
             KeyStroke.getKeyStrokeForEvent(awtEvent)
         }.getOrNull()?.asPlatformKeyStroke()
     }
+
+    override fun getKeyStrokeFromKeyCode(keyCode: Int): PlatformKeyStroke? {
+        return runCatching {
+            KeyStroke.getKeyStroke(keyCode, 0)
+        }.getOrNull()?.asPlatformKeyStroke()
+    }
 }
 
 data class DesktopKeyStroke(

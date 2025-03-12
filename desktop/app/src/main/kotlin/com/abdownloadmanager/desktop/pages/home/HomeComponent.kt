@@ -55,6 +55,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.awt.event.KeyEvent
 import java.io.File
 
 @Stable
@@ -1001,8 +1002,11 @@ class HomeComponent(
     override val shortcutManager = DesktopShortcutManager().apply {
         val isMac = Platform.isMac()
         val metaKey = if (isMac) "meta" else "ctrl"
-        val deleteKey = "DELETE"
-        deleteKey to downloadActions.deleteAction
+        if (isMac) {
+            KeyEvent.VK_BACK_SPACE to downloadActions.deleteAction
+        } else {
+            "DELETE" to downloadActions.deleteAction
+        }
         "$metaKey N" to newDownloadAction
         "$metaKey V" to newDownloadFromClipboardAction
         "$metaKey C" to downloadActions.copyDownloadLinkAction
