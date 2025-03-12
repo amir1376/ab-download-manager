@@ -2,7 +2,6 @@ package ir.amirab.util.platform
 
 import ir.amirab.util.platform.Platform.Android
 import ir.amirab.util.platform.Platform.Desktop
-import kotlin.contracts.contract
 
 sealed class Platform(val name: String) {
     data object Android : Platform("Android")
