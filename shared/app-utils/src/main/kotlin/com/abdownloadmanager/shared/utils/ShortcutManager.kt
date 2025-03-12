@@ -2,6 +2,7 @@ package com.abdownloadmanager.shared.utils
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.key
 
 abstract class ShortcutManager {
     private val shortcuts = mutableMapOf<PlatformKeyStroke, () -> Unit>()

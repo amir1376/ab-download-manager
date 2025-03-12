@@ -48,6 +48,7 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -998,19 +999,20 @@ class HomeComponent(
     }
 
     override val shortcutManager = DesktopShortcutManager().apply {
-        val metaKey = if (Platform.getCurrentPlatform() == Platform.Desktop.MacOS) "meta" else "ctrl"
+        val isMac = Platform.isMac()
+        val metaKey = if (isMac) "meta" else "ctrl"
+        val deleteKey = "DELETE"
+        deleteKey to downloadActions.deleteAction
         "$metaKey N" to newDownloadAction
         "$metaKey V" to newDownloadFromClipboardAction
         "$metaKey C" to downloadActions.copyDownloadLinkAction
         "$metaKey alt S" to gotoSettingsAction
         "$metaKey W" to requestExitAction
-        "DELETE" to downloadActions.deleteAction
         "$metaKey O" to downloadActions.openFileAction
         "$metaKey F" to downloadActions.openFolderAction
         "$metaKey E" to downloadActions.editDownloadAction
         "$metaKey P" to downloadActions.pauseAction
         "$metaKey R" to downloadActions.resumeAction
-        "DELETE" to downloadActions.deleteAction
         "$metaKey I" to downloadActions.openDownloadDialogAction
     }
     val showLabels = appSettings.showIconLabels
