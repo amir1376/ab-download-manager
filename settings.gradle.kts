@@ -3,6 +3,7 @@ pluginManagement {
 
 plugins{
 //    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 dependencyResolutionManagement {
@@ -22,6 +23,7 @@ include("desktop:shared")
 include("desktop:tray:common")
 include("desktop:tray:windows")
 include("desktop:tray:linux")
+include(":desktop:tray:mac")
 include("downloader:core")
 include("downloader:monitor")
 include("integration:server")
