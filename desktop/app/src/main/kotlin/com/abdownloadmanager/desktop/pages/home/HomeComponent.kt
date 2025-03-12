@@ -47,6 +47,7 @@ import ir.amirab.util.AppVersionTracker
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.osfileutil.FileUtils
+import ir.amirab.util.platform.Platform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -997,19 +998,20 @@ class HomeComponent(
     }
 
     override val shortcutManager = DesktopShortcutManager().apply {
-        "ctrl N" to newDownloadAction
-        "ctrl V" to newDownloadFromClipboardAction
-        "ctrl C" to downloadActions.copyDownloadLinkAction
-        "ctrl alt S" to gotoSettingsAction
-        "ctrl W" to requestExitAction
+        val metaKey = if (Platform.getCurrentPlatform() == Platform.Desktop.MacOS) "meta" else "ctrl"
+        "$metaKey N" to newDownloadAction
+        "$metaKey V" to newDownloadFromClipboardAction
+        "$metaKey C" to downloadActions.copyDownloadLinkAction
+        "$metaKey alt S" to gotoSettingsAction
+        "$metaKey W" to requestExitAction
         "DELETE" to downloadActions.deleteAction
-        "ctrl O" to downloadActions.openFileAction
-        "ctrl F" to downloadActions.openFolderAction
-        "ctrl E" to downloadActions.editDownloadAction
-        "ctrl P" to downloadActions.pauseAction
-        "ctrl R" to downloadActions.resumeAction
+        "$metaKey O" to downloadActions.openFileAction
+        "$metaKey F" to downloadActions.openFolderAction
+        "$metaKey E" to downloadActions.editDownloadAction
+        "$metaKey P" to downloadActions.pauseAction
+        "$metaKey R" to downloadActions.resumeAction
         "DELETE" to downloadActions.deleteAction
-        "ctrl I" to downloadActions.openDownloadDialogAction
+        "$metaKey I" to downloadActions.openDownloadDialogAction
     }
     val showLabels = appSettings.showIconLabels
     val headerActions = buildMenu {
