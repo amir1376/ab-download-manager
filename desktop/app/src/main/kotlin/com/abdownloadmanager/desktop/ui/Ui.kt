@@ -35,13 +35,19 @@ import com.abdownloadmanager.shared.utils.ProvideSizeAndSpeedUnit
 import com.abdownloadmanager.shared.utils.ui.ProvideDebugInfo
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
+import ir.amirab.util.desktop.mac.event.MacDockEventHandler
 import ir.amirab.util.desktop.systemtray.IComposeSystemTray
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import java.awt.Desktop
+import java.awt.desktop.AppReopenedEvent
+import java.awt.desktop.AppReopenedListener
 
 object Ui : KoinComponent {
     val scope: CoroutineScope by inject()
@@ -57,9 +63,13 @@ object Ui : KoinComponent {
         if (!appArguments.startSilent) {
             appComponent.openHome()
         }
+        if (Platform.isMac()) {
+            MacDockEventHandler.configure(
+                onClickIcon = appComponent::activateHomeIfNotOpen
+            )
+        }
         application {
             val theme by themeManager.currentThemeColor.collectAsState()
-
             ProvideDebugInfo(AppInfo.isInDebugMode()) {
                 ProvideLanguageManager(languageManager) {
                     ProvideNotificationManager {

@@ -32,7 +32,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.DragData
 import androidx.compose.ui.draganddrop.awtTransferable
+import androidx.compose.ui.draganddrop.dragData
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
@@ -58,7 +60,10 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
 import java.awt.datatransfer.DataFlavor
+import java.awt.dnd.DropTargetDragEvent
+import java.awt.dnd.DropTargetEvent
 import java.io.File
+import kotlin.reflect.full.memberProperties
 
 
 @Composable
@@ -189,9 +194,12 @@ fun HomePage(component: HomeComponent) {
                         override fun onStarted(event: DragAndDropEvent) {
                             isDragging = true
                             if (event.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                                component.onExternalTextDraggedIn { (event.awtTransferable.getTransferData(DataFlavor.stringFlavor) as String) }
+                                val plainText =
+                                    event.awtTransferable.getTransferData(DataFlavor.stringFlavor) as? String
+                                component.onExternalTextDraggedIn { plainText ?: "" }
                                 return
                             }
+
                             if (event.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                                 component.onExternalFilesDraggedIn {
                                     (event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>)

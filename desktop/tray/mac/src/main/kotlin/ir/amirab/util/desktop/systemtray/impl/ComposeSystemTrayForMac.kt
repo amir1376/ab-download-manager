@@ -1,24 +1,17 @@
 package ir.amirab.util.desktop.systemtray.impl
 
-import androidx.compose.runtime.*
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.toAwtImage
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberDialogState
-import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
-import com.abdownloadmanager.desktop.window.moveSafe
-import com.abdownloadmanager.shared.ui.widget.menu.SubMenu
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import com.google.auto.service.AutoService
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.desktop.GlobalDensity
-import ir.amirab.util.desktop.GlobalLayoutDirection
 import ir.amirab.util.desktop.systemtray.IComposeSystemTray
 import java.awt.Image
-import java.awt.SystemTray
 
 @AutoService(IComposeSystemTray::class)
 class ComposeSystemTrayForMac : IComposeSystemTray {
@@ -39,16 +32,17 @@ class ComposeSystemTrayForMac : IComposeSystemTray {
 
 @Composable
 private fun List<MenuItem>.toImmutableMenuItem(): List<ImmutableMenuItem> {
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
     return map {
         when (it) {
             MenuItem.Separator -> ImmutableMenuItem.Separator
             is MenuItem.SingleItem -> {
                 ImmutableMenuItem.SingleItem(
                     title = it.title.collectAsState().value.rememberString(),
-//                    icon = it.icon.collectAsState().value?.rememberPainter()?.toAwtImage(
-//                        density, layoutDirection,
-//                    ),
-                    icon = null,
+                    icon = it.icon.collectAsState().value?.rememberPainter()?.toAwtImage(
+                        density, layoutDirection,
+                    ),
                     onAction = it::onClick
                 )
             }
