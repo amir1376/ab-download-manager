@@ -7,7 +7,9 @@ import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.singleInstance.*
+import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
+import com.abdownloadmanager.desktop.utils.singleInstance.MutableSingleInstanceServerHandler
+import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
@@ -84,6 +86,7 @@ fun main(args: Array<String>) {
             singleInstance = singleInstance,
             appArguments = appArguments,
         )
+
     } catch (e: Throwable) {
         System.err.println("Fail to start the ${AppInfo.displayName} app because:")
         e.printStackTrace()
