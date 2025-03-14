@@ -7,19 +7,18 @@ import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.singleInstance.*
+import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
+import com.abdownloadmanager.desktop.utils.singleInstance.MutableSingleInstanceServerHandler
+import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
 import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isLinux
-import ir.amirab.util.platform.isMac
 import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.awt.SystemTray
 import kotlin.system.exitProcess
 
 

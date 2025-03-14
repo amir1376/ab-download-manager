@@ -41,7 +41,6 @@ dependencies {
     implementation(libs.arrow.optics)
     ksp(libs.arrow.opticKsp)
 
-
     implementation(libs.androidx.datastore)
 
     implementation(libs.aboutLibraries.core)
