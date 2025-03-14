@@ -3,7 +3,7 @@ package com.abdownloadmanager.shared.utils.extractors.linkextractor
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import com.abdownloadmanager.shared.utils.extractors.Extractor
 
-object DownloadCredentialsFromCurl : Extractor<String, List<DownloadCredentials>> {
+object DownloadCredentialsFromCurl : DownloadCredentialExtractor<String> {
     override fun extract(input: String): List<DownloadCredentials> {
         val curlCommands = input.split("\n").filter { it.trim().startsWith("curl") }
         return curlCommands.map { command ->
