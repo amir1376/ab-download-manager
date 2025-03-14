@@ -24,9 +24,7 @@ class ComposeSystemTrayForLinux : IComposeSystemTray {
         onClick: () -> Unit
     ) {
         val tooltipString = tooltip.rememberString()
-        val systemTray: SystemTray? = remember {
-            SystemTray.get(tooltipString)
-        }
+        val systemTray: SystemTray? = remember { SystemTray.get(tooltipString) }
         if (systemTray == null) {
             System.err.println("System tray is not supported")
             return
