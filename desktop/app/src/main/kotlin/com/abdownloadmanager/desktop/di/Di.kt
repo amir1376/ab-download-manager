@@ -18,6 +18,9 @@ import com.abdownloadmanager.shared.utils.ui.theme.ISystemThemeDetector
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
+import com.abdownloadmanager.desktop.utils.proxy.AutoConfigurableProxyProviderForDesktop
+import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvider
+import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import ir.amirab.downloader.DownloadManagerMinimalControl
@@ -29,6 +32,7 @@ import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.util.startup.Startup
 import com.abdownloadmanager.integration.Integration
+import com.abdownloadmanager.shared.utils.*
 import com.abdownloadmanager.updateapplier.DesktopUpdateApplier
 import com.abdownloadmanager.updateapplier.UpdateApplier
 import ir.amirab.downloader.DownloadManager
@@ -43,10 +47,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import com.abdownloadmanager.updatechecker.GithubUpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateChecker
-import com.abdownloadmanager.shared.utils.DownloadFoldersRegistry
-import com.abdownloadmanager.shared.utils.DownloadSystem
-import com.abdownloadmanager.shared.utils.FileIconProvider
-import com.abdownloadmanager.shared.utils.FileIconProviderUsingCategoryIcons
 import ir.amirab.util.AppVersionTracker
 import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.utils.autoremove.RemovedDownloadsFromDiskTracker
@@ -55,7 +55,10 @@ import com.abdownloadmanager.shared.utils.ui.IMyIcons
 import com.abdownloadmanager.shared.utils.proxy.IProxyStorage
 import com.abdownloadmanager.shared.utils.proxy.ProxyData
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
+import ir.amirab.downloader.connection.UserAgentProvider
+import ir.amirab.downloader.connection.proxy.AutoConfigurableProxyProvider
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
+import ir.amirab.downloader.connection.proxy.SystemProxySelectorProvider
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.util.compose.localizationmanager.LanguageManager
@@ -112,16 +115,25 @@ val downloaderModule = module {
             get()
         )
     }.bind<ProxyStrategyProvider>()
+    single {
+        ProxyCachingConfig.default()
+    }
+    single<AutoConfigurableProxyProvider> {
+        AutoConfigurableProxyProviderForDesktop(get())
+    }
+    single<SystemProxySelectorProvider> {
+        DesktopSystemProxySelectorProvider(get())
+    }
+    single<UserAgentProvider> {
+        UserAgentProviderFromSettings(get())
+    }
     single<DownloaderClient> {
         OkHttpDownloaderClient(
-            OkHttpClient
-                .Builder()
-                .dispatcher(Dispatcher().apply {
-                    //bypass limit on concurrent connections!
-                    maxRequests = Int.MAX_VALUE
-                    maxRequestsPerHost = Int.MAX_VALUE
-                }).build(),
-            get()
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
         )
     }
     single {
@@ -330,6 +342,28 @@ val appModule = module {
             },
             currentVersion = AppInfo.version,
         )
+    }
+
+    single {
+        val appSettingsStorage: AppSettingsStorage = get()
+        AppSSLFactoryProvider(
+            ignoreSSLCertificates = appSettingsStorage.ignoreSSLCertificates
+        )
+    }
+    single<OkHttpClient> {
+        val appSSLFactoryProvider: AppSSLFactoryProvider = get()
+        OkHttpClient
+            .Builder()
+            .dispatcher(Dispatcher().apply {
+                //bypass limit on concurrent connections!
+                maxRequests = Int.MAX_VALUE
+                maxRequestsPerHost = Int.MAX_VALUE
+            })
+            .sslSocketFactory(
+                appSSLFactoryProvider.createSSLSocketFactory(),
+                appSSLFactoryProvider.trustManager,
+            )
+            .build()
     }
 
 }

@@ -8,6 +8,8 @@ import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadComponent
 import com.abdownloadmanager.desktop.pages.category.CategoryComponent
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadComponent
+import com.abdownloadmanager.desktop.pages.filehash.FileChecksumComponent
+import com.abdownloadmanager.desktop.pages.filehash.FileChecksumComponentConfig
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.SettingsComponent
@@ -80,6 +82,7 @@ class AppComponent(
     AddDownloadDialogManager,
     CategoryDialogManager,
     EditDownloadDialogManager,
+    FileChecksumDialogManager,
     NotificationSender,
     DownloadItemOpener,
     ContainsEffects<AppEffects> by supportEffects(),
@@ -87,6 +90,7 @@ class AppComponent(
     val appRepository: AppRepository by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val integration: Integration by inject()
+    val useSystemTray = appSettings.useSystemTray
 
     fun openHome() {
         scope.launch {
@@ -94,6 +98,16 @@ class AppComponent(
                 if (it != null) {
                     it.bringToFront()
                 } else {
+                    showHome.activate(HomePageConfig())
+                }
+            }
+        }
+    }
+
+    fun activateHomeIfNotOpen() {
+        scope.launch {
+            showHomeSlot.value.child?.instance.let {
+                if (it == null) {
                     showHome.activate(HomePageConfig())
                 }
             }
@@ -120,6 +134,7 @@ class AppComponent(
                 downloadItemOpener = this,
                 downloadDialogManager = this,
                 addDownloadDialogManager = this,
+                fileChecksumDialogManager = this,
                 categoryDialogManager = this,
                 notificationSender = this,
                 editDownloadDialogManager = this,
@@ -257,7 +272,6 @@ class AppComponent(
                                 categoryId = categoryId,
                                 onDuplicateStrategy = onDuplicate,
                             )
-                            closeAddDownloadDialog(dialogId = config.id)
                         },
                         onRequestAddCategory = {
                             openCategoryDialog(-1)
@@ -293,7 +307,6 @@ class AppComponent(
                                 queueId = queueId,
                                 categorySelectionMode = categorySelectionMode
                             )
-                            closeAddDownloadDialog(config.id)
                         },
                         onRequestAddCategory = {
                             openCategoryDialog(-1)
@@ -680,6 +693,42 @@ class AppComponent(
         }
     }
 
+    private val fileChecksumPagesControl = SlotNavigation<FileChecksumComponentConfig>()
+    val openedFileChecksumDialog = childSlot(
+        key = "openedFileChecksumPage",
+        source = fileChecksumPagesControl,
+        serializer = null,
+        childFactory = { config, ctx ->
+            FileChecksumComponent(
+                ctx = ctx,
+                id = config.id,
+                itemIds = config.itemIds,
+                closeComponent = {
+                    closeFileChecksumPage(config.id)
+                }
+            )
+        }
+    ).subscribeAsStateFlow()
+
+    override fun openFileChecksumPage(ids: List<Long>) {
+        scope.launch {
+            val instance = openedFileChecksumDialog.value.child?.instance
+            if (instance?.itemIds == ids) {
+                instance.bringToFront()
+            } else {
+                fileChecksumPagesControl.navigate {
+                    FileChecksumComponentConfig(itemIds = ids)
+                }
+            }
+        }
+    }
+
+    override fun closeFileChecksumPage(dialogId: String) {
+        scope.launch {
+            fileChecksumPagesControl.dismiss()
+        }
+    }
+
     fun addDownload(
         items: List<DownloadItem>,
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
@@ -881,4 +930,10 @@ interface AddDownloadDialogManager {
     )
 
     fun closeAddDownloadDialog(dialogId: String)
+}
+
+interface FileChecksumDialogManager {
+    fun openFileChecksumPage(ids: List<Long>)
+
+    fun closeFileChecksumPage(dialogId: String)
 }

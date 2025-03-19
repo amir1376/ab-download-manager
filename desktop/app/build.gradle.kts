@@ -17,6 +17,8 @@ plugins {
     id("ir.amirab.installer-plugin")
 //    id(MyPlugins.proguardDesktop)
 }
+
+
 dependencies {
     implementation(libs.decompose)
     implementation(libs.decompose.jbCompose)
@@ -49,10 +51,9 @@ dependencies {
     implementation(libs.osThemeDetector) {
         exclude(group = "net.java.dev.jna")
     }
-
-    // at the moment I don't use jna but some libraries does
-    // filekit and osThemeDetector both use jna but with different versions
-    // I excluded jna from both of them and add it here!
+    implementation(libs.proxyVole) {
+        exclude(group = "net.java.dev.jna")
+    }
     implementation(libs.jna.core)
     implementation(libs.jna.platform)
 
@@ -64,10 +65,23 @@ dependencies {
     implementation(project(":desktop:app-utils"))
 
     implementation(project(":desktop:tray:common"))
-    if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
-        implementation(project(":desktop:tray:linux"))
-    } else {
-        implementation(project(":desktop:tray:windows"))
+
+    // Detection based on the operating system
+    when (Platform.getCurrentPlatform()) {
+        Platform.Desktop.Windows -> {
+            implementation(project(":desktop:tray:windows"))
+        }
+
+        Platform.Desktop.Linux -> {
+            implementation(project(":desktop:tray:linux"))
+        }
+
+        Platform.Desktop.MacOS -> {
+            implementation(project(":desktop:tray:mac"))
+        }
+
+        else -> Unit
+
     }
 
     implementation(project(":shared:app"))
@@ -76,6 +90,7 @@ dependencies {
     implementation(project(":shared:updater"))
     implementation(project(":shared:auto-start"))
     implementation(project(":shared:nanohttp4k"))
+    implementation(project(":desktop:mac_utils"))
 }
 
 aboutLibraries {
@@ -156,6 +171,7 @@ installerPlugin {
         appDisplayName = getPrettifiedAppName()
         appVersion = getAppVersionStringForPackaging(Exe)
         appDisplayVersion = getAppVersionString()
+        appDataDirName = getAppDataDirName()
         inputDir = project.file("build/compose/binaries/main-release/app/${getAppName()}")
         outputFileName = getAppName()
         licenceFile = rootProject.file("LICENSE")
@@ -187,6 +203,10 @@ buildConfig {
     buildConfigField(
         "APP_DISPLAY_NAME",
         provider { getPrettifiedAppName() }
+    )
+    buildConfigField(
+        "DATA_DIR_NAME",
+        provider { getAppDataDirName() }
     )
     buildConfigField(
         "APP_VERSION",

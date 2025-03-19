@@ -8,6 +8,7 @@ SetCompressor /SOLID lzma
 !define APP_PUBLISHER "{{ app_publisher }}"
 !define APP_NAME "{{ app_name }}"
 !define APP_DISPLAY_NAME "{{ app_display_name }}"
+!define APP_DATA_DIR_NAME "{{ app_data_dir_name }}"
 !define APP_VERSION "{{ app_version }}"
 !define APP_VERSION_WITH_BUILD "{{ app_version_with_build }}"
 !define APP_DISPLAY_VERSION "{{ app_display_version }}"
@@ -87,6 +88,7 @@ FunctionEnd
 
 ;Uninstallation Pages
 !insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_COMPONENTS
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
@@ -148,6 +150,11 @@ FunctionEnd
 	RmDir /r "$SMPROGRAMS\${APP_DISPLAY_NAME}"
 !macroend
 
+!macro RemoveUserData
+	RMDir /r "$PROFILE\${APP_DATA_DIR_NAME}"
+	RmDir /r "${INSTALL_DIR}\${APP_DATA_DIR_NAME}"
+!macroend
+
 !macro CreateDesktopShortcut
     CreateShortcut "$DESKTOP\${APP_DISPLAY_NAME}.lnk" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe" "" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.ico"
 !macroend
@@ -203,7 +210,13 @@ Section "Desktop Shortcut"
     !insertmacro CreateDesktopShortcut
 SectionEnd
 
+Section /o "un.Remove User Data"
+    !insertmacro RemoveUserData
+SectionEnd
+
 Section "Uninstall"
+    SectionInstType RO
+
     !insertmacro closeApp
     !insertmacro clearFiles
 

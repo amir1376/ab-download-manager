@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.utils.proxy
 
+import com.abdownloadmanager.shared.utils.isValidUrl
 import ir.amirab.downloader.connection.proxy.Proxy
 import ir.amirab.downloader.connection.proxy.ProxyStrategy
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
@@ -18,6 +19,9 @@ class ProxyManager(
         Authenticator.setDefault(mySocksProxyAuthenticator)
     }
 
+    /**
+     * I don't like this it's better to improve this later
+     */
     private fun getProxyModeForThisURL(url: String): ProxyStrategy {
         val usingProxy = proxyData.value
         return when (usingProxy.proxyMode) {
@@ -27,6 +31,14 @@ class ProxyManager(
                 val proxyWithRules = usingProxy.proxyWithRules
                 if (shouldUseProxyFor(url, proxyWithRules.rules)) {
                     ProxyStrategy.ManualProxy(proxyWithRules.proxy)
+                } else {
+                    ProxyStrategy.Direct
+                }
+            }
+            ProxyMode.Pac -> {
+                val pacURI = usingProxy.pac.uri
+                if (isValidUrl(pacURI)) {
+                    ProxyStrategy.ByScript(pacURI)
                 } else {
                     ProxyStrategy.Direct
                 }

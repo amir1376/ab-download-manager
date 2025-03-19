@@ -53,6 +53,7 @@ abstract class NsisTask : DefaultTask() {
             "app_display_name" to commonParams.appDisplayName!!,
             "app_version" to commonParams.appVersion!!,
             "app_display_version" to commonParams.appDisplayVersion!!,
+            "app_data_dir_name" to commonParams.appDataDirName!!,
             "license_file" to commonParams.licenceFile!!,
             "icon_file" to commonParams.iconFile!!,
         )

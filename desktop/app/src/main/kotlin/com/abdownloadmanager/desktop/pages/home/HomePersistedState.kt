@@ -17,7 +17,7 @@ import org.koin.core.component.inject
 data class HomePageStateToPersist(
     val downloadListState: TableState.SerializableTableState? = null,
     val windowSize: Pair<Float, Float> = 1000f to 500f,
-    val categoriesWidth: Float = 170f,
+    val categoriesWidth: Float = 185f,
 ) {
     class ConfigLens(prefix: String) : Lens<MapConfig, HomePageStateToPersist>,
         KoinComponent {

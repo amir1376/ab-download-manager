@@ -8,6 +8,9 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigura
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.runtime.*
+import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
+import com.abdownloadmanager.desktop.pages.settings.configurable.FileChecksumConfigurable
+import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import com.abdownloadmanager.resources.Res
@@ -24,10 +27,7 @@ import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.downloader.utils.orDefault
 import ir.amirab.util.flow.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.abdownloadmanager.shared.utils.category.Category
@@ -35,6 +35,7 @@ import com.abdownloadmanager.shared.utils.category.CategoryItem
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
+import kotlinx.coroutines.*
 
 sealed interface AddSingleDownloadPageEffects {
     data class SuggestUrl(val link: String) : AddSingleDownloadPageEffects
@@ -53,7 +54,8 @@ class AddSingleDownloadComponent(
     KoinComponent,
     ContainsEffects<AddSingleDownloadPageEffects> by supportEffects() {
 
-    private val appSettings: AppRepository by inject()
+    private val appSettings: AppSettingsStorage by inject()
+    private val appRepository: AppRepository by inject()
     private val client: DownloaderClient by inject()
     val downloadSystem: DownloadSystem by inject()
     val iconProvider: FileIconProvider by inject()
@@ -92,7 +94,7 @@ class AddSingleDownloadComponent(
     }
 
     private fun useDefaultFolder() {
-        setFolder(appSettings.saveLocation.value)
+        setFolder(appRepository.saveLocation.value)
     }
 
 
@@ -109,7 +111,7 @@ class AddSingleDownloadComponent(
 
 
     private val downloadChecker = DownloadUiChecker(
-        initialFolder = appSettings.saveLocation.value,
+        initialFolder = appRepository.saveLocation.value,
         downloadSystem = downloadSystem,
         scope = scope,
         downloaderClient = client,
@@ -147,7 +149,8 @@ class AddSingleDownloadComponent(
             .onEachLatest { onDuplicateStrategy.update { null } }
             .launchIn(scope)
         combine(
-            name, credentials.map { it.link }
+            name,
+            credentials.map { it.link },
         ) { name, link ->
             val category = categoryManager.getCategoryOf(
                 CategoryItem(
@@ -155,11 +158,16 @@ class AddSingleDownloadComponent(
                     url = link,
                 )
             )
+            val globalUseCategoryByDefault = appSettings.useCategoryByDefault.value
+            val suggestedUseCategory: Boolean
             if (category == null) {
-                setUseCategory(false)
+                suggestedUseCategory = false
             } else {
                 setSelectedCategory(category)
-                setUseCategory(true)
+                suggestedUseCategory = true
+            }
+            if (globalUseCategoryByDefault) {
+                setUseCategory(suggestedUseCategory)
             }
         }.launchIn(scope)
     }
@@ -214,6 +222,7 @@ class AddSingleDownloadComponent(
     //extra settings
     private var threadCount = MutableStateFlow(null as Int?)
     private var speedLimit = MutableStateFlow(0L)
+    private var fileChecksum = MutableStateFlow(null as FileChecksum?)
 
 
     val downloadItem = combineStateFlows(
@@ -222,7 +231,8 @@ class AddSingleDownloadComponent(
         this.name,
         this.length,
         this.speedLimit,
-        this.threadCount
+        this.threadCount,
+        this.fileChecksum,
     ) {
             credentials,
             folder,
@@ -230,6 +240,7 @@ class AddSingleDownloadComponent(
             length,
             speedLimit,
             threadCount,
+            fileChecksum,
         ->
         DownloadItem(
             id = -1,
@@ -242,7 +253,8 @@ class AddSingleDownloadComponent(
             completeTime = null,
             status = DownloadStatus.Added,
             preferredConnectionCount = threadCount,
-            speedLimit = speedLimit
+            speedLimit = speedLimit,
+            fileChecksum = fileChecksum?.toString()
         ).withCredentials(credentials)
     }
 
@@ -258,9 +270,15 @@ class AddSingleDownloadComponent(
             describe = {
                 if (it == 0L) Res.string.unlimited.asStringSource()
                 else convertPositiveSpeedToHumanReadable(
-                    it, appSettings.speedUnit.value
+                    it, appRepository.speedUnit.value
                 ).asStringSource()
             }
+        ),
+        FileChecksumConfigurable(
+            Res.string.download_item_settings_file_checksum.asStringSource(),
+            Res.string.download_item_settings_file_checksum_description.asStringSource(),
+            backedBy = fileChecksum,
+            describe = { "".asStringSource() }
         ),
         IntConfigurable(
             Res.string.settings_download_thread_count.asStringSource(),
@@ -270,10 +288,10 @@ class AddSingleDownloadComponent(
                     it ?: 0
                 },
                 unMap = {
-                    it.takeIf { it > 1 }
+                    it.takeIf { it >= 1 }
                 }
             ),
-            range = 0..32,
+            range = 0..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
             describe = {
                 if (it == 0) Res.string.use_global_settings.asStringSource()
                 else Res.string.download_item_settings_thread_count_describe
@@ -334,15 +352,20 @@ class AddSingleDownloadComponent(
             onRequestDownload(
                 item,
                 onDuplicateStrategy.value.orDefault(),
-                selectedCategory.value?.id
+                getCategoryIfUseCategoryIsOn()?.id
             )
         }
     }
 
+    private fun getCategoryIfUseCategoryIsOn(): Category? {
+        return if (useCategory.value)
+            selectedCategory.value
+        else
+            null
+    }
+
     private fun saveLocationIfNecessary(folder: String) {
-        val category = selectedCategory.value?.takeIf {
-            useCategory.value
-        }
+        val category = getCategoryIfUseCategoryIsOn()
         val shouldAdd = if (category == null) {
             // always add if user don't use category
             true
@@ -358,16 +381,23 @@ class AddSingleDownloadComponent(
 
     fun onRequestAddToQueue(
         queueId: Long?,
+        startQueue: Boolean,
     ) {
         val downloadItem = downloadItem.value
         consumeDialog {
             saveLocationIfNecessary(downloadItem.folder)
             onRequestAddToQueue(
-                downloadItem,
-                queueId,
-                onDuplicateStrategy.value.orDefault(),
-                selectedCategory.value?.id
+                item = downloadItem,
+                queueId = queueId,
+                onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
+                categoryId = getCategoryIfUseCategoryIsOn()?.id,
             )
+            if (queueId != null && startQueue) {
+                GlobalScope.launch {
+                    downloadSystem.startQueue(queueId)
+                }
+            }
+            onRequestClose()
         }
     }
 

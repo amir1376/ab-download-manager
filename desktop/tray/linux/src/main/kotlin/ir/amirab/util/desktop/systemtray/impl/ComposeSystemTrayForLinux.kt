@@ -23,7 +23,8 @@ class ComposeSystemTrayForLinux : IComposeSystemTray {
         menu: List<MenuItem>,
         onClick: () -> Unit
     ) {
-        val systemTray: SystemTray? = remember { SystemTray.get() }
+        val tooltipString = tooltip.rememberString()
+        val systemTray: SystemTray? = remember { SystemTray.get(tooltipString) }
         if (systemTray == null) {
             System.err.println("System tray is not supported")
             return
@@ -36,7 +37,6 @@ class ComposeSystemTrayForLinux : IComposeSystemTray {
                 GlobalLayoutDirection,
             )
         }
-        val tooltipString = tooltip.rememberString()
 
         LaunchedEffect(awtImage) {
             systemTray.setImage(awtImage)

@@ -1,8 +1,6 @@
 package ir.amirab.downloader.connection
 
-import ir.amirab.downloader.connection.proxy.ProxyStrategy
-import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
-import ir.amirab.downloader.connection.proxy.ProxyType
+import ir.amirab.downloader.connection.proxy.*
 import ir.amirab.downloader.connection.response.ResponseInfo
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.utils.await
@@ -13,15 +11,20 @@ import java.net.ProxySelector
 
 class OkHttpDownloaderClient(
     private val okHttpClient: OkHttpClient,
+    private val defaultUserAgentProvider: UserAgentProvider,
     private val proxyStrategyProvider: ProxyStrategyProvider,
+    private val systemProxySelectorProvider: SystemProxySelectorProvider,
+    private val autoConfigurableProxyProvider: AutoConfigurableProxyProvider,
 ) : DownloaderClient() {
     private fun newCall(
         downloadCredentials: IDownloadCredentials,
-        start: Long,
+        start: Long?,
         end: Long?,
         extraBuilder: Request.Builder.() -> Unit,
     ): Call {
-        val rangeHeader = createRangeHeader(start, end)
+        val rangeHeader = start?.let {
+            createRangeHeader(start, end)
+        }
         return okHttpClient
             .applyProxy(downloadCredentials)
             .newCall(
@@ -30,6 +33,13 @@ class OkHttpDownloaderClient(
                     .apply {
                         defaultHeadersInFirst().forEach { (k, v) ->
                             header(k, v)
+                        }
+                        // we don't to add something that we sure that it will be overridden later
+                        if (downloadCredentials.userAgent == null) {
+                            // only add default user agent if we don't specify it
+                            defaultUserAgentProvider.getUserAgent()?.let { userAgent ->
+                                header("User-Agent", userAgent)
+                            }
                         }
                         downloadCredentials.headers
                             ?.filter {
@@ -53,7 +63,11 @@ class OkHttpDownloaderClient(
                         }
                     }
                     .apply(extraBuilder)
-                    .header(rangeHeader.first, rangeHeader.second)
+                    .apply {
+                        if (rangeHeader != null) {
+                            header(rangeHeader.first, rangeHeader.second)
+                        }
+                    }
                     .build()
             )
     }
@@ -67,8 +81,22 @@ class OkHttpDownloaderClient(
             ProxyStrategy.Direct -> return this
             ProxyStrategy.UseSystem -> {
                 newBuilder()
-                    .proxySelector(ProxySelector.getDefault())
+                    .proxySelector(
+                        systemProxySelectorProvider.getSystemProxySelector()
+                            ?: ProxySelector.getDefault()
+                    )
                     .build()
+            }
+
+            is ProxyStrategy.ByScript -> {
+                val proxySelector = autoConfigurableProxyProvider.getAutoConfigurableProxy(strategy.scriptPath)
+                if (proxySelector != null) {
+                    newBuilder()
+                        .proxySelector(proxySelector)
+                        .build()
+                } else {
+                    this
+                }
             }
 
             is ProxyStrategy.ManualProxy -> {
@@ -103,11 +131,15 @@ class OkHttpDownloaderClient(
     }
 
 
-    override suspend fun head(credentials: IDownloadCredentials): ResponseInfo {
+    override suspend fun head(
+        credentials: IDownloadCredentials,
+        start: Long?,
+        end: Long?,
+    ): ResponseInfo {
         newCall(
             downloadCredentials = credentials,
-            start = 0,
-            end = 255,
+            start = start,
+            end = end,
             extraBuilder = {
 //                head()
             }
@@ -133,7 +165,7 @@ class OkHttpDownloaderClient(
 
     override suspend fun connect(
         credentials: IDownloadCredentials,
-        start: Long,
+        start: Long?,
         end: Long?,
     ): Connection {
         val response = newCall(

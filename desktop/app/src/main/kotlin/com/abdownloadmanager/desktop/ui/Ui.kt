@@ -1,40 +1,50 @@
 package com.abdownloadmanager.desktop.ui
 
+import androidx.compose.runtime.*
+import androidx.compose.ui.window.ApplicationScope
+import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.AppEffects
-import com.abdownloadmanager.desktop.actions.*
+import com.abdownloadmanager.desktop.actions.gotoSettingsAction
+import com.abdownloadmanager.desktop.actions.requestExitAction
+import com.abdownloadmanager.desktop.actions.showDownloadList
 import com.abdownloadmanager.desktop.pages.about.ShowAboutDialog
 import com.abdownloadmanager.desktop.pages.addDownload.ShowAddDownloadDialogs
-import com.abdownloadmanager.desktop.pages.extenallibs.ShowOpenSourceLibraries
-import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
-import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
-import com.abdownloadmanager.desktop.pages.settings.SettingWindow
-import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialogs
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
-import ir.amirab.util.compose.action.buildMenu
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
-import androidx.compose.runtime.*
-import androidx.compose.ui.window.*
-import com.abdownloadmanager.shared.ui.widget.ProvideLanguageManager
-import com.abdownloadmanager.shared.ui.widget.ProvideNotificationManager
-import com.abdownloadmanager.shared.ui.widget.useNotification
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
 import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
 import com.abdownloadmanager.desktop.pages.confirmexit.ConfirmExit
 import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
+import com.abdownloadmanager.desktop.pages.extenallibs.ShowOpenSourceLibraries
+import com.abdownloadmanager.desktop.pages.filehash.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
+import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
+import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
+import com.abdownloadmanager.desktop.pages.settings.SettingWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
+import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialogs
 import com.abdownloadmanager.desktop.pages.updater.ShowUpdaterDialog
-import com.abdownloadmanager.desktop.ui.widget.*
-import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.desktop.ui.widget.ShowMessageDialogs
+import com.abdownloadmanager.desktop.utils.AppInfo
+import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
+import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
+import com.abdownloadmanager.desktop.utils.isInDebugMode
+import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
+import com.abdownloadmanager.shared.ui.widget.ProvideLanguageManager
+import com.abdownloadmanager.shared.ui.widget.ProvideNotificationManager
+import com.abdownloadmanager.shared.ui.widget.useNotification
 import com.abdownloadmanager.shared.utils.ProvideSizeAndSpeedUnit
+import com.abdownloadmanager.shared.utils.mvi.HandleEffects
 import com.abdownloadmanager.shared.utils.ui.ProvideDebugInfo
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
+import ir.amirab.util.desktop.mac.event.MacDockEventHandler
 import ir.amirab.util.desktop.systemtray.IComposeSystemTray
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -56,9 +66,13 @@ object Ui : KoinComponent {
         if (!appArguments.startSilent) {
             appComponent.openHome()
         }
+        if (Platform.isMac()) {
+            MacDockEventHandler.configure(
+                onClickIcon = appComponent::activateHomeIfNotOpen
+            )
+        }
         application {
             val theme by themeManager.currentThemeColor.collectAsState()
-
             ProvideDebugInfo(AppInfo.isInDebugMode()) {
                 ProvideLanguageManager(languageManager) {
                     ProvideNotificationManager {
@@ -93,6 +107,7 @@ object Ui : KoinComponent {
                                     ShowAddDownloadDialogs(appComponent)
                                     ShowDownloadDialogs(appComponent)
                                     ShowCategoryDialogs(appComponent)
+                                    FileChecksumWindow(appComponent)
                                     ShowUpdaterDialog(appComponent.updater)
                                     ShowAboutDialog(appComponent)
                                     NewQueueDialog(appComponent)
@@ -143,16 +158,19 @@ private fun HandleEffectsForApp(appComponent: AppComponent) {
 private fun ApplicationScope.SystemTray(
     component: AppComponent,
 ) {
-    IComposeSystemTray.Instance.ComposeSystemTray(
-        icon = MyIcons.appIcon,
-        onClick = showDownloadList,
-        tooltip = AppInfo.displayName.asStringSource(),
-        menu = remember {
-            buildMenu {
-                +showDownloadList
-                +gotoSettingsAction
-                +requestExitAction
+    val useSystemTray by component.useSystemTray.collectAsState()
+    if (useSystemTray) {
+        IComposeSystemTray.Instance.ComposeSystemTray(
+            icon = MyIcons.appIcon,
+            onClick = showDownloadList,
+            tooltip = AppInfo.displayName.asStringSource(),
+            menu = remember {
+                buildMenu {
+                    +showDownloadList
+                    +gotoSettingsAction
+                    +requestExitAction
+                }
             }
-        }
-    )
+        )
+    }
 }

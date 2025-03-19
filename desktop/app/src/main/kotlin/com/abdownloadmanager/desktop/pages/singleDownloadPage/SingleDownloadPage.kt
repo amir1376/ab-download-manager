@@ -414,7 +414,7 @@ sealed class PartInfoCells : TableCell<IndexedValue<UiPart>> {
     data object Number : PartInfoCells() {
         override val id: String = "#"
         override val name: StringSource = "#".asStringSource()
-        override val size: CellSize = CellSize.Fixed(26.dp)
+        override val size: CellSize = CellSize.Fixed(32.dp)
     }
 
     data object Status : PartInfoCells() {

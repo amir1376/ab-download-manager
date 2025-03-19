@@ -19,6 +19,7 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.inactiveQueuesFlow
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
@@ -54,7 +55,12 @@ val newDownloadFromClipboardAction = simpleAction(
     if (contentsInClipboard.isNullOrEmpty()) {
         return@simpleAction
     }
-    val items = DownloadCredentialFromStringExtractor
+    val curlItems = DownloadCredentialsFromCurl.extract(contentsInClipboard)
+    if (curlItems.isNotEmpty()) {
+        appComponent.openAddDownloadDialog(curlItems)
+        return@simpleAction
+    }
+    val items: List<DownloadCredentials> = DownloadCredentialFromStringExtractor
         .extract(contentsInClipboard)
         .distinctBy { it.link }
     if (items.isEmpty()) {
@@ -69,7 +75,7 @@ val batchDownloadAction = simpleAction(
     appComponent.openBatchDownload()
 }
 val stopQueueGroupAction = MenuItem.SubMenu(
-    icon = MyIcons.stop,
+    icon = MyIcons.queueStop,
     title = Res.string.stop_queue.asStringSource(),
     items = emptyList()
 ).apply {
@@ -83,7 +89,7 @@ val stopQueueGroupAction = MenuItem.SubMenu(
 
 
 val startQueueGroupAction = MenuItem.SubMenu(
-    icon = MyIcons.resume,
+    icon = MyIcons.queueStart,
     title = Res.string.start_queue.asStringSource(),
     items = emptyList()
 ).apply {

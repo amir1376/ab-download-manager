@@ -1,22 +1,29 @@
 package com.abdownloadmanager.desktop.utils
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import com.abdownloadmanager.shared.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.ui.IMyIcons
+import ir.amirab.util.compose.IconSource
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.swing.filechooser.FileSystemView
 
-object FileIconProvider {
+class OSFileIconProvider(
+    private val icons: IMyIcons
+) : FileIconProvider {
     private val registeredIcons = mutableMapOf<String, ImageBitmap>()
-    private val lock=Any()
-    fun getIconOfFileExtension(
+    private val lock = Any()
+    private fun getIconOfFileExtension(
         extension: String,
     ): ImageBitmap? {
         val imageBitmap = registeredIcons[extension]
         if (imageBitmap != null) {
             return imageBitmap
         } else {
-            synchronized(lock){
+            synchronized(lock) {
                 val bitmapFoundInSync = registeredIcons[extension]
                 if (bitmapFoundInSync != null) {
                     return bitmapFoundInSync
@@ -29,7 +36,7 @@ object FileIconProvider {
                     val icon = fileSystemView.getSystemIcon(file, w, h)
                     bufferedImageToImageBitmap(iconToImage(icon))
                 }.onSuccess {
-                    registeredIcons[extension]=it
+                    registeredIcons[extension] = it
                 }.getOrNull()
             }
         }
@@ -47,5 +54,20 @@ object FileIconProvider {
 
     private fun bufferedImageToImageBitmap(bufferedImage: BufferedImage): ImageBitmap {
         return bufferedImage.toComposeImageBitmap()
+    }
+
+    override fun getIcon(fileName: String): IconSource {
+        val extension = fileName.substringAfterLast('.', "")
+        val imageBitmap = getIconOfFileExtension(extension)
+            ?: return icons.file
+        return IconSource.PainterIconSource(
+            BitmapPainter(imageBitmap),
+            false
+        )
+    }
+
+    @Composable
+    override fun rememberIcon(fileName: String): IconSource {
+        return getIcon(fileName)
     }
 }

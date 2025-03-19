@@ -4,20 +4,20 @@ import com.abdownloadmanager.desktop.pages.settings.SettingSections.*
 import com.abdownloadmanager.desktop.pages.settings.configurable.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
-import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.BaseComponent
 import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import com.abdownloadmanager.shared.utils.proxy.ProxyMode
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
+import ir.amirab.util.compose.*
 import ir.amirab.util.compose.localizationmanager.LanguageInfo
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.datasize.CommonSizeConvertConfigs
@@ -25,7 +25,9 @@ import ir.amirab.util.datasize.ConvertSizeConfig
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
+import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -45,20 +47,34 @@ interface SettingSectionGetter {
     operator fun get(key: SettingSections): List<Configurable<*>>
 }
 
+object ThreadCountLimitation {
+    const val MAX_ALLOWED_THREAD_COUNT = 256
+    const val MAX_NORMAL_VALUE = 32
+}
+
 fun threadCountConfig(appRepository: AppRepository): IntConfigurable {
     return IntConfigurable(
         title = Res.string.settings_download_thread_count.asStringSource(),
         description = Res.string.settings_download_thread_count_description.asStringSource(),
         backedBy = appRepository.threadCount,
-        range = 1..32,
+        range = 1..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
         renderMode = IntConfigurable.RenderMode.TextField,
         describe = {
-            Res.string.settings_download_thread_count_describe
-                .asStringSourceWithARgs(
-                    Res.string.settings_download_thread_count_describe_createArgs(
-                        count = it.toString()
-                    )
+            buildList {
+                add(
+                    Res.string.settings_download_thread_count_describe
+                        .asStringSourceWithARgs(
+                            Res.string.settings_download_thread_count_describe_createArgs(
+                                count = it.toString()
+                            )
+                        )
                 )
+                if (it > ThreadCountLimitation.MAX_NORMAL_VALUE) {
+                    add(
+                        Res.string.settings_download_thread_count_with_large_value_describe.asStringSource()
+                    )
+                }
+            }.combineStringSources("\n")
         },
     )
 }
@@ -113,6 +129,51 @@ fun trackDeletedFilesOnDisk(appRepository: AppRepository): BooleanConfigurable {
         title = Res.string.settings_track_deleted_files_on_disk.asStringSource(),
         description = Res.string.settings_track_deleted_files_on_disk_description.asStringSource(),
         backedBy = appRepository.trackDeletedFilesOnDisk,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
+fun ignoreSSLCertificates(appSettingsStorage: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_ignore_ssl_certificates.asStringSource(),
+        description = Res.string.settings_ignore_ssl_certificates_description.asStringSource(),
+        backedBy = appSettingsStorage.ignoreSSLCertificates,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
+fun userAgent(appSettingsStorage: AppSettingsStorage): StringConfigurable {
+    return StringConfigurable(
+        title = Res.string.settings_default_user_agent.asStringSource(),
+        description = Res.string.settings_default_user_agent_description.asStringSource(),
+        backedBy = appSettingsStorage.userAgent,
+        describe = {
+            if (it.isBlank()) {
+                Res.string.disabled.asStringSource()
+            } else {
+                "".asStringSource()
+            }
+        },
+    )
+}
+
+fun useCategoryByDefault(appSettingsStorage: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_use_category_by_default.asStringSource(),
+        description = Res.string.settings_use_category_by_default_description.asStringSource(),
+        backedBy = appSettingsStorage.useCategoryByDefault,
         describe = {
             if (it) {
                 Res.string.enabled.asStringSource()
@@ -231,6 +292,15 @@ fun proxyConfig(proxyManager: ProxyManager, scope: CoroutineScope): ProxyConfigu
                             value = it.proxyWithRules.proxy.run { "$type $host:$port" }
                         )
                     )
+
+                ProxyMode.Pac -> {
+                    Res.string.settings_use_proxy_describe_pac_proxy
+                        .asStringSourceWithARgs(
+                            Res.string.settings_use_proxy_describe_pac_proxy_createArgs(
+                                value = it.pac.uri
+                            )
+                        )
+                }
             }
         }
     )
@@ -293,26 +363,36 @@ fun themeConfig(
 fun languageConfig(
     languageManager: LanguageManager,
     scope: CoroutineScope,
-): EnumConfigurable<LanguageInfo> {
-    val currentLanguageName = languageManager.selectedLanguage
-    val allLanguages = languageManager.languageList
+): EnumConfigurable<LanguageInfo?> {
+    val currentLanguageName = languageManager.selectedLanguageInStorage
+    val allLanguages = languageManager.languageList.value
     return EnumConfigurable(
         title = Res.string.settings_language.asStringSource(),
         description = "".asStringSource(),
         backedBy = createMutableStateFlowFromStateFlow(
-            flow = currentLanguageName.mapStateFlow { l ->
-                allLanguages.value.find {
-                    it.toLocaleString() == l
-                } ?: LanguageManager.DefaultLanguageInfo
+            flow = currentLanguageName.mapStateFlow { language ->
+                language?.let {
+                    allLanguages.find {
+                        it.toLocaleString() == language
+                    }
+                }
             },
             updater = { languageInfo ->
                 languageManager.selectLanguage(languageInfo)
             },
             scope = scope,
         ),
-        possibleValues = allLanguages.value,
+        possibleValues = listOf(null).plus(allLanguages),
         describe = {
-            it.nativeName.asStringSource()
+            val isAuto = it == null
+            val language = it ?: languageManager.systemLanguageOrDefault
+            val languageName = language.nativeName
+            if (isAuto) {
+                // always use english here!
+                "System ($languageName)".asStringSource()
+            } else {
+                languageName.asStringSource()
+            }
         },
     )
 }
@@ -322,6 +402,36 @@ fun mergeTopBarWithTitleBarConfig(appSettings: AppSettingsStorage): BooleanConfi
         title = Res.string.settings_compact_top_bar.asStringSource(),
         description = Res.string.settings_compact_top_bar_description.asStringSource(),
         backedBy = appSettings.mergeTopBarWithTitleBar,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
+fun showIconLabels(appSettings: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_show_icon_labels.asStringSource(),
+        description = Res.string.settings_show_icon_labels_description.asStringSource(),
+        backedBy = appSettings.showIconLabels,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
+fun useSystemTray(appSettings: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_use_system_tray.asStringSource(),
+        description = Res.string.settings_use_system_tray_description.asStringSource(),
+        backedBy = appSettings.useSystemTray,
         describe = {
             if (it) {
                 Res.string.enabled.asStringSource()
@@ -407,6 +517,7 @@ class SettingsComponent(
     KoinComponent,
     ContainsEffects<SettingPageEffects> by supportEffects() {
     val appSettings by inject<AppSettingsStorage>()
+    private val pageStorage by inject<PageStatesStorage>()
     val appRepository by inject<AppRepository>()
     val proxyManager by inject<ProxyManager>()
     val themeManager by inject<ThemeManager>()
@@ -420,8 +531,10 @@ class SettingsComponent(
                     uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
                     mergeTopBarWithTitleBarConfig(appSettings),
+                    showIconLabels(appSettings),
                     speedUnit(appRepository, scope),
                     playSoundNotification(appSettings),
+                    useSystemTray(appSettings),
                 )
 
 //                Network -> listOf()
@@ -436,12 +549,15 @@ class SettingsComponent(
                     useAverageSpeedConfig(appRepository),
                     speedLimitConfig(appRepository),
                     threadCountConfig(appRepository),
+                    useCategoryByDefault(appSettings),
                     dynamicPartDownloadConfig(appRepository),
                     autoShowDownloadProgressWindow(appSettings),
                     showDownloadFinishWindow(appSettings),
                     useServerLastModified(appRepository),
                     useSparseFileAllocation(appRepository),
                     trackDeletedFilesOnDisk(appRepository),
+                    ignoreSSLCertificates(appSettings),
+                    userAgent(appSettings),
                 )
             }
         }
@@ -449,6 +565,32 @@ class SettingsComponent(
 
     fun toFront() {
         sendEffect(SettingPageEffects.BringToFront)
+    }
+
+    val settingsPageStateToPersist = MutableStateFlow(pageStorage.settingsPageStorage.value)
+    private val _windowSize = settingsPageStateToPersist.mapTwoWayStateFlow(
+        map = {
+            it.windowSize.let { (x, y) ->
+                DpSize(x.dp, y.dp)
+            }
+        },
+        unMap = {
+            copy(
+                windowSize = it.width.value to it.height.value
+            )
+        }
+    )
+    val windowSize = _windowSize.asStateFlow()
+    fun setWindowSize(dpSize: DpSize) {
+        _windowSize.value = dpSize
+    }
+
+    init {
+        settingsPageStateToPersist
+            .debounce(500)
+            .onEach { newValue ->
+                pageStorage.settingsPageStorage.update { newValue }
+            }.launchIn(scope)
     }
 
     var pages = listOf(

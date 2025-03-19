@@ -6,6 +6,7 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfi
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import arrow.optics.copy
+import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
@@ -80,9 +81,14 @@ class SingleDownloadComponent(
     init {
         downloadMonitor
             .downloadListFlow
-//            .conflate()
+            // downloadListFlow (combinedStateFlow { active + completed } downloads) emits null sometimes when download item removed from active downloads and also not exists in completed downloads yet (exactly at the moment that download finishes)
+            // however if the download removed by user (item == null)  this component will be closed outside of this component we don't need to handle this case here
+            // I explicitly filter nulls here to make onEach function predictable
+            // if I fix downloadListFlow to not emit nulls I can remove this filter later
+            .mapNotNull { it.firstOrNull { it.id == downloadId } }
+            .distinctUntilChanged()
             .onEach {
-                val item = it.firstOrNull { it.id == downloadId }
+                val item = it
                 val previous = itemStateFlow.value
                 if (previous is ProcessingDownloadItemState && item is CompletedDownloadItemState) {
                     // if It was opened to show progress
@@ -321,7 +327,7 @@ class SingleDownloadComponent(
                             )
                     }
                 },
-                range = 0..32,
+                range = 0..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
                 renderMode = IntConfigurable.RenderMode.TextField,
             ),
             SpeedLimitConfigurable(
