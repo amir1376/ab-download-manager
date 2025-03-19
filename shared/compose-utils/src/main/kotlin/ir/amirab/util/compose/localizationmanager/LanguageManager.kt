@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import ir.amirab.util.compose.contants.FILE_PROTOCOL
 import ir.amirab.util.compose.contants.RESOURCE_PROTOCOL
 import ir.amirab.util.flow.mapStateFlow
+import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import okio.FileSystem
@@ -11,14 +12,24 @@ import okio.Path.Companion.toPath
 import okio.buffer
 import java.io.InputStream
 import java.net.URI
-import java.util.Properties
+import java.util.*
 
 class LanguageManager(
     private val storage: LanguageStorage,
 ) {
     private val _languageList: MutableStateFlow<List<LanguageInfo>> = MutableStateFlow(emptyList())
     val languageList = _languageList.asStateFlow()
-    val selectedLanguage = storage.selectedLanguage
+    val systemLanguageOrDefault: LanguageInfo by lazy {
+        getSystemLanguageIfWeCanUse()
+    }
+    val selectedLanguageInStorage = storage.selectedLanguage
+    val selectedLanguage = storage.selectedLanguage.mapStateFlow {
+        it ?: systemLanguageOrDefault.toLocaleString()
+    }
+
+    //    val selectedLanguageInfo = selectedLanguage.mapStateFlow {
+//        bestLanguageInfo(it)
+//    }
     val isRtl = selectedLanguage.mapStateFlow { selectedLanguage ->
         rtlLanguages.any { selectedLanguage.startsWith(it) }
     }
@@ -28,11 +39,11 @@ class LanguageManager(
         instance = this
     }
 
-    fun selectLanguage(languageInfo: LanguageInfo) {
+    fun selectLanguage(languageInfo: LanguageInfo?) {
 //        ensure that language info is in the list!
 //        val languageInfo = languageList.value.find { it == languageInfo }
 //        selectedLanguage.value = (languageInfo ?: DefaultLanguageInfo).toLocaleString()
-        selectedLanguage.value = languageInfo.toLocaleString()
+        selectedLanguageInStorage.value = languageInfo?.toLocaleString()
     }
 
     fun getMessage(key: String): String {
@@ -42,7 +53,7 @@ class LanguageManager(
     }
 
     private fun getRequestedLanguage(): String {
-        return selectedLanguage.value
+        return selectedLanguage.value ?: systemLanguageOrDefault.toLocaleString()
     }
 
     @Volatile
@@ -74,6 +85,10 @@ class LanguageManager(
         }
     }
 
+    /**
+     * Find the best language info for the given locale.
+     * the returned language is guaranteed to be available. (at least [DefaultLanguageInfo])
+     */
     private fun bestLanguageInfo(locale: String): LanguageInfo {
         return languageList.value.find {
             it.toLocaleString() == locale
@@ -122,6 +137,11 @@ class LanguageManager(
             }
     }
 
+    private fun getSystemLanguageIfWeCanUse(): LanguageInfo {
+        val systemLocale = getSystemLocale().toString()
+        return bestLanguageInfo(systemLocale)
+    }
+
     companion object {
         lateinit var instance: LanguageManager
         private const val LOCALES_PATH = "/com/abdownloadmanager/resources/locales"
@@ -130,10 +150,8 @@ class LanguageManager(
                 languageCode = "en",
                 countryCode = "US",
             )
-            LanguageInfo(
-                locale = locale,
-                nativeName = "English",
-                path = URI("$RESOURCE_PROTOCOL:$LOCALES_PATH/${locale}.properties")
+            locale.toLanguageInfo(
+                path = "$RESOURCE_PROTOCOL:$LOCALES_PATH/${locale}.properties",
             )
         }
 
@@ -203,4 +221,12 @@ data class LanguageInfo(
     fun toLocaleString(): String {
         return locale.toString()
     }
+}
+
+private fun getSystemLocale(): MyLocale {
+    val javaSystemLocale = Locale.getDefault(Locale.Category.DISPLAY)
+    return MyLocale(
+        languageCode = javaSystemLocale.language,
+        countryCode = javaSystemLocale.country,
+    )
 }

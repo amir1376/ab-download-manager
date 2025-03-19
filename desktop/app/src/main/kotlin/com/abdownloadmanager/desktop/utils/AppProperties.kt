@@ -19,7 +19,6 @@ object AppProperties {
     }
 
     private object Keys {
-        const val CONFIG_DIRECTORY: String = "app.config.path"
         const val DEBUG: String = "app.debug"
     }
 
@@ -77,10 +76,6 @@ object AppProperties {
             .toBoolean()
     }
 
-    fun getConfigDirectory(): String {
-        return ensureAndGet(Keys.CONFIG_DIRECTORY)
-            .toString()
-    }
     //app.properties in installation directory
     fun isAppPropertiesFound(): Boolean {
         return foundAppProperties

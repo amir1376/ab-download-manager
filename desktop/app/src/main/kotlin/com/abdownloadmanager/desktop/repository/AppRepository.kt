@@ -1,19 +1,23 @@
 package com.abdownloadmanager.desktop.repository
 
+import ir.amirab.util.datasize.CommonSizeConvertConfigs
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.utils.AutoStartManager
-import com.abdownloadmanager.desktop.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.DownloadSystem
 import ir.amirab.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
-import com.abdownloadmanager.utils.proxy.ProxyManager
+import com.abdownloadmanager.shared.utils.autoremove.RemovedDownloadsFromDiskTracker
+import com.abdownloadmanager.shared.utils.category.CategoryManager
+import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.monitor.IDownloadMonitor
+import ir.amirab.util.datasize.BaseSize
+import ir.amirab.util.datasize.ConvertSizeConfig
+import ir.amirab.util.flow.mapStateFlow
+import ir.amirab.util.flow.withPrevious
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -24,11 +28,13 @@ class AppRepository : KoinComponent {
     val theme = appSettings.theme
 
     val uiScale = appSettings.uiScale
-    private val downloadSystem : DownloadSystem by inject()
+    private val downloadSystem: DownloadSystem by inject()
     private val downloadSettings: DownloadSettings by inject()
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
     private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor
     private val integration: Integration by inject()
+    private val removedDownloadsFromDiskTracker: RemovedDownloadsFromDiskTracker by inject()
+    val categoryManager: CategoryManager by inject()
 
     val speedLimiter = appSettings.speedLimit
     val threadCount = appSettings.threadCount
@@ -39,9 +45,35 @@ class AppRepository : KoinComponent {
     val saveLocation = appSettings.defaultDownloadFolder
     val integrationEnabled = appSettings.browserIntegrationEnabled
     val integrationPort = appSettings.browserIntegrationPort
+    val trackDeletedFilesOnDisk = appSettings.trackDeletedFilesOnDisk
+    val sizeUnit = MutableStateFlow(
+        CommonSizeConvertConfigs.BinaryBytes
+    )
+    val speedUnit = appSettings.useBitsForSpeed.mapStateFlow { useBits ->
+        if (useBits) {
+            CommonSizeConvertConfigs.BinaryBits
+        } else {
+            CommonSizeConvertConfigs.BinaryBytes
+        }
+    }
 
+    fun setSpeedUnit(speedUnit: ConvertSizeConfig) {
+        appSettings.useBitsForSpeed.value = speedUnit.baseSize == BaseSize.Bits
+    }
 
     init {
+        saveLocation
+            .debounce(500)
+            .withPrevious()
+            .onEach { (oldDownloadFolder, newDownloadFolder) ->
+                if (oldDownloadFolder == null) {
+                    return@onEach
+                }
+                categoryManager.updateCategoryFoldersBasedOnDefaultDownloadFolder(
+                    previousDownloadFolder = oldDownloadFolder,
+                    currentDownloadFolder = newDownloadFolder,
+                )
+            }.launchIn(scope)
         //maybe its better to move this to another place
         appSettings.autoStartOnBoot
             .debounce(500)
@@ -105,6 +137,16 @@ class AppRepository : KoinComponent {
                 integrationEnabled.update { false }
             }
         }.launchIn(scope)
+        trackDeletedFilesOnDisk
+            .debounce(500)
+            .onEach { enabled ->
+                if (enabled) {
+                    removedDownloadsFromDiskTracker.removeDownloadsThatFilesAreMissing()
+                    removedDownloadsFromDiskTracker.start()
+                } else {
+                    removedDownloadsFromDiskTracker.stop()
+                }
+            }.launchIn(scope)
     }
 
 }

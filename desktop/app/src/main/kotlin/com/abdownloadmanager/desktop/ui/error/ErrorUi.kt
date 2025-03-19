@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.ui.error
 
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.util.ScreenSurface
-import com.abdownloadmanager.desktop.ui.widget.ActionButton
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.utils.ui.widget.ScreenSurface
+import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
 import androidx.compose.foundation.background
@@ -13,14 +13,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 

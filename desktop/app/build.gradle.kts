@@ -17,12 +17,11 @@ plugins {
     id("ir.amirab.installer-plugin")
 //    id(MyPlugins.proguardDesktop)
 }
+
+
 dependencies {
     implementation(libs.decompose)
     implementation(libs.decompose.jbCompose)
-
-    //because we don't have material design, but we use ripple effect
-    implementation(libs.compose.material.rippleEffect)
 
     implementation(libs.koin.core)
 
@@ -45,17 +44,16 @@ dependencies {
     implementation(libs.androidx.datastore)
 
     implementation(libs.aboutLibraries.core)
-
+    implementation(libs.markdownRenderer.core)
     implementation(libs.composeFileKit) {
         exclude(group = "net.java.dev.jna")
     }
     implementation(libs.osThemeDetector) {
         exclude(group = "net.java.dev.jna")
     }
-
-    // at the moment I don't use jna but some libraries does
-    // filekit and osThemeDetector both use jna but with different versions
-    // I excluded jna from both of them and add it here!
+    implementation(libs.proxyVole) {
+        exclude(group = "net.java.dev.jna")
+    }
     implementation(libs.jna.core)
     implementation(libs.jna.platform)
 
@@ -64,14 +62,34 @@ dependencies {
 
     implementation(project(":integration:server"))
     implementation(project(":desktop:shared"))
-    implementation(project(":desktop:tray"))
-    implementation(project(":desktop:custom-window-frame"))
+    implementation(project(":desktop:app-utils"))
+
+    implementation(project(":desktop:tray:common"))
+
+    // Detection based on the operating system
+    when (Platform.getCurrentPlatform()) {
+        Platform.Desktop.Windows -> {
+            implementation(project(":desktop:tray:windows"))
+        }
+
+        Platform.Desktop.Linux -> {
+            implementation(project(":desktop:tray:linux"))
+        }
+
+        Platform.Desktop.MacOS -> {
+            implementation(project(":desktop:tray:mac"))
+        }
+
+        else -> Unit
+    }
+
+    implementation(project(":shared:app"))
     implementation(project(":shared:app-utils"))
     implementation(project(":shared:utils"))
     implementation(project(":shared:updater"))
     implementation(project(":shared:auto-start"))
     implementation(project(":shared:nanohttp4k"))
-    implementation(project(":shared:resources"))
+    implementation(project(":desktop:mac_utils"))
 }
 
 aboutLibraries {
@@ -152,6 +170,7 @@ installerPlugin {
         appDisplayName = getPrettifiedAppName()
         appVersion = getAppVersionStringForPackaging(Exe)
         appDisplayVersion = getAppVersionString()
+        appDataDirName = getAppDataDirName()
         inputDir = project.file("build/compose/binaries/main-release/app/${getAppName()}")
         outputFileName = getAppName()
         licenceFile = rootProject.file("LICENSE")
@@ -181,12 +200,20 @@ buildConfig {
         }
     )
     buildConfigField(
+        "APP_DISPLAY_NAME",
+        provider { getPrettifiedAppName() }
+    )
+    buildConfigField(
+        "DATA_DIR_NAME",
+        provider { getAppDataDirName() }
+    )
+    buildConfigField(
         "APP_VERSION",
         provider { getAppVersionString() }
     )
     buildConfigField(
         "APP_NAME",
-        provider { getPrettifiedAppName() }
+        provider { getAppName() }
     )
     buildConfigField(
         "PROJECT_WEBSITE",
@@ -198,6 +225,18 @@ buildConfig {
         "PROJECT_SOURCE_CODE",
         provider {
             "https://github.com/amir1376/ab-download-manager"
+        }
+    )
+    buildConfigField(
+        "PROJECT_GITHUB_OWNER",
+        provider {
+            "amir1376"
+        }
+    )
+    buildConfigField(
+        "PROJECT_GITHUB_REPO",
+        provider {
+            "ab-download-manager"
         }
     )
     buildConfigField(

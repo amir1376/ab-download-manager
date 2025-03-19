@@ -1,11 +1,12 @@
 package com.abdownloadmanager.desktop.storage
 
 import com.abdownloadmanager.desktop.pages.home.HomePageStateToPersist
-import com.abdownloadmanager.desktop.utils.*
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
+import com.abdownloadmanager.desktop.pages.settings.SettingPageStateToPersist
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageStateToPersist
+import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
 import ir.amirab.util.config.getDecoded
 import ir.amirab.util.config.keyOfEncoded
 import ir.amirab.util.config.putEncoded
@@ -49,6 +50,7 @@ data class CommonData(
 @Serializable
 data class PageStatesModel(
     val home: HomePageStateToPersist = HomePageStateToPersist(),
+    val settings: SettingPageStateToPersist = SettingPageStateToPersist(),
     val downloadPage: SingleDownloadPageStateToPersist = SingleDownloadPageStateToPersist(),
     val global: CommonData = CommonData(),
 ) {
@@ -63,11 +65,13 @@ data class PageStatesModel(
             val common = CommonData.ConfigLens("global.")
             val downloadPage = SingleDownloadPageStateToPersist.ConfigLens("downloadPage.")
             val home = HomePageStateToPersist.ConfigLens("home.")
+            val settings = SettingPageStateToPersist.ConfigLens("settings.")
         }
 
         override fun get(source: MapConfig): PageStatesModel {
             return PageStatesModel(
                 home = Child.home.get(source),
+                settings = Child.settings.get(source),
                 downloadPage = Child.downloadPage.get(source),
                 global = Child.common.get(source)
             )
@@ -75,6 +79,7 @@ data class PageStatesModel(
 
         override fun set(source: MapConfig, focus: PageStatesModel): MapConfig {
             Child.home.set(source, focus.home)
+            Child.settings.set(source, focus.settings)
             Child.downloadPage.set(source, focus.downloadPage)
             Child.common.set(source, focus.global)
             return source
@@ -88,4 +93,5 @@ class PageStatesStorage(
     val lastUsedSaveLocations = from(PageStatesModel.global.lastSavedLocations)
     val downloadPage = from(PageStatesModel.downloadPage)
     val homePageStorage = from(PageStatesModel.home)
+    val settingsPageStorage = from(PageStatesModel.settings)
 }

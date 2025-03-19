@@ -1,58 +1,64 @@
 package com.abdownloadmanager.desktop.pages.home
 
-import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
-import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
-import com.abdownloadmanager.desktop.pages.home.sections.category.*
-import com.abdownloadmanager.utils.compose.WithContentAlpha
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.*
-import com.abdownloadmanager.desktop.ui.widget.menu.MenuBar
-import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import com.abdownloadmanager.desktop.ui.widget.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import ir.amirab.downloader.utils.ByteConverter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import com.abdownloadmanager.desktop.ui.widget.ActionButton
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.awtTransferable
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.abdownloadmanager.desktop.ui.customwindow.*
-import com.abdownloadmanager.desktop.ui.widget.menu.ShowOptionsInDropDown
+import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
+import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
+import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
+import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadStatusCategoryFilter
+import com.abdownloadmanager.desktop.pages.home.sections.category.StatusFilterItem
+import com.abdownloadmanager.desktop.window.custom.TitlePosition
+import com.abdownloadmanager.desktop.window.custom.WindowEnd
+import com.abdownloadmanager.desktop.window.custom.WindowStart
+import com.abdownloadmanager.desktop.window.custom.WindowTitlePosition
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.rememberIconPainter
-import ir.amirab.util.compose.resources.myStringResource
+import com.abdownloadmanager.shared.ui.widget.*
+import com.abdownloadmanager.shared.ui.widget.menu.MenuBar
+import com.abdownloadmanager.shared.ui.widget.menu.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.utils.LocalSpeedUnit
+import com.abdownloadmanager.shared.utils.category.Category
+import com.abdownloadmanager.shared.utils.category.rememberIconPainter
+import com.abdownloadmanager.shared.utils.convertPositiveBytesToSizeUnit
+import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.WithTitleBarDirection
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
+import ir.amirab.util.compose.resources.myStringResource
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.awt.datatransfer.DataFlavor
 import java.io.File
 
@@ -188,6 +194,7 @@ fun HomePage(component: HomeComponent) {
                                 component.onExternalTextDraggedIn { (event.awtTransferable.getTransferData(DataFlavor.stringFlavor) as String) }
                                 return
                             }
+
                             if (event.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                                 component.onExternalFilesDraggedIn {
                                     (event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>)
@@ -246,11 +253,11 @@ fun HomePage(component: HomeComponent) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Spacer(Modifier.size(8.dp))
+                        Spacer(Modifier.size(4.dp))
                         AddUrlButton {
                             component.requestAddNewDownload()
                         }
-                        Actions(component.headerActions)
+                        Actions(component.headerActions, component.showLabels.collectAsState().value)
                     }
                     var lastSelected by remember { mutableStateOf(null as Long?) }
                     DownloadList(
@@ -735,14 +742,10 @@ private fun Footer(component: HomeComponent) {
         val activeCount by component.activeDownloadCountFlow.collectAsState()
         FooterItem(MyIcons.activeCount, activeCount.toString(), "")
         val size by component.globalSpeedFlow.collectAsState(0)
-        val speed = baseConvertBytesToHumanReadable(size)
+        val speed = convertPositiveBytesToSizeUnit(size, LocalSpeedUnit.current)
         if (speed != null) {
-            val speedText = ByteConverter.prettify(speed.value)
-            val unitText = ByteConverter.unitPrettify(speed.unit)
-                ?.let {
-                    "$it/s"
-                }
-                .orEmpty()
+            val speedText = speed.formatedValue()
+            val unitText = speed.unit.toString() + "/s"
             FooterItem(MyIcons.speed, speedText, unitText)
         }
     }

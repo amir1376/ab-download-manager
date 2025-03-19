@@ -1,12 +1,12 @@
 package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.TimeConfigurable
-import com.abdownloadmanager.desktop.ui.widget.IntTextField
+import com.abdownloadmanager.shared.ui.widget.IntTextField
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import com.abdownloadmanager.desktop.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier

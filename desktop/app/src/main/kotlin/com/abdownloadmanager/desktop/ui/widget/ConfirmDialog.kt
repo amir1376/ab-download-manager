@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.ui.widget
 
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,7 +18,10 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.desktop.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.ui.widget.ActionButton
+import com.abdownloadmanager.shared.ui.widget.ActionContainer
+import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.resources.myStringResource

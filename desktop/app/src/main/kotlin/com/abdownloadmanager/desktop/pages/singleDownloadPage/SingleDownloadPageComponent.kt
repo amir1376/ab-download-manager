@@ -3,15 +3,17 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 import androidx.compose.runtime.Immutable
 import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
-import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
-import com.abdownloadmanager.desktop.utils.mvi.supportEffects
+import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
+import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import arrow.optics.copy
+import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable
+import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.*
+import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
@@ -22,7 +24,6 @@ import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.combineStateFlows
-import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -55,6 +56,7 @@ class SingleDownloadComponent(
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
     private val appSettings: AppSettingsStorage by inject()
+    private val appRepository: AppRepository by inject()
     val fileIconProvider: FileIconProvider by inject()
     private val singleDownloadPageStateToPersist by lazy {
         get<PageStatesStorage>().downloadPage
@@ -79,9 +81,14 @@ class SingleDownloadComponent(
     init {
         downloadMonitor
             .downloadListFlow
-            .conflate()
+            // downloadListFlow (combinedStateFlow { active + completed } downloads) emits null sometimes when download item removed from active downloads and also not exists in completed downloads yet (exactly at the moment that download finishes)
+            // however if the download removed by user (item == null)  this component will be closed outside of this component we don't need to handle this case here
+            // I explicitly filter nulls here to make onEach function predictable
+            // if I fix downloadListFlow to not emit nulls I can remove this filter later
+            .mapNotNull { it.firstOrNull { it.id == downloadId } }
+            .distinctUntilChanged()
             .onEach {
-                val item = it.firstOrNull { it.id == downloadId }
+                val item = it
                 val previous = itemStateFlow.value
                 if (previous is ProcessingDownloadItemState && item is CompletedDownloadItemState) {
                     // if It was opened to show progress
@@ -122,19 +129,19 @@ class SingleDownloadComponent(
                 add(
                     SingleDownloadPagePropertyItem(
                         Res.string.size.asStringSource(),
-                        convertSizeToHumanReadable(it.contentLength)
+                        convertPositiveSizeToHumanReadable(it.contentLength, appRepository.sizeUnit.value)
                     )
                 )
                 add(
                     SingleDownloadPagePropertyItem(
                         Res.string.download_page_downloaded_size.asStringSource(),
-                        convertBytesToHumanReadable(it.progress).orEmpty().asStringSource()
+                        convertPositiveSizeToHumanReadable(it.progress, appRepository.sizeUnit.value)
                     )
                 )
                 add(
                     SingleDownloadPagePropertyItem(
                         Res.string.speed.asStringSource(),
-                        convertSpeedToHumanReadable(it.speed).asStringSource()
+                        convertPositiveSpeedToHumanReadable(it.speed, appRepository.speedUnit.value).asStringSource()
                     )
                 )
                 add(
@@ -320,7 +327,7 @@ class SingleDownloadComponent(
                             )
                     }
                 },
-                range = 0..32,
+                range = 0..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
                 renderMode = IntConfigurable.RenderMode.TextField,
             ),
             SpeedLimitConfigurable(
@@ -331,7 +338,7 @@ class SingleDownloadComponent(
                     if (it == 0L) {
                         Res.string.unlimited.asStringSource()
                     } else {
-                        convertSpeedToHumanReadable(it).asStringSource()
+                        convertPositiveSpeedToHumanReadable(it, appRepository.speedUnit.value).asStringSource()
                     }
                 },
             ),

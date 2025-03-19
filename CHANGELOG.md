@@ -14,6 +14,117 @@
 
 ### Security
 
+## 1.5.4
+
+### Added
+
+- The app now supports full portability by creating an empty `.abdm` directory in the installation folder.
+- An option to delete user data (configuration files) when using Windows Uninstaller.
+
+### Fixed
+
+- Unchecked "Use Category" didn't work as expected.
+
+### Improved
+
+- Download engine improvements.
+- Translation updated.
+
+## 1.5.3
+
+### Added
+
+- Vietnamese language.
+- An option to "Select Queue" dialog to start the queue immediately.
+- An option to allow user set custom User-agent in the settings.
+- An option to not "Use Category" by default.
+- An option to disable SSL Certificate Verification.
+- An option to show/hide icon labels in the main toolbar (you can hover over them to see their labels).
+- An option to not use System Tray.
+
+### Fixed
+
+- Sometimes Thread count not applied correctly.
+- The download completion dialog appeared even when its option is disabled.
+- Some servers return 256 Bytes instead of full size
+
+### Improved
+
+- Translations updated
+- Minor UI improvements
+- Use system language as default language
+- Proxy Settings page improved
+
+## 1.5.2
+
+### Added
+
+- An ability to validate downloads with File Checksum
+- System Proxy support
+- Proxy Auto Configuration (pac) support
+
+### Changed
+
+- Maximum allowed thread count has been increased
+
+### Fixed
+
+- Fixed the incorrect System Tray name on Linux.
+
+### Improved
+
+- Translations Updated
+- Settings window size will be remembered now
+
+## 1.5.1
+
+### Added
+
+- Italian Language
+- German Language
+- Georgian Language
+- Indonesian Language
+- An option to change download speed unit
+- An ability to start new download using Rest-Api
+
+### Fixed
+
+- System tray in Linux now has correct icon and native option menu
+- App crashes when changing theme in Linux
+- Open file/folder action fails sometimes in Windows
+
+### Improved
+
+- Translations updated
+- Split category and location configuration options in multi download page
+- Home page minor UI improvements
+
+## 1.5.0
+
+### Added
+
+- In App Update feature.
+- An option to track deleted files on disk and remove them from the download list (either manually or automatically).
+- Delete option to the Main toolbar.
+
+### Changed
+
+- UI Scale maximum value increased to 3x.
+
+### Fixed
+
+- When you change "Default download Folder", the "Download Location" of categories also updated (if they are inside "
+  Default Download Location").
+- Issue on the "Add Multiple Download" page where the "Save Mode" set to "All in Same Location" was not functioning as
+  expected.
+- App does not start on boot when installation path contains space.
+
+### Improved
+
+- Redesigned "About" Page.
+- Translations updated.
+- "Extra Config" section on the "Add Download" page was not displaying correctly in some languages.
+
 ## 1.4.4
 
 ### Added

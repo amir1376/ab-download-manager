@@ -3,25 +3,24 @@ package com.abdownloadmanager.desktop.pages.addDownload.multiple
 import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.DownloadUiChecker
 import com.abdownloadmanager.desktop.repository.AppRepository
-import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
-import com.abdownloadmanager.desktop.utils.DownloadSystem
+import com.abdownloadmanager.shared.ui.widget.customtable.TableState
+import com.abdownloadmanager.shared.utils.DownloadSystem
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemSaveMode.*
-import com.abdownloadmanager.desktop.utils.asState
-import com.abdownloadmanager.utils.FileIconProvider
-import com.abdownloadmanager.utils.category.Category
-import com.abdownloadmanager.utils.category.CategoryItem
-import com.abdownloadmanager.utils.category.CategoryManager
-import com.abdownloadmanager.utils.category.CategorySelectionMode
+import com.abdownloadmanager.shared.utils.FileIconProvider
+import com.abdownloadmanager.shared.utils.category.Category
+import com.abdownloadmanager.shared.utils.category.CategoryItem
+import com.abdownloadmanager.shared.utils.category.CategoryManager
+import com.abdownloadmanager.shared.utils.category.CategorySelectionMode
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -68,13 +67,20 @@ class AddMultiDownloadComponent(
 
     private val categoryManager: CategoryManager by inject()
     val categories = categoryManager.categoriesFlow
-    private val _selectedCategory = MutableStateFlow(categories.value.firstOrNull())
+    private val _selectedCategory = MutableStateFlow<Category?>(null)
     val selectedCategory = _selectedCategory.asStateFlow()
 
-    fun setSelectedCategory(category: Category) {
+    fun setSelectedCategory(category: Category?) {
         _selectedCategory.update {
             category
         }
+    }
+
+    private val _allInSameLocation = MutableStateFlow(false)
+    val allInSameLocation = _allInSameLocation.asStateFlow()
+
+    fun setAllItemsInSameLocation(sameLocation: Boolean) {
+        _allInSameLocation.update { sameLocation }
     }
 
     fun requestAddCategory() {
@@ -103,12 +109,6 @@ class AddMultiDownloadComponent(
     }
 
     var list: List<DownloadUiChecker> by mutableStateOf(emptyList())
-    private val _saveMode = MutableStateFlow(EachFileInTheirOwnCategory)
-    val saveMode = _saveMode.asStateFlow()
-    fun setSaveMode(saveMode: AddMultiItemSaveMode) {
-        _saveMode.update { saveMode }
-    }
-
 
     private val checkList = MutableSharedFlow<DownloadUiChecker>()
     private fun enqueueCheck(links: List<DownloadUiChecker>) {
@@ -161,29 +161,20 @@ class AddMultiDownloadComponent(
         }
     }
 
-    val isCategoryModeHasValidState by run {
-        val category by selectedCategory.asState(scope)
-        val saveMode by saveMode.asState(scope)
-        derivedStateOf {
-            when (saveMode) {
-                EachFileInTheirOwnCategory -> true
-                AllInOneCategory -> category != null
-                InSameLocation -> true
-            }
-        }
-    }
     val canClickAdd by derivedStateOf {
-        selectionList.isNotEmpty() && isCategoryModeHasValidState
+        selectionList.isNotEmpty()
     }
     private val queueManager: QueueManager by inject()
     val queueList = queueManager.queues
 
     private fun getFolderForItem(
         categorySelectionMode: CategorySelectionMode?,
+        allInSameLocation: Boolean,
         url: String,
         fleName: String,
         defaultFolder: String,
     ): String {
+        if (allInSameLocation) return defaultFolder
         return when (categorySelectionMode) {
             CategorySelectionMode.Auto -> {
                 downloadSystem.categoryManager
@@ -207,17 +198,13 @@ class AddMultiDownloadComponent(
     }
 
     fun requestAddDownloads(
-        queueId: Long?,
+        queueId: Long?, startQueue: Boolean,
     ) {
-        val categorySelectionMode = when (saveMode.value) {
-            EachFileInTheirOwnCategory -> CategorySelectionMode.Auto
-            AllInOneCategory -> selectedCategory.value?.let {
-                CategorySelectionMode.Fixed(it.id)
-            }
 
-            InSameLocation -> {
-                if (alsoAutoCategorize.value) CategorySelectionMode.Auto
-                else null
+        val categorySelectionMode = when {
+            alsoAutoCategorize.value -> CategorySelectionMode.Auto
+            else -> selectedCategory.value?.let {
+                CategorySelectionMode.Fixed(it.id)
             }
         }
         val itemsToAdd = list
@@ -233,7 +220,8 @@ class AddMultiDownloadComponent(
                         categorySelectionMode = categorySelectionMode,
                         url = it.credentials.value.link,
                         fleName = it.name.value,
-                        defaultFolder = it.folder.value
+                        defaultFolder = it.folder.value,
+                        allInSameLocation = allInSameLocation.value
                     ),
                     name = it.name.value,
                     link = it.credentials.value.link,
@@ -248,8 +236,13 @@ class AddMultiDownloadComponent(
                 categorySelectionMode = categorySelectionMode
             )
             val folder = folder.value
-            if (saveMode.value == InSameLocation) {
+            if (allInSameLocation.value) {
                 addToLastUsedLocations(folder)
+            }
+            if (startQueue && queueId != null) {
+                scope.launch {
+                    downloadSystem.startQueue(queueId)
+                }
             }
             requestClose()
         }

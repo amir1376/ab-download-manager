@@ -1,17 +1,26 @@
 package com.abdownloadmanager.desktop.di
 
+import GithubApi
+import com.abdownloadmanager.UpdateDownloadLocationProvider
+import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.desktop.AppComponent
+import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.desktop.integration.IntegrationHandlerImp
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
+import com.abdownloadmanager.desktop.pages.updater.UpdateDownloaderViaDownloadSystem
 import ir.amirab.downloader.queue.QueueManager
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.*
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.theme.ISystemThemeDetector
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
+import com.abdownloadmanager.desktop.utils.proxy.AutoConfigurableProxyProviderForDesktop
+import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvider
+import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import ir.amirab.downloader.DownloadManagerMinimalControl
@@ -23,6 +32,9 @@ import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.util.startup.Startup
 import com.abdownloadmanager.integration.Integration
+import com.abdownloadmanager.shared.utils.*
+import com.abdownloadmanager.updateapplier.DesktopUpdateApplier
+import com.abdownloadmanager.updateapplier.UpdateApplier
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.util.config.datastore.createMapConfigDatastore
 import kotlinx.coroutines.*
@@ -33,16 +45,20 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import com.abdownloadmanager.updatechecker.DummyUpdateChecker
+import com.abdownloadmanager.updatechecker.GithubUpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateChecker
-import com.abdownloadmanager.utils.FileIconProvider
-import com.abdownloadmanager.utils.FileIconProviderUsingCategoryIcons
-import com.abdownloadmanager.utils.category.*
-import com.abdownloadmanager.utils.compose.IMyIcons
-import com.abdownloadmanager.utils.proxy.IProxyStorage
-import com.abdownloadmanager.utils.proxy.ProxyData
-import com.abdownloadmanager.utils.proxy.ProxyManager
+import ir.amirab.util.AppVersionTracker
+import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
+import com.abdownloadmanager.shared.utils.autoremove.RemovedDownloadsFromDiskTracker
+import com.abdownloadmanager.shared.utils.category.*
+import com.abdownloadmanager.shared.utils.ui.IMyIcons
+import com.abdownloadmanager.shared.utils.proxy.IProxyStorage
+import com.abdownloadmanager.shared.utils.proxy.ProxyData
+import com.abdownloadmanager.shared.utils.proxy.ProxyManager
+import ir.amirab.downloader.connection.UserAgentProvider
+import ir.amirab.downloader.connection.proxy.AutoConfigurableProxyProvider
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
+import ir.amirab.downloader.connection.proxy.SystemProxySelectorProvider
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.util.compose.localizationmanager.LanguageManager
@@ -80,6 +96,9 @@ val downloaderModule = module {
     single<IDiskStat> {
         DesktopDiskStat()
     }
+    single<ISystemThemeDetector> {
+        DesktopSystemThemeDetector()
+    }
     single {
         QueueManager(get(), get())
     }
@@ -96,16 +115,25 @@ val downloaderModule = module {
             get()
         )
     }.bind<ProxyStrategyProvider>()
+    single {
+        ProxyCachingConfig.default()
+    }
+    single<AutoConfigurableProxyProvider> {
+        AutoConfigurableProxyProviderForDesktop(get())
+    }
+    single<SystemProxySelectorProvider> {
+        DesktopSystemProxySelectorProvider(get())
+    }
+    single<UserAgentProvider> {
+        UserAgentProviderFromSettings(get())
+    }
     single<DownloaderClient> {
         OkHttpDownloaderClient(
-            OkHttpClient
-                .Builder()
-                .dispatcher(Dispatcher().apply {
-                    //bypass limit on concurrent connections!
-                    maxRequests = Int.MAX_VALUE
-                    maxRequestsPerHost = Int.MAX_VALUE
-                }).build(),
-            get()
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
         )
     }
     single {
@@ -185,18 +213,49 @@ val integrationModule = module {
     }
 }
 val updaterModule = module {
+    single {
+        UpdateDownloadLocationProvider {
+            AppInfo.updateDir.resolve("downloads")
+        }
+    }
+    single<UpdateApplier> {
+        DesktopUpdateApplier(
+            installationFolder = AppInfo.installationFolder,
+            updateFolder = AppInfo.updateDir.path,
+            logDir = AppInfo.logDir.path,
+            appName = AppInfo.name,
+            updateDownloader = UpdateDownloaderViaDownloadSystem(
+                get(),
+                get(),
+            ),
+        )
+    }
     single<UpdateChecker> {
-        DummyUpdateChecker(AppVersion.get())
+        GithubUpdateChecker(
+            AppVersion.get(),
+            githubApi = GithubApi(
+                owner = SharedConstants.projectGithubOwner,
+                repo = SharedConstants.projectGithubRepo,
+                client = OkHttpClient
+                    .Builder()
+                    .build()
+            )
+        )
+    }
+    single {
+        UpdateManager(
+            updateChecker = get(),
+            updateApplier = get(),
+            appVersionTracker = get(),
+        )
     }
 }
 val startUpModule = module {
     single {
         Startup.getStartUpManagerForDesktop(
-            name = AppInfo.name,
-            path = AppInfo.exeFile?.let { exeFile ->
-                "$exeFile ${AppArguments.Args.BACKGROUND}"
-            },
-            jar = false,
+            name = AppInfo.displayName,
+            path = AppInfo.exeFile,
+            args = listOf(AppArguments.Args.BACKGROUND),
         )
     }
 }
@@ -222,7 +281,7 @@ val appModule = module {
         AppRepository()
     }
     single {
-        ThemeManager(get(), get())
+        ThemeManager(get(), get(), get())
     }
     single {
         LanguageManager(get())
@@ -263,6 +322,48 @@ val appModule = module {
                 AppComponent(context)
             }
         }
+    }
+    single {
+        RemovedDownloadsFromDiskTracker(
+            get(), get(), get(),
+        )
+    }
+    single {
+        PreviousVersion(
+            systemPath = AppInfo.systemDir,
+            currentVersion = AppInfo.version,
+        )
+    }
+    single {
+        AppVersionTracker(
+            previousVersion = {
+                // it MUST be booted first
+                get<PreviousVersion>().get()
+            },
+            currentVersion = AppInfo.version,
+        )
+    }
+
+    single {
+        val appSettingsStorage: AppSettingsStorage = get()
+        AppSSLFactoryProvider(
+            ignoreSSLCertificates = appSettingsStorage.ignoreSSLCertificates
+        )
+    }
+    single<OkHttpClient> {
+        val appSSLFactoryProvider: AppSSLFactoryProvider = get()
+        OkHttpClient
+            .Builder()
+            .dispatcher(Dispatcher().apply {
+                //bypass limit on concurrent connections!
+                maxRequests = Int.MAX_VALUE
+                maxRequestsPerHost = Int.MAX_VALUE
+            })
+            .sslSocketFactory(
+                appSSLFactoryProvider.createSSLSocketFactory(),
+                appSSLFactoryProvider.trustManager,
+            )
+            .build()
     }
 
 }

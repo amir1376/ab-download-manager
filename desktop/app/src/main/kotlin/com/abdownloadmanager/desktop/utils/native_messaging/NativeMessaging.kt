@@ -4,8 +4,6 @@ import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.isAppInstalled
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 data class NativeMessagingManifests(
     val firefoxNativeMessagingManifest: FirefoxNativeMessagingManifest,
@@ -65,8 +63,8 @@ class NativeMessaging(
         if (!AppInfo.isAppInstalled()) return null
         val execFile = AppInfo.exeFile!!
         return FirefoxNativeMessagingManifest(
-            name = AppInfo.name,
-            description = AppInfo.name,
+            name = AppInfo.displayName,
+            description = AppInfo.displayName,
             path = execFile,
             type = "stdio",
             allowedExtensions = listOf(
@@ -78,8 +76,8 @@ class NativeMessaging(
         if (!AppInfo.isAppInstalled()) return null
         val execFile = AppInfo.exeFile!!
         return ChromeNativeMessagingManifest(
-            name = AppInfo.name,
-            description = AppInfo.name,
+            name = AppInfo.displayName,
+            description = AppInfo.displayName,
             path = execFile,
             type = "stdio",
             allowedOrigins = listOf(

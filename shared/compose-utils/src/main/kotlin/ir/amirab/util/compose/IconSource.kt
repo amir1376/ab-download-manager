@@ -41,6 +41,15 @@ sealed interface IconSource {
         override fun rememberPainter(): Painter = rememberVectorPainter(value)
     }
 
+    @Immutable
+    data class PainterIconSource(
+        override val value: Painter,
+        override val requiredTint: Boolean,
+    ) : IconSource {
+        @Composable
+        override fun rememberPainter(): Painter = value
+    }
+
     companion object
 }
 

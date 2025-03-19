@@ -5,38 +5,32 @@ import java.io.FileWriter
 import java.io.PrintWriter
 
 class UnixXDGStartup(
-    name:String,
+    name: String,
     path: String,
-    isJar:Boolean=false
+    args: List<String>,
 ) : AbstractStartupManager(
     name = name,
     path = path,
-    isJar = isJar
+    args = args,
 ) {
 
     private fun getAutoStartFile(): File {
         if (!autostartDir.exists()) {
             autostartDir.mkdirs()
         }
-        return File(autostartDir, super.name + ".desktop")
+        return File(autostartDir, this.name + ".desktop")
     }
+
     @Throws(Exception::class)
     override fun install() {
         val out = PrintWriter(FileWriter(getAutoStartFile()))
         out.println("[Desktop Entry]")
         out.println("Type=Application")
-        out.println("Name=" + super.name)
-        if (isJar) {
-            out.println("Exec=java -jar '" + super.path + "'")
-        } else {
-            out.println("Exec=" + super.path)
-        }
+        out.println("Name=" + this.name)
+        out.println("Exec=" + getExecutableWithArgs())
         out.println("Terminal=false")
         out.println("NoDisplay=true")
         out.close()
-
-        val cmd = arrayOf("chmod", "+x", super.path)
-        Runtime.getRuntime().exec(cmd)
     }
 
     override fun uninstall() {

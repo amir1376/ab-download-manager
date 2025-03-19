@@ -2,17 +2,14 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurable
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageSections.*
-import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.utils.compose.WithContentColor
+import com.abdownloadmanager.shared.utils.ui.LocalContentColor
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.*
-import com.abdownloadmanager.desktop.ui.widget.customtable.*
-import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -38,8 +35,16 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
+import com.abdownloadmanager.shared.ui.widget.*
+import com.abdownloadmanager.shared.ui.widget.customtable.CellSize
+import com.abdownloadmanager.shared.ui.widget.customtable.Table
+import com.abdownloadmanager.shared.ui.widget.customtable.TableCell
+import com.abdownloadmanager.shared.ui.widget.customtable.TableState
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.compose.useIsInDebugMode
+import com.abdownloadmanager.shared.utils.LocalSizeUnit
+import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
+import com.abdownloadmanager.shared.utils.ui.useIsInDebugMode
+import com.abdownloadmanager.shared.utils.div
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.part.PartDownloadStatus
@@ -342,13 +347,18 @@ fun ColumnScope.RenderPartInfo(itemState: ProcessingDownloadItemState) {
                         }
 
                         PartInfoCells.Downloaded -> {
-                            SimpleCellText(convertSizeToHumanReadable(it.value.howMuchProceed).rememberString())
+                            SimpleCellText(
+                                convertPositiveSizeToHumanReadable(
+                                    it.value.howMuchProceed,
+                                    LocalSizeUnit.current
+                                ).rememberString()
+                            )
                         }
 
                         PartInfoCells.Total -> {
                             SimpleCellText(
                                 it.value.length?.let { length ->
-                                    convertSizeToHumanReadable(length).rememberString()
+                                    convertPositiveSizeToHumanReadable(length, LocalSizeUnit.current).rememberString()
                                 } ?: myStringResource(Res.string.unknown),
                             )
                         }
@@ -404,7 +414,7 @@ sealed class PartInfoCells : TableCell<IndexedValue<UiPart>> {
     data object Number : PartInfoCells() {
         override val id: String = "#"
         override val name: StringSource = "#".asStringSource()
-        override val size: CellSize = CellSize.Fixed(26.dp)
+        override val size: CellSize = CellSize.Fixed(32.dp)
     }
 
     data object Status : PartInfoCells() {

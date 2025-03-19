@@ -1,16 +1,15 @@
 package com.abdownloadmanager.desktop.pages.settings
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurable
-import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.desktop.ui.customwindow.WindowIcon
-import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.desktop.window.custom.WindowIcon
+import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.widget.Handle
-import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.ui.widget.Handle
+import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
@@ -24,9 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.shared.utils.div
 import ir.amirab.util.compose.resources.myStringResource
-import kotlinx.coroutines.channels.ticker
 
 @Composable
 private fun SideBar(

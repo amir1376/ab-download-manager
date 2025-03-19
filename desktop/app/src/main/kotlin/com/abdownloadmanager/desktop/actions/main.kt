@@ -3,22 +3,23 @@ package com.abdownloadmanager.desktop.actions
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.desktop.di.Di
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
 import ir.amirab.util.compose.action.AnAction
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.action.simpleAction
-import com.abdownloadmanager.desktop.utils.getIcon
-import com.abdownloadmanager.desktop.utils.getName
+import com.abdownloadmanager.shared.utils.getIcon
+import com.abdownloadmanager.shared.utils.getName
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.utils.category.Category
+import com.abdownloadmanager.shared.utils.category.Category
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.inactiveQueuesFlow
-import com.abdownloadmanager.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
@@ -54,7 +55,12 @@ val newDownloadFromClipboardAction = simpleAction(
     if (contentsInClipboard.isNullOrEmpty()) {
         return@simpleAction
     }
-    val items = DownloadCredentialFromStringExtractor
+    val curlItems = DownloadCredentialsFromCurl.extract(contentsInClipboard)
+    if (curlItems.isNotEmpty()) {
+        appComponent.openAddDownloadDialog(curlItems)
+        return@simpleAction
+    }
+    val items: List<DownloadCredentials> = DownloadCredentialFromStringExtractor
         .extract(contentsInClipboard)
         .distinctBy { it.link }
     if (items.isEmpty()) {
@@ -69,7 +75,7 @@ val batchDownloadAction = simpleAction(
     appComponent.openBatchDownload()
 }
 val stopQueueGroupAction = MenuItem.SubMenu(
-    icon = MyIcons.stop,
+    icon = MyIcons.queueStop,
     title = Res.string.stop_queue.asStringSource(),
     items = emptyList()
 ).apply {
@@ -83,7 +89,7 @@ val stopQueueGroupAction = MenuItem.SubMenu(
 
 
 val startQueueGroupAction = MenuItem.SubMenu(
-    icon = MyIcons.resume,
+    icon = MyIcons.queueStart,
     title = Res.string.start_queue.asStringSource(),
     items = emptyList()
 ).apply {
@@ -149,12 +155,12 @@ val showDownloadList = simpleAction(
     appComponent.openHome()
 }
 
-/*val checkForUpdateAction = simpleAction(
-    title = "Check For Update",
+val checkForUpdateAction = simpleAction(
+    title = Res.string.update_check_for_update.asStringSource(),
     icon = MyIcons.refresh,
 ) {
     appComponent.updater.requestCheckForUpdate()
-}*/
+}
 val openAboutAction = simpleAction(
     title = Res.string.about.asStringSource(),
     icon = MyIcons.info,

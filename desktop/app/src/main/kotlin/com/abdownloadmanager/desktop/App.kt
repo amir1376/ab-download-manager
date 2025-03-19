@@ -3,12 +3,18 @@
  */
 package com.abdownloadmanager.desktop
 
+import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.singleInstance.*
+import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
+import com.abdownloadmanager.desktop.utils.singleInstance.MutableSingleInstanceServerHandler
+import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
 import com.abdownloadmanager.integration.Integration
+import com.abdownloadmanager.shared.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 import org.koin.core.component.KoinComponent
@@ -20,6 +26,8 @@ class App : AutoCloseable,
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
     private val integration: Integration by inject()
+    private val previousVersion: PreviousVersion by inject()
+    private val updateManager: UpdateManager by inject()
 
     //TODO Setup Native Messaging Feature
     //private val browserNativeMessaging: NativeMessaging by inject()
@@ -32,8 +40,10 @@ class App : AutoCloseable,
             runBlocking {
                 //make sure to not get any dependency until boot the DI Container
                 Di.boot()
+                // it's better to organize these list of boot functions in a separate class
                 integration.boot()
                 downloadSystem.boot()
+                previousVersion.boot()
                 //TODO Setup Native Messaging Feature
                 //waiting for compose kmp to add multi launcher to nativeDistributions,the PR is already exists but not merger
                 //or maybe I should use a custom solution
@@ -76,8 +86,9 @@ fun main(args: Array<String>) {
             singleInstance = singleInstance,
             appArguments = appArguments,
         )
+
     } catch (e: Throwable) {
-        System.err.println("Fail to start the ${AppInfo.name} app because:")
+        System.err.println("Fail to start the ${AppInfo.displayName} app because:")
         e.printStackTrace()
         exitProcess(-1)
     }
@@ -169,7 +180,7 @@ private fun defaultApp(
             System.getProperty("skiko.renderApi") != null
 
     if (!customRenderApiRequested) {
-        if (Platform.getCurrentPlatform() == Platform.Desktop.Windows) {
+        if (Platform.isWindows()) {
             // At the moment default render api have some problems on windows!
             // - when I resize a window, the contents of the window will be stretched
             // - sometimes when I close a window, the window flashes on exiting

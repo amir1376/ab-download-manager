@@ -71,6 +71,7 @@ data class WindowsConfig(
     var appDisplayName: String? = null,
     var appVersion: String? = null,
     var appDisplayVersion: String? = null,
+    var appDataDirName: String? = null,
     var iconFile: File? = null,
     var licenceFile: File? = null,
 

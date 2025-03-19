@@ -4,16 +4,26 @@ plugins {
     id(Plugins.Kotlin.serialization)
 }
 dependencies {
-    implementation(project(":downloader:core"))
-    implementation(project(":downloader:monitor"))
+    api(project(":downloader:core"))
+    api(project(":downloader:monitor"))
     api(project(":shared:config"))
     api(project(":shared:utils"))
     api(project(":shared:compose-utils"))
-    implementation(libs.androidx.datastore)
-    implementation(libs.kotlin.coroutines.core)
-    implementation(libs.kotlin.serialization.json)
+    api(project(":shared:resources"))
 
-    implementation(compose.runtime)
-    implementation(compose.foundation)
-    implementation(compose.ui)
+    api(libs.decompose)
+
+    api(libs.androidx.datastore)
+    api(libs.kotlin.coroutines.core)
+    api(libs.kotlin.serialization.json)
+    implementation(libs.kotlinFileWatcher)
+
+    api(libs.koin.core)
+
+    api(compose.runtime)
+    api(compose.foundation)
+    api(compose.ui)
+
+    //because we don't have material design, but we use ripple effect
+    implementation(libs.compose.material.rippleEffect)
 }

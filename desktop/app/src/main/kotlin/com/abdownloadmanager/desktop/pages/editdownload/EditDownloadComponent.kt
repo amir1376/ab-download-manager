@@ -1,12 +1,11 @@
 package com.abdownloadmanager.desktop.pages.editdownload
 
-import androidx.compose.runtime.Immutable
-import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.mvi.ContainsEffects
-import com.abdownloadmanager.desktop.utils.mvi.ContainsScreenState
-import com.abdownloadmanager.desktop.utils.mvi.SupportsScreenState
-import com.abdownloadmanager.desktop.utils.mvi.supportEffects
-import com.abdownloadmanager.utils.FileIconProvider
+import com.abdownloadmanager.desktop.repository.AppRepository
+import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
+import com.abdownloadmanager.shared.utils.mvi.supportEffects
+import com.abdownloadmanager.shared.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.DownloadSystem
+import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
@@ -32,6 +31,7 @@ class EditDownloadComponent(
     private val downloaderClient: DownloaderClient by inject()
     val iconProvider: FileIconProvider by inject()
     val downloadSystem: DownloadSystem by inject()
+    private val appRepository: AppRepository by inject()
     val editDownloadUiChecker = MutableStateFlow(null as EditDownloadState?)
 
     init {
@@ -75,7 +75,8 @@ class EditDownloadComponent(
                         .contains(editedDownloadFile)
                 }
             },
-            scope,
+            scope = scope,
+            appRepository = appRepository,
         )
         editDownloadUiChecker.value = editDownloadState
         pendingCredential?.let { credentials ->

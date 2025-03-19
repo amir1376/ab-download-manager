@@ -1,21 +1,24 @@
 package com.abdownloadmanager.desktop.pages.extenallibs
 
-import com.abdownloadmanager.utils.compose.ProvideTextStyle
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.customtable.Table
-import com.abdownloadmanager.desktop.ui.widget.customtable.TableState
-import com.abdownloadmanager.utils.compose.WithContentAlpha
+import androidx.compose.foundation.background
+import com.abdownloadmanager.shared.utils.ui.ProvideTextStyle
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.ui.widget.customtable.Table
+import com.abdownloadmanager.shared.ui.widget.customtable.TableState
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
-import com.abdownloadmanager.desktop.ui.widget.Text
-import com.abdownloadmanager.desktop.ui.widget.customtable.styled.MyStyledTableHeader
+import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.customtable.styled.MyStyledTableHeader
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.myColors
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.entity.Library
 
@@ -62,12 +65,13 @@ private fun OpenSourceLibraries(
                 )
             },
             wrapItem = { _, item, rowContent ->
-                Box(Modifier
-                    .clickable {
-                        currentDialog = item
-                    }
-                    .widthIn(getTableSize().visibleWidth)
-                    .padding(vertical = 6.dp, horizontal = itemHorizontalPadding)) {
+                Box(
+                    Modifier
+                        .clickable {
+                            currentDialog = item
+                        }
+                        .widthIn(getTableSize().visibleWidth)
+                        .padding(vertical = 6.dp, horizontal = itemHorizontalPadding)) {
                     rowContent()
                 }
             },
@@ -83,12 +87,15 @@ private fun OpenSourceLibraries(
                                         overflow = TextOverflow.Ellipsis,
                                         maxLines = 1
                                     )
-                                    Text(
-                                        library.artifactVersion.orEmpty(),
-                                        fontSize = myTextSizes.base,
-                                        overflow = TextOverflow.Ellipsis,
-                                        maxLines = 1,
-                                    )
+                                    Spacer(Modifier.width(2.dp))
+                                    library.artifactVersion?.let { version ->
+                                        Text(
+                                            text = version,
+                                            fontSize = myTextSizes.base,
+                                            overflow = TextOverflow.Ellipsis,
+                                            maxLines = 1,
+                                        )
+                                    }
                                 }
                             }
                             WithContentAlpha(0.75f) {

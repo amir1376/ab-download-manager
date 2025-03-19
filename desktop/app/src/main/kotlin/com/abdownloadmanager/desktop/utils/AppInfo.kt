@@ -7,6 +7,7 @@ import java.io.File
 
 object AppInfo {
     val name = SharedConstants.appName
+    val displayName = SharedConstants.appDisplayName
     val packageName = SharedConstants.packageName
     val website = SharedConstants.projectWebsite
     val sourceCode = SharedConstants.projectSourceCode
@@ -20,6 +21,38 @@ object AppInfo {
 //            return@run null
 //        }
         System.getProperty("jpackage.app-path")
+    }
+    val installationFolder: String? = run {
+        exeFile?.let(::File)
+            ?.parentFile // executable path
+            ?.let {
+                when (Platform.getCurrentPlatform()) {
+                    Platform.Desktop.Linux -> it.parentFile // <installationFolder>/bin/ABDownloadManager
+                    Platform.Desktop.MacOS -> it.parentFile // not checked yet
+                    Platform.Desktop.Windows -> it // <installationFolder>/ABDownloadManager.exe
+                    else -> null
+                }?.path
+            }
+    }
+
+    private fun getPortableDataDir(): File? {
+        val dataDirName = SharedConstants.dataDirName
+        if (installationFolder != null) {
+            val portableDataDir = File(installationFolder, dataDirName)
+            if (portableDataDir.exists() && portableDataDir.canWrite()) {
+                return portableDataDir
+            }
+        }
+        return null
+    }
+
+    private fun getUserDataDir(): File {
+        val dataDirName = SharedConstants.dataDirName
+        return File(System.getProperty("user.home"), dataDirName)
+    }
+
+    val dataDir by lazy {
+        getPortableDataDir() ?: getUserDataDir()
     }
 }
 
@@ -35,9 +68,9 @@ fun AppInfo.isInDebugMode(): Boolean {
     return AppArguments.get().debug || AppProperties.isDebugMode() || isInIDE()
 }
 
-val AppInfo.configDir: File get() = File(AppProperties.getConfigDirectory())
+val AppInfo.configDir: File get() = dataDir.resolve("config")
+val AppInfo.systemDir: File get() = dataDir.resolve("system")
+val AppInfo.updateDir: File get() = AppInfo.systemDir.resolve("update")
+val AppInfo.logDir: File get() = AppInfo.systemDir.resolve("log")
 val AppInfo.optionsDir: File get() = AppInfo.configDir.resolve("options")
-val AppInfo.downloadDbDir:File get() =  AppInfo.configDir.resolve("download_db")
-fun AppInfo.extensions(){
-
-}
+val AppInfo.downloadDbDir: File get() = AppInfo.configDir.resolve("download_db")

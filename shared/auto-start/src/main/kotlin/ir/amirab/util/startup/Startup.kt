@@ -7,11 +7,14 @@ object Startup {
      * Add file to startup
      * @param name Name of key/file
      * @param path Path to file
-     * @param jar If file should be executed by the JVM
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun getStartUpManagerForDesktop(name: String, path: String?, jar: Boolean = false): AbstractStartupManager {
+    fun getStartUpManagerForDesktop(
+        name: String,
+        path: String?,
+        args: List<String>,
+    ): AbstractStartupManager {
         if (path==null){
             //there is no installation path provided so we use no-op
             return noImplStartUpManager()
@@ -20,18 +23,19 @@ object Startup {
         val startup=when (os) {
             Platform.Desktop.Linux -> {
                 if (Utils.isHeadless) {
-                    HeadlessStartup(name, path, jar)
+                    HeadlessStartup(name, path, args)
                 } else {
-                    UnixXDGStartup(name, path, jar)
+                    UnixXDGStartup(name, path, args)
                 }
             }
-            Platform.Desktop.MacOS -> MacOSStartup(name, path, jar)
-            Platform.Desktop.Windows -> WindowsStartup(name, path, jar)
+
+            Platform.Desktop.MacOS -> MacOSStartup(name, path, args)
+            Platform.Desktop.Windows -> WindowsStartup(name, path, args)
             Platform.Android -> error("this code should not be called in android")
         }
         return startup
     }
     private fun noImplStartUpManager(): HeadlessStartup {
-        return HeadlessStartup("","",false)
+        return HeadlessStartup("", "", emptyList())
     }
 }

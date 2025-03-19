@@ -2,16 +2,14 @@ package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.ConfigurableGroup
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurableGroup
-import com.abdownloadmanager.utils.compose.LocalContentAlpha
-import com.abdownloadmanager.utils.compose.LocalContentColor
-import com.abdownloadmanager.desktop.ui.customwindow.WindowTitle
+import com.abdownloadmanager.shared.utils.ui.LocalContentAlpha
+import com.abdownloadmanager.shared.utils.ui.LocalContentColor
+import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.*
-import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import com.abdownloadmanager.desktop.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,8 +32,9 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
+import com.abdownloadmanager.shared.utils.div
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.IDownloadItemState

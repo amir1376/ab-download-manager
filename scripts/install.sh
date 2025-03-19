@@ -14,11 +14,27 @@ logger() {
 
   if [[ "$1" == "error" ]]; then
     # Red color for errors
-    echo -e "${timestamp} -- "$0" [Error]: \033[0;31m$@\033[0m" | tee -a ${LOG_FILE}
+    echo -e "${timestamp} -- ABDM-Installer [Error]: \033[0;31m$@\033[0m" | tee -a ${LOG_FILE}
   else
     # Default color for non-error messages
-    echo -e "${timestamp} -- "$0" [Info]: $@" | tee -a ${LOG_FILE}
+    echo -e "${timestamp} -- ABDM-Installer [Info]: $@" | tee -a ${LOG_FILE}
   fi
+}
+
+remove_if_exists() {
+    local target="$1"
+
+    if [ -z "$target" ]; then
+        logger "No target specified in remove_if_exists function"
+        return 1
+    fi
+
+    if [ -e "$target" ]; then
+        logger "File \"$target\" Removed"
+        rm -rf "$target"
+    else
+        logger "File \"$target\" does not exist"
+    fi
 }
 
 # --- Detect OS and The Package Manager to use
@@ -101,11 +117,39 @@ BINARY_PATH="$HOME/.local/$APP_NAME/bin/$APP_NAME"
 
 # --- Delete the old version Application if exists
 delete_old_version() {
-    # --- Killing Any Application Process 
-    pkill -f "$APP_NAME"
-    rm -rf "$HOME/.local/$APP_NAME"
-    rm -rf "$HOME/.local/bin/$APP_NAME"
-    logger "removed old version AB Download Manager"
+    # Find the PID(s) of the application
+    PIDS=$(pidof "$APP_NAME") || true
+
+    if [ -n "$PIDS" ]; then
+        echo "Found $APP_NAME with PID(s): $PIDS. Attempting to kill..."
+
+        # Attempt to terminate the process gracefully
+        kill $PIDS 2>/dev/null || echo "Graceful kill failed..."
+
+        # Wait for a short period to allow graceful shutdown
+        sleep 2
+
+        # Check if the process is still running
+        PIDS=$(pidof "$APP_NAME") || true
+        if [ -n "$PIDS" ]; then
+            echo "Process still running. Force killing..."
+            kill -9 $PIDS 2>/dev/null || echo "Force kill failed..."
+        else
+            echo "$APP_NAME terminated successfully."
+        fi
+    else
+        echo "$APP_NAME is not running."
+    fi
+
+    # Remove old version directories
+    # First Remove link to "$HOME/.local/$APP_NAME"
+    remove_if_exists "$HOME/.local/bin/$APP_NAME"
+    # then Remove the main binary files directory
+    remove_if_exists "$HOME/.local/$APP_NAME"
+
+
+    # Log the removal action
+    logger "Removed old version of $APP_NAME"
 }
 
 # --- Generate a .desktop file for the app
@@ -127,7 +171,7 @@ EOF
 # --- Download the latest version of the app
 download_zip() {
     # Remove the app tarball if it exists in /tmp
-    rm -f "/tmp/$ASSET_NAME"
+    remove_if_exists "/tmp/$ASSET_NAME"
 
     logger "downloading AB Download Manager ..."
     # Perform the download with curl
@@ -135,9 +179,9 @@ download_zip() {
         logger "download finished successfully"
     else
         logger error "Download failed! Something Went Wrong"
-        logger error "Hint: Check Your Internet Connectivity"
+        logger error "Check Your Internet Connectivity"
         # Optionally remove the partially downloaded file
-        rm -f "/tmp/$ASSET_NAME"
+        remove_if_exists "/tmp/$ASSET_NAME"
     fi
 }
 
@@ -151,10 +195,10 @@ install_app() {
     tar -xzf "/tmp/$ASSET_NAME" -C "$HOME/.local"
 
     # --- remove tarball after installation
-    rm "/tmp/$ASSET_NAME"
+    remove_if_exists "/tmp/$ASSET_NAME"
 
     # Link the binary to ~/.local/bin
-    ln -s "$BINARY_PATH" "$HOME/.local/bin/$APP_NAME"
+    ln -sf "$BINARY_PATH" "$HOME/.local/bin/$APP_NAME"
 
     # Create a .desktop file in ~/.local/share/applications
     generate_desktop_file

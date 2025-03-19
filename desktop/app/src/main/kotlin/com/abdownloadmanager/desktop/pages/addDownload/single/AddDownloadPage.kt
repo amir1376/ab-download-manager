@@ -1,16 +1,15 @@
 package com.abdownloadmanager.desktop.pages.addDownload.single
 
-import com.abdownloadmanager.utils.compose.WithContentAlpha
-import com.abdownloadmanager.utils.compose.WithContentColor
-import com.abdownloadmanager.desktop.ui.customwindow.BaseOptionDialog
+import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.WithContentColor
+import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.utils.compose.widget.MyIcon
-import com.abdownloadmanager.desktop.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.ui.theme.myColors
-import com.abdownloadmanager.desktop.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.ui.widget.*
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.windowUtil.moveSafe
+import com.abdownloadmanager.desktop.window.moveSafe
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,9 +29,14 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.*
-import com.abdownloadmanager.desktop.utils.mvi.HandleEffects
+import com.abdownloadmanager.shared.utils.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.utils.CanAddResult
+import com.abdownloadmanager.shared.utils.LocalSizeUnit
+import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
+import com.abdownloadmanager.shared.utils.div
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.compose.asStringSource
@@ -174,8 +178,8 @@ fun AddDownloadPage(
             ShowAddToQueueDialog(
                 queueList = component.queues.collectAsState().value,
                 onClose = { component.shouldShowAddToQueue = false },
-                onQueueSelected = {
-                    component.onRequestAddToQueue(it)
+                onQueueSelected = { queue, startQueue ->
+                    component.onRequestAddToQueue(queue, startQueue)
                 }
             )
         }
@@ -559,7 +563,7 @@ fun RenderFileTypeAndSize(
                                     iconModifier
                                 )
                                 val size = fileInfo.totalLength?.let {
-                                    convertSizeToHumanReadable(it)
+                                    convertPositiveSizeToHumanReadable(it, LocalSizeUnit.current)
                                 }.takeIf {
                                     // this is a length of a html page (error)
                                     fileInfo.isSuccessFul
@@ -596,13 +600,15 @@ fun MyTextFieldIcon(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    MyIcon(icon, null, Modifier
-        .pointerHoverIcon(PointerIcon.Default)
-        .fillMaxHeight()
-        .clickable(enabled = enabled, onClick = onClick)
-        .wrapContentHeight()
-        .padding(horizontal = 8.dp)
-        .size(16.dp))
+    MyIcon(
+        icon, null, Modifier
+            .pointerHoverIcon(PointerIcon.Default)
+            .fillMaxHeight()
+            .clickable(enabled = enabled, onClick = onClick)
+            .wrapContentHeight()
+            .padding(horizontal = 8.dp)
+            .size(16.dp)
+    )
 }
 
 @Composable

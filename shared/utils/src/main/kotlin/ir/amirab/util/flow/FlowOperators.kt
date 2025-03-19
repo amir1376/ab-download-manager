@@ -54,7 +54,7 @@ fun <T> Flow<T>.rest(time: Long, emitLastEmissionWithoutRest: Boolean = false): 
 
 fun <T, R> Flow<T>.concurrentMap(
     capacity: Int = Channel.BUFFERED,
-    transformBlock: suspend (T) -> R
+    transformBlock: suspend (T) -> R,
 ): Flow<R> {
     return flow {
         coroutineScope {
@@ -175,7 +175,7 @@ fun <T> Flow<T>.saved(count: Int): Flow<List<T>> {
     require(count >= 0)
     return when (count) {
         0 -> emptyFlow()
-        else -> scan(
+        else -> scan<T, List<T>>(
             listOf()
         ) { l, v ->
             if (l.size < count) {
@@ -183,7 +183,7 @@ fun <T> Flow<T>.saved(count: Int): Flow<List<T>> {
             } else {
                 l.drop(1).plus(v)
             }
-        }
+        }.drop(1) // scan emits an initial value (emptyList)
     }
 }
 
@@ -222,7 +222,21 @@ fun <T> Flow<T>.chunked(count: Int): Flow<List<T>> = flow {
     }
 }
 
-fun <T> Flow<T>.onEachLatest(block:suspend (T)->Unit) = transformLatest {
+fun <T> Flow<T>.onEachLatest(block: suspend (T) -> Unit) = transformLatest {
     block(it)
     emit(it)
 }
+
+fun <T, R> Flow<T>.withPrevious(
+    transform: (previous: T?, current: T) -> R,
+): Flow<R> {
+    return saved(2)
+        .pad(2, false)
+        .map {
+            val previous = it[0]
+            val current = it[1] as T
+            transform(previous, current)
+        }
+}
+
+fun <T> Flow<T>.withPrevious(): Flow<Pair<T?, T>> = withPrevious { previous, current -> previous to current }

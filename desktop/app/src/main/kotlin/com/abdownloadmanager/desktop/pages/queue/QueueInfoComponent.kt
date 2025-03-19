@@ -2,13 +2,12 @@ package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.*
 import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.ConfigurableGroup
-import com.abdownloadmanager.desktop.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.BaseComponent
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
 import com.abdownloadmanager.desktop.utils.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.resources.*
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadMonitor

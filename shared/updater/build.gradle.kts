@@ -7,4 +7,6 @@ dependencies {
     api(libs.okhttp.okhttp)
     api(libs.kotlin.coroutines.core)
     implementation(project(":shared:utils"))
+    implementation(libs.jna.platform)
+    implementation(libs.semver)
 }

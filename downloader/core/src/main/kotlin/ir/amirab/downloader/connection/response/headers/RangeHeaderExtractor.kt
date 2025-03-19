@@ -10,7 +10,8 @@ data class ContentRangeValue(
 fun ResponseInfo.getContentRange(): ContentRangeValue? {
     val value = responseHeaders["content-range"] ?: return null
     val actualValue = runCatching {
-        value.substring("bytes ".length)
+        // some servers don't append "bytes " to the start of the value
+        value.removePrefix("bytes ")
     }.getOrNull() ?: return null
     if (actualValue.isBlank()) {
         return null

@@ -1,15 +1,20 @@
 package com.abdownloadmanager.desktop.pages.updater
 
-import com.abdownloadmanager.desktop.ui.customwindow.CustomWindow
-import com.abdownloadmanager.desktop.ui.widget.NotificationModel
-import com.abdownloadmanager.desktop.ui.widget.NotificationType
-import com.abdownloadmanager.desktop.ui.widget.ShowNotification
-import com.abdownloadmanager.desktop.ui.widget.useNotification
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.shared.ui.widget.NotificationType
+import com.abdownloadmanager.shared.ui.widget.ShowNotification
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.UpdateCheckStatus
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.desktop.screen.applyUiScale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,9 +26,9 @@ fun ShowUpdaterDialog(updaterComponent: UpdateComponent) {
     val closeUpdatePage = {
         updaterComponent.requestClose()
     }
-    val status = updaterComponent.updateCheckStatus
+    val status = updaterComponent.updateCheckStatus.collectAsState().value
 
-    var message by remember { mutableStateOf(null as String?) }
+    var message by remember { mutableStateOf(null as StringSource?) }
     var notificationType by remember { mutableStateOf(null as NotificationType?) }
     LaunchedEffect(status) {
         fun CoroutineScope.clearMessageAfter(delay: Long) {
@@ -33,23 +38,27 @@ fun ShowUpdaterDialog(updaterComponent: UpdateComponent) {
             }
         }
         when (status) {
-            UpdateStatus.Checking -> {
-                message = "Checking for update"
+            UpdateCheckStatus.Checking -> {
+                message = Res.string.update_checking_for_update.asStringSource()
                 notificationType = NotificationType.Loading(null)
             }
 
-            is UpdateStatus.Error -> {
+            is UpdateCheckStatus.Error -> {
                 clearMessageAfter(3000)
-                message = """
-                    Error while checking for update
-                    ${status.e.localizedMessage}
-                    """.trimIndent()
+                message = StringSource.CombinedStringSource(
+                    listOf(
+                        Res.string.update_check_error.asStringSource(),
+                        status.e.localizedMessage.orEmpty().asStringSource(),
+                    ),
+                    "\n",
+                )
+                status.e.printStackTrace()
                 notificationType = NotificationType.Error
             }
 
-            UpdateStatus.NoUpdate -> {
+            UpdateCheckStatus.NoUpdate -> {
                 clearMessageAfter(3000)
-                message = "No update"
+                message = Res.string.update_no_update.asStringSource()
                 notificationType = NotificationType.Info
             }
 
@@ -62,21 +71,23 @@ fun ShowUpdaterDialog(updaterComponent: UpdateComponent) {
 
     message?.let { message ->
         ShowNotification(
-            title = "Updater".asStringSource(),
-            description = message.asStringSource(),
+            title = Res.string.update_updater.asStringSource(),
+            description = message,
             type = notificationType ?: NotificationType.Info,
             tag = "Updater"
         )
     }
     if (showUpdate && newVersion != null) {
+        val uiScale = LocalUiScale.current
         CustomWindow(
             state = rememberWindowState(
-                size = DpSize(400.dp, 400.dp)
+                size = DpSize(500.dp, 400.dp).applyUiScale(uiScale),
+                position = WindowPosition.Aligned(Alignment.Center)
             ),
             onCloseRequest = closeUpdatePage,
         ) {
             NewUpdatePage(
-                versionVersionData = newVersion,
+                newVersionInfo = newVersion,
                 currentVersion = updaterComponent.currentVersion,
                 cancel = closeUpdatePage,
                 update = {
