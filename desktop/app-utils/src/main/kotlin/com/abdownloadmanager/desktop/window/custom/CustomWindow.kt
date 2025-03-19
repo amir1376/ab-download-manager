@@ -38,6 +38,7 @@ import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.customwindow.HitSpots
 import ir.amirab.util.customwindow.util.CustomWindowDecorationAccessing
 import ir.amirab.util.customwindow.windowFrameItem
+import ir.amirab.util.platform.Platform
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -165,6 +166,9 @@ private fun FrameWindowScope.FrameContent(
             .height(32.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        val isMacOS = Platform.getCurrentPlatform() == Platform.Desktop.MacOS
+        val startPadding = if (isMacOS) 76.dp else 16.dp
+
         Row(
             Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
@@ -175,7 +179,7 @@ private fun FrameWindowScope.FrameContent(
                     .windowFrameItem("icon", HitSpots.MENU_BAR),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(startPadding))
                 windowIcon?.let {
                     WithContentAlpha(1f) {
                         Image(it, null, Modifier.size(16.dp))
@@ -227,11 +231,13 @@ private fun FrameWindowScope.FrameContent(
                 }
             }
         }
-        WindowsActionButtons(
-            onRequestClose,
-            onRequestMinimize,
-            onRequestToggleMaximize,
-        )
+        if (Platform.getCurrentPlatform() != Platform.Desktop.MacOS) {
+            WindowsActionButtons(
+                onRequestClose,
+                onRequestMinimize,
+                onRequestToggleMaximize,
+            )
+        }
     }
 }
 
