@@ -1,4 +1,4 @@
-package ir.amirab.util.desktop.mac.event
+package com.abdownloadmanager.desktop.window.mac.event
 
 import java.awt.Desktop
 import java.awt.desktop.AppReopenedEvent
