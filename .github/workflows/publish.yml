@@ -38,11 +38,6 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ matrix.os }}-gradle
           enableCrossOsArchive: true
-      - name: make Gradlew executable
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          chmod 755 ./gradlew
-        shell: "bash"
       - name: Gradle
         #          at the current version of compose plugin
         #          first attempt to init gradle always fails because of "BuildScopeServices has been closed"

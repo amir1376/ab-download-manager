@@ -42,6 +42,7 @@ import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
+import ir.amirab.util.desktop.mac.event.MacDockEventHandler
 import ir.amirab.util.desktop.systemtray.IComposeSystemTray
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac

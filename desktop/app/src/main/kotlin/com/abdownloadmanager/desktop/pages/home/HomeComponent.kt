@@ -235,7 +235,7 @@ class DownloadActions(
         }
     )
 
-    val copyDownloadLinkAsCurlAction = simpleAction(
+    val copyDownloadCredentialsAsCurlAction = simpleAction(
         title = Res.string.copy_as_curl.asStringSource(),
         icon = MyIcons.copy,
         checkEnable = selections.mapStateFlow { it.isNotEmpty() },
@@ -319,8 +319,10 @@ class DownloadActions(
         +moveToQueueItems
         +moveToCategoryAction
         separator()
-        +(copyDownloadLinkAction)
-        +(copyDownloadLinkAsCurlAction)
+        subMenu(Res.string.copy.asStringSource(), MyIcons.copy) {
+            +(copyDownloadLinkAction)
+            +(copyDownloadCredentialsAsCurlAction)
+        }
         +editDownloadAction
         +fileChecksumAction
         +(openDownloadDialogAction)

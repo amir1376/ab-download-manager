@@ -89,6 +89,7 @@ dependencies {
     implementation(project(":shared:updater"))
     implementation(project(":shared:auto-start"))
     implementation(project(":shared:nanohttp4k"))
+    implementation(project(":desktop:mac_utils"))
 }
 
 aboutLibraries {

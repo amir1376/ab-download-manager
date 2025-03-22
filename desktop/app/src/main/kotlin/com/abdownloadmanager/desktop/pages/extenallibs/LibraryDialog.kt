@@ -10,7 +10,9 @@ import com.abdownloadmanager.shared.utils.div
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -56,7 +58,11 @@ fun LibraryDialog(
                     )
                     .padding(16.dp)
             ) {
-                Column {
+                Column(
+                    Modifier
+                        .weight(1f, false)
+                        .verticalScroll(rememberScrollState())
+                ) {
                     LibraryNameAndVersion(library.name, library.artifactVersion, library.artifactId)
                     Spacer(Modifier.height(16.dp))
                     library.description?.let {
@@ -139,9 +145,10 @@ private fun LibraryDevelopers(devs: List<Developer>) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ListOfNamesWithLinks(map: List<Pair<StringSource, String?>>) {
-    Row {
+    FlowRow {
         for ((i, v) in map.withIndex()) {
             val (name, link) = v
             MaybeLinkText(name.rememberString(), link)
