@@ -57,6 +57,8 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.awt.datatransfer.DataFlavor
@@ -188,8 +190,7 @@ fun HomePage(component: HomeComponent) {
                 },
                 target = remember {
                     object : DragAndDropTarget {
-                        override fun onStarted(event: DragAndDropEvent) {
-                            isDragging = true
+                        private fun onDraggedIn(event: DragAndDropEvent) {
                             if (event.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                                 component.onExternalTextDraggedIn { (event.awtTransferable.getTransferData(DataFlavor.stringFlavor) as String) }
                                 return
@@ -197,10 +198,15 @@ fun HomePage(component: HomeComponent) {
 
                             if (event.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                                 component.onExternalFilesDraggedIn {
-                                    (event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>)
+                                    (event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>).filterIsInstance<File>()
                                 }
                                 return
                             }
+                        }
+
+                        override fun onStarted(event: DragAndDropEvent) {
+                            isDragging = true
+                            onDraggedIn(event)
                         }
 
                         override fun onEnded(event: DragAndDropEvent) {
@@ -210,6 +216,9 @@ fun HomePage(component: HomeComponent) {
 
                         override fun onDrop(event: DragAndDropEvent): Boolean {
                             isDragging = false
+                            if (Platform.isMac()) {
+                                onDraggedIn(event)
+                            }
                             component.onDropped()
                             return true
                         }
@@ -620,7 +629,7 @@ fun DragWidget(
             text = myStringResource(Res.string.drop_link_or_file_here),
             fontSize = myTextSizes.xl
         )
-        if (linkCount != null) {
+        if (linkCount != null && Platform.isMac().not()) {
             when {
                 linkCount > 0 -> {
                     Text(
@@ -639,12 +648,8 @@ fun DragWidget(
                     Text(myStringResource(Res.string.nothing_will_be_imported))
                 }
             }
-
         }
-
     }
-
-
 }
 
 
