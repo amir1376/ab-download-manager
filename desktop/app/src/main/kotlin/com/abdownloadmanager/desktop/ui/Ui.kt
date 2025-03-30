@@ -68,7 +68,10 @@ object Ui : KoinComponent {
         }
         if (Platform.isMac()) {
             MacDockEventHandler.configure(
-                onClickIcon = appComponent::activateHomeIfNotOpen
+                onClickIcon = appComponent::activateHomeIfNotOpen,
+                onAboutClick = {
+                    appComponent.showAboutPage.value = true
+                }
             )
         }
         application {
