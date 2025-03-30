@@ -4,7 +4,7 @@ import java.awt.Desktop
 import java.awt.desktop.AppReopenedEvent
 import java.awt.desktop.AppReopenedListener
 
-object MacDockEventHandler {
+object MacEventHandler {
     fun configure(onClickIcon: () -> Unit, onAboutClick: () -> Unit) {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.APP_EVENT_REOPENED)) {
             Desktop.getDesktop().apply {
