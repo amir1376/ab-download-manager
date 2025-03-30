@@ -64,6 +64,7 @@ import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.datastore.kotlinxSerializationDataStore
+import okhttp3.internal.tls.OkHostnameVerifier
 
 val downloaderModule = module {
     single<IDownloadQueueDatabase> {
@@ -350,8 +351,16 @@ val appModule = module {
             ignoreSSLCertificates = appSettingsStorage.ignoreSSLCertificates
         )
     }
+    single {
+        val appSettingsStorage: AppSettingsStorage = get()
+        AppHostNameVerifier(
+            delegateHostnameVerifier = OkHostnameVerifier,
+            ignoreHostNameVerification = appSettingsStorage.ignoreSSLCertificates
+        )
+    }
     single<OkHttpClient> {
         val appSSLFactoryProvider: AppSSLFactoryProvider = get()
+        val appHostNameVerifier: AppHostNameVerifier = get()
         OkHttpClient
             .Builder()
             .dispatcher(Dispatcher().apply {
@@ -363,6 +372,7 @@ val appModule = module {
                 appSSLFactoryProvider.createSSLSocketFactory(),
                 appSSLFactoryProvider.trustManager,
             )
+            .hostnameVerifier(appHostNameVerifier)
             .build()
     }
 
