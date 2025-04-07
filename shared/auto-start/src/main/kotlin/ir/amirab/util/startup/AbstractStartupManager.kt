@@ -16,6 +16,7 @@ abstract class AbstractStartupManager(
         }.joinToString(" ")
     }
 
+
     private fun String.quoted(): String {
         return "\"$this\""
     }

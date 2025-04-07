@@ -22,7 +22,7 @@ class MacOSStartup(
     @Throws(Exception::class)
     override fun install() {
         val file = getFile()
-
+        println(super.path)
         val plistContent = buildString {
             appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
             appendLine("<plist version=\"1.0\">")
@@ -32,9 +32,12 @@ class MacOSStartup(
             appendLine("\t<key>ProgramArguments</key>")
             appendLine("\t<array>")
             appendLine("\t\t<string>/usr/bin/open</string>")
-            appendLine("\t\t<string>-n</string>")
             appendLine("\t\t<string>-a</string>")
             appendLine("\t\t<string>${super.path}</string>")
+            appendLine("\t\t<string>--args</string>")
+            args.forEach {
+                appendLine("\t\t<string>$it</string>")
+            }
             appendLine("\t</array>")
             appendLine("\t<key>RunAtLoad</key>")
             appendLine("\t<true/>")
