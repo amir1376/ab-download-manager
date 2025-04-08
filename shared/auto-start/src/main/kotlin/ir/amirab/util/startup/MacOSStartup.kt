@@ -22,7 +22,7 @@ class MacOSStartup(
     @Throws(Exception::class)
     override fun install() {
         val file = getFile()
-        println(super.path)
+
         val plistContent = buildString {
             appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
             appendLine("<plist version=\"1.0\">")
