@@ -18,7 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -282,7 +288,14 @@ fun CustomWindow(
     windowController: WindowController = remember {
         WindowController()
     },
-    onKeyEvent: (KeyEvent) -> Boolean = { false },
+    onKeyEvent: (KeyEvent) -> Boolean = {
+        if (it.key.keyCode == Key.W.keyCode && (it.isMetaPressed || it.isCtrlPressed) && it.type == KeyEventType.KeyUp) {
+            onCloseRequest.invoke()
+            true
+        } else {
+            false
+        }
+    },
     alwaysOnTop: Boolean = false,
     preventMinimize: Boolean = onRequestMinimize == null,
     content: @Composable FrameWindowScope.() -> Unit,
