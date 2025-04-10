@@ -19,11 +19,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -44,6 +44,7 @@ import com.abdownloadmanager.shared.utils.ui.theme.UiScaledContent
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.jetbrains.JBR
 import com.jetbrains.WindowDecorations
+import com.jetbrains.WindowMove
 import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.desktop.screen.applyUiScale
 import ir.amirab.util.ifThen
@@ -53,6 +54,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.awt.event.MouseEvent
 
 
 // a window frame which totally rendered with compose
@@ -135,6 +137,7 @@ fun FrameWindowScope.SnapDraggableToolbar(
         fun computeHeaderHeight(height: Dp): Float {
             return height.value.applyUiScale(uiScale)
         }
+
         var headerHeight by remember {
             mutableStateOf(computeHeaderHeight(getPlatformTitleBarHeight()))
         }
@@ -160,6 +163,7 @@ fun FrameWindowScope.SnapDraggableToolbar(
                     .customTitleBarMouseEventHandler(customTitleBar)
             )
             FrameContent(
+                modifier = Modifier,
                 title = title,
                 windowIcon = windowIcon,
                 titlePosition = titlePosition,
@@ -171,15 +175,11 @@ fun FrameWindowScope.SnapDraggableToolbar(
             )
         }
     } else {
-        WindowDraggableArea(
-            Modifier.onClick(
-                onDoubleClick = {
-                    onRequestToggleMaximize?.invoke()
-                },
-                onClick = {}
-            )
-        ) {
+        SystemDraggableSection(
+            onRequestToggleMaximize = onRequestToggleMaximize,
+        ) { modifier ->
             FrameContent(
+                modifier = modifier,
                 title = title,
                 windowIcon = windowIcon,
                 titlePosition = titlePosition,
@@ -189,6 +189,40 @@ fun FrameWindowScope.SnapDraggableToolbar(
                 onRequestToggleMaximize = onRequestToggleMaximize,
                 onRequestClose = onRequestClose
             )
+        }
+    }
+}
+
+@Composable
+internal fun FrameWindowScope.SystemDraggableSection(
+    onRequestToggleMaximize: (() -> Unit)?,
+    content: @Composable (Modifier) -> Unit
+) {
+    val windowMove: WindowMove? = JBR.getWindowMove()
+    val viewConfig = LocalViewConfiguration.current
+    var lastPress by remember { mutableStateOf(0L) }
+    if (windowMove != null) {
+        content(
+            Modifier
+                .onPointerEvent(PointerEventType.Press, PointerEventPass.Main) {
+                    if (
+                        this.currentEvent.button == PointerButton.Primary &&
+                        this.currentEvent.changes.any { changed -> !changed.isConsumed }
+                    ) {
+                        windowMove.startMovingTogetherWithMouse(window, MouseEvent.BUTTON1)
+                        if (
+                            System.currentTimeMillis() - lastPress in
+                            viewConfig.doubleTapMinTimeMillis..viewConfig.doubleTapTimeoutMillis
+                        ) {
+                            onRequestToggleMaximize?.invoke()
+                        }
+                        lastPress = System.currentTimeMillis()
+                    }
+                },
+        )
+    } else {
+        WindowDraggableArea {
+            content(Modifier)
         }
     }
 }
@@ -242,6 +276,7 @@ private fun FrameWindowScope.getCurrentWindowSize(): DpSize {
 
 @Composable
 private fun FrameWindowScope.FrameContent(
+    modifier: Modifier,
     title: String,
     windowIcon: Painter? = null,
     titlePosition: TitlePosition,
@@ -252,7 +287,7 @@ private fun FrameWindowScope.FrameContent(
     onRequestClose: () -> Unit,
 ) {
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .height(getPlatformTitleBarHeight()),
         verticalAlignment = Alignment.CenterVertically,
