@@ -20,8 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
-import ir.amirab.util.customwindow.HitSpots
-import ir.amirab.util.customwindow.windowFrameItem
 
 @Composable
 fun SystemButton(
@@ -107,26 +105,25 @@ fun FrameWindowScope.WindowsActionButtons(
             SystemButton(
                 icon = MyIcons.windowMinimize,
                 onClick = onRequestMinimize,
-                modifier = Modifier.windowFrameItem("minimize", HitSpots.MINIMIZE_BUTTON)
+                modifier = Modifier
             )
         }
 
         onToggleMaximize?.let {
             SystemButton(
-                icon =
-                if (isWindowMaximized()) {
+                icon = if (isWindowMaximized()) {
                     MyIcons.windowFloating
                 } else {
                     MyIcons.windowMaximize
                 },
                 onClick = onToggleMaximize,
-                modifier = Modifier.windowFrameItem("maximize", HitSpots.MAXIMIZE_BUTTON)
+                modifier = Modifier
             )
         }
 
         CloseButton(
             onRequestClose = onRequestClose,
-            modifier = Modifier.windowFrameItem("close", HitSpots.CLOSE_BUTTON)
+            modifier = Modifier
         )
     }
 }

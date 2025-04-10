@@ -17,7 +17,6 @@ rootProject.name = "ABDownloadManager"
 
 include("desktop:app")
 include("desktop:app-utils")
-include("desktop:custom-window-frame")
 include("desktop:shared")
 include("desktop:tray:common")
 include("desktop:tray:windows")
