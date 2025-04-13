@@ -216,17 +216,15 @@ fun StatusFilterItem(
                         )
                         MyIcon(
                             MyIcons.up, null, Modifier
-                            .fillMaxHeight().wrapContentHeight()
-                            .clip(CircleShape)
-                            .size(24.dp)
-                            .clickable {
-                                onRequestExpand(!isExpanded)
-                            }
-                            .padding(6.dp)
-                            .width(16.dp)
-                            .let {
-                                it.rotate(if (isExpanded) 180f else 0f)
-                            })
+                                .fillMaxHeight().wrapContentHeight()
+                                .clip(CircleShape)
+                                .size(24.dp)
+                                .clickable {
+                                    onRequestExpand(!isExpanded)
+                                }
+                                .padding(6.dp)
+                                .width(16.dp)
+                                .rotate(if (isExpanded) 0f else 180f))
                     }
                 }
                 AnimatedVisibility(
