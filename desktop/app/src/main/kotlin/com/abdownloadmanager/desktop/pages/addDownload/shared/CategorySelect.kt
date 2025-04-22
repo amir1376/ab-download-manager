@@ -10,7 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 import ir.amirab.util.ifThen
@@ -18,7 +20,9 @@ import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.rememberIconPainter
+import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun CategorySelect(
@@ -53,6 +57,20 @@ fun CategorySelect(
             isSelectionOpen = true
         },
         modifier = modifier,
+        renderEmpty = {
+            Column(
+                modifier = Modifier.fillMaxSize().wrapContentSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                MyIcon(MyIcons.info, null, Modifier.size(64.dp))
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    myStringResource(Res.string.no_categories_found),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = myTextSizes.lg,
+                )
+            }
+        },
         dropDownSize = DpSize(220.dp, 220.dp),
     )
 }
