@@ -234,7 +234,8 @@ private fun UpdateTaskBar(
                         }
                     }
 
-                    DownloadJobStatus.Downloading -> {
+                    DownloadJobStatus.Downloading,
+                    is DownloadJobStatus.Retrying -> {
                         if (percent != null) {
                             Taskbar.State.NORMAL
                         } else {

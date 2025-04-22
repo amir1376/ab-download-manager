@@ -177,6 +177,7 @@ fun RenderProgressBar(itemState: IDownloadItemState) {
         }
 
         DownloadJobStatus.IDLE -> myColors.warningGradient
+        is DownloadJobStatus.Retrying -> myColors.errorGradient
         DownloadJobStatus.Finished -> myColors.successGradient
         is DownloadJobStatus.PreparingFile -> myColors.infoGradient
         DownloadJobStatus.Resuming,
