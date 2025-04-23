@@ -51,6 +51,9 @@ object ThreadCountLimitation {
     const val MAX_ALLOWED_THREAD_COUNT = 256
     const val MAX_NORMAL_VALUE = 32
 }
+object MaximumDownloadRetriesLimitation {
+    const val MAX_ALLOWED_RETRIES = 1024
+}
 
 fun threadCountConfig(appRepository: AppRepository): IntConfigurable {
     return IntConfigurable(
@@ -75,6 +78,27 @@ fun threadCountConfig(appRepository: AppRepository): IntConfigurable {
                     )
                 }
             }.combineStringSources("\n")
+        },
+    )
+}
+fun maxDownloadRetryCount(appRepository: AppRepository): IntConfigurable {
+    return IntConfigurable(
+        title = Res.string.settings_download_max_retries_count.asStringSource(),
+        description = Res.string.settings_download_max_retries_count_description.asStringSource(),
+        backedBy = appRepository.maxDownloadRetryCount,
+        range = 0..MaximumDownloadRetriesLimitation.MAX_ALLOWED_RETRIES,
+        renderMode = IntConfigurable.RenderMode.TextField,
+        describe = {
+            if (it == 0) {
+                Res.string.settings_download_max_retries_count_describe_no_retries.asStringSource()
+            } else {
+                Res.string.settings_download_max_retries_count_describe_n_retries
+                    .asStringSourceWithARgs(
+                        Res.string.settings_download_max_retries_count_describe_n_retries_createArgs(
+                            count = "$it"
+                        )
+                    )
+            }
         },
     )
 }
@@ -549,6 +573,7 @@ class SettingsComponent(
                     useAverageSpeedConfig(appRepository),
                     speedLimitConfig(appRepository),
                     threadCountConfig(appRepository),
+                    maxDownloadRetryCount(appRepository),
                     useCategoryByDefault(appSettings),
                     dynamicPartDownloadConfig(appRepository),
                     autoShowDownloadProgressWindow(appSettings),

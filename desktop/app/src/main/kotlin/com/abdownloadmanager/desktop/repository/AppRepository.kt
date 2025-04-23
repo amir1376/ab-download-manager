@@ -41,6 +41,7 @@ class AppRepository : KoinComponent {
     val dynamicPartCreation = appSettings.dynamicPartCreation
     val useServerLastModifiedTime = appSettings.useServerLastModifiedTime
     val useSparseFileAllocation = appSettings.useSparseFileAllocation
+    val maxDownloadRetryCount = appSettings.maxDownloadRetryCount
     val useAverageSpeed = appSettings.useAverageSpeed
     val saveLocation = appSettings.defaultDownloadFolder
     val integrationEnabled = appSettings.browserIntegrationEnabled
@@ -113,6 +114,12 @@ class AppRepository : KoinComponent {
             .debounce(500)
             .onEach {
                 downloadSettings.useSparseFileAllocation = it
+                downloadManager.reloadSetting()
+            }.launchIn(scope)
+        maxDownloadRetryCount
+            .debounce(500)
+            .onEach {
+                downloadSettings.maxDownloadRetryCount = it
                 downloadManager.reloadSetting()
             }.launchIn(scope)
         integrationPort

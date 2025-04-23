@@ -186,6 +186,7 @@ class SingleDownloadComponent(
             DownloadJobStatus.IDLE -> Res.string.idle
             is DownloadJobStatus.PreparingFile -> Res.string.preparing_file
             DownloadJobStatus.Resuming -> Res.string.resuming
+            is DownloadJobStatus.Retrying -> Res.string.retrying
         }.asStringSource()
     }
 
