@@ -37,6 +37,14 @@
       "link": "https://crowdin.com/profile/uDEV"
     },
     {
+      "name": "xNino",
+      "link": "https://crowdin.com/profile/xNino"
+    },
+    {
+      "name": "Leon Aissa (Dimiikou)",
+      "link": "https://crowdin.com/profile/Dimiikou"
+    },
+    {
       "name": "Lukas (lukasitaly)",
       "link": "https://github.com/lukasitaly"
     }
@@ -63,12 +71,12 @@
   ],
   "fr": [
     {
-      "name": "Hani Rouatbi (lamjed001)",
-      "link": "https://crowdin.com/profile/lamjed001"
-    },
-    {
       "name": "Gooseman (realgooseman)",
       "link": "https://crowdin.com/profile/realgooseman"
+    },
+    {
+      "name": "Hani Rouatbi (lamjed001)",
+      "link": "https://crowdin.com/profile/lamjed001"
     }
   ],
   "id": [
@@ -83,6 +91,14 @@
     {
       "name": "kuydukuy (hilmy2nd)",
       "link": "https://crowdin.com/profile/hilmy2nd"
+    },
+    {
+      "name": "andybr",
+      "link": "https://crowdin.com/profile/andybr"
+    },
+    {
+      "name": "exodius",
+      "link": "https://crowdin.com/profile/exodius"
     }
   ],
   "it": [
@@ -97,6 +113,12 @@
     {
       "name": "Lukas (lukasitaly)",
       "link": "https://github.com/lukasitaly"
+    }
+  ],
+  "ja": [
+    {
+      "name": "ユタ (dsi3020)",
+      "link": "https://crowdin.com/profile/dsi3020"
     }
   ],
   "ka": [
@@ -117,12 +139,24 @@
     {
       "name": "Davy J. (deaveipslon)",
       "link": "https://crowdin.com/profile/deaveipslon"
+    },
+    {
+      "name": "Juliano Eduardo (zerocoolroot)",
+      "link": "https://crowdin.com/profile/zerocoolroot"
+    },
+    {
+      "name": "John Peter Sá (johnppetersa)",
+      "link": "https://crowdin.com/profile/johnppetersa"
     }
   ],
   "ru": [
     {
       "name": "in-ferno",
       "link": "https://crowdin.com/profile/in-ferno"
+    },
+    {
+      "name": "Semyon (maz1lovo)",
+      "link": "https://crowdin.com/profile/maz1lovo"
     }
   ],
   "sq": [
@@ -133,7 +167,7 @@
   ],
   "tr": [
     {
-      "name": "𝗦𝗵𝗟𝗲𝗿𝗣 (mikropsoft)",
+      "name": "𝗛𝗼𝗹𝗶 (mikropsoft)",
       "link": "https://crowdin.com/profile/mikropsoft"
     },
     {
@@ -152,6 +186,10 @@
     }
   ],
   "vi": [
+    {
+      "name": "Quân Xinh Tươi (chetaoquocte)",
+      "link": "https://crowdin.com/profile/chetaoquocte"
+    },
     {
       "name": "Zenfast",
       "link": "https://crowdin.com/profile/Zenfast"
@@ -215,6 +253,10 @@
     {
       "name": "abc0922001",
       "link": "https://crowdin.com/profile/abc0922001"
+    },
+    {
+      "name": "Gholts",
+      "link": "https://crowdin.com/profile/Gholts"
     }
   ]
 }
