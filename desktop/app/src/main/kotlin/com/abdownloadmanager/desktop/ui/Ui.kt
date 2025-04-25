@@ -71,7 +71,8 @@ object Ui : KoinComponent {
                 onClickIcon = appComponent::activateHomeIfNotOpen,
                 onAboutClick = {
                     appComponent.showAboutPage.value = true
-                }
+                },
+                onSettingsClick = appComponent::openSettings
             )
         }
         application {
@@ -87,23 +88,28 @@ object Ui : KoinComponent {
                                 ProvideSizeUnits(appComponent) {
                                     HandleEffectsForApp(appComponent)
                                     SystemTray(appComponent)
-                                    val showHomeSlot = appComponent.showHomeSlot.collectAsState().value
+                                    val showHomeSlot =
+                                        appComponent.showHomeSlot.collectAsState().value
                                     showHomeSlot.child?.instance?.let {
                                         HomeWindow(it, appComponent::closeHome)
                                     }
-                                    val showSettingSlot = appComponent.showSettingSlot.collectAsState().value
+                                    val showSettingSlot =
+                                        appComponent.showSettingSlot.collectAsState().value
                                     showSettingSlot.child?.instance?.let {
                                         SettingWindow(it, appComponent::closeSettings)
                                     }
-                                    val showQueuesSlot = appComponent.showQueuesSlot.collectAsState().value
+                                    val showQueuesSlot =
+                                        appComponent.showQueuesSlot.collectAsState().value
                                     showQueuesSlot.child?.instance?.let {
                                         QueuesWindow(it)
                                     }
-                                    val batchDownloadSlot = appComponent.batchDownloadSlot.collectAsState().value
+                                    val batchDownloadSlot =
+                                        appComponent.batchDownloadSlot.collectAsState().value
                                     batchDownloadSlot.child?.instance?.let {
                                         BatchDownloadWindow(it)
                                     }
-                                    val editDownloadSlot = appComponent.editDownloadSlot.collectAsState().value
+                                    val editDownloadSlot =
+                                        appComponent.editDownloadSlot.collectAsState().value
                                     editDownloadSlot.child?.instance?.let {
                                         EditDownloadWindow(it)
                                     }
