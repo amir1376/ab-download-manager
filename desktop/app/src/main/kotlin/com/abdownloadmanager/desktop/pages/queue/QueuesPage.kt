@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.queue
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.ConfigurableGroup
-import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurableGroup
+import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
+import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurableGroup
 import com.abdownloadmanager.shared.utils.ui.LocalContentAlpha
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.desktop.window.custom.WindowTitle

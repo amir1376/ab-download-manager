@@ -1,6 +1,5 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.FolderConfigurable
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.MyTextField
@@ -12,13 +11,41 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.desktop.LocalWindow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 
+class FolderConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<String>,
+    describe: ((String) -> StringSource),
+    validate: (String) -> Boolean,
+    enabled: StateFlow<Boolean> = Configurable.DefaultEnabledValue,
+    visible: StateFlow<Boolean> = Configurable.DefaultVisibleValue,
+) : StringConfigurable(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    validate = validate,
+    describe = describe,
+    enabled = enabled,
+    visible = visible,
+) {
+    @Composable
+    override fun render(modifier: Modifier) {
+        RenderFolderConfig(this, modifier)
+    }
+}
+
+
 @Composable
-fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
+private fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
 
@@ -68,3 +95,4 @@ fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
         }
     )
 }
+

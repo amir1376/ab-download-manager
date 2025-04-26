@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.abdownloadmanager.desktop.pages.settings.configurable.ProxyConfigurable
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.utils.ui.myColors
@@ -32,6 +32,31 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.DesktopUtils
 import ir.amirab.util.ifThen
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+class ProxyConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<ProxyData>,
+    describe: (ProxyData) -> StringSource,
+    validate: (ProxyData) -> Boolean,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : Configurable<ProxyData>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
+    validate = validate,
+    enabled = enabled,
+    visible = visible,
+) {
+    @Composable
+    override fun render(modifier: Modifier) {
+        RenderProxyConfig(this, modifier)
+    }
+}
 
 
 @Composable
@@ -561,3 +586,4 @@ private fun <T> Accordion(
         }
     }
 }
+

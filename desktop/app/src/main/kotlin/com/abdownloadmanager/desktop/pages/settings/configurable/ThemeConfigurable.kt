@@ -1,6 +1,5 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.ThemeConfigurable
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import androidx.compose.foundation.background
@@ -16,12 +15,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.pages.settings.ThemeInfo
+import com.abdownloadmanager.desktop.utils.configurable.BaseEnumConfigurable
+import ir.amirab.util.compose.StringSource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+class ThemeConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<ThemeInfo>,
+    describe: (ThemeInfo) -> StringSource,
+    possibleValues: List<ThemeInfo>,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : BaseEnumConfigurable<ThemeInfo>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
+    possibleValues = possibleValues,
+    enabled = enabled,
+    visible = visible,
+) {
+    @Composable
+    override fun render(modifier: Modifier) {
+        RenderThemeConfig(this, modifier)
+    }
+}
+
 
 @Composable
-fun RenderThemeConfig(cfg: ThemeConfigurable, modifier: Modifier) {
+private fun RenderThemeConfig(cfg: ThemeConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
-    val enabled= isConfigEnabled()
+    val enabled = isConfigEnabled()
     ConfigTemplate(
         modifier = modifier,
         title = {

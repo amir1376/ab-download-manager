@@ -1,6 +1,5 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.DoubleTextField
 import androidx.compose.animation.AnimatedVisibility
@@ -10,11 +9,37 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.utils.configurable.BaseLongConfigurable
 import com.abdownloadmanager.shared.utils.LocalSpeedUnit
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.datasize.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+class SpeedLimitConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<Long>,
+    describe: (Long) -> StringSource,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : BaseLongConfigurable(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
+    range = 0..Long.MAX_VALUE,
+    enabled = enabled,
+    visible = visible,
+) {
+    @Composable
+    override fun render(modifier: Modifier) {
+        RenderSpeedConfig(this, modifier)
+    }
+}
 
 @Composable
-fun RenderSpeedConfig(cfg: SpeedLimitConfigurable, modifier: Modifier) {
+private fun RenderSpeedConfig(cfg: SpeedLimitConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
 

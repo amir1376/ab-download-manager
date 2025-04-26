@@ -1,6 +1,5 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.DayOfWeekConfigurable
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
@@ -18,16 +17,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.DayOfWeek
 import java.time.DayOfWeek.*
 
+class DayOfWeekConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<Set<DayOfWeek>>,
+    describe: (Set<DayOfWeek>) -> StringSource,
+    validate: (Set<DayOfWeek>) -> Boolean,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : Configurable<Set<DayOfWeek>>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
+    validate = validate,
+    enabled = enabled,
+    visible = visible,
+) {
+    @Composable
+    override fun render(modifier: Modifier) {
+        RenderDayOfWeekConfigurable(this, modifier)
+    }
+}
+
 @Composable
-fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Modifier) {
+private fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
-    val allDays = DayOfWeek.values().toSet()
+    val allDays = values().toSet()
     val enabled = isConfigEnabled()
     fun isSelected(dayOfWeek: DayOfWeek): Boolean {
         return dayOfWeek in value

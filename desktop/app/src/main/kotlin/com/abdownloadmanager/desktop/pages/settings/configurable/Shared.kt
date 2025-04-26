@@ -1,6 +1,5 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.Configurable
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
@@ -30,6 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
+import com.abdownloadmanager.desktop.utils.configurable.ConfigGroupInfo
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.shared.utils.div
 
 

@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.desktop.pages.settings.configurable.*
-import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.ConfigurableGroup
+import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.utils.BaseComponent
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow

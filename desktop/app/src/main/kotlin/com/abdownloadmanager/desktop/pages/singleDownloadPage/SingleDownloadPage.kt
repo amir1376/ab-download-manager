@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurable
+import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurable
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageSections.*
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha

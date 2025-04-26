@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import com.abdownloadmanager.shared.utils.proxy.ProxyMode
@@ -67,7 +68,7 @@ fun threadCountConfig(appRepository: AppRepository): IntConfigurable {
                 add(
                     Res.string.settings_download_thread_count_describe
                         .asStringSourceWithARgs(
-                            Res.string.settings_download_thread_count_describe_createArgs(
+                            Res.string.`settings_download_thread_count_describe_createArgs`(
                                 count = it.toString()
                             )
                         )
