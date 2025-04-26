@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.pages.settings
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurable
+import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurable
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
 import com.abdownloadmanager.desktop.window.custom.WindowTitle

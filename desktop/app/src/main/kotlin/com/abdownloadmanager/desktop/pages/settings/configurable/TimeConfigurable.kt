@@ -1,6 +1,5 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.TimeConfigurable
 import com.abdownloadmanager.shared.ui.widget.IntTextField
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -12,7 +11,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
+import ir.amirab.util.compose.StringSource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.LocalTime
+
+class TimeConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<LocalTime>,
+    describe: (LocalTime) -> StringSource,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : Configurable<LocalTime>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
+    enabled = enabled,
+    visible = visible,
+) {
+    @Composable
+    override fun render(modifier: Modifier) {
+        RenderTimeConfig(this, modifier)
+    }
+}
 
 @Composable
 fun RenderTimeConfig(cfg: TimeConfigurable, modifier: Modifier) {

@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.utils.configurable
 
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes

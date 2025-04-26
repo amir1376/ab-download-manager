@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
@@ -7,15 +7,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.pages.settings.configurable.FileChecksumConfigurable
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.utils.FileChecksum
 import com.abdownloadmanager.shared.utils.FileChecksumAlgorithm
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.resources.myStringResource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+class FileChecksumConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<FileChecksum?>,
+    describe: (FileChecksum?) -> StringSource,
+    enabled: StateFlow<Boolean> = DefaultEnabledValue,
+    visible: StateFlow<Boolean> = DefaultVisibleValue,
+) : Configurable<FileChecksum?>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    describe = describe,
+    enabled = enabled,
+    visible = visible,
+) {
+    @Composable
+    override fun render(modifier: Modifier) {
+        RenderFileChecksumConfig(this, modifier)
+    }
+}
 
 @Composable
-fun RenderFileChecksumConfig(cfg: FileChecksumConfigurable, modifier: Modifier) {
+private fun RenderFileChecksumConfig(cfg: FileChecksumConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
 

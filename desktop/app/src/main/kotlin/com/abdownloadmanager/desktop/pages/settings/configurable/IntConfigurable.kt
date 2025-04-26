@@ -1,7 +1,5 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.pages.settings.configurable
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
-import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable.RenderMode.*
 import com.abdownloadmanager.shared.ui.widget.IntTextField
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.width
@@ -10,6 +8,38 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
+import ir.amirab.util.compose.StringSource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+class IntConfigurable(
+    title: StringSource,
+    description: StringSource,
+    backedBy: MutableStateFlow<Int>,
+    describe: ((Int) -> StringSource),
+    val range: IntRange,
+    val renderMode: RenderMode = RenderMode.TextField,
+    enabled: StateFlow<Boolean> = Configurable.DefaultEnabledValue,
+    visible: StateFlow<Boolean> = Configurable.DefaultVisibleValue,
+) : Configurable<Int>(
+    title = title,
+    description = description,
+    backedBy = backedBy,
+    validate = {
+        it in range
+    },
+    describe = describe,
+) {
+    enum class RenderMode {
+        TextField,
+    }
+
+    @Composable
+    override fun render(modifier: Modifier) {
+        RenderIntegerConfig(this, modifier)
+    }
+}
 
 
 private operator fun IntRange.get(index: Int): Int {
@@ -22,10 +52,10 @@ private operator fun IntRange.get(index: Int): Int {
 }
 
 @Composable
-fun RenderIntegerConfig(cfg: IntConfigurable, modifier: Modifier) {
+private fun RenderIntegerConfig(cfg: IntConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
-    val enabled= isConfigEnabled()
+    val enabled = isConfigEnabled()
     ConfigTemplate(
         modifier = modifier,
         title = {
@@ -33,7 +63,7 @@ fun RenderIntegerConfig(cfg: IntConfigurable, modifier: Modifier) {
         },
         value = {
             when (cfg.renderMode) {
-                TextField -> {
+                IntConfigurable.RenderMode.TextField -> {
                     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
                     IntTextField(
                         value = value,
@@ -54,3 +84,5 @@ fun RenderIntegerConfig(cfg: IntConfigurable, modifier: Modifier) {
             }
         })
 }
+
+
