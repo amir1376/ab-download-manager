@@ -1,6 +1,5 @@
-package com.abdownloadmanager.desktop.pages.settings.configurable.widgets
+package com.abdownloadmanager.desktop.utils.configurable
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.Configurable
 import androidx.compose.runtime.Stable
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -226,8 +226,23 @@ fun StatusCell(
                     )
                 }
 
+                is DownloadJobStatus.Resuming -> {
+                    ProgressAndPercent(
+                        itemState.percent,
+                        DownloadProgressStatus.Resuming,
+                        itemState.gotAnyProgress
+                    )
+                }
+
+                is DownloadJobStatus.Retrying -> {
+                    ProgressAndPercent(
+                        itemState.percent,
+                        DownloadProgressStatus.Retrying,
+                        itemState.gotAnyProgress
+                    )
+                }
+
                 DownloadJobStatus.Finished,
-                DownloadJobStatus.Resuming,
                     -> SimpleStatus(myStringResource(itemState.status.toStringResource()))
             }
         }
@@ -265,6 +280,10 @@ private fun DownloadJobStatus.toStringResource(): MyStringResource {
         DownloadJobStatus.Resuming -> {
             Res.string.resuming
         }
+
+        is DownloadJobStatus.Retrying -> {
+            Res.string.retrying
+        }
     }
 }
 
@@ -286,8 +305,16 @@ private fun DownloadProgressStatus.toStringResource(): MyStringResource {
             Res.string.creating_file
         }
 
+        DownloadProgressStatus.Resuming -> {
+            Res.string.resuming
+        }
+
         DownloadProgressStatus.Downloading -> {
             Res.string.downloading
+        }
+
+        DownloadProgressStatus.Retrying -> {
+            Res.string.retrying
         }
     }
 }
@@ -303,7 +330,7 @@ private fun SimpleStatus(string: String) {
 }
 
 private enum class DownloadProgressStatus {
-    Added, Error, Paused, CreatingFile, Downloading
+    Added, Error, Paused, CreatingFile, Resuming, Downloading, Retrying
 }
 
 @Composable
@@ -316,7 +343,9 @@ private fun ProgressAndPercent(
         DownloadProgressStatus.Error -> myColors.errorGradient
         DownloadProgressStatus.Paused, DownloadProgressStatus.Added -> myColors.warningGradient
         DownloadProgressStatus.CreatingFile -> myColors.infoGradient
+        DownloadProgressStatus.Resuming -> myColors.infoGradient
         DownloadProgressStatus.Downloading -> myColors.primaryGradient
+        DownloadProgressStatus.Retrying -> myColors.errorGradient
     }
     val statusString = myStringResource(status.toStringResource())
     Column {

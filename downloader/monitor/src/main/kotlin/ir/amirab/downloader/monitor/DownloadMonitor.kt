@@ -26,16 +26,21 @@ class DownloadMonitor(
             if (value == field) return
             field = value
             //always cancel current job
-            avSpeedCollectorJob?.cancel()
-            avSpeedCollectorJob = if (value) {
-                // enabling average speed calculator flow only if nececary
-                // it will add a subscriber count into averageSpeedFlow and causes to start working
-                scope.launch { averageDownloadSpeedFlow.collect() }
-            } else {
-                // disable average speed
-                null
-            }
+            updateUseAverageSpeedFlow(value)
         }
+
+    private fun updateUseAverageSpeedFlow(useAverageSpeed: Boolean) {
+        avSpeedCollectorJob?.cancel()
+        avSpeedCollectorJob = if (useAverageSpeed) {
+            // enabling average speed calculator flow only if nececary
+            // it will add a subscriber count into averageSpeedFlow and causes to start working
+            scope.launch { averageDownloadSpeedFlow.collect() }
+        } else {
+            // disable average speed
+            null
+        }
+    }
+
     override val activeDownloadListFlow = MutableStateFlow<List<ProcessingDownloadItemState>>(emptyList())
     override val completedDownloadListFlow = MutableStateFlow<List<CompletedDownloadItemState>>(emptyList())
     override val downloadListFlow: StateFlow<List<IDownloadItemState>> =
@@ -73,41 +78,54 @@ class DownloadMonitor(
     }
 
 
-    private val downloadSpeedFlow = MutableStateFlow<Map<Long, Long>>(emptyMap())
+    private val downloadSpeedFlow = MutableStateFlow<SpeedAtTime>(SpeedAtTime.empty())
 
     private val averageDownloadSpeedFlow = downloadSpeedFlow
         .saved(5)
-        .map { lastStats ->
-            val last = lastStats.lastOrNull() ?: return@map emptyMap()
-            last.mapValues { (id, _) ->
-                lastStats
-                    .map { it.getOrElse(id) { 0L } }
-                    .average().toLong()
-            }
-        }.stateIn(scope, SharingStarted.WhileSubscribed(), emptyMap())
+        .map { lastSpeedHistory ->
+            val lastSpeeds = lastSpeedHistory.lastOrNull()?.speed ?: return@map SpeedAtTime.empty()
+            SpeedAtTime(
+                lastSpeeds
+                    .mapValues { (id, _) ->
+                        lastSpeedHistory
+                            .mapNotNull { it.speed.getOrElse(id) { null } }
+                            .average()
+                            .toLong()
+                    }
+            )
+        }.stateIn(scope, SharingStarted.WhileSubscribed(), SpeedAtTime.empty())
 
     private var speedMeterJob: Job? = null
     private fun startSpeedMeter() {
         speedMeterJob?.cancel()
+        updateUseAverageSpeedFlow(useAverageSpeed)
         speedMeterJob = scope.launch {
             var lastWrites = mapOf<Long, Long>()
             while (isActive) {
                 val newWrites = downloadManager.downloadJobs.associate {
                     it.id to it.getDownloadedSize()
                 }
-                downloadSpeedFlow.value = newWrites.mapValues { (id, newWrite) ->
-                    val lastWrittenData = lastWrites.getOrElse(id) { null }
-                    val newSpeed = when {
-                        lastWrittenData != null -> {
-                            newWrite - lastWrittenData
+                downloadSpeedFlow.value = SpeedAtTime(
+                    newWrites.mapValues { (id, newWrite) ->
+                        val lastWrittenData = lastWrites.getOrElse(id) { null }
+                        val newSpeed = when {
+                            lastWrittenData != null -> {
+                                if (newWrite < lastWrittenData) {
+                                    // maybe download was restarted our lastWrittenData is not valid anymore
+                                    newWrite
+                                } else {
+                                    newWrite - lastWrittenData
+                                }
+                            }
+
+                            else -> {
+                                // this item seen for the first time
+                                0
+                            }
                         }
-                        else -> {
-                            // this item seen for the first time
-                            0
-                        }
+                        newSpeed
                     }
-                    newSpeed
-                }
+                )
                 lastWrites = newWrites
                 delay(1_000)
             }
@@ -117,10 +135,12 @@ class DownloadMonitor(
     private fun stopSpeedMeter() {
         speedMeterJob?.cancel()
         speedMeterJob = null
+        avSpeedCollectorJob?.cancel()
+        avSpeedCollectorJob = null
     }
 
 
-    private fun getPreferedSpeedFlow(): StateFlow<Map<Long, Long>> {
+    private fun getPreferedSpeedFlow(): StateFlow<SpeedAtTime> {
         return when {
             useAverageSpeed -> averageDownloadSpeedFlow
             else -> downloadSpeedFlow
@@ -129,7 +149,7 @@ class DownloadMonitor(
     }
 
     private fun getSpeedOf(id: Long): Long {
-        val speed = getPreferedSpeedFlow().value.getOrElse(id) { -1 }
+        val speed = getPreferedSpeedFlow().value.speed.getOrElse(id) { -1 }
 //        println("speed of $id is $speed")
         return speed
     }
@@ -150,7 +170,7 @@ class DownloadMonitor(
                     when (event) {
                         is DownloadManagerEvents.OnJobCompleted -> {
                             val item =
-                                    CompletedDownloadItemState.fromDownloadItem(event.downloadItem)
+                                CompletedDownloadItemState.fromDownloadItem(event.downloadItem)
                             completedDownloadListFlow.update { current ->
                                 //replace if this id is already in the completed list
                                 // this is happened when we are creating a job from a completed download
@@ -281,5 +301,14 @@ class DownloadMonitor(
         if (event is DownloadManagerEvents.OnJobCanceled) {
             throw event.e
         }
+    }
+}
+
+data class SpeedAtTime(
+    val speed: Map<Long, Long>,
+    val time: Long = System.currentTimeMillis(),
+) {
+    companion object {
+        fun empty() = SpeedAtTime(emptyMap())
     }
 }

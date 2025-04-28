@@ -14,6 +14,30 @@
 
 ### Security
 
+## 1.5.5
+
+### Added
+
+- Japanese Language
+- An option to automatically "Retry Failed Downloads" (Disabled by default for now)
+- An option to Import/Export download credentials as curl command
+
+### Fixed
+
+- The download progress sometimes shows incorrect speeds and ETAs
+- Some unverified hostnames can't be used when the "Ignore SSL Certificate" is enabled
+- Startup on Boot issue in macOS
+- Drag And Drop of links issue in macOS
+- Some shortcuts didn't work properly in macOS
+- System Tray didn't work in macOS
+
+### Improved
+
+- Translations updated
+- Minor UI improvements
+- App Icon size in macOS
+- Override "About" dialog in macOS
+
 ## 1.5.4
 
 ### Added

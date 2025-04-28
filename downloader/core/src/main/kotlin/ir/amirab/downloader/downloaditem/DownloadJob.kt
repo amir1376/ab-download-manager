@@ -11,6 +11,7 @@ import ir.amirab.downloader.exception.FileChangedException
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.part.*
 import ir.amirab.downloader.utils.*
+import ir.amirab.util.tryLocked
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,6 +71,7 @@ class DownloadJob(
                 else -> null
             }
             applySpeedLimit()
+            downloadedSizeBeforeRetry = getDownloadedSize()
             booted = true
 //            thisLogger().info("job for dl_$id booted")
         }
@@ -122,6 +124,7 @@ class DownloadJob(
         downloadItem.startTime = null
         downloadItem.completeTime = null
         strictDownload = true
+        downloadedSizeBeforeRetry = 0 // nothing
         saveState()
         downloadManager.onDownloadItemChange(downloadItem)
     }
@@ -132,12 +135,27 @@ class DownloadJob(
             return
         }
         _isDownloadActive.update { true }
+        resumeWithNewScope(
+            newActiveScope = createAndInitializeDownloadScope(),
+            isInFirstResume = true
+        )
+    }
+
+    fun createAndInitializeDownloadScope(): CoroutineScope {
         val newActiveScope = newScopeBasedOn(scope)
             .also {
                 activeDownloadScope = it
             }
+        return newActiveScope
+    }
+
+    private suspend fun resumeWithNewScope(
+        newActiveScope: CoroutineScope,
+        isInFirstResume: Boolean,
+    ) {
+
 //        println(parts.filter { !it.isCompleted })
-        newActiveScope.launch {
+        return newActiveScope.launch {
             //boot download item from storage!
             boot()
             // if download item is booted and parts is not empty it means that we resumed that file in some point
@@ -165,10 +183,13 @@ class DownloadJob(
                 onDownloadResumed()
             } catch (e: Exception) {
                 e.printStackIfNOtUsual()
-                scope.launch {
-                    //moving to main scope and request to cancel this scope!
-//                    println("error in resume ${e::class.qualifiedName}!")
+                if (ExceptionUtils.isNormalCancellation(e)) {
                     pause(e)
+                } else {
+                    downloadFailedRetryOrPause(
+                        e = e,
+                        isInFirstResume = isInFirstResume,
+                    )
                 }
             }
         }.join()
@@ -277,13 +298,14 @@ class DownloadJob(
         } else {
             if (supportsConcurrent == true) {
                 //split parts
-                setParts(splitToRange(
-                    minPartSize = downloadManager.settings.minPartSize,
-                    maxPartCount = getRequestedPartitionCount().toLong(),
-                    size = downloadItem.contentLength,
-                ).map {
-                    Part(it.first, it.last)
-                })
+                setParts(
+                    splitToRange(
+                        minPartSize = downloadManager.settings.minPartSize,
+                        maxPartCount = getRequestedPartitionCount().toLong(),
+                        size = downloadItem.contentLength,
+                    ).map {
+                        Part(it.first, it.last)
+                    })
             } else {
                 setParts(
                     listOf(Part(0, (downloadItem.contentLength - 1).takeIf { it >= 0 }, 0))
@@ -403,15 +425,89 @@ class DownloadJob(
             }
         if (allHaveError && !paused) {
 //            println("all have error!")
-            scope.launch {
-//                println("request pause send")
-                pause(TooManyErrorException(throwable))
+            downloadFailedRetryOrPause(
+                e = throwable,
+                isInFirstResume = false,
+            )
+        }
+    }
+
+    // for this download job only, it has higher priority than download manager settings
+    var _maxAllowedRetries: Int? = null
+    fun getMaxAllowedRetries(): Int {
+        return _maxAllowedRetries ?: downloadManager.settings.maxDownloadRetryCount
+    }
+
+    var failedDownloadTries = 0
+    val delayForEachRetry = 3_000L
+    private var downloadedSizeBeforeRetry = 0L
+
+    private var retryJob: Job? = null
+
+    private val retryLock = Mutex()
+
+    // I have to improve this function to not allow accessing it concurrently
+    private fun downloadFailedRetryOrPause(
+        e: Throwable,
+        isInFirstResume: Boolean,
+    ) {
+        //moving to the main scope and request to cancel activeDownload scope!
+        scope.launch {
+            if (isInFirstResume && failedDownloadTries == 0 && shouldRetryIfInitialFailed()) {
+                if (ExceptionUtils.isNetworkError(e) || ExceptionUtils.isResponseError(e)) {
+                    pause(e)
+                    return@launch
+                }
+            }
+            // can't proceed
+            if (e is DownloadValidationException && e.isCritical()) {
+                pause(e)
+                return@launch
+            }
+            val downloadedSize = getDownloadedSize()
+            if (downloadedSize > downloadedSizeBeforeRetry) {
+                // download had progress! so we reset it
+                failedDownloadTries = 0
+            } else {
+                failedDownloadTries++
+            }
+            downloadedSizeBeforeRetry = downloadedSize
+
+            // we always have one try (the initial resume action), after that others are retries!
+            val retriedCount = (failedDownloadTries - 1).coerceAtLeast(0)
+            if (retriedCount < getMaxAllowedRetries()) {
+                retry(isInFirstResume)
+            } else {
+                pause(TooManyErrorException(e))
             }
         }
     }
 
-    //    var maxRetries = 3
-//    var failTries = 0
+    fun retry(isInFirstResume: Boolean) {
+        scope.launch {
+            val newScopeResult = retryLock.tryLocked {
+                val job = async {
+                    saveState()
+                    cancelDownloadScope()
+                    stopAllParts()
+                    _status.update { DownloadJobStatus.Retrying(delayForEachRetry) }
+                    delay(delayForEachRetry)
+                    createAndInitializeDownloadScope()
+                }
+                retryJob = job
+                job.await()
+            }
+            newScopeResult.getOrNull()?.let {
+                resumeWithNewScope(it, isInFirstResume)
+            }
+        }
+    }
+
+    fun shouldRetryIfInitialFailed(): Boolean {
+        return true
+    }
+
+
     private fun onPartStatusChanged(
         partDownloader: PartDownloader,
         partStatus: PartDownloadStatus,
@@ -600,10 +696,17 @@ class DownloadJob(
         saveState()
     }
 
-    suspend fun pause(throwable: Throwable = CancellationException()) {
-        boot()
+    suspend fun cancelDownloadScope() {
         activeDownloadScope?.coroutineContext?.job?.cancelAndJoin()
         activeDownloadScope = null
+    }
+
+    suspend fun cancelRetry() {
+        retryJob?.cancel()
+        retryJob = null
+    }
+
+    suspend fun stopAllParts() {
         withContext(Dispatchers.Default) {
             partDownloaderList.values.onEach {
                 it.stop()
@@ -612,6 +715,14 @@ class DownloadJob(
                 it.awaitIdle()
             }
         }
+    }
+
+    suspend fun pause(throwable: Throwable = CancellationException()) {
+        boot()
+        failedDownloadTries = 0
+        cancelRetry()
+        cancelDownloadScope()
+        stopAllParts()
         onDownloadCanceled(throwable)
     }
 
@@ -661,6 +772,9 @@ sealed class DownloadJobStatus(
     fun asDownloadStatus() = downloadStatus
 
     data object Downloading : DownloadJobStatus(0, DownloadStatus.Downloading),
+        IsActive
+
+    data class Retrying(val timeUntilRetry: Long) : DownloadJobStatus(0, DownloadStatus.Paused),
         IsActive
 
     data object Resuming : DownloadJobStatus(0, DownloadStatus.Downloading),

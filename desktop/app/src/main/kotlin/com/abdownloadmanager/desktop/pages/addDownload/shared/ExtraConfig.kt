@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.pages.addDownload.shared
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderConfigurable
+import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurable
 import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.ui.widget.Text
@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
-import com.abdownloadmanager.desktop.pages.settings.configurable.Configurable
+import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension

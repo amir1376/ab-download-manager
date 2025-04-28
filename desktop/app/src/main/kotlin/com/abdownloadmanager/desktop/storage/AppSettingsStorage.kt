@@ -20,6 +20,7 @@ data class AppSettingsModel(
     val showIconLabels: Boolean = true,
     val useSystemTray: Boolean = true,
     val threadCount: Int = 8,
+    val maxDownloadRetryCount: Int = 0,
     val dynamicPartCreation: Boolean = true,
     val useServerLastModifiedTime: Boolean = false,
     val useSparseFileAllocation: Boolean = true,
@@ -53,6 +54,7 @@ data class AppSettingsModel(
             val showIconLabels = booleanKeyOf("showIconLabels")
             val useSystemTray = booleanKeyOf("useSystemTray")
             val threadCount = intKeyOf("threadCount")
+            val maxDownloadRetryCount = intKeyOf("maxDownloadRetryCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
             val useSparseFileAllocation = booleanKeyOf("useSparseFileAllocation")
@@ -83,6 +85,7 @@ data class AppSettingsModel(
                 showIconLabels = source.get(Keys.showIconLabels) ?: default.showIconLabels,
                 useSystemTray = source.get(Keys.useSystemTray) ?: default.useSystemTray,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
+                maxDownloadRetryCount = source.get(Keys.maxDownloadRetryCount) ?: default.maxDownloadRetryCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
                 useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime)
                     ?: default.useServerLastModifiedTime,
@@ -116,6 +119,7 @@ data class AppSettingsModel(
                 put(Keys.showIconLabels, focus.showIconLabels)
                 put(Keys.useSystemTray, focus.useSystemTray)
                 put(Keys.threadCount, focus.threadCount)
+                put(Keys.maxDownloadRetryCount, focus.maxDownloadRetryCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
                 put(Keys.useSparseFileAllocation, focus.useSparseFileAllocation)
@@ -173,6 +177,7 @@ class AppSettingsStorage(
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
     val useSparseFileAllocation = from(AppSettingsModel.useSparseFileAllocation)
     val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
+    val maxDownloadRetryCount = from(AppSettingsModel.maxDownloadRetryCount)
     val showDownloadProgressDialog = from(AppSettingsModel.showDownloadProgressDialog)
     val showDownloadCompletionDialog = from(AppSettingsModel.showDownloadCompletionDialog)
     val speedLimit = from(AppSettingsModel.speedLimit)

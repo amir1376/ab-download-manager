@@ -49,6 +49,7 @@ fun <T> DialogDropDown(
     onRequestCloseDropDown: () -> Unit,
     dropDownSize: DpSize = DpSize(220.dp, 250.dp),
     renderItem: @Composable (T) -> Unit,
+    renderEmpty: @Composable () -> Unit,
 ) {
     Column(modifier) {
         DropDownHeader(
@@ -64,6 +65,7 @@ fun <T> DialogDropDown(
                 possibleItems = possibleItems,
                 selectedItem = selectedItem,
                 onItemSelected = onItemSelected,
+                drawOnEmpty = renderEmpty,
                 renderItem = renderItem,
             )
         }
@@ -77,6 +79,7 @@ fun <T> DropDownContent(
     possibleItems: List<T>,
     selectedItem: T?,
     onItemSelected: (T) -> Unit,
+    drawOnEmpty: @Composable () -> Unit,
     renderItem: @Composable (T) -> Unit,
 ) {
     BaseOptionDialog(
@@ -152,6 +155,11 @@ fun <T> DropDownContent(
                                 }
                             }
                         }
+                    }
+                }
+                if (possibleItems.isEmpty()) {
+                    Box(Modifier.padding().fillMaxSize()) {
+                        drawOnEmpty()
                     }
                 }
                 AnimatedVisibility(

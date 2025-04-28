@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.pages.settings.configurable.widgets.RenderSpinner
+import com.abdownloadmanager.desktop.pages.settings.configurable.RenderSpinner
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.resources.Res

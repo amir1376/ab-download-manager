@@ -65,7 +65,12 @@ class DesktopUpdateApplier(
         requireNotNull(downloadSource) {
             "Can't find proper download link for your platform! Please update it manually"
         }
-        val downloadedFile = updateDownloader.downloadUpdate(downloadSource)
+        val downloadedFile = try {
+            updateDownloader.downloadUpdate(downloadSource)
+        } catch (e:Exception) {
+            downloading = false
+            throw  e
+        }
         if (!downloadedFile.exists()) {
             downloading = false
             return
