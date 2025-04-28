@@ -2,12 +2,20 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.draganddrop.dragAndDropSource
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropTransferAction
+import androidx.compose.ui.draganddrop.DragAndDropTransferData
+import androidx.compose.ui.draganddrop.DragAndDropTransferable
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.pages.home.DownloadItemTransferable
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
@@ -17,9 +25,12 @@ import com.abdownloadmanager.shared.utils.LocalSizeUnit
 import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.widget.IconActionButton
+import com.abdownloadmanager.shared.ui.widget.Tooltip
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -56,6 +67,7 @@ private fun Actions(
     modifier: Modifier,
     component: SingleDownloadComponent,
 ) {
+    val iDownloadItemState by component.itemStateFlow.collectAsState()
     Column(modifier) {
         Spacer(
             Modifier
@@ -69,6 +81,7 @@ private fun Actions(
                 .background(myColors.surface / 0.5f)
                 .padding(horizontal = 16.dp)
                 .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             ActionButton(
                 myStringResource(Res.string.open),
@@ -85,6 +98,42 @@ private fun Actions(
                     component.openFolder()
                 },
             )
+            Spacer(Modifier.width(8.dp))
+            val dragTheFileDescription = Res.string.drag_the_file_to_another_app.asStringSource()
+            Tooltip(dragTheFileDescription) {
+                IconActionButton(
+                    icon = MyIcons.dragAndDrop,
+                    contentDescription = dragTheFileDescription.rememberString(),
+                    modifier = Modifier
+                        .dragAndDropSource(
+                            drawDragDecoration = {},
+                            block = {
+                                detectDragGestures(
+                                    onDrag = { _ ->
+                                        val completedDownloadItemState =
+                                            iDownloadItemState as? CompletedDownloadItemState
+                                                ?: return@detectDragGestures
+                                        startTransfer(
+                                            DragAndDropTransferData(
+                                                transferable = DragAndDropTransferable(
+                                                    DownloadItemTransferable(
+                                                        listOf(completedDownloadItemState)
+                                                    )
+                                                ),
+                                                supportedActions = listOf(
+                                                    // TODO it doesn't work!
+                                                    DragAndDropTransferAction.Copy,
+                                                ),
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        ),
+                    onClick = {},
+                )
+            }
+
             Spacer(Modifier.weight(1f))
             ActionButton(
                 myStringResource(Res.string.close),

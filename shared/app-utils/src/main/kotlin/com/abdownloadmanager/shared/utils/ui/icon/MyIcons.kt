@@ -97,4 +97,5 @@ override val back get() = "/icons/back.svg".asIconSource()
 
     override val earth: IconSource get() = "/icons/earth.svg".asIconSource()
     override val hearth: IconSource get() = "/icons/hearth.svg".asIconSource()
+    override val dragAndDrop: IconSource get() = "/icons/drag_and_drop.svg".asIconSource()
 }
