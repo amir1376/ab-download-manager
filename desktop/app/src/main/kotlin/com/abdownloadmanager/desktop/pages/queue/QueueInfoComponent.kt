@@ -15,6 +15,7 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
+import ir.amirab.util.flow.combineStateFlows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -79,11 +80,14 @@ class QueueInfoComponent(
         downloadQueue: DownloadQueue, parentScope: CoroutineScope,
     ): List<ConfigurableGroup> {
         val scope = newScopeBasedOn(parentScope)
+        val enabledStartTimeFlow = downloadQueue.queueModel.mapStateFlow() {
+            it.scheduledTimes.enabledStartTime
+        }
         val enabledEndTimeFlow = downloadQueue.queueModel.mapStateFlow() {
             it.scheduledTimes.enabledEndTime
         }
-        val enabledSchedulerFlow = downloadQueue.queueModel.mapStateFlow() {
-            it.scheduledTimes.enabledStartTime
+        val enabledSchedulerFlow = combineStateFlows(enabledStartTimeFlow, enabledEndTimeFlow) { start, end ->
+            start || end
         }
         return listOf(
             ConfigurableGroup(
@@ -160,7 +164,10 @@ class QueueInfoComponent(
                         scope = scope,
                         updater = { newValue ->
                             downloadQueue.setScheduledTimes {
-                                copy(enabledStartTime = newValue)
+                                copy(
+                                    enabledStartTime = newValue,
+                                    enabledEndTime = newValue,
+                                )
                             }
                         }
                     ),
@@ -185,6 +192,20 @@ class QueueInfoComponent(
                         },
                         describe = { "".asStringSource() },
                     ),
+                    BooleanConfigurable(
+                        Res.string.queue_scheduler_enable_auto_start_time.asStringSource(),
+                        description = "".asStringSource(),
+                        describe = { "".asStringSource() },
+                        backedBy = createMutableStateFlowFromStateFlow(
+                            scope = scope,
+                            flow = enabledStartTimeFlow,
+                            updater = { newValue ->
+                                downloadQueue.setScheduledTimes {
+                                    copy(enabledStartTime = newValue)
+                                }
+                            },
+                        ),
+                    ),
                     TimeConfigurable(
                         Res.string.queue_scheduler_auto_start_time.asStringSource(),
                         "".asStringSource(),
@@ -200,6 +221,7 @@ class QueueInfoComponent(
                             },
                         ),
                         describe = { "".asStringSource() },
+                        visible = enabledStartTimeFlow,
                     ),
                     BooleanConfigurable(
                         Res.string.queue_scheduler_enable_auto_stop_time.asStringSource(),
@@ -213,8 +235,7 @@ class QueueInfoComponent(
                                     copy(enabledEndTime = newValue)
                                 }
                             },
-
-                            ),
+                        ),
                     ),
                     TimeConfigurable(
                         Res.string.queue_scheduler_auto_stop_time.asStringSource(),

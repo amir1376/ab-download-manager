@@ -8,20 +8,20 @@ data class ScheduleTimes(
     val daysOfWeek: Set<DayOfWeek>,
     val startTime: LocalTime,
     val endTime: LocalTime,
-    val enabledStartTime:Boolean,
-    val enabledEndTime:Boolean,
+    val enabledStartTime: Boolean,
+    val enabledEndTime: Boolean,
 ) {
     init {
-        require(daysOfWeek.isNotEmpty()){
+        require(daysOfWeek.isNotEmpty()) {
             "we have always have one day"
         }
     }
 
     companion object {
-        fun default()=ScheduleTimes(
-            daysOfWeek = DayOfWeek.values().toSet(),
-            startTime = LocalTime(6,30),
-            endTime = LocalTime(7,30),
+        fun default() = ScheduleTimes(
+            daysOfWeek = DayOfWeek.entries.toSet(),
+            startTime = LocalTime(2, 30),
+            endTime = LocalTime(7, 30),
             enabledStartTime = false,
             enabledEndTime = false,
         )
@@ -32,7 +32,7 @@ data class ScheduleTimes(
     }
 
 
-    private fun getNearestDayOfWork(forTime:LocalTime): Int {
+    private fun getNearestDayOfWork(forTime: LocalTime): Int {
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         var currentDay = now.dayOfWeek
         val currentTime = now.time
@@ -52,16 +52,17 @@ data class ScheduleTimes(
             }
             currentDay = currentDay.plus(1)
             count++
-            if (count>7){
+            if (count > 7) {
                 error("there is a bug in our code stoping loop")
             }
         }
 
     }
+
     fun getNearestTimeToStart(): Long {
         val now = Clock.System.now()
 
-        val nextTime =now
+        val nextTime = now
             .plus(
                 getNearestDayOfWork(startTime),
                 DateTimeUnit.DAY,
