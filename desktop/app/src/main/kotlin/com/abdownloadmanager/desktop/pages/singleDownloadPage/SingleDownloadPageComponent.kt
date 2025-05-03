@@ -25,6 +25,7 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapTwoWayStateFlow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -57,6 +58,7 @@ class SingleDownloadComponent(
     private val downloadSystem: DownloadSystem by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val appRepository: AppRepository by inject()
+    private val applicationScope: CoroutineScope by inject()
     val fileIconProvider: FileIconProvider by inject()
     private val singleDownloadPageStateToPersist by lazy {
         get<PageStatesStorage>().downloadPage
@@ -244,6 +246,18 @@ class SingleDownloadComponent(
     }
 
     fun close() {
+        scope.launch {
+            onDismiss()
+        }
+    }
+
+    fun cancel() {
+        applicationScope.launch {
+            val state = itemStateFlow.value as? ProcessingDownloadItemState
+            if (state?.status is DownloadJobStatus.IsActive) {
+                downloadSystem.manualPause(downloadId)
+            }
+        }
         scope.launch {
             onDismiss()
         }
