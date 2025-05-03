@@ -52,7 +52,7 @@ fun QueuePage(component: QueuesComponent) {
     val activeItem: DownloadQueue = component.selectedItem
     WindowTitle(myStringResource(Res.string.queues))
     val borderShape = RoundedCornerShape(6.dp)
-    val borderColor = myColors.onBackground / 5
+    val borderColor = myColors.surface
     Column {
         Row(
             Modifier.weight(1f)
@@ -77,9 +77,12 @@ fun QueuePage(component: QueuesComponent) {
                 modifier = Modifier
                     .weight(1f)
                     .padding(2.dp)
-                    .border(1.dp, borderColor, borderShape),
+                    .border(1.dp, borderColor, borderShape)
+                    .padding(1.dp)
+                    .clip(borderShape),
                 item = activeItem,
                 component = component.queueInfoComponent.collectAsState().value.child!!.instance,
+                borderColor = borderColor,
             )
         }
         Actions(component, activeItem)
@@ -142,6 +145,7 @@ private fun QueueInfo(
     modifier: Modifier,
     item: DownloadQueue,
     component: QueueInfoComponent,
+    borderColor: Color,
 ) {
     val fm = LocalFocusManager.current
     //remove focus to prevent accidentally change config in different queue
@@ -152,14 +156,8 @@ private fun QueueInfo(
         mutableStateOf(QueueInfoPages.Config)
     }
     Column(modifier) {
-        val shape = RoundedCornerShape(6.dp)
         Column(
             Modifier
-                .clip(shape)
-                .background(myColors.surface)
-                .padding(horizontal = 4.dp)
-                .padding(top = 1.dp)
-                .padding(bottom = 1.dp)
         ) {
             MyTabRow {
                 QueueInfoPages.entries.forEach {
@@ -171,11 +169,10 @@ private fun QueueInfo(
                     )
                 }
             }
+            Spacer(Modifier.fillMaxWidth().height(1.dp).background(borderColor))
             val pageModifier = Modifier
                 .fillMaxSize()
-                .clip(shape)
-                .background(myColors.background)
-                .padding(16.dp)
+                .padding(4.dp)
             when (currentPage) {
                 QueueInfoPages.Config -> RenderQueueConfig(pageModifier, component)
                 QueueInfoPages.Items -> RenderQueueItems(pageModifier, component)
