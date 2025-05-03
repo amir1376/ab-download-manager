@@ -10,7 +10,6 @@ import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
-import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
@@ -502,44 +501,22 @@ fun RenderInfo(
 
 @Composable
 fun RenderActions(
-    itemState: IDownloadItemState,
+    itemState: ProcessingDownloadItemState,
     singleDownloadComponent: SingleDownloadComponent,
     showingPartInfo: Boolean,
     onRequestShowPartInfo: (show: Boolean) -> Unit,
 ) {
-    AnimatedContent(
-        itemState,
-        transitionSpec = {
-            val tween = tween<Float>(1000, 0, LinearEasing)
-            fadeIn(tween).togetherWith(fadeOut(tween))
-        },
-        contentKey = {
-            it is CompletedDownloadItemState
-        }
-    ) {
-        Row {
-            when (it) {
-                is CompletedDownloadItemState -> {
-                    Spacer(Modifier.weight(1f))
-                    OpenFileButton(singleDownloadComponent::openFile)
-                    OpenFolderButton(singleDownloadComponent::openFolder)
-                }
-
-                is ProcessingDownloadItemState -> {
-                    PartInfoButton(showingPartInfo, onRequestShowPartInfo)
-                    Spacer(Modifier.weight(1f))
-                    ToggleButton(
-                        it,
-                        singleDownloadComponent::toggle,
-                        singleDownloadComponent::resume,
-                        singleDownloadComponent::pause,
-                    )
-                    CloseButton(singleDownloadComponent::close)
-                }
-            }
-        }
+    Row {
+        PartInfoButton(showingPartInfo, onRequestShowPartInfo)
+        Spacer(Modifier.weight(1f))
+        ToggleButton(
+            itemState,
+            singleDownloadComponent::toggle,
+            singleDownloadComponent::resume,
+            singleDownloadComponent::pause,
+        )
+        CancelButton(singleDownloadComponent::cancel)
     }
-
 }
 
 @Composable
@@ -579,12 +556,14 @@ private fun SingleDownloadPageButton(
 }
 
 @Composable
-private fun CloseButton(close: () -> Unit) {
+private fun CancelButton(
+    cancel: () -> Unit,
+) {
     SingleDownloadPageButton(
         {
-            close()
+            cancel()
         },
-        text = myStringResource(Res.string.close)
+        text = myStringResource(Res.string.cancel)
     )
 }
 
