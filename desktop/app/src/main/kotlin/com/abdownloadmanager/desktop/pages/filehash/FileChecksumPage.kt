@@ -10,21 +10,26 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.pages.settings.configurable.FileChecksumConfigurable
 import com.abdownloadmanager.desktop.pages.settings.configurable.RenderSpinner
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
+import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurable
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.Help
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.ui.widget.Tooltip
 import com.abdownloadmanager.shared.ui.widget.customtable.*
 import com.abdownloadmanager.shared.ui.widget.customtable.styled.MyStyledTableHeader
+import com.abdownloadmanager.shared.ui.widget.menu.WithContextMenu
+import com.abdownloadmanager.shared.ui.widget.menu.MyDropDown
+import com.abdownloadmanager.shared.utils.FileChecksum
 import com.abdownloadmanager.shared.utils.FileChecksumAlgorithm
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.rememberDotLoading
@@ -35,8 +40,11 @@ import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun FileChecksumPage(component: FileChecksumComponent) {
@@ -60,9 +68,7 @@ fun FileChecksumPage(component: FileChecksumComponent) {
                     val mutableInteractionSource = remember { MutableInteractionSource() }
                     it.indication(mutableInteractionSource, LocalIndication.current)
                         .hoverable(mutableInteractionSource)
-                }
-
-                    .padding(vertical = 8.dp)) {
+                }) {
                     content()
                 }
             },
@@ -85,7 +91,12 @@ fun FileChecksumPage(component: FileChecksumComponent) {
                     }
 
                     FileChecksumTableCells.SavedChecksum -> {
-                        FileChecksumTableCellRenderers.RenderSavedChecksum(item)
+                        FileChecksumTableCellRenderers.RenderSavedChecksum(
+                            item = item,
+                            onRequestSaveNewChecksum = {
+                                component.updateChecksum(item.downloadItem.id, it)
+                            }
+                        )
                     }
                 }
             })
@@ -158,83 +169,207 @@ private fun Actions(
 
 
 private data object FileChecksumTableCellRenderers {
+    private val itemVerticalPadding = 8.dp
+
+    @Composable
+    private fun CellContent(
+        content: @Composable () -> Unit
+    ) {
+        Box(
+            modifier = Modifier.padding(vertical = itemVerticalPadding)
+        ) {
+            content()
+        }
+    }
+
     @Composable
     fun RenderName(item: DownloadItemWithChecksum) {
-        SimpleText(item.downloadItem.name)
+        CellContent {
+            SimpleText(item.downloadItem.name)
+        }
     }
 
     @Composable
     fun RenderStatus(item: DownloadItemWithChecksum) {
-        when (val status = item.checksumStatus) {
-            is ChecksumStatus.Checking -> {
-                RenderCheckingStatus(status.percent)
-            }
+        CellContent {
+            when (val status = item.checksumStatus) {
+                is ChecksumStatus.Checking -> {
+                    RenderCheckingStatus(status.percent)
+                }
 
-            ChecksumStatus.Error.DownloadNotFinished -> {
-                RenderErrorStatus(myStringResource(Res.string.download_not_finished))
-            }
+                ChecksumStatus.Error.DownloadNotFinished -> {
+                    RenderErrorStatus(myStringResource(Res.string.download_not_finished))
+                }
 
-            is ChecksumStatus.Error.Exception -> {
-                RenderErrorStatus(status.t.localizedMessage ?: status.t::class.simpleName.orEmpty())
-            }
+                is ChecksumStatus.Error.Exception -> {
+                    RenderErrorStatus(status.t.localizedMessage ?: status.t::class.simpleName.orEmpty())
+                }
 
-            ChecksumStatus.Error.FileNotFound -> {
-                RenderErrorStatus(myStringResource(Res.string.file_not_found))
-            }
+                ChecksumStatus.Error.FileNotFound -> {
+                    RenderErrorStatus(myStringResource(Res.string.file_not_found))
+                }
 
-            is ChecksumStatus.Finished -> {
-                RenderFinishedStatus(
-                    status = status,
-                )
-            }
+                is ChecksumStatus.Finished -> {
+                    RenderFinishedStatus(
+                        status = status,
+                    )
+                }
 
-            ChecksumStatus.Waiting -> {
-                RenderWaitingStatus()
+                ChecksumStatus.Waiting -> {
+                    RenderWaitingStatus()
+                }
             }
         }
     }
 
     @Composable
     fun RenderAlgorithm(item: DownloadItemWithChecksum) {
-        SimpleText(item.algorithm)
-    }
-
-    @Composable
-    private fun CopyableText(text: String) {
-        Tooltip(
-            Res.string.copy_to_clipboard.asStringSource()
-        ) {
-            SimpleText(
-                text,
-                Modifier.clickable {
-                    ClipboardUtil.copy(text)
-                },
-            )
+        CellContent {
+            SimpleText(item.algorithm)
         }
     }
 
     @Composable
     fun RenderCalculatedChecksum(item: DownloadItemWithChecksum) {
-        if (item.calculatedChecksum != null) {
-            CopyableText(item.calculatedChecksum)
-        } else if (item.isProcessing) {
-            //shimmer
-            ShimmerEffect(
-                centerColor = myColors.onBackground / 0.4f,
-                surroundingColor = myColors.onBackground / 0.1f,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(6.dp))
-                    .height(myTextSizes.base.value.dp)
-            )
-        } else if (item.isError) {
-            SimpleText("!")
+        WithContextMenu(
+            menuProvider = {
+                buildMenu {
+                    if (item.calculatedChecksum != null) {
+                        item(
+                            title = Res.string.copy.asStringSource(),
+                            icon = MyIcons.copy,
+                            onClick = {
+                                ClipboardUtil.copy(item.calculatedChecksum)
+                            }
+                        )
+                    }
+                }
+            }
+        ) {
+            if (item.calculatedChecksum != null) {
+                SimpleText(item.calculatedChecksum)
+            } else if (item.isProcessing) {
+                //shimmer
+                ShimmerEffect(
+                    centerColor = myColors.onBackground / 0.4f,
+                    surroundingColor = myColors.onBackground / 0.1f,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(6.dp))
+                        .height(myTextSizes.base.value.dp)
+                )
+            } else if (item.isError) {
+                SimpleText("!")
+            }
         }
     }
 
     @Composable
-    fun RenderSavedChecksum(item: DownloadItemWithChecksum) {
-        CopyableText(item.savedChecksum.orEmpty())
+    fun RenderSavedChecksum(
+        item: DownloadItemWithChecksum,
+        onRequestSaveNewChecksum: (FileChecksum?) -> Unit
+    ) {
+        fun createMenu(
+            item: DownloadItemWithChecksum,
+            onRequestEdit: (Boolean) -> Unit,
+        ): List<MenuItem> {
+            return buildMenu {
+                if (item.savedChecksum != null) {
+                    item(
+                        title = Res.string.copy.asStringSource(),
+                        icon = MyIcons.copy,
+                        onClick = {
+                            ClipboardUtil.copy(item.savedChecksum)
+                        },
+                    )
+                }
+                item(
+                    title = Res.string.edit.asStringSource(),
+                    icon = MyIcons.edit,
+                    onClick = {
+                        onRequestEdit(true)
+                    },
+                )
+            }
+        }
+
+        var edit by remember { mutableStateOf(false) }
+        WithContextMenu(
+            menuProvider = {
+                createMenu(
+                    item = item,
+                    onRequestEdit = { edit = it }
+                )
+            }
+        ) {
+            Column(Modifier.fillMaxSize()) {
+                CellContent {
+                    SimpleText(item.savedChecksum.orEmpty())
+                }
+                if (edit) {
+                    ChecksumEditDropDown(
+                        item = item,
+                        onRequestSaveNewChecksum = {
+                            onRequestSaveNewChecksum(it)
+                            edit = false
+                        },
+                        onCloseRequest = {
+                            edit = false
+                        },
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun ChecksumEditDropDown(
+        item: DownloadItemWithChecksum,
+        onCloseRequest: () -> Unit,
+        onRequestSaveNewChecksum: (FileChecksum?) -> Unit,
+    ) {
+        val editChecksumFlow = remember {
+            MutableStateFlow<FileChecksum?>(FileChecksum(item.algorithm, item.savedChecksum.orEmpty()))
+        }
+        val fileChecksumConfigurable = remember {
+            FileChecksumConfigurable(
+                title = Res.string.download_item_settings_file_checksum.asStringSource(),
+                description = Res.string.download_item_settings_file_checksum_description.asStringSource(),
+                backedBy = editChecksumFlow,
+                describe = {
+                    "".asStringSource()
+                },
+            )
+        }
+        MyDropDown(
+            onDismissRequest = onCloseRequest,
+            anchor = Alignment.BottomEnd,
+            alignment = Alignment.BottomStart,
+        ) {
+            val shape = RoundedCornerShape(6.dp)
+            Column(
+                Modifier
+                    .shadow(24.dp)
+                    .clip(shape)
+                    .width(350.dp)
+                    .border(1.dp, myColors.surface, shape)
+                    .background(myColors.menuGradientBackground)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                RenderConfigurable(fileChecksumConfigurable, Modifier)
+                ActionButton(
+                    text = myStringResource(Res.string.update),
+                    modifier = Modifier
+                        .align(Alignment.End),
+                    onClick = {
+                        val newChecksum = editChecksumFlow.value
+                        onRequestSaveNewChecksum(
+                            newChecksum.takeIf { it?.value?.isNotEmpty() ?: false }
+                        )
+                    }
+                )
+            }
+        }
     }
 
     @Composable

@@ -89,9 +89,7 @@ class FileChecksumComponent(
         setState {
             it.copy(
                 items = downloadItems.map { downloadItem ->
-                    val savedChecksum = downloadItem.fileChecksum?.let { fc ->
-                        FileChecksum.fromString(fc)
-                    }
+                    val savedChecksum = FileChecksum.fromNullableString(downloadItem.fileChecksum)
                     DownloadItemWithChecksum(
                         downloadItem = downloadItem,
                         checksumStatus = ChecksumStatus.Waiting,
@@ -110,6 +108,67 @@ class FileChecksumComponent(
         }
     }
 
+    fun updateChecksum(
+        downloadId: Long,
+        fileChecksum: FileChecksum?,
+    ) {
+        scope.launch {
+            val newChecksumString = fileChecksum?.toString()
+            downloadSystem.downloadManager.updateDownloadItem(
+                id = downloadId,
+                updater = {
+                    it.fileChecksum = newChecksumString
+                }
+            )
+            // update this class internal download items
+            downloadItems = downloadItems.map {
+                it.ifThen(it.id == downloadId) {
+                    copy(fileChecksum = newChecksumString)
+                }
+            }
+            updateItem(downloadId) {
+                var modified: DownloadItemWithChecksum = it
+                // update the download item (in this component only)
+                modified = modified.copy(
+                    downloadItem = it.downloadItem.copy(
+                        fileChecksum = newChecksumString
+                    ),
+                    savedChecksum = fileChecksum?.value
+                )
+                // update hash compare
+                if (fileChecksum != null) {
+                    val algorithm = fileChecksum.algorithm
+                    if (it.algorithm != fileChecksum.algorithm) {
+                        // reset calculated hash if the previous algorithm is different from the new one!
+                        modified = modified.copy(
+                            algorithm = algorithm,
+                            calculatedChecksum = null,
+                            checksumStatus = ChecksumStatus.Waiting,
+                        )
+                    } else if (modified.calculatedChecksum != null) {
+                        // user previously started the check, and he calculated the hash
+                        // so we compare saved hash with calculated hash for him
+                        modified = modified.copy(
+                            algorithm = algorithm,
+                            checksumStatus = compareHashes(
+                                savedChecksum = fileChecksum,
+                                calculatedChecksum = FileChecksum(algorithm, modified.calculatedChecksum)
+                            )
+                        )
+                    }
+                } else {
+                    // we don't have saved checksum, so we don't know if its matches or not!
+                    if (it.checksumStatus is ChecksumStatus.Finished) {
+                        modified = modified.copy(
+                            checksumStatus = ChecksumStatus.Finished.Done,
+                        )
+                    }
+                }
+                modified
+            }
+        }
+    }
+
     private suspend fun startCheck() {
         // clean old statuses
         setup()
@@ -117,8 +176,10 @@ class FileChecksumComponent(
         isChecking.update { true }
         try {
             withContext(Dispatchers.IO) {
-                for (item in downloadItems) {
-                    processItem(item)
+                // some dude may change checksum when we are busy here
+                // so always use the latest download items object!
+                for (index in downloadItems.indices) {
+                    processItem(downloadItems[index])
                 }
             }
         } finally {
@@ -151,17 +212,10 @@ class FileChecksumComponent(
                     }
                 }
             )
-            val savedChecksum = FileChecksum.fromNullableString(item.fileChecksum)
-            val calculatedChecksum = FileChecksum(algorithm, hash)
-            val newStatus = if (savedChecksum == null) {
-                ChecksumStatus.Finished.Done
-            } else {
-                if (savedChecksum == calculatedChecksum) {
-                    ChecksumStatus.Finished.Matches
-                } else {
-                    ChecksumStatus.Finished.NotMatches
-                }
-            }
+            val newStatus = compareHashes(
+                FileChecksum.fromNullableString(item.fileChecksum),
+                FileChecksum(algorithm, hash),
+            )
             scope.launch {
                 updateItem(item.id) {
                     it.copy(
@@ -177,11 +231,26 @@ class FileChecksumComponent(
         }
     }
 
+    private fun compareHashes(
+        savedChecksum: FileChecksum?, calculatedChecksum: FileChecksum
+    ): ChecksumStatus.Finished {
+        return if (savedChecksum == null) {
+            ChecksumStatus.Finished.Done
+        } else {
+            if (savedChecksum == calculatedChecksum) {
+                ChecksumStatus.Finished.Matches
+            } else {
+                ChecksumStatus.Finished.NotMatches
+            }
+        }
+    }
+
     private fun getChecksumAlgorithmForItem(downloadItem: DownloadItem): String {
         return downloadItem.fileChecksum?.let {
             FileChecksum.fromString(it).algorithm
         } ?: selectedDefaultAlgorithm.value.algorithm
     }
+
     private fun updateItem(id: Long, updater: (DownloadItemWithChecksum) -> DownloadItemWithChecksum) {
         setState {
             it.copy(
@@ -193,6 +262,7 @@ class FileChecksumComponent(
             )
         }
     }
+
     private fun updateItemStatus(id: Long, status: ChecksumStatus) {
         updateItem(id) {
             it.copy(checksumStatus = status)
