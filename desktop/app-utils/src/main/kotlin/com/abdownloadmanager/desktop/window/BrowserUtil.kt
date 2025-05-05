@@ -15,7 +15,6 @@ abstract class Browser {
 
     open fun openLink(url: String): Boolean {
         val executablePath = getExecutablePath()?.path
-        println(arrayOf(executablePath, url).joinToString(" "))
         if (executablePath == null) {
             return false
         }
