@@ -2,6 +2,7 @@ package ir.amirab.util.osfileutil
 
 import ir.amirab.util.execAndWait
 import java.io.File
+import java.net.URLEncoder
 
 internal class LinuxFileUtils : FileUtilsBase() {
     override fun openFileInternal(file: File): Boolean {
@@ -9,6 +10,7 @@ internal class LinuxFileUtils : FileUtilsBase() {
     }
 
     override fun openFolderOfFileInternal(file: File): Boolean {
+        val uri = "file://" + encodePath(file.path)
         val dbusSendResult = execAndWait(
             arrayOf(
                 "dbus-send",
@@ -16,7 +18,7 @@ internal class LinuxFileUtils : FileUtilsBase() {
                 "--dest=org.freedesktop.FileManager1",
                 "/org/freedesktop/FileManager1",
                 "org.freedesktop.FileManager1.ShowItems",
-                "array:string:file://${file.path}",
+                "array:string:$uri",
                 "string:"
             )
         )
@@ -31,5 +33,15 @@ internal class LinuxFileUtils : FileUtilsBase() {
 
     override fun openFolderInternal(folder: File): Boolean {
         return execAndWait(arrayOf("xdg-open", folder.parent))
+    }
+
+    private fun encodePath(path: String): String {
+        return path
+            .split('/')
+            .joinToString("/") {
+                URLEncoder
+                    .encode(it, Charsets.UTF_8)
+                    .replace("+", "%20")
+            }
     }
 }
