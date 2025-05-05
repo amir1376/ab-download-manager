@@ -280,6 +280,7 @@ class SingleDownloadComponent(
         speedLimit = MutableStateFlow(dItem?.speedLimit ?: 0)
         downloadManager.listOfJobsEvents
             .filterIsInstance<DownloadManagerEvents.OnJobChanged>()
+            .filter { it.downloadItem.id == dItem?.id }
             .onEach { event ->
                 threadCount.update {
                     event.downloadItem.preferredConnectionCount ?: 0
