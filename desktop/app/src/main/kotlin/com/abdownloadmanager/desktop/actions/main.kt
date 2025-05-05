@@ -6,6 +6,7 @@ import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
+import com.abdownloadmanager.desktop.window.Browser
 import ir.amirab.util.compose.action.AnAction
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.buildMenu
@@ -136,7 +137,13 @@ val browserIntegrations = MenuItem.SubMenu(
             item(
                 title = browserExtension.type.getName().asStringSource(),
                 icon = browserExtension.type.getIcon(),
-                onClick = { UrlUtils.openUrl(browserExtension.url) }
+                onClick = {
+                    val browser = Browser.getBrowserByType(browserExtension.type)
+                    val success = browser?.openLink(browserExtension.url) == true
+                    if (!success) {
+                        UrlUtils.openUrl(browserExtension.url)
+                    }
+                }
             )
         }
     }
