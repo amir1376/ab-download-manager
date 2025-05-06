@@ -47,7 +47,7 @@ fun SystemButton(
                 alpha = if (isFocused || isHovered) {
                     1f
                 } else {
-                    0.25f
+                    0.5f
                 }
             )
         ).value,
