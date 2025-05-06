@@ -22,6 +22,10 @@ import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.desktop.screen.applyUiScale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import java.awt.Dimension
 import java.awt.Taskbar
 import java.awt.Window
@@ -163,9 +167,16 @@ private fun ProgressWindow(
     val defaultWidth = 450f.applyUiScale(uiScale)
 
     val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
+    val singleDownloadPageSizing = remember(showPartInfo) { SingleProgressDownloadPageSizing() }
+    var h = defaultHeight
+    var w = defaultWidth
+    if (showPartInfo) {
+        h += singleDownloadPageSizing.partInfoHeight.value
+            .applyUiScale(uiScale)
+    }
     val state = rememberWindowState(
-        height = defaultHeight.dp,
-        width = defaultWidth.dp,
+        height = h.dp,
+        width = w.dp,
         position = WindowPosition(Alignment.Center)
     )
     CustomWindow(
@@ -181,13 +192,6 @@ private fun ProgressWindow(
         )
         LaunchedEffect(Unit) {
             window.minimumSize = Dimension(defaultWidth.toInt(), defaultHeight.toInt())
-        }
-        val singleDownloadPageSizing = remember(showPartInfo) { SingleProgressDownloadPageSizing() }
-        var h = defaultHeight
-        var w = defaultWidth
-        if (showPartInfo) {
-            h += singleDownloadPageSizing.partInfoHeight.value
-                .applyUiScale(uiScale)
         }
         LaunchedEffect(w, h) {
             state.size = DpSize(
