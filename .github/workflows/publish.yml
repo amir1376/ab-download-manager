@@ -74,6 +74,16 @@ jobs:
             "ABDownloadManager.dmg" \
             desktop/app/build/compose/binaries/main-release/app/
 
+      - name: Move DMG to release directory
+        run: |
+          mv ABDownloadManager.dmg ./build/ci-release/
+
+      - name: Upload output to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./build/ci-release
+          name: app-macos
+
   release:
     runs-on: ubuntu-latest
     needs: [ "create-packages" ]
@@ -101,8 +111,8 @@ jobs:
           make_latest: legacy
           draft: true
           files: |
-            release/binaries/*
-            ABDownloadManager.dmg
+            release/app-macos/*
+            release/ABDownloadManager.dmg
           body_path: release/release-notes.md
 
       - name: "Remove artifacts to free space"
