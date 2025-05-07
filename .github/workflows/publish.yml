@@ -35,10 +35,11 @@ jobs:
             echo "PATH=$jdksPath/$extracted/Contents/Home/bin:$PATH" >> "$GITHUB_ENV"
           
           else
-            jdkFileName="jbrsdk-17.0.12-$os-b1207.37.tar.gz"
-            link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileName"
-            curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileName"
-            tar -xf "$jdksPath/$jdkFileName" -C "$jdksPath"
+            jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
+            jdkFileNameWithExt="$jdkFileName.tar.gz"
+            link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
+            curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileNameWithExt"
+            tar -xf "$jdksPath/$jdkFileNameWithExt" -C "$jdksPath"
             echo "JAVA_HOME=$jdksPath/$jdkFileName" >> "$GITHUB_ENV"
             echo "PATH=$jdksPath/$jdkFileName/bin:$PATH" >> "$GITHUB_ENV"
           fi
