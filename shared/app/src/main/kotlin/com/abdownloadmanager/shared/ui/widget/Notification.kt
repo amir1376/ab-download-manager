@@ -110,7 +110,7 @@ fun NotificationArea(
         itemsIndexed(list){index, item ->
             Spacer(Modifier.size(12.dp))
             RenderNotification(
-                Modifier.animateItemPlacement(),
+                Modifier.animateItem(),
                 item
             )
         }

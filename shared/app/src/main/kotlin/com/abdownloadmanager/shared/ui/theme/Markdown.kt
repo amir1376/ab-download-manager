@@ -1,6 +1,8 @@
 package com.abdownloadmanager.shared.ui.theme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
@@ -12,14 +14,17 @@ import com.mikepenz.markdown.model.DefaultMarkdownTypography
 
 @Composable
 fun myMarkdownColors(): DefaultMarkdownColors {
+    val currentColor = LocalContentColor.current
     return DefaultMarkdownColors(
-        text = LocalContentColor.current,
+        text = currentColor,
         linkText = myColors.info,
         codeText = myColors.onSurface,
         inlineCodeText = myColors.onSurface,
         codeBackground = myColors.surface,
-        dividerColor = LocalContentColor.current.copy(alpha = 0.1f),
+        dividerColor = currentColor.copy(alpha = 0.1f),
         inlineCodeBackground = myColors.surface,
+        tableText = currentColor,
+        tableBackground = Color.Transparent,
     )
 }
 
@@ -84,5 +89,11 @@ fun myMarkdownTypography(): DefaultMarkdownTypography {
         link = defaultTextStyle.copy(
             fontSize = myTextSizes.base,
         ),
+        textLink = TextLinkStyles(
+            style = defaultTextStyle.copy(
+                fontSize = myTextSizes.base,
+            ).toSpanStyle()
+        ),
+        table = defaultTextStyle,
     )
 }
