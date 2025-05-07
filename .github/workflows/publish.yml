@@ -20,32 +20,28 @@ jobs:
       - name: Setting up Jetbrains Runtime
         shell: bash
         run: |
-      - name: Setting up Jetbrains Runtime (for all OS)
-        shell: bash
-        run: |
           set -Eeuo pipefail
           jdksPath="$HOME/.jdks"
+          
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
-          
-          if [[ "$os" == "macos-x64" || "$os" == "macos-arm64" ]]; then
-            jdkFileName="jbrsdk-17.0.12-macos-x64-b1207.37.dmg"
-            link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileName"
-            echo "Downloading macOS JDK from $link"
-            curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileName"
-          
-            hdiutil attach "$jdksPath/$jdkFileName" -nobrowse -quiet
-            sudo cp -R /Volumes/JetBrains\ Runtime/JetBrains\ Runtime.app/Contents/Home "$jdksPath/"
-            hdiutil detach "/Volumes/JetBrains Runtime" -quiet
 
+          if [[ "${{ runner.os }}" == "macos" ]]; then
+            mkdir -p "$jdksPath"
+            link="https://download.oracle.com/java/17/archive/jdk-17.0.12_macos-x64_bin.tar.gz"
+            curl --location "$link" --output "$jdksPath/jdk.tar.gz"
+            tar -xf "$jdksPath/jdk.tar.gz" -C "$jdksPath"
+            extracted=$(ls "$jdksPath" | grep jdk-17)
+            echo "JAVA_HOME=$jdksPath/$extracted/Contents/Home" >> "$GITHUB_ENV"
+            echo "PATH=$jdksPath/$extracted/Contents/Home/bin:$PATH" >> "$GITHUB_ENV"
+          
           else
             jdkFileName="jbrsdk-17.0.12-$os-b1207.37.tar.gz"
             link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileName"
             curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileName"
             tar -xf "$jdksPath/$jdkFileName" -C "$jdksPath"
+            echo "JAVA_HOME=$jdksPath/$jdkFileName" >> "$GITHUB_ENV"
+            echo "PATH=$jdksPath/$jdkFileName/bin:$PATH" >> "$GITHUB_ENV"
           fi
-
-          echo "JAVA_HOME=$jdksPath/jbrsdk-17.0.12" >> "$GITHUB_ENV"
-          echo "PATH=$jdksPath/jbrsdk-17.0.12/bin:$PATH" >> "$GITHUB_ENV"
 
       - name: Cache Gradle Dependencies
         uses: actions/cache@v4
