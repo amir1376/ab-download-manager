@@ -12,6 +12,7 @@ import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
@@ -29,6 +30,8 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
 
     val openedAddDownloadDialogs = component.openedAddDownloadDialogs.collectAsState().value
     for (addDownloadComponent in openedAddDownloadDialogs) {
+        val shouldShowWindow by addDownloadComponent.shouldShowWindow.collectAsState()
+        if (!shouldShowWindow) return
         val onRequestClose = {
             component.closeAddDownloadDialog(addDownloadComponent.id)
         }

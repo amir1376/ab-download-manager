@@ -15,24 +15,24 @@ abstract class AddDownloadComponent(
     ctx: ComponentContext,
     val id: String,
 ) : BaseComponent(ctx), KoinComponent {
-    companion object{
+    companion object {
         const val lastLocationsCacheSize = 4
 
     }
 
     private var dialogUsed = false
-    protected fun consumeDialog(block:()->Unit){
-        if (dialogUsed){
+    protected fun consumeDialog(block: () -> Unit) {
+        if (dialogUsed) {
             return
         }
         block()
-        dialogUsed=true
+        dialogUsed = true
     }
 
-    val pageStatesStorage:PageStatesStorage by inject()
+    val pageStatesStorage: PageStatesStorage by inject()
     private val _lastUsedLocations = pageStatesStorage.lastUsedSaveLocations
     val lastUsedLocations: StateFlow<List<String>> = _lastUsedLocations.asStateFlow()
-    fun addToLastUsedLocations(saveLocation: String){
+    fun addToLastUsedLocations(saveLocation: String) {
         _lastUsedLocations.update {
             buildList {
                 add(saveLocation)
@@ -42,18 +42,23 @@ abstract class AddDownloadComponent(
                 .take(lastLocationsCacheSize)
         }
     }
+
+    abstract val shouldShowWindow: StateFlow<Boolean>
 }
 
 interface AddDownloadConfig {
     val id: String
+    val importOptions: ImportOptions
 
     data class SingleAddConfig(
         val credentials: DownloadCredentials = DownloadCredentials.empty(),
+        override val importOptions: ImportOptions = ImportOptions(),
         override val id: String = UUID.randomUUID().toString(),
     ) : AddDownloadConfig
 
     data class MultipleAddConfig(
         val links: List<DownloadCredentials> = emptyList(),
+        override val importOptions: ImportOptions = ImportOptions(),
         override val id: String = UUID.randomUUID().toString(),
     ) : AddDownloadConfig
 
