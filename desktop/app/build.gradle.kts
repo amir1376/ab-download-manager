@@ -93,8 +93,16 @@ dependencies {
 }
 
 aboutLibraries {
-    prettyPrint = true
-    registerAndroidTasks = false
+    export {
+        prettyPrint = true
+    }
+    android {
+        registerAndroidTasks = false
+    }
+    library {
+        duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+        duplicationRule = com.mikepenz.aboutlibraries.plugin.DuplicateRule.SIMPLE
+    }
 }
 
 tasks.processResources {
