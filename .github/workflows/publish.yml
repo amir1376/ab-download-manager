@@ -22,27 +22,14 @@ jobs:
         run: |
           set -Eeuo pipefail
           jdksPath="$HOME/.jdks"
-          
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
-
-          if [[ "${{ runner.os }}" == "macos" ]]; then
-            mkdir -p "$jdksPath"
-            link="https://download.oracle.com/java/17/archive/jdk-17.0.12_macos-x64_bin.tar.gz"
-            curl --location "$link" --output "$jdksPath/jdk.tar.gz"
-            tar -xf "$jdksPath/jdk.tar.gz" -C "$jdksPath"
-            extracted=$(ls "$jdksPath" | grep jdk-17)
-            echo "JAVA_HOME=$jdksPath/$extracted/Contents/Home" >> "$GITHUB_ENV"
-            echo "PATH=$jdksPath/$extracted/Contents/Home/bin:$PATH" >> "$GITHUB_ENV"
-          
-          else
-            jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
-            jdkFileNameWithExt="$jdkFileName.tar.gz"
-            link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
-            curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileNameWithExt"
-            tar -xf "$jdksPath/$jdkFileNameWithExt" -C "$jdksPath"
-            echo "JAVA_HOME=$jdksPath/$jdkFileName" >> "$GITHUB_ENV"
-            echo "PATH=$jdksPath/$jdkFileName/bin:$PATH" >> "$GITHUB_ENV"
-          fi
+          jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
+          jdkFileNameWithExt="$jdkFileName.tar.gz"
+          link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
+          curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileNameWithExt"
+          tar -xf "$jdksPath/$jdkFileNameWithExt" -C "$jdksPath"
+          echo "JAVA_HOME=$jdksPath/$jdkFileName" >> "$GITHUB_ENV"
+          echo "PATH=$jdksPath/$jdkFileName/bin:$PATH" >> "$GITHUB_ENV"
 
       - name: Cache Gradle Dependencies
         uses: actions/cache@v4
