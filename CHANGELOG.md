@@ -14,6 +14,22 @@
 
 ### Security
 
+## 1.5.7
+
+### Added
+
+- Drag and Drop files to other categories or external applications
+
+### Fixed
+
+- "Parts Info" section in the "Download Progress" window does not expand for the first time
+
+### Improved
+
+- Translations Updated
+- Improved UI rendering on Windows, resulting in higher FPS.
+- Minor UI/UX Improvements
+
 ## 1.5.6
 
 ### Added
