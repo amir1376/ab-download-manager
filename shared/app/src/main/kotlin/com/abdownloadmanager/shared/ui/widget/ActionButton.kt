@@ -34,7 +34,7 @@ fun ActionButton(
     start: (@Composable RowScope.() -> Unit)? = null,
     end: (@Composable RowScope.() -> Unit)? = null,
 ) {
-    val shape = RoundedCornerShape(10.dp)
+    val shape = RoundedCornerShape(6.dp)
     Row(
         modifier
             .border(1.dp, if (enabled) borderColor else disabledBorderColor, shape)
