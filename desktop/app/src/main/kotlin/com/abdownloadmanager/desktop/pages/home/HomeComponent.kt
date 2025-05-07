@@ -579,6 +579,12 @@ class HomeComponent(
         }
     }
 
+    fun moveItemsToCategory(category: Category, items: List<Long>) {
+        scope.launch {
+            categoryManager.addItemsToCategory(category.id, items)
+        }
+    }
+
 
     fun requestAddNewDownload(
         link: List<DownloadCredentials> = listOf(DownloadCredentials.empty()),

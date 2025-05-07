@@ -24,33 +24,31 @@ import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.delay
 
+private const val TooltipDelay = 500L
+
 @Composable
 fun Tooltip(
     tooltip: StringSource,
-    delayUntilShow: Long = 500,
+    delayUntilShow: Long = TooltipDelay,
     content: @Composable () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     var showHint by remember { mutableStateOf(false) }
     LaunchedEffect(isHovered) {
-        if (isHovered) {
-            delay(delayUntilShow)
-            showHint = true
-        } else {
-            showHint = false
-        }
+        showHint = isHovered
     }
     Column(
         modifier = Modifier
             .hoverable(interactionSource)
     ) {
         if (showHint) {
-            TooltipPopup(
+            DelayedTooltipPopup(
                 onRequestCloseShowHelpContent = {
                     showHint = false
                 },
                 content = tooltip.rememberString(),
+                delay = delayUntilShow,
             )
         }
         content()
@@ -87,5 +85,24 @@ fun TooltipPopup(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun DelayedTooltipPopup(
+    onRequestCloseShowHelpContent: () -> Unit,
+    content: String,
+    delay: Long = TooltipDelay,
+) {
+    var showPopup by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(delay)
+        showPopup = true
+    }
+    if (showPopup) {
+        TooltipPopup(
+            onRequestCloseShowHelpContent,
+            content,
+        )
     }
 }
