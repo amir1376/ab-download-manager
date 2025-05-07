@@ -293,7 +293,9 @@ val appPackageNameByComposePlugin
         "compose.desktop.application.nativeDistributions.packageName must not be null!"
     }
 
-val distributableAppArchiveDir: Provider<Directory> = project.layout.buildDirectory.dir("dist/archives")
+val distributableAppArchiveDir: Provider<Directory> =
+    project.layout.buildDirectory.dir("dist/archives")
+
 fun AbstractArchiveTask.fromAppImagePath() {
     from(tasks.named("createReleaseDistributable"))
     destinationDirectory.set(distributableAppArchiveDir)

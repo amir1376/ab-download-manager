@@ -12,7 +12,7 @@ jobs:
   create-packages:
     strategy:
       matrix:
-        os: [ "ubuntu-latest" , "windows-latest" ]
+        os: [ "ubuntu-latest" , "windows-latest", "macos-latest" ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -59,9 +59,29 @@ jobs:
           path: ./build/ci-release
           name: app-${{ matrix.os }}
 
+      - name: Install create-dmg for macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install create-dmg
+
+      - name: Create DMG for macOS
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          create-dmg \
+            --volname "ABDownloadManager" \
+            --background "desktop/app/resources/installer/dmg_background.png" \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "ABDownloadManager.app" 100 150 \
+            --app-drop-link 450 150 \
+            "ABDownloadManager.dmg" \
+            desktop/app/build/compose/binaries/main-release/app/
+
   release:
     runs-on: "ubuntu-latest"
-    needs: ["create-packages"]
+    needs: [ "create-packages" ]
     steps:
       - uses: "actions/download-artifact@v4"
         name: "Download All Artifacts Into One Directory"
@@ -86,6 +106,7 @@ jobs:
           draft: true
           files: |
             release/binaries/*
+            ABDownloadManager.dmg
           body_path: release/release-notes.md
       - name: "Remove artifacts to free space"
         uses: geekyeggo/delete-artifact@v5
