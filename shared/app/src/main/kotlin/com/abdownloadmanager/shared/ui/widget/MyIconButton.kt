@@ -35,7 +35,7 @@ fun IconActionButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(10.dp)
+    val shape = RoundedCornerShape(6.dp)
     Box(
         modifier
             .ifThen(!enabled) {
