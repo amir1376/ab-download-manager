@@ -92,7 +92,8 @@ jobs:
             "ABDownloadManager.dmg" \
             desktop/app/build/compose/binaries/main-release/app/
 
-      - name: Prepare release folder and upload output to artifacts
+      - name: Prepare release folder and upload output to artifacts (for macOS)
+        if: matrix.os == 'macos-latest'
         run: |
           mkdir -p release
           cp -r build/ci-release/* release/ || true
