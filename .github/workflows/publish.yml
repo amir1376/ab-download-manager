@@ -11,13 +11,13 @@ jobs:
   create-packages:
     strategy:
       matrix:
-        os: [ "macos-latest", "ubuntu-latest", "windows-latest" ]
+        os: [ "ubuntu-latest", "windows-latest", "macos-latest" ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setting up Jetbrains Runtime (for all OS)
+      - name: Setting up Jetbrains Runtime
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -86,11 +86,12 @@ jobs:
           cp -r build/ci-release/* release/ || true
           cp ABDownloadManager.dmg release/
 
-      - name: Upload output to artifacts
+      - name: Upload release artifacts
         uses: actions/upload-artifact@v4
+        if: matrix.os == 'macos-latest'
         with:
           path: release
-          name: app-${{ matrix.os }}
+          name: app-macos
 
   release:
     runs-on: "ubuntu-latest"
