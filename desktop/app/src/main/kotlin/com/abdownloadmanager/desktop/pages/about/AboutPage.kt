@@ -303,9 +303,9 @@ private fun AboutPageListItemButton(
     val shape = RoundedCornerShape(6.dp)
     Row(
         modifier
-            .clickable(onClick = onClick)
             .border(1.dp, myColors.onBackground / 0.15f, shape)
             .clip(shape)
+            .clickable(onClick = onClick)
             .background(myColors.surface / 0.5f)
             .padding(
                 horizontal = 8.dp,
