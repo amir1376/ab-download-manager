@@ -33,6 +33,7 @@ import org.koin.core.component.inject
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.CategoryItem
 import com.abdownloadmanager.shared.utils.category.CategoryManager
+import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import kotlinx.coroutines.*
@@ -48,6 +49,7 @@ class AddSingleDownloadComponent(
     val onRequestAddToQueue: OnRequestAddSingleItem,
     val onRequestAddCategory: () -> Unit,
     val openExistingDownload: (Long) -> Unit,
+    val updateExistingDownloadCredentials: (Long, IDownloadCredentials) -> Unit,
     private val downloadItemOpener: DownloadItemOpener,
     id: String,
 ) : AddDownloadComponent(ctx, id),
@@ -406,6 +408,14 @@ class AddSingleDownloadComponent(
             ?.itemId
             ?.let {
                 openExistingDownload(it)
+            }
+    }
+
+    fun updateDownloadCredentialsOfOriginalDownload() {
+        (canAddResult.value as? CanAddResult.DownloadAlreadyExists)
+            ?.itemId
+            ?.let {
+                updateExistingDownloadCredentials(it, downloadItem.value)
             }
     }
 
