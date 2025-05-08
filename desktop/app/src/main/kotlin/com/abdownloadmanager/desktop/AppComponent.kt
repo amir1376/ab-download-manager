@@ -49,6 +49,7 @@ import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.CategorySelectionMode
 import com.abdownloadmanager.shared.utils.subscribeAsStateFlow
 import com.arkivanov.decompose.childContext
+import ir.amirab.downloader.downloaditem.withCredentials
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
 import ir.amirab.util.compose.StringSource
@@ -289,6 +290,15 @@ class AppComponent(
                             closeAddDownloadDialog(config.id)
                         },
                         downloadItemOpener = this,
+                        updateExistingDownloadCredentials = { id, newCredentials ->
+                            scope.launch {
+                                downloadSystem.downloadManager.updateDownloadItem(id) {
+                                    it.withCredentials(newCredentials)
+                                }
+                                closeAddDownloadDialog(config.id)
+                                openDownloadDialog(id)
+                            }
+                        },
                         id = config.id
                     ).also {
                         it.setCredentials(config.credentials)
