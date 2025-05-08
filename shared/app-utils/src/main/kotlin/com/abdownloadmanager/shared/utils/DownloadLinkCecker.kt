@@ -4,6 +4,7 @@ import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import java.io.File
 
 sealed interface CanAddResult {
     data class DownloadAlreadyExists(val itemId: Long) : CanAddResult
@@ -64,11 +65,10 @@ class AddDownloadChecker(
         }
         val name = name.value
         val folder = folder.value
-        val items = downloadSystem
-            .getDownloadItemByLink(link)
-            .filter {
-                it.name == name
-            }
+        val file = File(folder, name)
+        val items = downloadSystem.getDownloadItemsBy {
+            file == downloadSystem.getDownloadFile(it)
+        }
 
 //        val fileExists = File(folder, name).exists()
 
