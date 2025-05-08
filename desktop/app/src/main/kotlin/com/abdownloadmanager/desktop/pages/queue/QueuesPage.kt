@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +44,9 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.*
-import org.burnoutcrew.reorderable.*
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.ReorderableLazyListState
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 
 @Composable
@@ -191,7 +194,9 @@ fun RenderQueueItems(
     val queueModel by component.downloadQueue.queueModel.collectAsState()
     val downloadItems by component.downloadQueueItems.collectAsState()
     val selectedIds by component.selectedListItems.collectAsState()
+    val lazyListState = rememberLazyListState()
     val state = rememberReorderableLazyListState(
+        lazyListState,
         onMove = { from, to ->
             component.swapItem(from.index, to.index)
         }
@@ -199,11 +204,10 @@ fun RenderQueueItems(
 
     Column(modifier) {
         LazyColumn(
-            state = state.listState,
+            state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .weight(1f)
-                .reorderable(state)
         ) {
             itemsIndexed(downloadItems,
                 key = { _, item -> item.id }
@@ -284,7 +288,7 @@ private fun LazyItemScope.RenderQueueItem(
                         }
                     ).value
                 )
-                .detectReorder(state)
+                .draggableHandle()
         ) {
             NavigateableItem(
                 isSelected = isSelected,
