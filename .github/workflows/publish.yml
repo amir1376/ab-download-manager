@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ "ubuntu-latest" , "windows-latest", "macos-latest" ]
+        arch: [ "x64", "arm64" ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -25,7 +26,7 @@ jobs:
           jdksPath="$HOME/.jdks"
           mkdir -p "$jdksPath"
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
-          if [[ "$os" == "macos-arm64" ]]; then
+          if [[ "$os" == "macos-arm64" ]] || [[ "$os" == "macos-x64" ]]; then
             jdkFileName="jbrsdk-17.0.11-osx-aarch64-b1312.2"
             extracted="$jdkFileName"
             javaHome="$jdksPath/$extracted/Contents/Home"
