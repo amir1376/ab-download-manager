@@ -57,6 +57,8 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -744,8 +746,8 @@ class AppComponent(
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
         categorySelectionMode: CategorySelectionMode?,
         queueId: Long?,
-    ) {
-        scope.launch {
+    ): Deferred<Long> {
+        scope.async {
             downloadSystem.addDownload(
                 newItemsToAdd = items,
                 onDuplicateStrategy = onDuplicateStrategy,
