@@ -63,9 +63,8 @@ abstract class InstallerPluginExtension {
 
     fun isThisPlatformSupported() = when (Platform.getCurrentPlatform()) {
         Platform.Desktop.Windows -> windowsConfig != null
-        else -> {
-            false
-        }
+        Platform.Desktop.MacOS -> macosConfig != null
+        else -> false
     }
 
     fun getCreatedInstallerTargetFormats(): List<InstallerTargetFormat> {
@@ -74,6 +73,12 @@ abstract class InstallerPluginExtension {
                 Platform.Desktop.Windows -> {
                     if (windowsConfig != null) {
                         add(InstallerTargetFormat.Exe)
+                    }
+                }
+
+                Platform.Desktop.MacOS -> {
+                    if (macosConfig != null) {
+                        add(InstallerTargetFormat.Dmg)
                     }
                 }
 
