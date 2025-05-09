@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
@@ -21,7 +20,6 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -48,6 +46,8 @@ import com.jetbrains.WindowMove
 import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.desktop.screen.applyUiScale
 import ir.amirab.util.ifThen
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -286,11 +286,13 @@ private fun FrameWindowScope.FrameContent(
     onRequestToggleMaximize: (() -> Unit)?,
     onRequestClose: () -> Unit,
 ) {
-    Row(
-        modifier
+    TitleBarContentWithSystemButtons(
+        modifier = modifier
             .fillMaxWidth()
             .height(getPlatformTitleBarHeight()),
-        verticalAlignment = Alignment.CenterVertically,
+        onRequestMinimize = onRequestMinimize,
+        onRequestToggleMaximize = onRequestToggleMaximize,
+        onRequestClose = onRequestClose
     ) {
         Row(
             Modifier.weight(1f),
@@ -356,11 +358,6 @@ private fun FrameWindowScope.FrameContent(
                 }
             }
         }
-        WindowsActionButtons(
-            onRequestClose,
-            onRequestMinimize,
-            onRequestToggleMaximize,
-        )
     }
 }
 
