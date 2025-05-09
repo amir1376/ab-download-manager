@@ -26,11 +26,11 @@ jobs:
           mkdir -p "$jdksPath"
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
           if [[ "$os" == "macos-arm64" ]]; then
-            jdkFileName="jbr-17.0.14-osx-aarch64-b1367.22"
+            jdkFileName="jbrsdk-17.0.14-osx-aarch64-b1367.22"
             extracted="$jdkFileName"
             javaHome="$jdksPath/$extracted/Contents/Home"
           elif [[ "$os" == "macos-x64" ]]; then
-            jdkFileName="jbr-17.0.14-osx-x64-b1367.22"
+            jdkFileName="jbrsdk-17.0.14-osx-x64-b1367.22"
             extracted="$jdkFileName"
             javaHome="$jdksPath/$extracted/Contents/Home"
           else
