@@ -57,6 +57,8 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -311,7 +313,7 @@ class AppComponent(
                         id = config.id,
                         onRequestClose = { closeAddDownloadDialog(config.id) },
                         onRequestAdd = { items, strategy, queueId, categorySelectionMode ->
-                            addDownload(
+                            addDownloads(
                                 items = items,
                                 onDuplicateStrategy = strategy,
                                 queueId = queueId,
@@ -739,13 +741,13 @@ class AppComponent(
         }
     }
 
-    fun addDownload(
+    fun addDownloads(
         items: List<DownloadItem>,
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
         categorySelectionMode: CategorySelectionMode?,
         queueId: Long?,
-    ) {
-        scope.launch {
+    ): Deferred<List<Long>> {
+        return scope.async {
             downloadSystem.addDownload(
                 newItemsToAdd = items,
                 onDuplicateStrategy = onDuplicateStrategy,
@@ -760,8 +762,8 @@ class AppComponent(
         queueId: Long?,
         categoryId: Long?,
         onDuplicateStrategy: OnDuplicateStrategy,
-    ) {
-        scope.launch {
+    ): Deferred<Long> {
+        return scope.async {
             downloadSystem.addDownload(
                 downloadItem = item,
                 onDuplicateStrategy = onDuplicateStrategy,
@@ -775,16 +777,15 @@ class AppComponent(
         item: DownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
         categoryId: Long?,
-    ) {
-        scope.launch {
-            val id = downloadSystem.addDownload(
+    ): Deferred<Long> {
+        return scope.async {
+            downloadSystem.addDownload(
                 downloadItem = item,
                 onDuplicateStrategy = onDuplicateStrategy,
                 queueId = DefaultQueueInfo.ID,
                 categoryId = categoryId,
-            )
-            launch {
-                downloadSystem.manualResume(id)
+            ).also {
+                downloadSystem.manualResume(it)
             }
         }
     }

@@ -393,10 +393,11 @@ class AddSingleDownloadComponent(
                 queueId = queueId,
                 onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
                 categoryId = getCategoryIfUseCategoryIsOn()?.id,
-            )
-            if (queueId != null && startQueue) {
-                GlobalScope.launch {
-                    downloadSystem.startQueue(queueId)
+            ).invokeOnCompletion {
+                if (queueId != null && startQueue) {
+                    GlobalScope.launch {
+                        downloadSystem.startQueue(queueId)
+                    }
                 }
             }
             onRequestClose()
@@ -456,7 +457,7 @@ fun interface OnRequestAddSingleItem {
         queueId: Long?,
         onDuplicateStrategy: OnDuplicateStrategy,
         categoryId: Long?,
-    )
+    ): Deferred<Long>
 }
 
 fun interface OnRequestDownloadSingleItem {
