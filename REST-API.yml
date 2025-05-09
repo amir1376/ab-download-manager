@@ -16,19 +16,21 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                link:
-                  type: string
-                  description: The link to the download source
-                headers:
-                  type: object
-                  additionalProperties:
+              type: array
+              items:
+                type: object
+                properties:
+                  link:
                     type: string
-                  description: Optional headers for the request
-                downloadPage:
-                  type: string
-                  description: Optional download page URL
+                    description: The link to the download source
+                  headers:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Optional headers for the request
+                  downloadPage:
+                    type: string
+                    description: Optional download page URL
       responses:
         "200":
           description: Successfully added the download
