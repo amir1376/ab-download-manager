@@ -313,7 +313,7 @@ class AppComponent(
                         id = config.id,
                         onRequestClose = { closeAddDownloadDialog(config.id) },
                         onRequestAdd = { items, strategy, queueId, categorySelectionMode ->
-                            addDownload(
+                            addDownloads(
                                 items = items,
                                 onDuplicateStrategy = strategy,
                                 queueId = queueId,
@@ -741,7 +741,7 @@ class AppComponent(
         }
     }
 
-    fun addDownload(
+    fun addDownloads(
         items: List<DownloadItem>,
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
         categorySelectionMode: CategorySelectionMode?,
