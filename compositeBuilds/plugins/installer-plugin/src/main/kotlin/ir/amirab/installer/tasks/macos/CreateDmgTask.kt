@@ -50,6 +50,9 @@ abstract class CreateDmgTask : DefaultTask() {
     @get:InputFile
     abstract val backgroundImage: Property<File>
 
+    @get:InputFile
+    abstract val licenseFile: Property<File>
+
     @get:Input
     abstract val outputFileName: Property<String>
 
@@ -85,7 +88,8 @@ abstract class CreateDmgTask : DefaultTask() {
             "window_height" to windowHeight.get(),
             "icons_y" to iconsY.get(),
             "app_offset_x" to appOffsetX.get(),
-            "folder_offset_x" to folderOffsetX.get()
+            "folder_offset_x" to folderOffsetX.get(),
+            "license_file" to licenseFile.get().absolutePath
         )
     }
 
@@ -108,6 +112,7 @@ abstract class CreateDmgTask : DefaultTask() {
             append("--background \"${context["background_image"]}\" ")
             append("--icon \"${context["icon_file"]}\" ${context["app_offset_x"]} ${context["icons_y"]} ")
             append("--app-drop-link ${context["folder_offset_x"]} ${context["icons_y"]} ")
+            append("--eula ${context["license_file"]} ")
             append("\"${context["output_file"]}\" ")
             append("\"${context["input_dir"]}\"")
         }

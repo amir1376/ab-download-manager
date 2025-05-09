@@ -203,6 +203,7 @@ installerPlugin {
         appFileName = "${getAppName()}.app"
         backgroundImage = project.file("resources/installer/dmg_background.png")
         outputFileName = getAppName()
+        licenseFile = rootProject.file("LICENSE")
     }
 }
 

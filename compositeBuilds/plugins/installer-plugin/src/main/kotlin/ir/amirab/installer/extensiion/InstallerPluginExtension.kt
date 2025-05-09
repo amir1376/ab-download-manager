@@ -112,6 +112,7 @@ data class MacosConfig(
     var inputDir: File? = null,
     var iconSize: Int = 100,
     var backgroundImage: File? = null,
+    var licenseFile: File? = null,
     val windowWidth: Int = 600,
     val windowHeight: Int = 400,
     val iconsY: Int = 150,
