@@ -26,8 +26,8 @@ jobs:
           mkdir -p "$jdksPath"
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
           if [[ "$os" == "macos-arm64" ]]; then
-            jdkFileName="jbr-17.0.14-osx-aarch64-b1367.22"
-            extracted="jbr-17.0.14-osx-aarch64-b1367.22"
+            jdkFileName="jbrsdk-17.0.11-osx-aarch64-b1312.2"
+            extracted="$jdkFileName"
             javaHome="$jdksPath/$extracted/Contents/Home"
           else
             jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
