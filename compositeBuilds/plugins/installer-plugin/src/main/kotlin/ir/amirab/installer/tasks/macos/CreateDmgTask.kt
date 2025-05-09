@@ -42,9 +42,6 @@ abstract class CreateDmgTask : DefaultTask() {
     abstract val folderOffsetX: Property<Int>
 
     @get:Input
-    abstract val appVersion: Property<String>
-
-    @get:Input
     abstract val appFileName: Property<String>
 
     @get:InputFile

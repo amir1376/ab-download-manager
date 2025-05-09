@@ -104,14 +104,11 @@ data class WindowsConfig(
 
 data class MacosConfig(
     var appName: String? = null,
-    var appDisplayName: String? = null,
-    var appVersion: String? = null,
-    var appDisplayVersion: String? = null,
     var appFileName: String? = null,
     var outputFileName: String? = null,
     var inputDir: File? = null,
-    var iconSize: Int = 100,
     var backgroundImage: File? = null,
+    var iconSize: Int = 100,
     var licenseFile: File? = null,
     val windowWidth: Int = 600,
     val windowHeight: Int = 400,

@@ -46,7 +46,6 @@ class InstallerPlugin : Plugin<Project> {
                 .configure {
                     dependsOn(extension.taskDependencies.toTypedArray())
                     this.appName.set(requireNotNull(macosConfig.appName) { "appName not provided" })
-                    this.appVersion.set(requireNotNull(macosConfig.appVersion) { "appVersion not provided" })
                     this.appFileName.set(requireNotNull(macosConfig.appFileName) { "iconFile not provided" })
                     this.backgroundImage.set(requireNotNull(macosConfig.backgroundImage) { "backgroundImage not provided" })
                     this.outputFileName.set(requireNotNull(macosConfig.outputFileName) { "outputFileName not provided" })

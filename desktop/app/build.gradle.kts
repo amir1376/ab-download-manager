@@ -196,9 +196,6 @@ installerPlugin {
     }
     macos {
         appName = getAppName()
-        appDisplayName = getPrettifiedAppName()
-        appVersion = getAppVersionStringForPackaging(Dmg)
-        appDisplayVersion = getAppVersionString()
         inputDir = project.file("build/compose/binaries/main-release/app/")
         appFileName = "${getAppName()}.app"
         backgroundImage = project.file("resources/installer/dmg_background.png")
