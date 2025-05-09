@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.utils
 
+import ir.amirab.downloader.utils.DuplicateFilterByPath
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
@@ -66,9 +67,9 @@ class AddDownloadChecker(
         val name = name.value
         val folder = folder.value
         val file = File(folder, name)
-        val items = downloadSystem.getDownloadItemsBy {
-            file == downloadSystem.getDownloadFile(it)
-        }
+        val duplicateFilterByPath = DuplicateFilterByPath(file)
+        val items = downloadSystem
+            .getDownloadItemsBy(duplicateFilterByPath::isDuplicate)
 
 //        val fileExists = File(folder, name).exists()
 

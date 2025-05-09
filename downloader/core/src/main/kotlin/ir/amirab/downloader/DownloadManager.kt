@@ -7,6 +7,7 @@ import ir.amirab.downloader.downloaditem.*
 import ir.amirab.downloader.downloaditem.contexts.DuplicateRemoval
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.part.Part
+import ir.amirab.downloader.utils.DuplicateFilterByPath
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.downloader.utils.FileNameUtil
 import ir.amirab.downloader.utils.IDiskStat
@@ -81,9 +82,8 @@ class DownloadManager(
 //        thisLogger().info("adding download")
         val job = dbAddSync.withLock {
             val allDownloads = dlListDb.getAll()
-            val foundItems = allDownloads.filter {
-                it.link == newItem.link && it.name == newItem.name
-            }
+            val duplicateFinder = DuplicateFilterByPath(File(newItem.folder, newItem.name))
+            val foundItems = allDownloads.filter(duplicateFinder::isDuplicate)
             var removedItems = emptyList<DownloadItem>()
             if (foundItems.isNotEmpty()) {
                 when (onDuplicateStrategy) {
