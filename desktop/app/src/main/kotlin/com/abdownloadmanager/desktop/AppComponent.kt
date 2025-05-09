@@ -746,8 +746,8 @@ class AppComponent(
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
         categorySelectionMode: CategorySelectionMode?,
         queueId: Long?,
-    ): Deferred<Long> {
-        scope.async {
+    ): Deferred<List<Long>> {
+        return scope.async {
             downloadSystem.addDownload(
                 newItemsToAdd = items,
                 onDuplicateStrategy = onDuplicateStrategy,
@@ -762,8 +762,8 @@ class AppComponent(
         queueId: Long?,
         categoryId: Long?,
         onDuplicateStrategy: OnDuplicateStrategy,
-    ) {
-        scope.launch {
+    ): Deferred<Long> {
+        return scope.async {
             downloadSystem.addDownload(
                 downloadItem = item,
                 onDuplicateStrategy = onDuplicateStrategy,
@@ -777,16 +777,15 @@ class AppComponent(
         item: DownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
         categoryId: Long?,
-    ) {
-        scope.launch {
-            val id = downloadSystem.addDownload(
+    ): Deferred<Long> {
+        return scope.async {
+            downloadSystem.addDownload(
                 downloadItem = item,
                 onDuplicateStrategy = onDuplicateStrategy,
                 queueId = DefaultQueueInfo.ID,
                 categoryId = categoryId,
-            )
-            launch {
-                downloadSystem.manualResume(id)
+            ).also {
+                downloadSystem.manualResume(it)
             }
         }
     }
