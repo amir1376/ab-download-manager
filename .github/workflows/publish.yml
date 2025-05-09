@@ -26,7 +26,7 @@ jobs:
           mkdir -p "$jdksPath"
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
           if [[ "$os" == "macos-arm64" ]]; then
-            jdkFileName="jbr_jcef-17.0.14-osx-aarch64-b1367.22"
+            jdkFileName="jbr-17.0.14-osx-aarch64-b1367.22"
             extracted="jbr_jcef-17.0.14-osx-aarch64-b1367.22"
             echo "JAVA_HOME=$jdksPath/$extracted/Contents/Home" >> "$GITHUB_ENV"
             echo "PATH=$jdksPath/$extracted/Contents/Home/bin:$PATH" >> "$GITHUB_ENV"
