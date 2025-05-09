@@ -57,7 +57,7 @@ jobs:
 
       # Steps specific to macOS (to create DMG for macOS)
       - name: Install create-dmg (for macOS)
-        if: matrix.os == 'macos-latest'
+        if: startsWith(matrix.os, 'macos-')
         run: |
           brew install create-dmg
 
