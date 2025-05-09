@@ -4,6 +4,7 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+*"
   workflow_dispatch:
 
+
 permissions:
   contents: write
 
@@ -11,7 +12,7 @@ jobs:
   create-packages:
     strategy:
       matrix:
-        os: [ "ubuntu-latest", "windows-latest", "macos-latest" ]
+        os: [ "ubuntu-latest" , "windows-latest", "macos-latest" ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -21,27 +22,23 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
+
           jdksPath="$HOME/.jdks"
           os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
+          jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
+          jdkFileNameWithExt="$jdkFileName.tar.gz"
+          link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
 
-          if [[ "$os" == "macos-x64" || "$os" == "macos-arm64" ]]; then
-            mkdir -p "$jdksPath"
-            link="https://download.oracle.com/java/17/archive/jdk-17.0.12_macos-x64_bin.tar.gz"
-            curl --location "$link" --output "$jdksPath/jdk.tar.gz"
-            tar -xf "$jdksPath/jdk.tar.gz" -C "$jdksPath"
-            extracted=$(ls "$jdksPath" | grep jdk-17)
-            echo "JAVA_HOME=$jdksPath/$extracted/Contents/Home" >> "$GITHUB_ENV"
-            echo "PATH=$jdksPath/$extracted/Contents/Home/bin:$PATH" >> "$GITHUB_ENV"
+          echo "Detected OS and Arch: $os"
+          echo "JDK filename: $jdkFileNameWithExt"
+          echo "Download link: $link"
 
-          else
-            jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
-            jdkFileNameWithExt="$jdkFileName.tar.gz"
-            link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
-            curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileNameWithExt"
-            tar -xf "$jdksPath/$jdkFileNameWithExt" -C "$jdksPath"
-            echo "JAVA_HOME=$jdksPath/$jdkFileName" >> "$GITHUB_ENV"
-            echo "PATH=$jdksPath/$jdkFileName/bin:$PATH" >> "$GITHUB_ENV"
-          fi
+          curl --location "$link" --create-dirs --output "$jdksPath/$jdkFileNameWithExt"
+          tar -xf "$jdksPath/$jdkFileNameWithExt" -C "$jdksPath"
+
+          echo "JAVA_HOME=$jdksPath/$jdkFileName" >> "$GITHUB_ENV"
+          echo "PATH=$jdksPath/$jdkFileName/bin:$PATH" >> "$GITHUB_ENV"
+
 
       - name: Cache Gradle Dependencies
         uses: actions/cache@v4
@@ -52,8 +49,15 @@ jobs:
           key: ${{ matrix.os }}-gradle
           enableCrossOsArchive: true
 
+      # Steps specific to macOS (to create DMG for macOS)
+      - name: Install create-dmg (for macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install create-dmg
+
       - name: Gradle
-        run: ./gradlew
+        run: |
+          ./gradlew
         shell: "bash"
 
       - name: Build package for current OS using gradle
@@ -71,40 +75,6 @@ jobs:
         with:
           path: ./build/ci-release
           name: app-${{ matrix.os }}
-
-      # Steps specific to macOS (to create DMG for macOS)
-      - name: Install create-dmg (for macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install create-dmg
-
-      - name: Create DMG (for macOS)
-        if: matrix.os == 'macos-latest'
-        shell: bash
-        run: |
-          create-dmg \
-            --volname "ABDownloadManager" \
-            --background "desktop/app/resources/installer/dmg_background.png" \
-            --window-size 600 400 \
-            --icon-size 100 \
-            --icon "ABDownloadManager.app" 100 150 \
-            --app-drop-link 450 150 \
-            "ABDownloadManager.dmg" \
-            desktop/app/build/compose/binaries/main-release/app/
-
-      - name: Prepare release folder and upload output to artifacts (for macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          mkdir -p release
-          cp -r build/ci-release/* release/ || true
-          cp ABDownloadManager.dmg release/
-
-      - name: Upload release artifacts
-        uses: actions/upload-artifact@v4
-        if: matrix.os == 'macos-latest'
-        with:
-          path: release
-          name: app-macos
 
   release:
     runs-on: "ubuntu-latest"
@@ -126,7 +96,6 @@ jobs:
       - name: "Show the output tree of release"
         run: |
           tree .
-
       - uses: softprops/action-gh-release@v2
         with:
           prerelease: ${{ !steps.version.outputs.is_stable }}
@@ -134,9 +103,7 @@ jobs:
           draft: true
           files: |
             release/binaries/*
-            release/ABDownloadManager.dmg
           body_path: release/release-notes.md
-
       - name: "Remove artifacts to free space"
         uses: geekyeggo/delete-artifact@v5
         with:
