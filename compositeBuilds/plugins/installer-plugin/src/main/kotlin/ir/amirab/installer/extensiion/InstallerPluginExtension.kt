@@ -26,6 +26,9 @@ abstract class InstallerPluginExtension {
     internal var windowsConfig: WindowsConfig? = null
         private set
 
+    internal var macosConfig: MacosConfig? = null
+        private set
+
     fun windows(
         config: WindowsConfig.() -> Unit
     ) {
@@ -38,6 +41,20 @@ abstract class InstallerPluginExtension {
             this.windowsConfig!!
         }
         windowsConfig.config()
+    }
+
+    fun macos(
+        config: MacosConfig.() -> Unit
+    ) {
+        if (Platform.getCurrentPlatform() != Platform.Desktop.MacOS) return
+        val macosConfig = if (this.macosConfig == null) {
+            MacosConfig().also {
+                this.macosConfig = it
+            }
+        } else {
+            this.macosConfig!!
+        }
+        macosConfig.config()
     }
 
     val createInstallerTask: TaskProvider<Task> by lazy {
@@ -84,3 +101,20 @@ data class WindowsConfig(
     var extraParams: Map<String, Any> = emptyMap()
 ) : Serializable
 
+
+data class MacosConfig(
+    var appName: String? = null,
+    var appDisplayName: String? = null,
+    var appVersion: String? = null,
+    var appDisplayVersion: String? = null,
+    var appFileName: String? = null,
+    var outputFileName: String? = null,
+    var inputDir: File? = null,
+    var iconSize: Int = 100,
+    var backgroundImage: File? = null,
+    val windowWidth: Int = 600,
+    val windowHeight: Int = 400,
+    val iconsY: Int = 150,
+    val appOffsetX: Int = 100,
+    val folderOffsetX: Int = 450,
+) : Serializable

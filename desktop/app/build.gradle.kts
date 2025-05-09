@@ -193,7 +193,16 @@ installerPlugin {
             "header_image_file" to project.file("resources/installer/abdm-header-image.bmp"),
             "sidebar_image_file" to project.file("resources/installer/abdm-sidebar-image.bmp")
         )
-
+    }
+    macos {
+        appName = getAppName()
+        appDisplayName = getPrettifiedAppName()
+        appVersion = getAppVersionStringForPackaging(Dmg)
+        appDisplayVersion = getAppVersionString()
+        inputDir = project.file("build/compose/binaries/main-release/app/")
+        appFileName = "${getAppName()}.app"
+        backgroundImage = project.file("resources/installer/dmg_background.png")
+        outputFileName = getAppName()
     }
 }
 
