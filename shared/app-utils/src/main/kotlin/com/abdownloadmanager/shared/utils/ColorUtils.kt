@@ -26,8 +26,9 @@ value class HSLColor(val hsl: FloatArray) {
     constructor(hue: Float, saturation: Float, laminate: Float) : this(
         floatArrayOf(hue, saturation, laminate)
     )
+
     constructor(hue: Int, saturation: Float, laminate: Float) : this(
-        floatArrayOf(hue/360f, saturation, laminate)
+        floatArrayOf(hue / 360f, saturation, laminate)
     )
 
     fun copy(): HSLColor {
@@ -37,9 +38,11 @@ value class HSLColor(val hsl: FloatArray) {
     override fun toString(): String {
         return """HSLColor( hue=$hue , saturation=$saturation , laminate=$laminate )"""
     }
-    fun getHueInt():Int{
-        return (hue*360).toInt()
+
+    fun getHueInt(): Int {
+        return (hue * 360).toInt()
     }
+
     fun setHue(value: Int) {
         val h = value.coerceIn(0..360)
         hue = h / 360f
@@ -71,8 +74,8 @@ fun Color.toHsl(): HSLColor {
     val g = color.green
     val b = color.blue
 
-    val max = Math.max(r, Math.max(g, b))
-    val min = Math.min(r, Math.min(g, b))
+    val max = maxOf(r, g, b)
+    val min = minOf(r, g, b)
     hsl[2] = (max + min) / 2
 
     if (max == min) {
