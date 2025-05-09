@@ -33,8 +33,8 @@ jobs:
           else
             jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
             extracted="$jdkFileName"
-            echo "JAVA_HOME=$jdksPath/$extracted" >> "$GITHUB_ENV"
-            echo "PATH=$jdksPath/$extracted/bin:$PATH" >> "$GITHUB_ENV"
+            echo "JAVA_HOME=$jdksPath/$jdkFileName" >> "$GITHUB_ENV"
+            echo "PATH=$jdksPath/$jdkFileName/bin:$PATH" >> "$GITHUB_ENV"
           fi
           jdkFileNameWithExt="$jdkFileName.tar.gz"
           link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
