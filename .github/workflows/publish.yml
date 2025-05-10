@@ -18,33 +18,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setting up JetBrains Runtime
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          jdksPath="$HOME/.jdks"
-          mkdir -p "$jdksPath"
-          os=$(echo "${{ runner.os }}-${{ runner.arch }}" | tr "[:upper:]" "[:lower:]")
-          if [[ "$os" == "macos-arm64" ]]; then
-            jdkFileName="jbrsdk-17.0.14-osx-aarch64-b1367.22"
-            extracted="$jdkFileName"
-            javaHome="$jdksPath/$extracted/Contents/Home"
-          elif [[ "$os" == "macos-x64" ]]; then
-            jdkFileName="jbrsdk-17.0.14-osx-x64-b1367.22"
-            extracted="$jdkFileName"
-            javaHome="$jdksPath/$extracted/Contents/Home"
-          else
-            jdkFileName="jbrsdk-17.0.12-$os-b1207.37"
-            extracted="$jdkFileName"
-            javaHome="$jdksPath/$extracted"
-          fi
-          jdkFileNameWithExt="$jdkFileName.tar.gz"
-          link="https://cache-redirector.jetbrains.com/intellij-jbr/$jdkFileNameWithExt"
-          echo "Downloading: $link"
-          curl --fail --silent --location "$link" --output "$jdksPath/$jdkFileNameWithExt"
-          tar -xf "$jdksPath/$jdkFileNameWithExt" -C "$jdksPath"
-          echo "JAVA_HOME=$javaHome" >> "$GITHUB_ENV"
-          echo "$javaHome/bin" >> "$GITHUB_PATH"
+      - name: Set up JBR 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-package: "jdk"
+          java-version: '17.0.14'
 
       - name: Cache Gradle Dependencies
         uses: actions/cache@v4
