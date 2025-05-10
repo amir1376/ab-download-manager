@@ -42,6 +42,12 @@ abstract class CreateDmgTask : DefaultTask() {
     abstract val folderOffsetX: Property<Int>
 
     @get:Input
+    abstract val windowX: Property<Int>
+
+    @get:Input
+    abstract val windowY: Property<Int>
+
+    @get:Input
     abstract val appFileName: Property<String>
 
     @get:InputFile
@@ -86,6 +92,8 @@ abstract class CreateDmgTask : DefaultTask() {
             "icons_y" to iconsY.get(),
             "app_offset_x" to appOffsetX.get(),
             "folder_offset_x" to folderOffsetX.get(),
+            "window_x" to windowX.get(),
+            "window_y" to windowY.get(),
             "license_file" to licenseFile.get().absolutePath
         )
     }
@@ -110,6 +118,7 @@ abstract class CreateDmgTask : DefaultTask() {
             append("--icon ${context["icon_file"]} ${context["app_offset_x"]} ${context["icons_y"]} ")
             append("--app-drop-link ${context["folder_offset_x"]} ${context["icons_y"]} ")
             append("--eula ${context["license_file"]} ")
+            append("--window-pos ${context["window_x"]} ${context["window_y"]} ")
             append("${context["output_file"]} ")
             append("${context["input_dir"]}")
         }

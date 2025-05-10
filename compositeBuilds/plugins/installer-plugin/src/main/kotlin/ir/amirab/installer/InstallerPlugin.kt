@@ -57,6 +57,8 @@ class InstallerPlugin : Plugin<Project> {
                     this.folderOffsetX.set(macosConfig.folderOffsetX)
                     this.appOffsetX.set(macosConfig.appOffsetX)
                     this.iconsY.set(macosConfig.iconsY)
+                    this.windowX.set(macosConfig.windowX)
+                    this.windowY.set(macosConfig.windowY)
                     this.licenseFile.set(macosConfig.licenseFile)
                 }
         }

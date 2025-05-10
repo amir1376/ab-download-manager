@@ -120,4 +120,6 @@ data class MacosConfig(
     var iconsY: Int = 150,
     var appOffsetX: Int = 100,
     var folderOffsetX: Int = 450,
+    var windowX: Int = 150,
+    var windowY: Int = 200,
 ) : Serializable
