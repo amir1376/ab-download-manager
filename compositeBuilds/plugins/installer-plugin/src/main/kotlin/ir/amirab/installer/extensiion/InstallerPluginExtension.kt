@@ -68,7 +68,7 @@ abstract class InstallerPluginExtension {
     }
 
     fun getCreatedInstallerTargetFormats(): List<InstallerTargetFormat> {
-        return buildList<InstallerTargetFormat> {
+        return buildList {
             when (Platform.getCurrentPlatform()) {
                 Platform.Desktop.Windows -> {
                     if (windowsConfig != null) {
@@ -115,9 +115,9 @@ data class MacosConfig(
     var backgroundImage: File? = null,
     var iconSize: Int = 100,
     var licenseFile: File? = null,
-    val windowWidth: Int = 600,
-    val windowHeight: Int = 400,
-    val iconsY: Int = 150,
-    val appOffsetX: Int = 100,
-    val folderOffsetX: Int = 450,
+    var windowWidth: Int = 600,
+    var windowHeight: Int = 400,
+    var iconsY: Int = 150,
+    var appOffsetX: Int = 100,
+    var folderOffsetX: Int = 450,
 ) : Serializable

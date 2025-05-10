@@ -207,7 +207,7 @@ installerPlugin {
 
 // generate a file with these constants
 buildConfig {
-    packageName = "$desktopPackageName"
+    packageName = desktopPackageName
     buildConfigField(
         "PACKAGE_NAME",
         provider {

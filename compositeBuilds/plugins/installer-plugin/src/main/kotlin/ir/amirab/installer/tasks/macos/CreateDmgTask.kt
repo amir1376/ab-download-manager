@@ -74,9 +74,9 @@ abstract class CreateDmgTask : DefaultTask() {
     private fun createDmgContext(): Map<String, Any> {
         val outputFileNameWithExt = outputFileName.get() + ".dmg"
         return mapOf(
-            "input_dir" to inputDir.get().asFile.absolutePath,
+            "input_dir" to inputDir.get().asFile.absolutePath.asQuoted(),
             "output_file" to destFolder.file(outputFileNameWithExt)
-                .get().asFile.absolutePath,
+                .get().asFile.absolutePath.asQuoted(),
             "background_image" to backgroundImage.get().absolutePath.asQuoted(),
             "icon_file" to appFileName.get().asQuoted(),
             "app_name" to appName.get().asQuoted(),
@@ -90,7 +90,7 @@ abstract class CreateDmgTask : DefaultTask() {
         )
     }
 
-    private fun String.asQuoted() = "\"$this\""
+    private fun String.asQuoted() = "\"${this}\""
 
     @TaskAction
     fun run() {
@@ -102,16 +102,16 @@ abstract class CreateDmgTask : DefaultTask() {
         // which only works inside an active user session with GUI access.
         val fullCommand = buildString {
             append("launchctl asuser $(id -u) ")
-            append("\"${executable.absolutePath}\" ")
-            append("--volname \"${context["app_name"]}\" ")
+            append("${executable.absolutePath.asQuoted()} ")
+            append("--volname ${context["app_name"]} ")
             append("--window-size ${context["window_width"]} ${context["window_height"]} ")
             append("--icon-size ${context["icon_size"]} ")
-            append("--background \"${context["background_image"]}\" ")
-            append("--icon \"${context["icon_file"]}\" ${context["app_offset_x"]} ${context["icons_y"]} ")
+            append("--background ${context["background_image"]} ")
+            append("--icon ${context["icon_file"]} ${context["app_offset_x"]} ${context["icons_y"]} ")
             append("--app-drop-link ${context["folder_offset_x"]} ${context["icons_y"]} ")
             append("--eula ${context["license_file"]} ")
-            append("\"${context["output_file"]}\" ")
-            append("\"${context["input_dir"]}\"")
+            append("${context["output_file"]} ")
+            append("${context["input_dir"]}")
         }
 
         logger.debug("Creating DMG with shell command: {}", fullCommand)
