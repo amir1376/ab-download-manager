@@ -24,6 +24,9 @@ jobs:
           distribution: 'jetbrains'
           java-package: "jdk"
           java-version: '17.0.14'
+        # For GitHub API (use if you believe you'd run into rate limits)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache Gradle Dependencies
         uses: actions/cache@v4
