@@ -22,7 +22,6 @@ abstract class CreateDmgTask : DefaultTask() {
     @get:Input
     abstract val appName: Property<String>
 
-
     @get:Input
     abstract val iconSize: Property<Int>
 
@@ -52,6 +51,9 @@ abstract class CreateDmgTask : DefaultTask() {
 
     @get:InputFile
     abstract val backgroundImage: Property<File>
+
+    @get:InputFile
+    abstract val volumeIcon: Property<File>
 
     @get:InputFile
     abstract val licenseFile: Property<File>
@@ -84,6 +86,7 @@ abstract class CreateDmgTask : DefaultTask() {
             "output_file" to destFolder.file(outputFileNameWithExt)
                 .get().asFile.absolutePath.asQuoted(),
             "background_image" to backgroundImage.get().absolutePath.asQuoted(),
+            "volume_icon" to volumeIcon.get().absolutePath.asQuoted(),
             "icon_file" to appFileName.get().asQuoted(),
             "app_name" to appName.get().asQuoted(),
             "icon_size" to iconSize.get(),
@@ -118,6 +121,7 @@ abstract class CreateDmgTask : DefaultTask() {
             append("--icon ${context["icon_file"]} ${context["app_offset_x"]} ${context["icons_y"]} ")
             append("--app-drop-link ${context["folder_offset_x"]} ${context["icons_y"]} ")
             append("--eula ${context["license_file"]} ")
+            append("--volicon ${context["volume_icon"]} ")
             append("--window-pos ${context["window_x"]} ${context["window_y"]} ")
             append("${context["output_file"]} ")
             append("${context["input_dir"]}")

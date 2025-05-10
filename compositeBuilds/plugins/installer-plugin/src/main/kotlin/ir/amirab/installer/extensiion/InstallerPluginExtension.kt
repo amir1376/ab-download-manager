@@ -113,6 +113,7 @@ data class MacosConfig(
     var outputFileName: String? = null,
     var inputDir: File? = null,
     var backgroundImage: File? = null,
+    var volumeIcon: File? = null,
     var iconSize: Int = 100,
     var licenseFile: File? = null,
     var windowWidth: Int = 600,

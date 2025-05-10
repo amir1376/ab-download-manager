@@ -201,6 +201,7 @@ installerPlugin {
         backgroundImage = project.file("resources/installer/dmg_background.png")
         outputFileName = getAppName()
         licenseFile = rootProject.file("LICENSE")
+        volumeIcon = project.file("icons/icon.icns")
     }
 }
 

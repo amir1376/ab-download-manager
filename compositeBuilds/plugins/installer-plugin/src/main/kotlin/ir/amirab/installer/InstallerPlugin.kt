@@ -50,7 +50,9 @@ class InstallerPlugin : Plugin<Project> {
                     this.backgroundImage.set(requireNotNull(macosConfig.backgroundImage) { "backgroundImage not provided" })
                     this.outputFileName.set(requireNotNull(macosConfig.outputFileName) { "outputFileName not provided" })
                     this.inputDir.set(requireNotNull(macosConfig.inputDir) { "inputDir not provided" })
-                    this.destFolder.set(extension.outputFolder.get().asFile)
+                    this.licenseFile.set(requireNotNull(macosConfig.licenseFile) { "licenseFile not provided" })
+                    this.destFolder.set(requireNotNull(extension.outputFolder.get().asFile) { "outputFolder not provided" })
+                    this.volumeIcon.set(requireNotNull(macosConfig.volumeIcon) { "volumeIcon not provided" })
                     this.iconSize.set(macosConfig.iconSize)
                     this.windowHeight.set(macosConfig.windowHeight)
                     this.windowWidth.set(macosConfig.windowWidth)
@@ -59,7 +61,6 @@ class InstallerPlugin : Plugin<Project> {
                     this.iconsY.set(macosConfig.iconsY)
                     this.windowX.set(macosConfig.windowX)
                     this.windowY.set(macosConfig.windowY)
-                    this.licenseFile.set(macosConfig.licenseFile)
                 }
         }
         project.tasks.register(createInstallerTaskName) {
