@@ -78,8 +78,10 @@ private fun FrameWindowScope.CustomWindowFrame(
             Modifier
                 .fillMaxSize()
                 .ifThen(!JBR.isWindowDecorationsSupported()) {
-                    border(1.dp, Color.Gray.copy(0.25f), RectangleShape)
-                        .padding(1.dp)
+                    ifThen(isWindowFloating()) {
+                        border(1.dp, Color.Gray.copy(0.25f), RectangleShape)
+                            .padding(1.dp)
+                    }
                 }
                 .background(background)
         ) {
