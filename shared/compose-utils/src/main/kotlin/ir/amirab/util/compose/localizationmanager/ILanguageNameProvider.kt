@@ -26,6 +26,7 @@ object LanguageNameProvider : ILanguageNameProvider {
         "bm" to LanguageName("Bamanankan", "Bambara"),
         "bn" to LanguageName("বাংলা", "Bengali"),
         "bo" to LanguageName("བོད་སྐད་", "Tibetan"),
+        "bqi" to LanguageName("لۊری بختیاری", "Luri Bakhtiari"),
         "br" to LanguageName("Brezhoneg", "Breton"),
         "bs" to LanguageName("Bosanski", "Bosnian"),
         "ca" to LanguageName("Català", "Catalan"),
