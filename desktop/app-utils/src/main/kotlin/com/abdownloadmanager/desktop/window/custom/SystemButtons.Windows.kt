@@ -91,7 +91,7 @@ private fun Modifier.windowButton(): Modifier {
 }
 
 @Composable
-fun FrameWindowScope.WindowsSystemButtons(
+fun WindowsSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,

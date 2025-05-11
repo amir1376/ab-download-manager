@@ -10,28 +10,6 @@ import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
 
 @Composable
-internal fun FrameWindowScope.TitleBarContentWithSystemButtons(
-    modifier: Modifier,
-    onRequestMinimize: (() -> Unit)?,
-    onRequestToggleMaximize: (() -> Unit)?,
-    onRequestClose: () -> Unit,
-    content: @Composable RowScope.() -> Unit
-) {
-    Row(
-        modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        content()
-        PlatformActionButtons(
-            onRequestClose,
-            onRequestMinimize,
-            onRequestToggleMaximize,
-        )
-    }
-}
-
-
-@Composable
 fun FrameWindowScope.PlatformActionButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
@@ -39,7 +17,7 @@ fun FrameWindowScope.PlatformActionButtons(
 ) {
     when (Platform.asDesktop()) {
         Platform.Desktop.Windows -> {
-            WindowsSystemButtons(
+            MacOSSystemButtons(
                 onRequestClose = onRequestClose,
                 onRequestMinimize = onRequestMinimize,
                 onToggleMaximize = onToggleMaximize

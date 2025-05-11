@@ -72,7 +72,7 @@ private fun SystemButton(
 
 
 @Composable
-fun FrameWindowScope.LinuxSystemButtons(
+fun LinuxSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,

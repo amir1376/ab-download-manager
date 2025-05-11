@@ -25,7 +25,7 @@ import ir.amirab.util.compose.IconSource
 import ir.amirab.util.ifThen
 
 @Composable
-fun FrameWindowScope.MacOSSystemButtons(
+fun MacOSSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,
@@ -40,9 +40,9 @@ fun FrameWindowScope.MacOSSystemButtons(
             .fillMaxHeight().wrapContentHeight(Alignment.Top),
         verticalAlignment = Alignment.Top
     ) {
+        CloseButton(onRequestClose, isUserInThisArea)
         MinimizeButton(onRequestMinimize, isUserInThisArea)
         ToggleMaximizeButton(onToggleMaximize, isUserInThisArea)
-        CloseButton(onRequestClose, isUserInThisArea)
     }
 }
 
@@ -129,10 +129,7 @@ private fun SystemButton(
         ) {
             MyIcon(
                 icon = icon,
-                tint = (if (myColors.isLight) Color.Black else Color.White)
-                    .ifThen(!isHovered) {
-                        this / 0.8f
-                    },
+                tint = Color.Black,
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(5.dp),
