@@ -112,6 +112,16 @@ data class MacosConfig(
     var appFileName: String? = null,
     var outputFileName: String? = null,
     var inputDir: File? = null,
+    /**
+     * Displays an image larger than the window size with proper scaling.
+     *
+     * **Important:** Ensure the image’s aspect ratio is preserved exactly.
+     * Standard scaling methods can cause the background to render larger than expected
+     * when the window is resized, breaking the intended alignment.
+     *
+     * **Recommended approach:** Use the original image as the base layer when creating a new one.
+     * This helps maintain correct scaling and positioning across different window sizes.
+     */
     var backgroundImage: File? = null,
     var volumeIcon: File? = null,
     var iconSize: Int = 100,
