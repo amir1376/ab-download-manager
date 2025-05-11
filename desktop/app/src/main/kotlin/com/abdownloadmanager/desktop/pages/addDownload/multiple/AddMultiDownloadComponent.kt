@@ -34,7 +34,7 @@ class AddMultiDownloadComponent(
     private val onRequestAddCategory: () -> Unit,
 ) : AddDownloadComponent(ctx, id),
     KoinComponent {
-
+    override val shouldShowWindow: StateFlow<Boolean> = MutableStateFlow(true)
     val tableState = TableState(
         cells = AddMultiItemTableCells.all(),
         forceVisibleCells = listOf(
