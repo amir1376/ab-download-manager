@@ -3,22 +3,23 @@ package com.abdownloadmanager.desktop.window.custom.titlebar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.onClick
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.window.custom.MacOSSystemButtons
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import ir.amirab.util.compose.layout.RelativeAlignment
 import ir.amirab.util.ifThen
+import kotlin.math.roundToInt
 
 object MacTitleBar : TitleBar {
     override val systemButtonsFirst: Boolean = true
@@ -47,12 +48,13 @@ object MacTitleBar : TitleBar {
         end: @Composable (() -> Unit)?
     ) {
         MacTitleBarContent(
+            modifier = modifier,
             title = title,
             windowIcon = windowIcon,
             titlePosition = titlePosition,
+            systemButtonsWidth = 60.dp,
             start = start,
             end = end,
-            modifier = modifier,
         )
     }
 }
@@ -63,21 +65,30 @@ private fun MacTitleBarContent(
     title: String,
     windowIcon: Painter?,
     titlePosition: TitlePosition,
+    systemButtonsWidth: Dp,
     start: @Composable (() -> Unit)?,
     end: @Composable (() -> Unit)?
 ) {
+    val density = LocalDensity.current
     Row(
         modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (!titlePosition.afterStart) {
+        val titleShouldBeCentered = titlePosition.centered || start == null
+        val afterStart = titlePosition.afterStart
+        if (!afterStart) {
             Row(
                 Modifier
-                    .ifThen(titlePosition.centered) {
+                    .ifThen(titleShouldBeCentered) {
                         weight(1f)
-                            .ifThen(start == null) {
-                                wrapContentWidth()
-                            }
+                            .wrapContentWidth(
+                                RelativeAlignment.Horizontal(
+                                    mainAlignment = Alignment.CenterHorizontally,
+                                    relative = -(density.run {
+                                        systemButtonsWidth.toPx()
+                                    }.roundToInt())
+                                )
+                            )
                     }
                     .padding(titlePosition.padding),
                 verticalAlignment = Alignment.CenterVertically,
@@ -103,11 +114,11 @@ private fun MacTitleBarContent(
                 Spacer(Modifier.width(8.dp))
             }
         }
-        if (titlePosition.afterStart) {
+        if (afterStart) {
             Row(
                 Modifier
                     .weight(1f)
-                    .ifThen(titlePosition.centered) {
+                    .ifThen(titleShouldBeCentered) {
                         wrapContentWidth()
                     }
                     .padding(titlePosition.padding),
@@ -126,7 +137,7 @@ private fun MacTitleBarContent(
                 )
             }
         }
-        if (!titlePosition.centered && !titlePosition.afterStart) {
+        if (!titleShouldBeCentered && !titlePosition.afterStart) {
             Spacer(Modifier.weight(1f))
         }
         end?.let {

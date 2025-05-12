@@ -1,5 +1,6 @@
 package com.abdownloadmanager.desktop.window.custom.titlebar
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -27,8 +28,8 @@ interface TitleBar {
     fun RenderTitleBarContent(
         title: String,
         titlePosition: TitlePosition,
-        modifier: Modifier = Modifier,
-        windowIcon: Painter? = null,
+        modifier: Modifier,
+        windowIcon: Painter?,
         start: (@Composable () -> Unit)?,
         end: (@Composable () -> Unit)?,
     )
@@ -74,11 +75,11 @@ fun RenderTitleBar(
         }
         titleBar.RenderTitleBarContent(
             title = title,
-            windowIcon = windowIcon,
             titlePosition = titlePosition,
+            modifier = Modifier.weight(1f),
+            windowIcon = windowIcon,
             start = start,
-            end = end,
-            modifier = Modifier.weight(1f)
+            end = end
         )
         if (!systemButtonsAtFirst) {
             titleBar.RenderSystemButtons(
