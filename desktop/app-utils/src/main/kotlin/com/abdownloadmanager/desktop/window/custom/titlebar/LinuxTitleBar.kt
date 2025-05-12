@@ -1,10 +1,12 @@
 package com.abdownloadmanager.desktop.window.custom.titlebar
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import com.abdownloadmanager.desktop.window.custom.titlebar.LinuxSystemButtons
@@ -65,9 +67,13 @@ object LinuxTitleBar : TitleBar {
     ) {
         val windowFocused = isWindowFocused()
         CommonRenderTitleBar(
-            modifier = modifier.ifThen(!windowFocused) {
-                background(myColors.onBackground / 0.05f)
-            },
+            modifier = modifier
+                .background(
+                    animateColorAsState(
+                        if (windowFocused) Color.Transparent
+                        else myColors.onBackground / 0.05f
+                    ).value
+                ),
             titleBar = titleBar,
             title = title,
             windowIcon = windowIcon,
