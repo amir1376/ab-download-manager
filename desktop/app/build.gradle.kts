@@ -32,7 +32,7 @@ dependencies {
 
     implementation(libs.kotlin.datetime)
 
-    implementation(libs.compose.reorderable)
+    implementation(libs.reorderable)
 
     implementation(libs.http4k.core)
     implementation(libs.http4k.client.okhttp)

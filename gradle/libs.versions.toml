@@ -21,7 +21,7 @@ aboutLibraries = "12.1.2"
 jna = "5.16.0"
 datetime = "0.6.2"
 fileKit = "0.8.8"
-composeReorderable = "0.9.6"
+reorderable = "2.4.3"
 semver = "2.0.0"
 jgit = "6.9.0.202403050737-r"
 osThemeDetector = "3.9.1"
@@ -95,7 +95,7 @@ http4k-server-jetty = { module = "org.http4k:http4k-server-jetty", version.ref =
 http4k-client-okhttp = { module = "org.http4k:http4k-client-okhttp", version.ref = "http4k" }
 
 compose-material-rippleEffect = { module = "org.jetbrains.compose.material:material-ripple", version.ref = "compose" }
-compose-reorderable = { module = "org.burnoutcrew.composereorderable:reorderable", version.ref = "composeReorderable" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
