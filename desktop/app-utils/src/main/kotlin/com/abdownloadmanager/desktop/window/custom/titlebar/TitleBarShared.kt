@@ -1,8 +1,8 @@
 package com.abdownloadmanager.desktop.window.custom.titlebar
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
+import com.abdownloadmanager.desktop.window.custom.isWindowFocused
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
@@ -104,8 +105,13 @@ internal fun CommonTitleBarContent(
 fun Title(
     modifier: Modifier, title: String,
 ) {
+    val isWindowFocused = isWindowFocused()
     WithContentColor(myColors.onBackground) {
-        WithContentAlpha(1f) {
+        WithContentAlpha(
+            animateFloatAsState(
+                if (isWindowFocused) 1f else 0.5f
+            ).value
+        ) {
             Text(
                 title,
                 maxLines = 1,
