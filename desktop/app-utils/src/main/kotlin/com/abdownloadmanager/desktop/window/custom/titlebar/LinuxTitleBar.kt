@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
-import com.abdownloadmanager.desktop.window.custom.LinuxSystemButtons
+import com.abdownloadmanager.desktop.window.custom.titlebar.LinuxSystemButtons
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
 
 object LinuxTitleBar : TitleBar {

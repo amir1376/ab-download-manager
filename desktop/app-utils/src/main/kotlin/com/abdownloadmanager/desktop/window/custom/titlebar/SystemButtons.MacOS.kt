@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.window.custom
+package com.abdownloadmanager.desktop.window.custom.titlebar
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -25,7 +25,7 @@ import ir.amirab.util.compose.IconSource
 import ir.amirab.util.ifThen
 
 @Composable
-fun MacOSSystemButtons(
+internal fun MacOSSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,
@@ -49,7 +49,7 @@ fun MacOSSystemButtons(
 @Composable
 private fun MinimizeButton(onRequestMinimize: (() -> Unit)?, isUserInThisArea: Boolean) {
     onRequestMinimize?.let {
-        WindowMinimizeTooltip {
+        _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip {
             SystemButton(
                 onClick = onRequestMinimize,
                 modifier = Modifier,
@@ -64,12 +64,12 @@ private fun MinimizeButton(onRequestMinimize: (() -> Unit)?, isUserInThisArea: B
 @Composable
 private fun ToggleMaximizeButton(onToggleMaximize: (() -> Unit)?, isUserInThisArea: Boolean) {
     onToggleMaximize?.let {
-        WindowToggleMaximizeTooltip {
+        _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip {
             SystemButton(
                 onClick = onToggleMaximize,
                 modifier = Modifier,
                 hoveredBackgroundColor = Color(0xFF28C840),
-                icon = if (isWindowMaximized()) {
+                icon = if (_root_ide_package_.com.abdownloadmanager.desktop.window.custom.isWindowMaximized()) {
                     MyIcons.windowFloating
                 } else {
                     MyIcons.windowMaximize
@@ -82,7 +82,7 @@ private fun ToggleMaximizeButton(onToggleMaximize: (() -> Unit)?, isUserInThisAr
 
 @Composable
 private fun CloseButton(onRequestClose: () -> Unit, isUserInThisArea: Boolean) {
-    WindowCloseButtonTooltip {
+    _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowCloseButtonTooltip {
         SystemButton(
             onRequestClose,
             modifier = Modifier,
@@ -102,7 +102,7 @@ private fun SystemButton(
     isUserInThisArea: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val isWindowFocused = isWindowFocused()
+    val isWindowFocused = _root_ide_package_.com.abdownloadmanager.desktop.window.custom.isWindowFocused()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     Box(

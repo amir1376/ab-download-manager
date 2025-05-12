@@ -1,15 +1,16 @@
-package com.abdownloadmanager.desktop.window.custom
+package com.abdownloadmanager.desktop.window.custom.titlebar
 
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.onClick
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -18,20 +19,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
+import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
 
 @Composable
 private fun SystemButton(
     onClick: () -> Unit,
-    background: Color = Color.Transparent,
+    background: Color = LocalContentColor.current / 0.1f,
     onBackground: Color = LocalContentColor.current,
-    hoveredBackgroundColor: Color = background,
+    hoveredBackgroundColor: Color = LocalContentColor.current / 0.2f,
     onHoveredBackgroundColor: Color = LocalContentColor.current,
     icon: IconSource,
     modifier: Modifier = Modifier,
 ) {
-    val isFocused = isWindowFocused()
+    val isFocused = _root_ide_package_.com.abdownloadmanager.desktop.window.custom.isWindowFocused()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     MyIcon(
@@ -50,59 +51,41 @@ private fun SystemButton(
             )
         ).value,
         modifier = modifier
-            .clickable { onClick() }
+            .hoverable(interactionSource)
+            .onClick { onClick() }
+            .fillMaxHeight()
+            .wrapContentHeight()
+            .padding(horizontal = 4.dp)
             .background(
                 animateColorAsState(
                     when {
                         isHovered -> hoveredBackgroundColor
                         else -> background
                     }
-                ).value
+                ).value,
+                CircleShape
             )
-            .hoverable(interactionSource)
-            .windowButton()
+            .padding(6.dp)
+            .requiredSize(6.dp)
     )
 }
 
 
 @Composable
-private fun CloseButton(
-    onRequestClose: () -> Unit,
-    modifier: Modifier,
-) {
-    SystemButton(
-        onRequestClose,
-        background = Color.Transparent,
-        onBackground = myColors.onBackground,
-        hoveredBackgroundColor = Color(0xFFc42b1c),
-        onHoveredBackgroundColor = myColors.onError,
-        icon = MyIcons.windowClose,
-        modifier = modifier,
-    )
-}
-
-private fun Modifier.windowButton(): Modifier {
-    return fillMaxHeight()
-        .wrapContentHeight()
-        .padding(
-            horizontal = 20.dp,
-        )
-        .requiredSize(8.dp)
-}
-
-@Composable
-fun WindowsSystemButtons(
+internal fun LinuxSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,
 ) {
     Row(
         // Toolbar is aligned center vertically, so I fill that and place it on top
-        modifier = Modifier.fillMaxHeight().wrapContentHeight(Alignment.Top),
+        modifier = Modifier
+            .padding(horizontal = 6.dp)
+            .fillMaxHeight().wrapContentHeight(Alignment.Top),
         verticalAlignment = Alignment.Top
     ) {
         onRequestMinimize?.let {
-            WindowMinimizeTooltip {
+            _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip {
                 SystemButton(
                     icon = MyIcons.windowMinimize,
                     onClick = onRequestMinimize,
@@ -112,9 +95,9 @@ fun WindowsSystemButtons(
         }
 
         onToggleMaximize?.let {
-            WindowToggleMaximizeTooltip {
+            _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip {
                 SystemButton(
-                    icon = if (isWindowMaximized()) {
+                    icon = if (_root_ide_package_.com.abdownloadmanager.desktop.window.custom.isWindowMaximized()) {
                         MyIcons.windowFloating
                     } else {
                         MyIcons.windowMaximize
@@ -124,10 +107,12 @@ fun WindowsSystemButtons(
                 )
             }
         }
-        WindowCloseButtonTooltip {
-            CloseButton(
-                onRequestClose = onRequestClose,
-                modifier = Modifier
+
+        _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowCloseButtonTooltip {
+            SystemButton(
+                onRequestClose,
+                icon = MyIcons.windowClose,
+                modifier = Modifier,
             )
         }
     }
