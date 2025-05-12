@@ -20,7 +20,7 @@ import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -34,7 +34,7 @@ class AddMultiDownloadComponent(
     private val onRequestAddCategory: () -> Unit,
 ) : AddDownloadComponent(ctx, id),
     KoinComponent {
-
+    override val shouldShowWindow: StateFlow<Boolean> = MutableStateFlow(true)
     val tableState = TableState(
         cells = AddMultiItemTableCells.all(),
         forceVisibleCells = listOf(
@@ -234,14 +234,15 @@ class AddMultiDownloadComponent(
                 onDuplicateStrategy = { OnDuplicateStrategy.AddNumbered },
                 queueId = queueId,
                 categorySelectionMode = categorySelectionMode
-            )
-            val folder = folder.value
-            if (allInSameLocation.value) {
-                addToLastUsedLocations(folder)
-            }
-            if (startQueue && queueId != null) {
-                scope.launch {
-                    downloadSystem.startQueue(queueId)
+            ).invokeOnCompletion {
+                val folder = folder.value
+                if (allInSameLocation.value) {
+                    addToLastUsedLocations(folder)
+                }
+                if (startQueue && queueId != null) {
+                    scope.launch {
+                        downloadSystem.startQueue(queueId)
+                    }
                 }
             }
             requestClose()
@@ -270,5 +271,5 @@ fun interface OnRequestAdd {
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
         queueId: Long?,
         categorySelectionMode: CategorySelectionMode?,
-    )
+    ): Deferred<List<Long>>
 }

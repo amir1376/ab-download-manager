@@ -146,7 +146,7 @@ fun AddDownloadPage(
                     errorText = when (canAddResult) {
                         is CanAddResult.DownloadAlreadyExists -> {
                             if (onDuplicateStrategy == null) {
-                                myStringResource(Res.string.file_name_already_exists)
+                                myStringResource(Res.string.download_already_exists)
                             } else {
                                 null
                             }
@@ -243,7 +243,7 @@ private fun ShowSolutionsOnDuplicateDownload(component: AddSingleDownloadCompone
                 ) {
                     WindowDraggableArea(Modifier) {
                         Column(
-                            Modifier.padding(16.dp)
+                            Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
                         ) {
                             Text(
                                 myStringResource(Res.string.select_a_solution),
@@ -283,6 +283,14 @@ private fun ShowSolutionsOnDuplicateDownload(component: AddSingleDownloadCompone
                                 description = myStringResource(Res.string.download_strategy_override_existing_file_description),
                             ) {
                                 component.setOnDuplicateStrategy(OnDuplicateStrategy.OverrideDownload)
+                                close()
+                            }
+                            OnDuplicateStrategySolutionItem(
+                                isSelected = null,
+                                title = myStringResource(Res.string.download_strategy_update_download_link),
+                                description = myStringResource(Res.string.download_strategy_update_download_link_description),
+                            ) {
+                                component.updateDownloadCredentialsOfOriginalDownload()
                                 close()
                             }
                             OnDuplicateStrategySolutionItem(

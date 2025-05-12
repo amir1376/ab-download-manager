@@ -193,14 +193,22 @@ installerPlugin {
             "header_image_file" to project.file("resources/installer/abdm-header-image.bmp"),
             "sidebar_image_file" to project.file("resources/installer/abdm-sidebar-image.bmp")
         )
-
+    }
+    macos {
+        appName = getAppName()
+        inputDir = project.file("build/compose/binaries/main-release/app/")
+        appFileName = "${getAppName()}.app"
+        backgroundImage = project.file("resources/installer/dmg_background.png")
+        outputFileName = getAppName()
+        licenseFile = rootProject.file("LICENSE")
+        volumeIcon = project.file("icons/icon.icns")
     }
 }
 
 
 // generate a file with these constants
 buildConfig {
-    packageName = "$desktopPackageName"
+    packageName = desktopPackageName
     buildConfigField(
         "PACKAGE_NAME",
         provider {
@@ -293,7 +301,9 @@ val appPackageNameByComposePlugin
         "compose.desktop.application.nativeDistributions.packageName must not be null!"
     }
 
-val distributableAppArchiveDir: Provider<Directory> = project.layout.buildDirectory.dir("dist/archives")
+val distributableAppArchiveDir: Provider<Directory> =
+    project.layout.buildDirectory.dir("dist/archives")
+
 fun AbstractArchiveTask.fromAppImagePath() {
     from(tasks.named("createReleaseDistributable"))
     destinationDirectory.set(distributableAppArchiveDir)

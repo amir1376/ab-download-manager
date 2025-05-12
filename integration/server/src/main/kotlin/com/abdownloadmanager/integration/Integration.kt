@@ -108,10 +108,18 @@ class Integration(
                 runBlocking {
                     val itemsToAdd = kotlin.runCatching {
                         val message = it.getBody().orEmpty()
-                        customJson.decodeFromString<List<NewDownloadInfoFromIntegration>>(message)
+                        AddDownloadsFromIntegration.createFromRequest(
+                            json = customJson,
+                            jsonData = message
+                        )
                     }
                     itemsToAdd.onFailure { it.printStackTrace() }
-                    integrationHandler.addDownload(itemsToAdd.getOrThrow())
+                    itemsToAdd.getOrThrow().let { newImportRequest ->
+                        integrationHandler.addDownload(
+                            newImportRequest.items,
+                            newImportRequest.options,
+                        )
+                    }
                 }
                 MyResponse.Text("OK")
             }

@@ -8,6 +8,8 @@ import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigura
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.utils.*
 import androidx.compose.runtime.*
+import com.abdownloadmanager.desktop.pages.addDownload.ImportOptions
+import com.abdownloadmanager.desktop.pages.addDownload.SilentImportOptions
 import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
 import com.abdownloadmanager.desktop.pages.settings.configurable.FileChecksumConfigurable
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
@@ -33,9 +35,12 @@ import org.koin.core.component.inject
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.CategoryItem
 import com.abdownloadmanager.shared.utils.category.CategoryManager
+import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import kotlinx.coroutines.*
+import kotlinx.coroutines.selects.select
 
 sealed interface AddSingleDownloadPageEffects {
     data class SuggestUrl(val link: String) : AddSingleDownloadPageEffects
@@ -48,7 +53,9 @@ class AddSingleDownloadComponent(
     val onRequestAddToQueue: OnRequestAddSingleItem,
     val onRequestAddCategory: () -> Unit,
     val openExistingDownload: (Long) -> Unit,
+    val updateExistingDownloadCredentials: (Long, IDownloadCredentials) -> Unit,
     private val downloadItemOpener: DownloadItemOpener,
+    importOptions: ImportOptions,
     id: String,
 ) : AddDownloadComponent(ctx, id),
     KoinComponent,
@@ -59,6 +66,8 @@ class AddSingleDownloadComponent(
     private val client: DownloaderClient by inject()
     val downloadSystem: DownloadSystem by inject()
     val iconProvider: FileIconProvider by inject()
+    private val _shouldShowWindow = MutableStateFlow(importOptions.silentImport == null)
+    override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
 
     private val categoryManager: CategoryManager by inject()
 
@@ -391,10 +400,11 @@ class AddSingleDownloadComponent(
                 queueId = queueId,
                 onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
                 categoryId = getCategoryIfUseCategoryIsOn()?.id,
-            )
-            if (queueId != null && startQueue) {
-                GlobalScope.launch {
-                    downloadSystem.startQueue(queueId)
+            ).invokeOnCompletion {
+                if (queueId != null && startQueue) {
+                    GlobalScope.launch {
+                        downloadSystem.startQueue(queueId)
+                    }
                 }
             }
             onRequestClose()
@@ -406,6 +416,14 @@ class AddSingleDownloadComponent(
             ?.itemId
             ?.let {
                 openExistingDownload(it)
+            }
+    }
+
+    fun updateDownloadCredentialsOfOriginalDownload() {
+        (canAddResult.value as? CanAddResult.DownloadAlreadyExists)
+            ?.itemId
+            ?.let {
+                updateExistingDownloadCredentials(it, downloadItem.value)
             }
     }
 
@@ -438,6 +456,102 @@ class AddSingleDownloadComponent(
     fun addNewCategory() {
         onRequestAddCategory()
     }
+
+    init {
+        importOptions.silentImport?.let {
+            handleSilentImport(it)
+        }
+    }
+
+    fun handleSilentImport(silentImport: SilentImportOptions) {
+        scope.launch {
+            try {
+                withTimeout(2_000) {
+                    // ensure all values are set!
+                    credentials.map { it.link }.first { it.isNotEmpty() }
+                    folder.first { it.isNotEmpty() }
+                    name.first { it.isNotEmpty() }
+                }
+            } catch (_: Exception) {
+                onRequestClose()
+                return@launch
+            }
+            val failAutoAdd = async {
+                try {
+                    // although we don't need timeout, but I add this timeout here maybe there is a bug
+                    // and I don't want this coroutine to be halted infinitely
+                    withTimeout(10_000) {
+                        canAddToDownloads.first { it }
+                        if (silentImport.silentDownload) {
+                            onRequestDownload()
+                        } else {
+                            onRequestAddToQueue(
+                                DefaultQueueInfo.ID,
+                                false,
+                            )
+                        }
+                    }
+                    false
+                } catch (_: Exception) {
+                    true
+                }
+            }
+
+            val errorDuringWait = async {
+                val channel = canAddResult.produceIn(this)
+                try {
+                    val startTime = System.currentTimeMillis()
+                    for (i in channel) {
+                        when (i) {
+                            is CanAddResult.DownloadAlreadyExists,
+                            CanAddResult.CantWriteInThisFolder -> {
+                                return@async true
+                            }
+
+                            CanAddResult.InvalidUrl,
+                            CanAddResult.InvalidFileName -> {
+                                // we may get invalid filename/invalid url at the beginning! because the name is empty
+                                if (System.currentTimeMillis() - startTime >= 1000) {
+                                    return@async true
+                                }
+                            }
+
+                            CanAddResult.CanAdd -> {
+                                // we must not break here because it cancels [failAutoAdd]
+                                // instead we wait for [failAutoAdd] to be finished and we will be cancelled automatically after select is done!
+                            }
+
+                            null -> {}
+                        }
+                    }
+                    return@async true
+                } finally {
+                    channel.cancel()
+                }
+            }
+            val failedToAutoAdd = try {
+                select {
+                    failAutoAdd.onAwait { failed ->
+                        failed
+                    }
+                    errorDuringWait.onAwait { errorDuringWait ->
+                        errorDuringWait
+                    }
+                }
+            } catch (_: Exception) {
+                true
+            } finally {
+                runCatching {
+                    failAutoAdd.cancelAndJoin()
+                    errorDuringWait.cancelAndJoin()
+                }
+            }
+            if (failedToAutoAdd) {
+                // needs adjustments by user!
+                _shouldShowWindow.value = true
+            }
+        }
+    }
 }
 
 fun interface OnRequestAddSingleItem {
@@ -446,7 +560,7 @@ fun interface OnRequestAddSingleItem {
         queueId: Long?,
         onDuplicateStrategy: OnDuplicateStrategy,
         categoryId: Long?,
-    )
+    ): Deferred<Long>
 }
 
 fun interface OnRequestDownloadSingleItem {

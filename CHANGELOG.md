@@ -14,6 +14,22 @@
 
 ### Security
 
+## 1.5.8
+
+### Added
+
+- An option to allow update existing download from "Add Download" page if a duplicate is detected
+
+### Fixed
+
+- Crash when opening "Items" section of "Queues" page
+
+### Improved
+
+- Translations updated
+- Duplicate download detection
+- Minor UI/UX improvements
+
 ## 1.5.7
 
 ### Added

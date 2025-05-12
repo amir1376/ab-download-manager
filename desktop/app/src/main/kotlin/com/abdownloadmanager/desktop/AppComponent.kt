@@ -2,6 +2,7 @@ package com.abdownloadmanager.desktop
 
 import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadConfig
+import com.abdownloadmanager.desktop.pages.addDownload.ImportOptions
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadComponent
@@ -49,6 +50,7 @@ import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.CategorySelectionMode
 import com.abdownloadmanager.shared.utils.subscribeAsStateFlow
 import com.arkivanov.decompose.childContext
+import ir.amirab.downloader.downloaditem.withCredentials
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
 import ir.amirab.util.compose.StringSource
@@ -56,6 +58,8 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -289,7 +293,17 @@ class AppComponent(
                             closeAddDownloadDialog(config.id)
                         },
                         downloadItemOpener = this,
-                        id = config.id
+                        updateExistingDownloadCredentials = { id, newCredentials ->
+                            scope.launch {
+                                downloadSystem.downloadManager.updateDownloadItem(id) {
+                                    it.withCredentials(newCredentials)
+                                }
+                                closeAddDownloadDialog(config.id)
+                                openDownloadDialog(id)
+                            }
+                        },
+                        id = config.id,
+                        importOptions = config.importOptions
                     ).also {
                         it.setCredentials(config.credentials)
                     }
@@ -301,7 +315,7 @@ class AppComponent(
                         id = config.id,
                         onRequestClose = { closeAddDownloadDialog(config.id) },
                         onRequestAdd = { items, strategy, queueId, categorySelectionMode ->
-                            addDownload(
+                            addDownloads(
                                 items = items,
                                 onDuplicateStrategy = strategy,
                                 queueId = queueId,
@@ -310,7 +324,7 @@ class AppComponent(
                         },
                         onRequestAddCategory = {
                             openCategoryDialog(-1)
-                        }
+                        },
                     ).apply { addItems(config.links) }
                 }
 
@@ -614,7 +628,10 @@ class AppComponent(
         }
     }
 
-    fun externalCredentialComingIntoApp(list: List<DownloadCredentials>) {
+    fun externalCredentialComingIntoApp(
+        list: List<DownloadCredentials>,
+        options: ImportOptions
+    ) {
         val editDownloadComponent = editDownloadSlot.value.child?.instance
         if (editDownloadComponent != null) {
             list.firstOrNull()?.let {
@@ -622,12 +639,13 @@ class AppComponent(
                 editDownloadComponent.bringToFront()
             }
         } else {
-            openAddDownloadDialog(list)
+            openAddDownloadDialog(list, options)
         }
     }
 
     override fun openAddDownloadDialog(
         links: List<DownloadCredentials>,
+        importOptions: ImportOptions,
     ) {
         scope.launch {
             //remove duplicates
@@ -635,10 +653,14 @@ class AppComponent(
             addDownloadPageControl.navigate {
                 val newItems = it.items +
                         if (links.size > 1) {
-                            AddDownloadConfig.MultipleAddConfig(links)
+                            AddDownloadConfig.MultipleAddConfig(
+                                links,
+                                importOptions,
+                            )
                         } else {
                             AddDownloadConfig.SingleAddConfig(
-                                links.firstOrNull() ?: DownloadCredentials.empty()
+                                links.firstOrNull() ?: DownloadCredentials.empty(),
+                                importOptions,
                             )
                         }
                 val copy = it.copy(
@@ -729,13 +751,13 @@ class AppComponent(
         }
     }
 
-    fun addDownload(
+    fun addDownloads(
         items: List<DownloadItem>,
         onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
         categorySelectionMode: CategorySelectionMode?,
         queueId: Long?,
-    ) {
-        scope.launch {
+    ): Deferred<List<Long>> {
+        return scope.async {
             downloadSystem.addDownload(
                 newItemsToAdd = items,
                 onDuplicateStrategy = onDuplicateStrategy,
@@ -750,8 +772,8 @@ class AppComponent(
         queueId: Long?,
         categoryId: Long?,
         onDuplicateStrategy: OnDuplicateStrategy,
-    ) {
-        scope.launch {
+    ): Deferred<Long> {
+        return scope.async {
             downloadSystem.addDownload(
                 downloadItem = item,
                 onDuplicateStrategy = onDuplicateStrategy,
@@ -765,16 +787,15 @@ class AppComponent(
         item: DownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
         categoryId: Long?,
-    ) {
-        scope.launch {
-            val id = downloadSystem.addDownload(
+    ): Deferred<Long> {
+        return scope.async {
+            downloadSystem.addDownload(
                 downloadItem = item,
                 onDuplicateStrategy = onDuplicateStrategy,
                 queueId = DefaultQueueInfo.ID,
                 categoryId = categoryId,
-            )
-            launch {
-                downloadSystem.manualResume(id)
+            ).also {
+                downloadSystem.manualResume(it)
             }
         }
     }
@@ -927,6 +948,7 @@ interface AddDownloadDialogManager {
     val openedAddDownloadDialogs: StateFlow<List<AddDownloadComponent>>
     fun openAddDownloadDialog(
         links: List<DownloadCredentials>,
+        importOptions: ImportOptions = ImportOptions(),
     )
 
     fun closeAddDownloadDialog(dialogId: String)

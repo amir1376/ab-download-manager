@@ -183,6 +183,10 @@ class DownloadSystem(
         }
     }
 
+    suspend fun getDownloadItemsBy(selector: (DownloadItem) -> Boolean): List<DownloadItem> {
+        return downloadListDB.getAll().filter(selector)
+    }
+
     suspend fun getOrCreateDownloadByLink(
         downloadItem: DownloadItem,
     ): Long {
