@@ -171,7 +171,7 @@ private fun MacTitleBarContent(
                 Modifier
             ) {
                 end()
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(4.dp))
             }
         }
     }
