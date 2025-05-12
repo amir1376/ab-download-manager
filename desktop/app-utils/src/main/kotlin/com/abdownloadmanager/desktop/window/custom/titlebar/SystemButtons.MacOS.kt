@@ -15,14 +15,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.FrameWindowScope
+import com.abdownloadmanager.desktop.window.custom.WindowCloseButtonTooltip
+import com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip
+import com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip
+import com.abdownloadmanager.desktop.window.custom.isWindowFocused
+import com.abdownloadmanager.desktop.window.custom.isWindowMaximized
 import com.abdownloadmanager.shared.utils.darker
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
-import ir.amirab.util.ifThen
 
 @Composable
 internal fun MacOSSystemButtons(
@@ -49,7 +52,7 @@ internal fun MacOSSystemButtons(
 @Composable
 private fun MinimizeButton(onRequestMinimize: (() -> Unit)?, isUserInThisArea: Boolean) {
     onRequestMinimize?.let {
-        _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip {
+        WindowMinimizeTooltip {
             SystemButton(
                 onClick = onRequestMinimize,
                 modifier = Modifier,
@@ -64,12 +67,12 @@ private fun MinimizeButton(onRequestMinimize: (() -> Unit)?, isUserInThisArea: B
 @Composable
 private fun ToggleMaximizeButton(onToggleMaximize: (() -> Unit)?, isUserInThisArea: Boolean) {
     onToggleMaximize?.let {
-        _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip {
+        WindowToggleMaximizeTooltip {
             SystemButton(
                 onClick = onToggleMaximize,
                 modifier = Modifier,
                 hoveredBackgroundColor = Color(0xFF28C840),
-                icon = if (_root_ide_package_.com.abdownloadmanager.desktop.window.custom.isWindowMaximized()) {
+                icon = if (isWindowMaximized()) {
                     MyIcons.windowFloating
                 } else {
                     MyIcons.windowMaximize
@@ -82,7 +85,7 @@ private fun ToggleMaximizeButton(onToggleMaximize: (() -> Unit)?, isUserInThisAr
 
 @Composable
 private fun CloseButton(onRequestClose: () -> Unit, isUserInThisArea: Boolean) {
-    _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowCloseButtonTooltip {
+    WindowCloseButtonTooltip {
         SystemButton(
             onRequestClose,
             modifier = Modifier,
@@ -102,7 +105,7 @@ private fun SystemButton(
     isUserInThisArea: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val isWindowFocused = _root_ide_package_.com.abdownloadmanager.desktop.window.custom.isWindowFocused()
+    val isWindowFocused = isWindowFocused()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     Box(

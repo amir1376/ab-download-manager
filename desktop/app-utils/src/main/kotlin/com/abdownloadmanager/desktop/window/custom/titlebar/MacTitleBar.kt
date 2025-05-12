@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.window.custom.MacOSSystemButtons
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import ir.amirab.util.compose.layout.RelativeAlignment
@@ -55,6 +54,33 @@ object MacTitleBar : TitleBar {
             systemButtonsWidth = 60.dp,
             start = start,
             end = end,
+        )
+    }
+
+    @Composable
+    override fun RenderTitleBar(
+        modifier: Modifier,
+        titleBar: TitleBar,
+        title: String,
+        windowIcon: Painter?,
+        titlePosition: TitlePosition,
+        start: @Composable (() -> Unit)?,
+        end: @Composable (() -> Unit)?,
+        onRequestClose: () -> Unit,
+        onRequestMinimize: (() -> Unit)?,
+        onRequestToggleMaximize: (() -> Unit)?
+    ) {
+        CommonRenderTitleBar(
+            modifier = modifier,
+            titleBar = titleBar,
+            title = title,
+            windowIcon = windowIcon,
+            titlePosition = titlePosition,
+            start = start,
+            end = end,
+            onRequestClose = onRequestClose,
+            onRequestMinimize = onRequestMinimize,
+            onRequestToggleMaximize = onRequestToggleMaximize,
         )
     }
 }

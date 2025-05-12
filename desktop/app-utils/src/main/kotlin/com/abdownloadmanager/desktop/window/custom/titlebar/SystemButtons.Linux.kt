@@ -18,21 +18,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.FrameWindowScope
+import com.abdownloadmanager.desktop.window.custom.WindowCloseButtonTooltip
+import com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip
+import com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip
+import com.abdownloadmanager.desktop.window.custom.isWindowFocused
+import com.abdownloadmanager.desktop.window.custom.isWindowMaximized
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.myColors
 
 @Composable
 private fun SystemButton(
     onClick: () -> Unit,
-    background: Color = LocalContentColor.current / 0.1f,
-    onBackground: Color = LocalContentColor.current,
-    hoveredBackgroundColor: Color = LocalContentColor.current / 0.2f,
-    onHoveredBackgroundColor: Color = LocalContentColor.current,
     icon: IconSource,
     modifier: Modifier = Modifier,
 ) {
-    val isFocused = _root_ide_package_.com.abdownloadmanager.desktop.window.custom.isWindowFocused()
+    val onBackground = if (myColors.isLight) Color.Black else Color.White
+    val background = onBackground / 0.1f
+
+    val hoveredBackgroundColor: Color = onBackground / 0.2f
+    val onHoveredBackgroundColor: Color = onBackground
+
+    val isFocused = isWindowFocused()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     MyIcon(
@@ -85,7 +92,7 @@ internal fun LinuxSystemButtons(
         verticalAlignment = Alignment.Top
     ) {
         onRequestMinimize?.let {
-            _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip {
+            WindowMinimizeTooltip {
                 SystemButton(
                     icon = MyIcons.windowMinimize,
                     onClick = onRequestMinimize,
@@ -95,9 +102,9 @@ internal fun LinuxSystemButtons(
         }
 
         onToggleMaximize?.let {
-            _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip {
+            WindowToggleMaximizeTooltip {
                 SystemButton(
-                    icon = if (_root_ide_package_.com.abdownloadmanager.desktop.window.custom.isWindowMaximized()) {
+                    icon = if (isWindowMaximized()) {
                         MyIcons.windowFloating
                     } else {
                         MyIcons.windowMaximize
@@ -108,7 +115,7 @@ internal fun LinuxSystemButtons(
             }
         }
 
-        _root_ide_package_.com.abdownloadmanager.desktop.window.custom.WindowCloseButtonTooltip {
+        WindowCloseButtonTooltip {
             SystemButton(
                 onRequestClose,
                 icon = MyIcons.windowClose,

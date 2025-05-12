@@ -1,10 +1,6 @@
 package com.abdownloadmanager.desktop.window.custom.titlebar
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
@@ -34,6 +30,20 @@ interface TitleBar {
         end: (@Composable () -> Unit)?,
     )
 
+    @Composable
+    fun RenderTitleBar(
+        modifier: Modifier,
+        titleBar: TitleBar,
+        title: String,
+        windowIcon: Painter?,
+        titlePosition: TitlePosition,
+        start: (@Composable () -> Unit)?,
+        end: (@Composable () -> Unit)?,
+        onRequestClose: () -> Unit,
+        onRequestMinimize: (() -> Unit)?,
+        onRequestToggleMaximize: (() -> Unit)?,
+    )
+
     companion object {
         val DefaultTitleBarHeigh = 32.dp
         fun getPlatformTitleBar(): TitleBar {
@@ -42,51 +52,6 @@ interface TitleBar {
                 Platform.Desktop.MacOS -> MacTitleBar
                 Platform.Desktop.Linux -> LinuxTitleBar
             }
-        }
-    }
-}
-
-
-@Composable
-fun RenderTitleBar(
-    modifier: Modifier,
-    titleBar: TitleBar,
-    title: String,
-    windowIcon: Painter? = null,
-    titlePosition: TitlePosition,
-    start: (@Composable () -> Unit)?,
-    end: (@Composable () -> Unit)?,
-    onRequestClose: () -> Unit,
-    onRequestMinimize: (() -> Unit)?,
-    onRequestToggleMaximize: (() -> Unit)?,
-) {
-    Row(
-        modifier.height(titleBar.titleBarHeight),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        val systemButtonsAtFirst = titleBar.systemButtonsFirst
-
-        if (systemButtonsAtFirst) {
-            titleBar.RenderSystemButtons(
-                onRequestClose = onRequestClose,
-                onRequestMinimize = onRequestMinimize,
-                onToggleMaximize = onRequestToggleMaximize,
-            )
-        }
-        titleBar.RenderTitleBarContent(
-            title = title,
-            titlePosition = titlePosition,
-            modifier = Modifier.weight(1f),
-            windowIcon = windowIcon,
-            start = start,
-            end = end
-        )
-        if (!systemButtonsAtFirst) {
-            titleBar.RenderSystemButtons(
-                onRequestClose = onRequestClose,
-                onRequestMinimize = onRequestMinimize,
-                onToggleMaximize = onRequestToggleMaximize,
-            )
         }
     }
 }

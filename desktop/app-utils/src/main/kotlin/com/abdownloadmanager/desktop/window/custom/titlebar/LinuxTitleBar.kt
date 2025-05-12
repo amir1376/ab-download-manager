@@ -1,11 +1,18 @@
 package com.abdownloadmanager.desktop.window.custom.titlebar
 
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import com.abdownloadmanager.desktop.window.custom.titlebar.LinuxSystemButtons
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
+import com.abdownloadmanager.desktop.window.custom.isWindowFocused
+import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.myColors
+import ir.amirab.util.ifThen
 
 object LinuxTitleBar : TitleBar {
     override val systemButtonsFirst: Boolean = false
@@ -43,5 +50,34 @@ object LinuxTitleBar : TitleBar {
         )
     }
 
+    @Composable
+    override fun RenderTitleBar(
+        modifier: Modifier,
+        titleBar: TitleBar,
+        title: String,
+        windowIcon: Painter?,
+        titlePosition: TitlePosition,
+        start: @Composable (() -> Unit)?,
+        end: @Composable (() -> Unit)?,
+        onRequestClose: () -> Unit,
+        onRequestMinimize: (() -> Unit)?,
+        onRequestToggleMaximize: (() -> Unit)?
+    ) {
+        val windowFocused = isWindowFocused()
+        CommonRenderTitleBar(
+            modifier = modifier.ifThen(!windowFocused) {
+                background(myColors.onBackground / 0.05f)
+            },
+            titleBar = titleBar,
+            title = title,
+            windowIcon = windowIcon,
+            titlePosition = titlePosition,
+            start = start,
+            end = end,
+            onRequestClose = onRequestClose,
+            onRequestMinimize = onRequestMinimize,
+            onRequestToggleMaximize = onRequestToggleMaximize,
+        )
+    }
 
 }

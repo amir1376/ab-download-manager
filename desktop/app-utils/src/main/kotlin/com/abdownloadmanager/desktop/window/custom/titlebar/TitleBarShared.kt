@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -112,6 +113,50 @@ fun Title(
                 fontSize = myTextSizes.base,
                 modifier = Modifier
                     .then(modifier)
+            )
+        }
+    }
+}
+
+@Composable
+internal fun CommonRenderTitleBar(
+    modifier: Modifier,
+    titleBar: TitleBar,
+    title: String,
+    windowIcon: Painter? = null,
+    titlePosition: TitlePosition,
+    start: (@Composable () -> Unit)?,
+    end: (@Composable () -> Unit)?,
+    onRequestClose: () -> Unit,
+    onRequestMinimize: (() -> Unit)?,
+    onRequestToggleMaximize: (() -> Unit)?,
+) {
+    Row(
+        modifier.height(titleBar.titleBarHeight),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val systemButtonsAtFirst = titleBar.systemButtonsFirst
+
+        if (systemButtonsAtFirst) {
+            titleBar.RenderSystemButtons(
+                onRequestClose = onRequestClose,
+                onRequestMinimize = onRequestMinimize,
+                onToggleMaximize = onRequestToggleMaximize,
+            )
+        }
+        titleBar.RenderTitleBarContent(
+            title = title,
+            titlePosition = titlePosition,
+            modifier = Modifier.weight(1f),
+            windowIcon = windowIcon,
+            start = start,
+            end = end
+        )
+        if (!systemButtonsAtFirst) {
+            titleBar.RenderSystemButtons(
+                onRequestClose = onRequestClose,
+                onRequestMinimize = onRequestMinimize,
+                onToggleMaximize = onRequestToggleMaximize,
             )
         }
     }
