@@ -3,6 +3,7 @@ package com.abdownloadmanager.updateapplier;
 import com.abdownloadmanager.updatechecker.UpdateInfo
 import com.abdownloadmanager.updatechecker.UpdateSource
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import java.io.File
 
 class DesktopUpdateApplier(
@@ -14,6 +15,10 @@ class DesktopUpdateApplier(
 ) : UpdateApplier {
     private var downloading: Boolean = false
     override fun updateSupported(): Boolean {
+        if (Platform.isMac()) {
+            // TODO support macOS in-app update
+            return false
+        }
         val installationFolder = installationFolder ?: return false
         return File(installationFolder).canWrite()
     }
@@ -31,7 +36,7 @@ class DesktopUpdateApplier(
     }
 
     private fun isExeFile(name: String): Boolean {
-        return name.endsWith(".exe") || name.endsWith(".zip")
+        return name.endsWith(".exe")
     }
 
     override suspend fun applyUpdate(
