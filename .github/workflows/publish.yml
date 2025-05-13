@@ -21,9 +21,10 @@ jobs:
       - name: Set up JBR
         uses: actions/setup-java@v4
         with:
-          distribution: 'jetbrains'
+          distribution: "jetbrains"
           java-package: "jdk"
-          java-version: '21.0.7b968.13'
+          java-version: "21"
+          check-latest: true
 
       - name: Cache Gradle Dependencies
         uses: actions/cache@v4
