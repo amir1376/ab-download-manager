@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalUriHandler
@@ -34,6 +35,8 @@ import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.Tooltip
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.widget.ActionButton
+import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import ir.amirab.util.URLOpener
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.IconSource
@@ -133,6 +136,8 @@ private fun RenderAppInfo(
                 Text(
                     myStringResource(Res.string.developed_with_love_for_you),
                 )
+                Spacer(Modifier.height(8.dp))
+                DonateButton()
                 Spacer(Modifier.height(8.dp))
                 Spacer(
                     Modifier
@@ -449,6 +454,26 @@ fun MaybeLinkText(
             overflow = overflow
         )
     }
+}
+
+@Composable
+private fun DonateButton() {
+    ActionButton(
+        backgroundColor = SolidColor(LocalContentColor.current / 0.05f),
+        start = {
+            MyIcon(
+                MyIcons.hearth,
+                null,
+                modifier = Modifier.size(16.dp),
+                tint = myColors.error,
+            )
+            Spacer(Modifier.width(8.dp))
+        },
+        text = myStringResource(Res.string.donate),
+        onClick = {
+            URLOpener.openUrl(SharedConstants.donateLink)
+        }
+    )
 }
 
 private val LinkStyle: TextStyle

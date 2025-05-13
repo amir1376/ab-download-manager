@@ -165,6 +165,9 @@ val showDownloadList = simpleAction(
 val checkForUpdateAction = simpleAction(
     title = Res.string.update_check_for_update.asStringSource(),
     icon = MyIcons.refresh,
+    checkEnable = MutableStateFlow(
+        appComponent.updater.isUpdateSupported()
+    )
 ) {
     appComponent.updater.requestCheckForUpdate()
 }
@@ -185,6 +188,13 @@ val openTranslators = simpleAction(
     icon = MyIcons.language,
 ) {
     appComponent.openTranslatorsPage()
+}
+
+val donate = simpleAction(
+    title = Res.string.donate.asStringSource(),
+    icon = MyIcons.hearth,
+) {
+    URLOpener.openUrl(SharedConstants.donateLink)
 }
 
 val supportActionGroup = MenuItem.SubMenu(

@@ -20,6 +20,10 @@ class UpdateComponent(
     KoinComponent {
     private val updateManager: UpdateManager by inject()
 
+    fun isUpdateSupported(): Boolean {
+        return updateManager.isUpdateSupported()
+    }
+
     val currentVersion = AppVersion.get()
     val showNewUpdate = MutableStateFlow(false)
     val newVersionData = updateManager.newVersionData

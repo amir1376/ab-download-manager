@@ -7,6 +7,7 @@ interface BaseConstants {
     val dataDirName: String
     val projectWebsite: String
     val projectSourceCode: String
+    val donateLink: String
     val projectTranslations: String
     val projectGithubOwner: String
     val projectGithubRepo: String

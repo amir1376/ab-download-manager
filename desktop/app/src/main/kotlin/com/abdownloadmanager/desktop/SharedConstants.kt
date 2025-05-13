@@ -12,6 +12,7 @@ object SharedConstants : BaseConstants {
     override val projectWebsite: String = BuildConfig.PROJECT_WEBSITE
     override val projectTranslations: String = BuildConfig.PROJECT_TRANSLATIONS
     override val projectSourceCode: String = BuildConfig.PROJECT_SOURCE_CODE
+    override val donateLink: String = BuildConfig.DONATE_LINK
     override val projectGithubOwner: String = BuildConfig.PROJECT_GITHUB_OWNER
     override val projectGithubRepo: String = BuildConfig.PROJECT_GITHUB_REPO
     override val browserIntegrations: List<BrowserIntegrationModel> = listOf(

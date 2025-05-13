@@ -643,13 +643,13 @@ class HomeComponent(
             +gotoSettingsAction
         }
         subMenu(Res.string.help.asStringSource()) {
-            if (updateManager.isUpdateSupported()) {
-                +checkForUpdateAction
-            }
             +supportActionGroup
             separator()
             +openOpenSourceThirdPartyLibraries
             +openTranslators
+            +donate
+            separator()
+            +checkForUpdateAction
             +openAboutAction
         }
     }.filterIsInstance<MenuItem.SubMenu>()
