@@ -1,17 +1,12 @@
 package com.abdownloadmanager.desktop.window.custom
 
-import ir.amirab.util.customwindow.ProvideWindowSpotContainer
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import ir.amirab.util.compose.IconSource
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.onClick
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
@@ -19,28 +14,40 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowState
-import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.desktop.window.custom.titlebar.CommonRenderTitleBar
+import com.abdownloadmanager.desktop.window.custom.titlebar.TitleBar
 import com.abdownloadmanager.shared.utils.PopUpContainer
 import com.abdownloadmanager.shared.utils.ResponsiveBox
 import com.abdownloadmanager.shared.utils.ui.WithTitleBarDirection
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.utils.ui.theme.UiScaledContent
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.jetbrains.JBR
+import com.jetbrains.WindowDecorations
+import com.jetbrains.WindowMove
 import ir.amirab.util.desktop.LocalWindow
-import ir.amirab.util.customwindow.HitSpots
-import ir.amirab.util.customwindow.util.CustomWindowDecorationAccessing
-import ir.amirab.util.customwindow.windowFrameItem
+import ir.amirab.util.desktop.screen.applyUiScale
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.event.MouseEvent
 
 
 // a window frame which totally rendered with compose
@@ -63,9 +70,11 @@ private fun FrameWindowScope.CustomWindowFrame(
         Column(
             Modifier
                 .fillMaxSize()
-                .ifThen(!CustomWindowDecorationAccessing.isSupported) {
-                    border(1.dp, Color.Gray.copy(0.25f), RectangleShape)
-                        .padding(1.dp)
+                .ifThen(!JBR.isWindowDecorationsSupported()) {
+                    ifThen(isWindowFloating()) {
+                        border(1.dp, Color.Gray.copy(0.25f), RectangleShape)
+                            .padding(1.dp)
+                    }
                 }
                 .background(background)
         ) {
@@ -113,9 +122,41 @@ fun FrameWindowScope.SnapDraggableToolbar(
     onRequestToggleMaximize: (() -> Unit)?,
     onRequestClose: () -> Unit,
 ) {
-    ProvideWindowSpotContainer {
-        if (CustomWindowDecorationAccessing.isSupported) {
+    val titleBar = TitleBar.getPlatformTitleBar()
+    if (JBR.isWindowDecorationsSupported()) {
+        val density = LocalDensity.current
+        val uiScale = LocalUiScale.current
+        fun computeHeaderHeight(height: Dp): Float {
+            return height.value.applyUiScale(uiScale)
+        }
+
+        var headerHeight by remember {
+            mutableStateOf(computeHeaderHeight(titleBar.titleBarHeight))
+        }
+        val customTitleBar = remember {
+            JBR.getWindowDecorations().createCustomTitleBar()
+        }
+        LaunchedEffect(headerHeight) {
+            customTitleBar.height = headerHeight
+            customTitleBar.putProperty("controls.visible", false)
+            JBR.getWindowDecorations().setCustomTitleBar(window, customTitleBar)
+        }
+        Box(
+            Modifier
+                .onSizeChanged {
+                    headerHeight = computeHeaderHeight(
+                        density.run { it.height.toDp() }
+                    )
+                }
+        ) {
+            Spacer(
+                Modifier
+                    .matchParentSize()
+                    .customTitleBarMouseEventHandler(customTitleBar)
+            )
             FrameContent(
+                titleBar = titleBar,
+                modifier = Modifier,
                 title = title,
                 windowIcon = windowIcon,
                 titlePosition = titlePosition,
@@ -125,32 +166,112 @@ fun FrameWindowScope.SnapDraggableToolbar(
                 onRequestToggleMaximize = onRequestToggleMaximize,
                 onRequestClose = onRequestClose
             )
-        } else {
-            WindowDraggableArea(
-                Modifier.onClick(
-                    onDoubleClick = {
-                        onRequestToggleMaximize?.invoke()
-                    },
-                    onClick = {}
-                )
-            ) {
-                FrameContent(
-                    title = title,
-                    windowIcon = windowIcon,
-                    titlePosition = titlePosition,
-                    start = start,
-                    end = end,
-                    onRequestMinimize = onRequestMinimize,
-                    onRequestToggleMaximize = onRequestToggleMaximize,
-                    onRequestClose = onRequestClose
-                )
-            }
+        }
+    } else {
+        SystemDraggableSection(
+            onRequestToggleMaximize = onRequestToggleMaximize,
+        ) { modifier ->
+            FrameContent(
+                titleBar = titleBar,
+                modifier = modifier,
+                title = title,
+                windowIcon = windowIcon,
+                titlePosition = titlePosition,
+                start = start,
+                end = end,
+                onRequestMinimize = onRequestMinimize,
+                onRequestToggleMaximize = onRequestToggleMaximize,
+                onRequestClose = onRequestClose
+            )
         }
     }
 }
 
 @Composable
-private fun FrameWindowScope.FrameContent(
+internal fun FrameWindowScope.SystemDraggableSection(
+    onRequestToggleMaximize: (() -> Unit)?,
+    content: @Composable (Modifier) -> Unit
+) {
+    val windowMove: WindowMove? = JBR.getWindowMove()
+    val viewConfig = LocalViewConfiguration.current
+    var lastPress by remember { mutableStateOf(0L) }
+    if (windowMove != null) {
+        content(
+            Modifier
+                .onPointerEvent(PointerEventType.Press, PointerEventPass.Main) {
+                    if (
+                        this.currentEvent.button == PointerButton.Primary &&
+                        this.currentEvent.changes.any { changed -> !changed.isConsumed }
+                    ) {
+                        windowMove.startMovingTogetherWithMouse(window, MouseEvent.BUTTON1)
+                        if (
+                            System.currentTimeMillis() - lastPress in
+                            viewConfig.doubleTapMinTimeMillis..viewConfig.doubleTapTimeoutMillis
+                        ) {
+                            onRequestToggleMaximize?.invoke()
+                        }
+                        lastPress = System.currentTimeMillis()
+                    }
+                },
+        )
+    } else {
+        WindowDraggableArea {
+            content(Modifier)
+        }
+    }
+}
+
+internal fun Modifier.customTitleBarMouseEventHandler(
+    titleBar: WindowDecorations.CustomTitleBar
+): Modifier =
+    pointerInput(Unit) {
+        val currentContext = currentCoroutineContext()
+        awaitPointerEventScope {
+            var inUserControl = false
+            while (currentContext.isActive) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
+                event.changes.forEach {
+                    if (!it.isConsumed && !inUserControl) {
+                        titleBar.forceHitTest(false)
+                    } else {
+                        if (event.type == PointerEventType.Press) {
+                            inUserControl = true
+                        }
+                        if (event.type == PointerEventType.Release) {
+                            inUserControl = false
+                        }
+                        titleBar.forceHitTest(true)
+                    }
+                }
+            }
+        }
+    }
+
+@Composable
+private fun FrameWindowScope.getCurrentWindowSize(): DpSize {
+    var windowSize by remember {
+        mutableStateOf(DpSize(window.width.dp, window.height.dp))
+    }
+    //observe window size
+    DisposableEffect(window) {
+        val listener = object : ComponentAdapter() {
+            override fun componentResized(p0: ComponentEvent?) {
+                windowSize = DpSize(window.width.dp, window.height.dp)
+            }
+        }
+        window.addComponentListener(listener)
+        onDispose {
+            window.removeComponentListener(listener)
+        }
+    }
+    return windowSize
+}
+
+
+@Composable
+private fun FrameContent(
+    titleBar: TitleBar,
+    modifier: Modifier,
     title: String,
     windowIcon: Painter? = null,
     titlePosition: TitlePosition,
@@ -160,99 +281,21 @@ private fun FrameWindowScope.FrameContent(
     onRequestToggleMaximize: (() -> Unit)?,
     onRequestClose: () -> Unit,
 ) {
-    Row(
-        Modifier.fillMaxWidth()
-            .height(32.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Row(
-            Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Row(
-                Modifier
-                    .fillMaxHeight()
-                    .windowFrameItem("icon", HitSpots.MENU_BAR),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Spacer(Modifier.width(16.dp))
-                windowIcon?.let {
-                    WithContentAlpha(1f) {
-                        Image(it, null, Modifier.size(16.dp))
-                    }
-                    Spacer(Modifier.width(8.dp))
-                }
-            }
-            if (!titlePosition.afterStart) {
-                Title(
-                    modifier = Modifier
-                        .ifThen(titlePosition.centered) {
-                            weight(1f)
-                                .ifThen(start == null) {
-                                    wrapContentWidth()
-                                }
-                        }
-                        .padding(titlePosition.padding),
-                    title = title
-                )
-            }
-            start?.let {
-                Row(
-                    Modifier.windowFrameItem("start", HitSpots.OTHER_HIT_SPOT)
-                ) {
-                    start()
-                    Spacer(Modifier.width(8.dp))
-                }
-            }
-            if (titlePosition.afterStart) {
-                Title(
-                    modifier = Modifier
-                        .weight(1f)
-                        .ifThen(titlePosition.centered) {
-                            wrapContentWidth()
-                        }
-                        .padding(titlePosition.padding),
-                    title = title
-                )
-            }
-            if (!titlePosition.centered && !titlePosition.afterStart) {
-                Spacer(Modifier.weight(1f))
-            }
-            end?.let {
-                Row(
-                    Modifier.windowFrameItem("end", HitSpots.OTHER_HIT_SPOT)
-                ) {
-                    end()
-                    Spacer(Modifier.width(8.dp))
-                }
-            }
-        }
-        WindowsActionButtons(
-            onRequestClose,
-            onRequestMinimize,
-            onRequestToggleMaximize,
-        )
-    }
+    titleBar.RenderTitleBar(
+        titleBar = titleBar,
+        modifier = modifier
+            .fillMaxWidth(),
+        title = title,
+        windowIcon = windowIcon,
+        titlePosition = titlePosition,
+        start = start,
+        end = end,
+        onRequestMinimize = onRequestMinimize,
+        onRequestToggleMaximize = onRequestToggleMaximize,
+        onRequestClose = onRequestClose,
+    )
 }
 
-@Composable
-private fun FrameWindowScope.Title(
-    modifier: Modifier, title: String,
-) {
-    WithContentColor(myColors.onBackground) {
-        WithContentAlpha(1f) {
-            Text(
-                title,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = myTextSizes.base,
-                modifier = Modifier
-                    .windowFrameItem("title", HitSpots.DRAGGABLE_AREA)
-                    .then(modifier)
-            )
-        }
-    }
-}
 
 private val defaultAppIcon: IconSource
     @Composable
@@ -296,7 +339,7 @@ fun CustomWindow(
 
     val transparent: Boolean
     val undecorated: Boolean
-    val isAeroSnapSupported = CustomWindowDecorationAccessing.isSupported
+    val isAeroSnapSupported = JBR.isWindowDecorationsSupported()
     if (isAeroSnapSupported) {
         //we use aero snap
         transparent = false

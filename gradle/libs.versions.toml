@@ -30,6 +30,7 @@ markdownRenderer = "0.33.0"
 autoServiceKsp = "1.2.0"
 autoService = "1.1.1"
 proxyVole = "1.1.6"
+jbrApi = "1.5.0"
 
 [libraries]
 
@@ -131,7 +132,7 @@ autoService-annoations = { module = "com.google.auto.service:auto-service-annota
 
 systemTray = "com.dorkbox:SystemTray:4.4"
 proxyVole = { module = "org.bidib.com.github.markusbernhardt:proxy-vole", version.ref = "proxyVole" }
-
+jbrApi = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jbrApi" }
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }

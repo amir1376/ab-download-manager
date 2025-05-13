@@ -30,6 +30,8 @@ private const val TooltipDelay = 500L
 fun Tooltip(
     tooltip: StringSource,
     delayUntilShow: Long = TooltipDelay,
+    anchor: Alignment = Alignment.TopCenter,
+    alignment: Alignment = Alignment.TopCenter,
     content: @Composable () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -49,6 +51,8 @@ fun Tooltip(
                 },
                 content = tooltip.rememberString(),
                 delay = delayUntilShow,
+                anchor = anchor,
+                alignment = alignment
             )
         }
         content()
@@ -59,11 +63,13 @@ fun Tooltip(
 fun TooltipPopup(
     onRequestCloseShowHelpContent: () -> Unit,
     content: String,
+    anchor: Alignment = Alignment.TopCenter,
+    alignment: Alignment = Alignment.TopCenter
 ) {
     Popup(
         popupPositionProvider = rememberComponentRectPositionProvider(
-            anchor = Alignment.TopCenter,
-            alignment = Alignment.TopCenter,
+            anchor = anchor,
+            alignment = alignment,
         ),
         onDismissRequest = onRequestCloseShowHelpContent
     ) {
@@ -93,6 +99,8 @@ fun DelayedTooltipPopup(
     onRequestCloseShowHelpContent: () -> Unit,
     content: String,
     delay: Long = TooltipDelay,
+    anchor: Alignment = Alignment.TopCenter,
+    alignment: Alignment = Alignment.TopCenter,
 ) {
     var showPopup by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -101,8 +109,10 @@ fun DelayedTooltipPopup(
     }
     if (showPopup) {
         TooltipPopup(
-            onRequestCloseShowHelpContent,
-            content,
+            onRequestCloseShowHelpContent = onRequestCloseShowHelpContent,
+            content = content,
+            anchor = anchor,
+            alignment = alignment,
         )
     }
 }
