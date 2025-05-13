@@ -14,6 +14,16 @@
 
 ### Security
 
+## 1.6.1
+
+### Fixed
+
+- Application shortcut in Windows have no icon
+
+### Improved
+
+- Translations updated
+
 ## 1.6.0
 
 ### Added
