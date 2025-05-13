@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.di
 
-import GithubApi
+import com.abdownloadmanager.github.GithubApi
 import com.abdownloadmanager.UpdateDownloadLocationProvider
 import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.AppArguments

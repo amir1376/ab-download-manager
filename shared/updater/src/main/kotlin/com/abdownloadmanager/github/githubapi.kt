@@ -1,4 +1,4 @@
-
+package com.abdownloadmanager.github
 import ir.amirab.util.await
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

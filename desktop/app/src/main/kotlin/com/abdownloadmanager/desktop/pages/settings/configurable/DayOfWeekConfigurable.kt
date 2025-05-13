@@ -53,7 +53,7 @@ class DayOfWeekConfigurable(
 private fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
-    val allDays = values().toSet()
+    val allDays = entries.toSet()
     val enabled = isConfigEnabled()
     fun isSelected(dayOfWeek: DayOfWeek): Boolean {
         return dayOfWeek in value
