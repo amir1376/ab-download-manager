@@ -31,6 +31,12 @@
       "link": "https://crowdin.com/profile/Shariful7972"
     }
   ],
+  "bqi": [
+    {
+      "name": "Hossein Abaspanah (hosseinabaspanah)",
+      "link": "https://crowdin.com/profile/hosseinabaspanah"
+    }
+  ],
   "de": [
     {
       "name": "u!^DEV (uDEV)",
@@ -89,6 +95,12 @@
       "link": "https://crowdin.com/profile/lamjed001"
     }
   ],
+  "hu": [
+    {
+      "name": "John Fowler (JohnFowler58)",
+      "link": "https://crowdin.com/profile/JohnFowler58"
+    }
+  ],
   "id": [
     {
       "name": "Nicedward (dayat219onlyme)",
@@ -135,6 +147,12 @@
     {
       "name": "system32 (Symtax)",
       "link": "https://crowdin.com/profile/Symtax"
+    }
+  ],
+  "pl": [
+    {
+      "name": "Patrxgt",
+      "link": "https://crowdin.com/profile/Patrxgt"
     }
   ],
   "pt-BR": [
