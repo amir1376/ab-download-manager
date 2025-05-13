@@ -1,4 +1,4 @@
-package ir.amirab.util.desktop.linux
+package ir.amirab.util.desktop.utils.linux
 
 import ir.amirab.util.desktop.DesktopUtils
 import ir.amirab.util.execAndWait

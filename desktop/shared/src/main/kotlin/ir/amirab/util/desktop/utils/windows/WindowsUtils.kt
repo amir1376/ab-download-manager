@@ -1,4 +1,4 @@
-package ir.amirab.util.desktop.windows
+package ir.amirab.util.desktop.utils.windows
 
 import ir.amirab.util.desktop.DesktopUtils
 import ir.amirab.util.execAndWait
