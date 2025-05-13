@@ -335,14 +335,9 @@ val createDistributableAppArchive by tasks.registering {
 }
 
 val createBinariesForCi by tasks.registering {
-    val nativeDistributions = compose.desktop.application.nativeDistributions
-    val mainRelease = nativeDistributions.outputBaseDir.dir("main-release")
     if (installerPlugin.isThisPlatformSupported()) {
         dependsOn(installerPlugin.createInstallerTask)
         inputs.dir(installerPlugin.outputFolder)
-    } else {
-        dependsOn("packageReleaseDistributionForCurrentOS")
-        inputs.dir(mainRelease)
     }
     dependsOn(createDistributableAppArchive)
     inputs.property("appVersion", getAppVersionString())
@@ -365,22 +360,6 @@ val createBinariesForCi by tasks.registering {
                 )
             }
             logger.lifecycle("app packages for '${targets.joinToString(", ") { it.name }}' written in $output using the installer plugin")
-        } else {
-            val allowedTargets = nativeDistributions
-                .targetFormats.filter { it.isCompatibleWithCurrentOS }
-                .map {
-                    it.toInstallerTargetFormat()
-                }
-            for (target in allowedTargets) {
-                CiUtils.movePackagedAndCreateSignature(
-                    getAppVersion(),
-                    packageName,
-                    target,
-                    mainRelease.get().asFile.resolve(target.outputDirName),
-                    output,
-                )
-            }
-            logger.lifecycle("app packages for '${allowedTargets.joinToString(", ") { it.name }}' written in $output using compose packager tool")
         }
         val appArchiveDistributableDir = distributableAppArchiveDir.get().asFile
         CiUtils.copyAndHashToDestination(
