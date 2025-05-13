@@ -26,7 +26,7 @@
 - ⚡️ Faster Download Speed
 - ⏰ Queues and Schedulers
 - 🌐 Browser Extensions
-- 💻 Multiplatform (Windows / Linux for now)
+- 💻 Multiplatform (Windows / Linux / Mac)
 - 🌙 Multiple Themes (Dark/Light) with modern UI
 - ❤️ Free and Open Source
 
