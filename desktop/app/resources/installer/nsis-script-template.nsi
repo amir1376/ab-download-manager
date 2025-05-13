@@ -143,7 +143,7 @@ FunctionEnd
 
 !macro CreateStartMenu
 	createDirectory "$SMPROGRAMS\${APP_DISPLAY_NAME}"
-	createShortCut "$SMPROGRAMS\${APP_DISPLAY_NAME}\${APP_DISPLAY_NAME}.lnk" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe" "" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.ico"
+	createShortCut "$SMPROGRAMS\${APP_DISPLAY_NAME}\${APP_DISPLAY_NAME}.lnk" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe"
 !macroend
 
 !macro RemoveStartMenu
@@ -156,7 +156,7 @@ FunctionEnd
 !macroend
 
 !macro CreateDesktopShortcut
-    CreateShortcut "$DESKTOP\${APP_DISPLAY_NAME}.lnk" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe" "" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.ico"
+    CreateShortcut "$DESKTOP\${APP_DISPLAY_NAME}.lnk" "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe"
 !macroend
 
 !macro RemoveDesktopShortCut
