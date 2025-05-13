@@ -14,6 +14,30 @@
 
 ### Security
 
+## 1.6.0
+
+### Added
+
+- macOS support
+- Polish Language
+- Hungarian Language
+- Luri Bakhtiari Language
+- Silent Download option in the Browser Integration
+- Donate button in the app to support the project
+
+### Fixed
+
+- Overriding an existing download sometimes didn't work as expected.
+- "Start Queue" checkbox sometimes did not work as expected.
+
+### Improved
+
+- Translations updated
+- Custom Window decorations
+- Window dragging on Linux is now handled by the OS
+- Each platform now uses its own system button style
+- JVM updated to version 21
+
 ## 1.5.8
 
 ### Added
