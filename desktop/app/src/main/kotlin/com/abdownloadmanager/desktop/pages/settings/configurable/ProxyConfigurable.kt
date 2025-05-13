@@ -21,12 +21,12 @@ import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.isValidUrl
 import com.abdownloadmanager.shared.utils.proxy.*
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.downloader.connection.proxy.Proxy
 import ir.amirab.downloader.connection.proxy.ProxyType
+import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
@@ -110,7 +110,7 @@ private class ProxyEditState(
             }
 
             ProxyMode.Pac -> {
-                isValidUrl(pacURL.value)
+                UrlUtils.isValidUrl(pacURL.value)
             }
         }
 

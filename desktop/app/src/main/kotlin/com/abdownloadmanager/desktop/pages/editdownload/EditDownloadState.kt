@@ -13,6 +13,7 @@ import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.downloaditem.DownloadItem.Companion.LENGTH_UNKNOWN
 import ir.amirab.downloader.downloaditem.withCredentials
+import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
@@ -84,7 +85,7 @@ class EditDownloadChecker(
         if (current == edited) {
             return CanEditDownloadResult.NothingChanged
         }
-        if (!isValidUrl(edited.link)) {
+        if (!UrlUtils.isValidUrl(edited.link)) {
             return CanEditDownloadResult.InvalidURL
         }
         if (edited.name != current.name) {

@@ -34,12 +34,12 @@ import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.Tooltip
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
+import ir.amirab.util.URLOpener
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
-import java.net.URL
 
 @Composable
 fun AboutPage(
@@ -143,9 +143,7 @@ private fun RenderAppInfo(
                 Spacer(Modifier.height(8.dp))
                 val websiteUrl = SharedConstants.projectWebsite
                 val websiteDisplayName = remember(websiteUrl) {
-                    kotlin.runCatching {
-                        URL(websiteUrl).host
-                    }.getOrNull() ?: websiteUrl
+                    UrlUtils.getHost(websiteUrl) ?: websiteUrl
                 }
                 LinkText(
                     text = websiteDisplayName,
@@ -199,35 +197,35 @@ private fun SocialAndLinks(
             MyIcons.earth,
             Res.string.visit_the_project_website.asStringSource(),
             onClick = {
-                UrlUtils.openUrl(SharedConstants.projectWebsite)
+                URLOpener.openUrl(SharedConstants.projectWebsite)
             }
         )
         SocialSmallButton(
             MyIcons.openSource,
             Res.string.view_the_source_code.asStringSource(),
             onClick = {
-                UrlUtils.openUrl(SharedConstants.projectSourceCode)
+                URLOpener.openUrl(SharedConstants.projectSourceCode)
             }
         )
         SocialSmallButton(
             MyIcons.speaker,
             Res.string.channel.asStringSource(),
             onClick = {
-                UrlUtils.openUrl(SharedConstants.telegramChannelUrl)
+                URLOpener.openUrl(SharedConstants.telegramChannelUrl)
             }
         )
         SocialSmallButton(
             MyIcons.group,
             Res.string.group.asStringSource(),
             onClick = {
-                UrlUtils.openUrl(SharedConstants.telegramGroupUrl)
+                URLOpener.openUrl(SharedConstants.telegramGroupUrl)
             }
         )
         SocialSmallButton(
             MyIcons.language,
             Res.string.translators_contribute_title.asStringSource(),
             onClick = {
-                UrlUtils.openUrl(SharedConstants.projectTranslations)
+                URLOpener.openUrl(SharedConstants.projectTranslations)
             }
         )
     }
@@ -253,7 +251,7 @@ private fun CreditsSection(
             title = Res.string.this_is_a_free_and_open_source_software.asStringSource(),
             description = Res.string.view_the_source_code.asStringSource(),
             onClick = {
-                UrlUtils.openUrl(AppInfo.sourceCode)
+                URLOpener.openUrl(AppInfo.sourceCode)
             }
         )
         AboutPageListItemButton(

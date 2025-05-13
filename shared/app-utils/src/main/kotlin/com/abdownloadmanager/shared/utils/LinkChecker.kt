@@ -38,7 +38,7 @@ class LinkChecker(
 
     private fun validate() {
         val isValid = when {
-            !isValidUrl(this.credentials.value.link) -> false
+            !UrlUtils.isValidUrl(this.credentials.value.link) -> false
             else -> true
         }
         _isValid.update { isValid }
@@ -47,7 +47,7 @@ class LinkChecker(
     suspend fun check() {
         val downloadCredentials = credentials.value
         val link = downloadCredentials.link
-        val isValidUrl = isValidUrl(link)
+        val isValidUrl = UrlUtils.isValidUrl(link)
         setInfo(null)
         if (link.isBlank() || !isValidUrl) {
             return

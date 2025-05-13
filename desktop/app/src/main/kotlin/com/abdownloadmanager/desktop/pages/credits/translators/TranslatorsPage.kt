@@ -27,7 +27,7 @@ import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import ir.amirab.util.UrlUtils
+import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.localizationmanager.LanguageNameProvider
 import ir.amirab.util.compose.localizationmanager.MyLocale
 import ir.amirab.util.compose.resources.myStringResource
@@ -51,7 +51,7 @@ internal fun Translators(modifier: Modifier) {
         ContributionNotice(
             modifier = Modifier,
             onUserWantsToContribute = {
-                UrlUtils.openUrl(AppInfo.translationsUrl)
+                URLOpener.openUrl(AppInfo.translationsUrl)
             }
         )
     }

@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.utils
 
 import ir.amirab.downloader.utils.DuplicateFilterByPath
+import ir.amirab.util.UrlUtils
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
@@ -58,7 +59,7 @@ class AddDownloadChecker(
 
     private suspend fun validate(): CanAddResult {
         val link = this.link.value
-        if (!isValidUrl(link)) {
+        if (!UrlUtils.isValidUrl(link)) {
             return CanAddResult.InvalidUrl
         }
         if (!fileNameValid()) {

@@ -42,7 +42,7 @@ import com.abdownloadmanager.shared.utils.LocalSizeUnit
 import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import com.abdownloadmanager.shared.utils.div
-import ir.amirab.util.UrlUtils
+import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.desktop.screen.applyUiScale
@@ -170,7 +170,7 @@ fun BrowserImportButton(
                 enabled = downloadPage != null,
                 onClick = {
                     downloadPage?.let {
-                        UrlUtils.openUrl(it)
+                        URLOpener.openUrl(it)
                     }
                 },
 //                borderColor = when (credentialsImportedFromExternal) {

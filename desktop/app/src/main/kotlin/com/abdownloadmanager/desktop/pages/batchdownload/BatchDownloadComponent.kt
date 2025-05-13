@@ -4,8 +4,8 @@ import com.abdownloadmanager.shared.utils.BaseComponent
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
-import com.abdownloadmanager.shared.utils.isValidUrl
 import com.arkivanov.decompose.ComponentContext
+import ir.amirab.util.UrlUtils
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +58,7 @@ class BatchDownloadComponent(
         scope.launch {
             withContext(Dispatchers.Default) {
                 val clipboard = ClipboardUtil.read() ?: return@withContext
-                if (isValidUrl(clipboard)) {
+                if (UrlUtils.isValidUrl(clipboard)) {
                     setLink(clipboard.trim())
                 }
             }
@@ -105,7 +105,7 @@ class BatchDownloadComponent(
                 when {
                     listSize < 1 -> BatchDownloadValidationResult.Others
                     listSize > MAX_ALLOWED_RANGE -> BatchDownloadValidationResult.MaxRangeExceed(MAX_ALLOWED_RANGE)
-                    !isValidUrl(it.first()) -> BatchDownloadValidationResult.URLInvalid
+                    !UrlUtils.isValidUrl(it.first()) -> BatchDownloadValidationResult.URLInvalid
                     else -> BatchDownloadValidationResult.Ok
                 }
             }

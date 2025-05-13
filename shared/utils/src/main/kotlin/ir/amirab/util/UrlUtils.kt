@@ -1,20 +1,26 @@
 package ir.amirab.util
 
-import ir.amirab.util.platform.Platform
-import java.awt.Desktop
 import java.net.URI
 import java.net.URL
 import java.net.URLDecoder
 
 object UrlUtils {
+    fun createURL(url: String): URL {
+        return URI.create(url).toURL()
+    }
+
+    fun isValidUrl(link: String): Boolean {
+        return runCatching { createURL(link) }.isSuccess
+    }
+
     fun extractNameFromLink(link: String): String? {
         return runCatching {
-            URL(link)
+            createURL(link)
         }.map { url ->
             val foundName = url.path
                 .split("/")
-                .filter { it.isNotBlank() }
-                .lastOrNull()?.let {
+                .lastOrNull { it.isNotBlank() }
+                ?.let {
                     kotlin.runCatching {
                         URLDecoder.decode(it, Charsets.UTF_8)
                     }.getOrNull()
@@ -27,12 +33,10 @@ object UrlUtils {
             .getOrNull()
     }
 
-    fun openUrl(url: String) {
-        kotlin.runCatching {
-            val desktop = Desktop.getDesktop()
-            if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                desktop.browse(URI(url))
-            }
-        }
+    fun getHost(url: String): String? {
+        return kotlin.runCatching {
+            createURL(url).host
+        }.getOrNull()
     }
+
 }

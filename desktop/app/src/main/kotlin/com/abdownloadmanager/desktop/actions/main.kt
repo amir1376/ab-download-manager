@@ -21,7 +21,7 @@ import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.inactiveQueuesFlow
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
-import ir.amirab.util.UrlUtils
+import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
 import kotlinx.coroutines.CoroutineScope
@@ -141,7 +141,7 @@ val browserIntegrations = MenuItem.SubMenu(
                     val browser = Browser.getBrowserByType(browserExtension.type)
                     val success = browser?.openLink(browserExtension.url) == true
                     if (!success) {
-                        UrlUtils.openUrl(browserExtension.url)
+                        URLOpener.openUrl(browserExtension.url)
                     }
                 }
             )
@@ -192,17 +192,17 @@ val supportActionGroup = MenuItem.SubMenu(
     icon = MyIcons.group,
     items = buildMenu {
         item(Res.string.website.asStringSource(), MyIcons.appIcon) {
-            UrlUtils.openUrl(AppInfo.website)
+            URLOpener.openUrl(AppInfo.website)
         }
         item(Res.string.source_code.asStringSource(), MyIcons.openSource) {
-            UrlUtils.openUrl(AppInfo.sourceCode)
+            URLOpener.openUrl(AppInfo.sourceCode)
         }
         subMenu(Res.string.telegram.asStringSource(), MyIcons.telegram) {
             item(Res.string.channel.asStringSource(), MyIcons.speaker) {
-                UrlUtils.openUrl(SharedConstants.telegramChannelUrl)
+                URLOpener.openUrl(SharedConstants.telegramChannelUrl)
             }
             item(Res.string.group.asStringSource(), MyIcons.group) {
-                UrlUtils.openUrl(SharedConstants.telegramGroupUrl)
+                URLOpener.openUrl(SharedConstants.telegramGroupUrl)
             }
         }
     }

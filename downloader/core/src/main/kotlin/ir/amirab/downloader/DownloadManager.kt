@@ -13,6 +13,7 @@ import ir.amirab.downloader.utils.FileNameUtil
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.downloader.utils.OnDuplicateStrategy.*
+import ir.amirab.util.UrlUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
@@ -73,7 +74,7 @@ class DownloadManager(
     ): Long {
 
         //make sure url is valid
-        require(runCatching { URL(newItem.link) }.isSuccess) {
+        require(UrlUtils.isValidUrl(newItem.link)) {
             "url is not valid"
         }
 
