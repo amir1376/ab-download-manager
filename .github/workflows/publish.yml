@@ -18,15 +18,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up JBR 17
+      - name: Set up JBR
         uses: actions/setup-java@v4
         with:
           distribution: 'jetbrains'
           java-package: "jdk"
-          java-version: '17.0.14'
-        # For GitHub API (use if you believe you'd run into rate limits)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          java-version: '21.0.7b968.13'
 
       - name: Cache Gradle Dependencies
         uses: actions/cache@v4
