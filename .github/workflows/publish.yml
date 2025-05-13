@@ -25,6 +25,8 @@ jobs:
           java-package: "jdk"
           java-version: "21"
           check-latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache Gradle Dependencies
         uses: actions/cache@v4
