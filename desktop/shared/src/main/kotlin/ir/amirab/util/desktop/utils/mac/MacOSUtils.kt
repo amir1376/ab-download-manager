@@ -1,4 +1,4 @@
-package ir.amirab.util.desktop.mac
+package ir.amirab.util.desktop.utils.mac
 
 import ir.amirab.util.desktop.DesktopUtils
 import ir.amirab.util.execAndWait

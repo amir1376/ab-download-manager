@@ -1,14 +1,5 @@
 package com.abdownloadmanager.desktop.pages.addDownload
 
-import com.abdownloadmanager.desktop.AddDownloadDialogManager
-import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownloadComponent
-import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemPage
-import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPage
-import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
-import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowIcon
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,9 +10,19 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.desktop.AddDownloadDialogManager
+import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownloadComponent
+import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemPage
+import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPage
+import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.WindowIcon
+import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.PlatformAppActivator
 import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 
@@ -58,6 +59,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
                 ) {
                     LaunchedEffect(Unit) {
                         window.minimumSize = Dimension(w, h)
+                        PlatformAppActivator.active()
                     }
 //                    BringToFront()
                     WindowTitle(myStringResource(Res.string.add_download))
@@ -81,6 +83,7 @@ fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
                 ) {
                     LaunchedEffect(Unit) {
                         window.minimumSize = Dimension(w, h)
+                        PlatformAppActivator.active()
                     }
 //                    BringToFront()
                     WindowTitle(myStringResource(Res.string.add_download))

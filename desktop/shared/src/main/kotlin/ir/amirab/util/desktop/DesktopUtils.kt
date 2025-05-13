@@ -1,8 +1,8 @@
 package ir.amirab.util.desktop
 
-import ir.amirab.util.desktop.linux.LinuxUtils
-import ir.amirab.util.desktop.mac.MacOSUtils
-import ir.amirab.util.desktop.windows.WindowsUtils
+import ir.amirab.util.desktop.utils.linux.LinuxUtils
+import ir.amirab.util.desktop.utils.mac.MacOSUtils
+import ir.amirab.util.desktop.utils.windows.WindowsUtils
 import ir.amirab.util.platform.Platform
 
 
