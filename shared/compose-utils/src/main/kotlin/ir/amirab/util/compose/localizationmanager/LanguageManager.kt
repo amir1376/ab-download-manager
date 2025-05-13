@@ -176,7 +176,7 @@ class LanguageManager(
             )
         }
 
-        private val rtlLanguages = arrayOf("ar", "fa", "he", "iw", "ji", "ur", "yi")
+        private val rtlLanguages = arrayOf("ar", "bqi", "fa", "he", "iw", "ji", "ur", "yi")
 
         private fun extractLanguageCodeAndCountryCodeFromFileName(name: String): MyLocale? {
             return name
