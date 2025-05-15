@@ -12,7 +12,7 @@ object MacEventHandler {
         onClickIcon: () -> Unit,
         onAboutClick: () -> Unit,
         onSettingsClick: () -> Unit,
-        onQuite: () -> Unit,
+        onQuit: () -> Unit,
     ) {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop()
                 .isSupported(Desktop.Action.APP_EVENT_REOPENED)
@@ -32,7 +32,7 @@ object MacEventHandler {
                 if (isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
                     setQuitHandler { _, response ->
                         response.cancelQuit()
-                        onQuite.invoke()
+                        onQuit.invoke()
                     }
                 }
             }
