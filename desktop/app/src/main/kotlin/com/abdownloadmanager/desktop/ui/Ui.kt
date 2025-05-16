@@ -72,7 +72,10 @@ object Ui : KoinComponent {
                 onAboutClick = {
                     appComponent.showAboutPage.value = true
                 },
-                onSettingsClick = appComponent::openSettings
+                onSettingsClick = appComponent::openSettings,
+                onQuit = {
+                    scope.launch { appComponent.requestExitApp() }
+                }
             )
         }
         application {
