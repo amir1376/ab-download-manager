@@ -12,6 +12,8 @@ import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.desktop.GlobalDensity
 import ir.amirab.util.desktop.GlobalLayoutDirection
 import ir.amirab.util.desktop.systemtray.IComposeSystemTray
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isLinux
 import java.awt.Image
 
 @AutoService(IComposeSystemTray::class)
@@ -24,7 +26,10 @@ class ComposeSystemTrayForLinux : IComposeSystemTray {
         onClick: () -> Unit
     ) {
         val tooltipString = tooltip.rememberString()
-        val systemTray: SystemTray? = remember { SystemTray.get(tooltipString) }
+        val systemTray: SystemTray? = remember {
+            SystemTray.FORCE_TRAY_TYPE = getTrayType()
+            SystemTray.get(tooltipString)
+        }
         if (systemTray == null) {
             System.err.println("System tray is not supported")
             return
@@ -61,6 +66,22 @@ class ComposeSystemTrayForLinux : IComposeSystemTray {
         }
     }
 }
+
+private const val TRAY_TYPE_NAME = "ABDM_SYSTEM_TRAY_TYPE"
+private fun getTrayType(): SystemTray.TrayType {
+    val trayTypeFromEnv = System.getenv(TRAY_TYPE_NAME)
+    val userRequestedValue = runCatching {
+        SystemTray.TrayType.valueOf(trayTypeFromEnv)
+    }.getOrNull()
+    if (userRequestedValue != null) {
+        return userRequestedValue
+    }
+    if (Platform.isLinux()) {
+        return SystemTray.TrayType.AppIndicator
+    }
+    return SystemTray.TrayType.AutoDetect
+}
+
 
 private fun Menu.addImmutableMenu(immutableMenu: List<ImmutableMenuItem>) {
     for (item in immutableMenu) {
