@@ -6,13 +6,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
+import com.abdownloadmanager.desktop.window.custom.titlebar.linux.LinuxTitleBar
+import com.abdownloadmanager.desktop.window.custom.titlebar.mac.MacTitleBar
+import com.abdownloadmanager.desktop.window.custom.titlebar.windows.WindowsTitleBar
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
 
 interface TitleBar {
-    val systemButtonsFirst: Boolean
     val titleBarHeight: Dp
-
+    val systemButtonsPosition: SystemButtonsPosition
     @Composable
     fun RenderSystemButtons(
         onRequestClose: () -> Unit,
@@ -55,3 +57,14 @@ interface TitleBar {
         }
     }
 }
+
+enum class SystemButtonType {
+    Close,
+    Minimize,
+    Maximize,
+}
+
+data class SystemButtonsPosition(
+    val buttons: List<SystemButtonType>,
+    val isLeft: Boolean,
+)

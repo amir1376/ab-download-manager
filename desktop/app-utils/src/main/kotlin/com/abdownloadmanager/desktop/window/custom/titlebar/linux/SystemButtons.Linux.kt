@@ -1,6 +1,5 @@
-package com.abdownloadmanager.desktop.window.custom.titlebar
+package com.abdownloadmanager.desktop.window.custom.titlebar.linux
 
-import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import androidx.compose.animation.animateColorAsState
@@ -23,6 +22,8 @@ import com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip
 import com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip
 import com.abdownloadmanager.desktop.window.custom.isWindowFocused
 import com.abdownloadmanager.desktop.window.custom.isWindowMaximized
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType.*
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
@@ -83,6 +84,7 @@ internal fun LinuxSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,
+    buttons: List<SystemButtonType>,
 ) {
     Row(
         // Toolbar is aligned center vertically, so I fill that and place it on top
@@ -91,36 +93,46 @@ internal fun LinuxSystemButtons(
             .fillMaxHeight().wrapContentHeight(Alignment.Top),
         verticalAlignment = Alignment.Top
     ) {
-        onRequestMinimize?.let {
-            WindowMinimizeTooltip {
-                SystemButton(
-                    icon = MyIcons.windowMinimize,
-                    onClick = onRequestMinimize,
-                    modifier = Modifier
-                )
-            }
-        }
+        buttons.forEach {
+            when (it) {
+                Close -> {
+                    WindowCloseButtonTooltip {
+                        SystemButton(
+                            onRequestClose,
+                            icon = MyIcons.windowClose,
+                            modifier = Modifier,
+                        )
+                    }
+                }
 
-        onToggleMaximize?.let {
-            WindowToggleMaximizeTooltip {
-                SystemButton(
-                    icon = if (isWindowMaximized()) {
-                        MyIcons.windowFloating
-                    } else {
-                        MyIcons.windowMaximize
-                    },
-                    onClick = onToggleMaximize,
-                    modifier = Modifier
-                )
-            }
-        }
+                Minimize -> {
+                    onRequestMinimize?.let {
+                        WindowMinimizeTooltip {
+                            SystemButton(
+                                icon = MyIcons.windowMinimize,
+                                onClick = onRequestMinimize,
+                                modifier = Modifier
+                            )
+                        }
+                    }
+                }
 
-        WindowCloseButtonTooltip {
-            SystemButton(
-                onRequestClose,
-                icon = MyIcons.windowClose,
-                modifier = Modifier,
-            )
+                Maximize -> {
+                    onToggleMaximize?.let {
+                        WindowToggleMaximizeTooltip {
+                            SystemButton(
+                                icon = if (isWindowMaximized()) {
+                                    MyIcons.windowFloating
+                                } else {
+                                    MyIcons.windowMaximize
+                                },
+                                onClick = onToggleMaximize,
+                                modifier = Modifier
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

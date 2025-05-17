@@ -141,7 +141,7 @@ internal fun CommonRenderTitleBar(
         modifier.height(titleBar.titleBarHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val systemButtonsAtFirst = titleBar.systemButtonsFirst
+        val systemButtonsAtFirst = titleBar.systemButtonsPosition.isLeft
 
         if (systemButtonsAtFirst) {
             titleBar.RenderSystemButtons(

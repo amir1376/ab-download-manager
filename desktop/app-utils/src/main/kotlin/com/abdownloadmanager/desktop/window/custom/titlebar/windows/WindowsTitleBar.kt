@@ -1,24 +1,26 @@
-package com.abdownloadmanager.desktop.window.custom.titlebar
+package com.abdownloadmanager.desktop.window.custom.titlebar.windows
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
-import com.abdownloadmanager.desktop.window.custom.titlebar.LinuxSystemButtons
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
-import com.abdownloadmanager.desktop.window.custom.isWindowFocused
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.myColors
-import ir.amirab.util.ifThen
+import com.abdownloadmanager.desktop.window.custom.titlebar.CommonRenderTitleBar
+import com.abdownloadmanager.desktop.window.custom.titlebar.CommonTitleBarContent
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonsPosition
+import com.abdownloadmanager.desktop.window.custom.titlebar.TitleBar
 
-object LinuxTitleBar : TitleBar {
-    override val systemButtonsFirst: Boolean = false
-    override val titleBarHeight: Dp = TitleBar.DefaultTitleBarHeigh
+object WindowsTitleBar : TitleBar {
+    override val titleBarHeight: Dp = TitleBar.Companion.DefaultTitleBarHeigh
+    override val systemButtonsPosition: SystemButtonsPosition = SystemButtonsPosition(
+        buttons = listOf(
+            SystemButtonType.Minimize,
+            SystemButtonType.Maximize,
+            SystemButtonType.Close,
+        ),
+        isLeft = false,
+    )
 
     @Composable
     override fun RenderSystemButtons(
@@ -26,10 +28,11 @@ object LinuxTitleBar : TitleBar {
         onRequestMinimize: (() -> Unit)?,
         onToggleMaximize: (() -> Unit)?
     ) {
-        LinuxSystemButtons(
+        WindowsSystemButtons(
             onRequestClose = onRequestClose,
             onRequestMinimize = onRequestMinimize,
             onToggleMaximize = onToggleMaximize,
+            buttons = systemButtonsPosition.buttons,
         )
     }
 
@@ -65,15 +68,8 @@ object LinuxTitleBar : TitleBar {
         onRequestMinimize: (() -> Unit)?,
         onRequestToggleMaximize: (() -> Unit)?
     ) {
-        val windowFocused = isWindowFocused()
         CommonRenderTitleBar(
-            modifier = modifier
-                .background(
-                    animateColorAsState(
-                        if (windowFocused) Color.Transparent
-                        else myColors.onBackground / 0.05f
-                    ).value
-                ),
+            modifier = modifier,
             titleBar = titleBar,
             title = title,
             windowIcon = windowIcon,
