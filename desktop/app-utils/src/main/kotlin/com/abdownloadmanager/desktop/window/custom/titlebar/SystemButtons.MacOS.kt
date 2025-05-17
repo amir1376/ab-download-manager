@@ -32,6 +32,7 @@ internal fun MacOSSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,
+    buttons: List<SystemButtonType>,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isUserInThisArea by interactionSource.collectIsHoveredAsState()
@@ -43,9 +44,21 @@ internal fun MacOSSystemButtons(
             .fillMaxHeight().wrapContentHeight(Alignment.Top),
         verticalAlignment = Alignment.Top
     ) {
-        CloseButton(onRequestClose, isUserInThisArea)
-        MinimizeButton(onRequestMinimize, isUserInThisArea)
-        ToggleMaximizeButton(onToggleMaximize, isUserInThisArea)
+        buttons.forEach {
+            when (it) {
+                SystemButtonType.Close -> {
+                    CloseButton(onRequestClose, isUserInThisArea)
+                }
+
+                SystemButtonType.Minimize -> {
+                    MinimizeButton(onRequestMinimize, isUserInThisArea)
+                }
+
+                SystemButtonType.Maximize -> {
+                    ToggleMaximizeButton(onToggleMaximize, isUserInThisArea)
+                }
+            }
+        }
     }
 }
 

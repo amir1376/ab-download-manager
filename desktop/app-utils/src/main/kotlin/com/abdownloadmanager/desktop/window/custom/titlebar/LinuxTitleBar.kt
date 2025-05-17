@@ -17,9 +17,15 @@ import com.abdownloadmanager.shared.utils.ui.myColors
 import ir.amirab.util.ifThen
 
 object LinuxTitleBar : TitleBar {
-    override val systemButtonsFirst: Boolean = false
     override val titleBarHeight: Dp = TitleBar.DefaultTitleBarHeigh
-
+    override val systemButtonsPosition: SystemButtonsPosition = SystemButtonsPosition(
+        buttons = listOf(
+            SystemButtonType.Minimize,
+            SystemButtonType.Maximize,
+            SystemButtonType.Close,
+        ),
+        isLeft = false,
+    )
     @Composable
     override fun RenderSystemButtons(
         onRequestClose: () -> Unit,
@@ -30,6 +36,7 @@ object LinuxTitleBar : TitleBar {
             onRequestClose = onRequestClose,
             onRequestMinimize = onRequestMinimize,
             onToggleMaximize = onToggleMaximize,
+            buttons = systemButtonsPosition.buttons,
         )
     }
 

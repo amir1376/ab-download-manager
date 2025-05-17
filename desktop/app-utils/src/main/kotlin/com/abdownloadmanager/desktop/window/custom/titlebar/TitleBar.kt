@@ -10,9 +10,8 @@ import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
 
 interface TitleBar {
-    val systemButtonsFirst: Boolean
     val titleBarHeight: Dp
-
+    val systemButtonsPosition: SystemButtonsPosition
     @Composable
     fun RenderSystemButtons(
         onRequestClose: () -> Unit,
@@ -55,3 +54,14 @@ interface TitleBar {
         }
     }
 }
+
+enum class SystemButtonType {
+    Close,
+    Minimize,
+    Maximize,
+}
+
+data class SystemButtonsPosition(
+    val buttons: List<SystemButtonType>,
+    val isLeft: Boolean,
+)

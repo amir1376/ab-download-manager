@@ -21,9 +21,15 @@ import ir.amirab.util.ifThen
 import kotlin.math.roundToInt
 
 object MacTitleBar : TitleBar {
-    override val systemButtonsFirst: Boolean = true
     override val titleBarHeight: Dp = TitleBar.DefaultTitleBarHeigh
-
+    override val systemButtonsPosition: SystemButtonsPosition = SystemButtonsPosition(
+        buttons = listOf(
+            SystemButtonType.Close,
+            SystemButtonType.Minimize,
+            SystemButtonType.Maximize,
+        ),
+        isLeft = true,
+    )
     @Composable
     override fun RenderSystemButtons(
         onRequestClose: () -> Unit,
@@ -34,6 +40,7 @@ object MacTitleBar : TitleBar {
             onRequestClose = onRequestClose,
             onRequestMinimize = onRequestMinimize,
             onToggleMaximize = onToggleMaximize,
+            buttons = systemButtonsPosition.buttons,
         )
     }
 
