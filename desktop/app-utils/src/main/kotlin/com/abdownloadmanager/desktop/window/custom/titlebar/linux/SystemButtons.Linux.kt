@@ -1,15 +1,15 @@
-package com.abdownloadmanager.desktop.window.custom.titlebar
+package com.abdownloadmanager.desktop.window.custom.titlebar.linux
 
-import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.onClick
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -22,19 +22,24 @@ import com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip
 import com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip
 import com.abdownloadmanager.desktop.window.custom.isWindowFocused
 import com.abdownloadmanager.desktop.window.custom.isWindowMaximized
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType.*
+import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 
 @Composable
 private fun SystemButton(
     onClick: () -> Unit,
-    background: Color = Color.Transparent,
-    onBackground: Color = LocalContentColor.current,
-    hoveredBackgroundColor: Color = background,
-    onHoveredBackgroundColor: Color = LocalContentColor.current,
     icon: IconSource,
     modifier: Modifier = Modifier,
 ) {
+    val onBackground = if (myColors.isLight) Color.Black else Color.White
+    val background = onBackground / 0.1f
+
+    val hoveredBackgroundColor: Color = onBackground / 0.2f
+    val onHoveredBackgroundColor: Color = onBackground
+
     val isFocused = isWindowFocused()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -54,48 +59,28 @@ private fun SystemButton(
             )
         ).value,
         modifier = modifier
-            .clickable { onClick() }
+            .hoverable(interactionSource)
+            .onClick { onClick() }
+            .fillMaxHeight()
+            .wrapContentHeight()
+            .padding(horizontal = 4.dp)
             .background(
                 animateColorAsState(
                     when {
                         isHovered -> hoveredBackgroundColor
                         else -> background
                     }
-                ).value
+                ).value,
+                CircleShape
             )
-            .hoverable(interactionSource)
-            .windowButton()
+            .padding(6.dp)
+            .requiredSize(6.dp)
     )
 }
 
 
 @Composable
-private fun CloseButton(
-    onRequestClose: () -> Unit,
-    modifier: Modifier,
-) {
-    SystemButton(
-        onRequestClose,
-        background = Color.Transparent,
-        onBackground = myColors.onBackground,
-        hoveredBackgroundColor = Color(0xFFc42b1c),
-        onHoveredBackgroundColor = myColors.onError,
-        icon = MyIcons.windowClose,
-        modifier = modifier,
-    )
-}
-
-private fun Modifier.windowButton(): Modifier {
-    return fillMaxHeight()
-        .wrapContentHeight()
-        .padding(
-            horizontal = 20.dp,
-        )
-        .requiredSize(8.dp)
-}
-
-@Composable
-internal fun WindowsSystemButtons(
+internal fun LinuxSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,
@@ -103,21 +88,24 @@ internal fun WindowsSystemButtons(
 ) {
     Row(
         // Toolbar is aligned center vertically, so I fill that and place it on top
-        modifier = Modifier.fillMaxHeight().wrapContentHeight(Alignment.Top),
+        modifier = Modifier
+            .padding(horizontal = 6.dp)
+            .fillMaxHeight().wrapContentHeight(Alignment.Top),
         verticalAlignment = Alignment.Top
     ) {
         buttons.forEach {
             when (it) {
-                SystemButtonType.Close -> {
+                Close -> {
                     WindowCloseButtonTooltip {
-                        CloseButton(
-                            onRequestClose = onRequestClose,
-                            modifier = Modifier
+                        SystemButton(
+                            onRequestClose,
+                            icon = MyIcons.windowClose,
+                            modifier = Modifier,
                         )
                     }
                 }
 
-                SystemButtonType.Minimize -> {
+                Minimize -> {
                     onRequestMinimize?.let {
                         WindowMinimizeTooltip {
                             SystemButton(
@@ -129,7 +117,7 @@ internal fun WindowsSystemButtons(
                     }
                 }
 
-                SystemButtonType.Maximize -> {
+                Maximize -> {
                     onToggleMaximize?.let {
                         WindowToggleMaximizeTooltip {
                             SystemButton(

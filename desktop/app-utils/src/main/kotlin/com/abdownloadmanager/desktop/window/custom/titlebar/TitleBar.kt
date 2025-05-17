@@ -6,6 +6,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
+import com.abdownloadmanager.desktop.window.custom.titlebar.linux.LinuxTitleBar
+import com.abdownloadmanager.desktop.window.custom.titlebar.mac.MacTitleBar
+import com.abdownloadmanager.desktop.window.custom.titlebar.windows.WindowsTitleBar
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
 
