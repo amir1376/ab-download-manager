@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.window.custom.titlebar
+package com.abdownloadmanager.desktop.window.custom.titlebar.mac
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -20,6 +20,7 @@ import com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip
 import com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip
 import com.abdownloadmanager.desktop.window.custom.isWindowFocused
 import com.abdownloadmanager.desktop.window.custom.isWindowMaximized
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
 import com.abdownloadmanager.shared.utils.darker
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
@@ -32,6 +33,7 @@ internal fun MacOSSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,
+    buttons: List<SystemButtonType>,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isUserInThisArea by interactionSource.collectIsHoveredAsState()
@@ -43,9 +45,21 @@ internal fun MacOSSystemButtons(
             .fillMaxHeight().wrapContentHeight(Alignment.Top),
         verticalAlignment = Alignment.Top
     ) {
-        CloseButton(onRequestClose, isUserInThisArea)
-        MinimizeButton(onRequestMinimize, isUserInThisArea)
-        ToggleMaximizeButton(onToggleMaximize, isUserInThisArea)
+        buttons.forEach {
+            when (it) {
+                SystemButtonType.Close -> {
+                    CloseButton(onRequestClose, isUserInThisArea)
+                }
+
+                SystemButtonType.Minimize -> {
+                    MinimizeButton(onRequestMinimize, isUserInThisArea)
+                }
+
+                SystemButtonType.Maximize -> {
+                    ToggleMaximizeButton(onToggleMaximize, isUserInThisArea)
+                }
+            }
+        }
     }
 }
 

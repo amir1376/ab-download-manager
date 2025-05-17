@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.window.custom.titlebar
+package com.abdownloadmanager.desktop.window.custom.titlebar.windows
 
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import ir.amirab.util.compose.IconSource
@@ -22,6 +22,7 @@ import com.abdownloadmanager.desktop.window.custom.WindowMinimizeTooltip
 import com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip
 import com.abdownloadmanager.desktop.window.custom.isWindowFocused
 import com.abdownloadmanager.desktop.window.custom.isWindowMaximized
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 
@@ -99,40 +100,52 @@ internal fun WindowsSystemButtons(
     onRequestClose: () -> Unit,
     onRequestMinimize: (() -> Unit)?,
     onToggleMaximize: (() -> Unit)?,
+    buttons: List<SystemButtonType>,
 ) {
     Row(
         // Toolbar is aligned center vertically, so I fill that and place it on top
         modifier = Modifier.fillMaxHeight().wrapContentHeight(Alignment.Top),
         verticalAlignment = Alignment.Top
     ) {
-        onRequestMinimize?.let {
-            WindowMinimizeTooltip {
-                SystemButton(
-                    icon = MyIcons.windowMinimize,
-                    onClick = onRequestMinimize,
-                    modifier = Modifier
-                )
-            }
-        }
+        buttons.forEach {
+            when (it) {
+                SystemButtonType.Close -> {
+                    WindowCloseButtonTooltip {
+                        CloseButton(
+                            onRequestClose = onRequestClose,
+                            modifier = Modifier
+                        )
+                    }
+                }
 
-        onToggleMaximize?.let {
-            WindowToggleMaximizeTooltip {
-                SystemButton(
-                    icon = if (isWindowMaximized()) {
-                        MyIcons.windowFloating
-                    } else {
-                        MyIcons.windowMaximize
-                    },
-                    onClick = onToggleMaximize,
-                    modifier = Modifier
-                )
+                SystemButtonType.Minimize -> {
+                    onRequestMinimize?.let {
+                        WindowMinimizeTooltip {
+                            SystemButton(
+                                icon = MyIcons.windowMinimize,
+                                onClick = onRequestMinimize,
+                                modifier = Modifier
+                            )
+                        }
+                    }
+                }
+
+                SystemButtonType.Maximize -> {
+                    onToggleMaximize?.let {
+                        WindowToggleMaximizeTooltip {
+                            SystemButton(
+                                icon = if (isWindowMaximized()) {
+                                    MyIcons.windowFloating
+                                } else {
+                                    MyIcons.windowMaximize
+                                },
+                                onClick = onToggleMaximize,
+                                modifier = Modifier
+                            )
+                        }
+                    }
+                }
             }
-        }
-        WindowCloseButtonTooltip {
-            CloseButton(
-                onRequestClose = onRequestClose,
-                modifier = Modifier
-            )
         }
     }
 }

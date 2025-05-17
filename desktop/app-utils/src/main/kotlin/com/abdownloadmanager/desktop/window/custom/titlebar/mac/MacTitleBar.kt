@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.window.custom.titlebar
+package com.abdownloadmanager.desktop.window.custom.titlebar.mac
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -15,15 +15,26 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
+import com.abdownloadmanager.desktop.window.custom.titlebar.CommonRenderTitleBar
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
+import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonsPosition
+import com.abdownloadmanager.desktop.window.custom.titlebar.Title
+import com.abdownloadmanager.desktop.window.custom.titlebar.TitleBar
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import ir.amirab.util.compose.layout.RelativeAlignment
 import ir.amirab.util.ifThen
 import kotlin.math.roundToInt
 
 object MacTitleBar : TitleBar {
-    override val systemButtonsFirst: Boolean = true
-    override val titleBarHeight: Dp = TitleBar.DefaultTitleBarHeigh
-
+    override val titleBarHeight: Dp = TitleBar.Companion.DefaultTitleBarHeigh
+    override val systemButtonsPosition: SystemButtonsPosition = SystemButtonsPosition(
+        buttons = listOf(
+            SystemButtonType.Close,
+            SystemButtonType.Minimize,
+            SystemButtonType.Maximize,
+        ),
+        isLeft = true,
+    )
     @Composable
     override fun RenderSystemButtons(
         onRequestClose: () -> Unit,
@@ -34,6 +45,7 @@ object MacTitleBar : TitleBar {
             onRequestClose = onRequestClose,
             onRequestMinimize = onRequestMinimize,
             onToggleMaximize = onToggleMaximize,
+            buttons = systemButtonsPosition.buttons,
         )
     }
 
