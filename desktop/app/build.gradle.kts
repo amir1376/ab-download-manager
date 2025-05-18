@@ -153,6 +153,7 @@ compose {
                     pkgPackageVersion = getAppVersionStringForPackaging(Pkg)
                     dmgPackageVersion = getAppVersionStringForPackaging(Dmg)
                     iconFile = project.file("icons/icon.icns")
+                    jvmArgs("-Dapple.awt.enableTemplateImages=true")
                 }
                 windows {
                     exePackageVersion = getAppVersionStringForPackaging(Exe)
