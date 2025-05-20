@@ -14,6 +14,7 @@ dependencies{
     implementation(libs.pluginChangeLog)
     implementation(libs.pluginBuildConfig)
     implementation(libs.pluginAboutLibraries)
+    implementation(libs.pluginGradleVersions)
     implementation(libs.semver)
     implementation("ir.amirab.util:platform:1")
     implementation("ir.amirab.plugin:git-version-plugin:1")

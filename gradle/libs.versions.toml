@@ -31,6 +31,7 @@ autoServiceKsp = "1.2.0"
 autoService = "1.1.1"
 proxyVole = "1.1.6"
 jbrApi = "1.5.0"
+gradleVersions = "0.52.0"
 
 [libraries]
 
@@ -115,6 +116,7 @@ pluginChangeLog = { module = "org.jetbrains.intellij.plugins:gradle-changelog-pl
 pluginBuildConfig = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildConfig" }
 pluginKsp = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
 pluginAboutLibraries = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutLibraries" }
+pluginGradleVersions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "gradleVersions" }
 
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
