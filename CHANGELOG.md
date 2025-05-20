@@ -14,6 +14,24 @@
 
 ### Security
 
+## 1.6.2
+
+### Added
+
+- Thai Language
+
+### Fixed
+
+- System Tray crashes sometimes in Linux
+- Icons not rendered properly sometimes in Linux
+- System Tray icon color in macOS
+- Quit handler in macOS
+
+### Improved
+
+- Translations updated
+- Respect user defined position of system buttons in Linux
+
 ## 1.6.1
 
 ### Fixed
