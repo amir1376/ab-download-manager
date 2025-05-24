@@ -2,6 +2,8 @@ package ir.amirab.downloader.connection
 
 import ir.amirab.downloader.connection.response.ResponseInfo
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.downloader.utils.throwIf
 
 abstract class DownloaderClient {
     /**
@@ -32,13 +34,19 @@ abstract class DownloaderClient {
     ): Connection
 
     suspend fun test(credentials: IDownloadCredentials): ResponseInfo {
-        val rangeStart = 0L
-        val rangeEnd = 255L
-        val rangeLength = rangeEnd - rangeStart + 1 // 256
-        val response = head(credentials, rangeStart, rangeEnd)
+        try {
+            val rangeStart = 0L
+            val rangeEnd = 255L
+            val rangeLength = rangeEnd - rangeStart + 1 // 256
+            val response = head(credentials, rangeStart, rangeEnd)
 
-        if (response.isSuccessFul && response.totalLength != rangeLength) {
-            return response
+            if (response.isSuccessFul && response.totalLength != rangeLength) {
+                return response
+            }
+        } catch (e: Exception) {
+            e.throwIf { ExceptionUtils.isNormalCancellation(e) }
+            // some servers may reset the connection (ECONNRESET) if we ask for bytes=0-255
+            // so we don't provide resume support for them
         }
         // server may return un-standard response we use headless (without resuming support)
         return head(credentials, null, null)
