@@ -59,9 +59,11 @@ import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -586,9 +588,11 @@ class AppComponent(
         openDownloadItem(item)
     }
 
-    override fun openDownloadItem(downloadItem: DownloadItem) {
+    override suspend fun openDownloadItem(downloadItem: DownloadItem) {
         runCatching {
-            FileUtils.openFile(downloadSystem.getDownloadFile(downloadItem))
+            withContext(Dispatchers.IO) {
+                FileUtils.openFile(downloadSystem.getDownloadFile(downloadItem))
+            }
         }.onFailure {
             sendNotification(
                 Res.string.open_file,
@@ -614,9 +618,16 @@ class AppComponent(
         openDownloadItemFolder(item)
     }
 
-    override fun openDownloadItemFolder(downloadItem: DownloadItem) {
+    override suspend fun openDownloadItemFolder(downloadItem: DownloadItem) {
         runCatching {
-            FileUtils.openFolderOfFile(downloadSystem.getDownloadFile(downloadItem))
+            withContext(Dispatchers.IO) {
+                val file = downloadSystem.getDownloadFile(downloadItem)
+                if (file.exists()) {
+                    FileUtils.openFolderOfFile(file)
+                } else {
+                    FileUtils.openFolder(file.parentFile)
+                }
+            }
         }.onFailure {
             sendNotification(
                 Res.string.open_folder,

@@ -134,9 +134,6 @@ class DownloadActions(
     val openFolderAction = simpleAction(
         title = Res.string.open_folder.asStringSource(),
         icon = MyIcons.folderOpen,
-        checkEnable = defaultItem.mapStateFlow {
-            it?.statusOrFinished() is DownloadJobStatus.Finished
-        },
         onActionPerformed = {
             scope.launch {
                 val d = defaultItem.value ?: return@launch
@@ -941,11 +938,7 @@ class HomeComponent(
 
     fun openFolder(id: Long) {
         scope.launch {
-            val dItem = downloadSystem.getDownloadItemById(id) ?: return@launch
-            if (dItem.status != DownloadStatus.Completed) {
-                return@launch
-            }
-            downloadItemOpener.openDownloadItemFolder(dItem)
+            downloadItemOpener.openDownloadItemFolder(id)
         }
     }
 

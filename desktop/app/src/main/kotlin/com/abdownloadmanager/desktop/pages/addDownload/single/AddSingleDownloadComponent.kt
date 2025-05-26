@@ -61,6 +61,7 @@ class AddSingleDownloadComponent(
     KoinComponent,
     ContainsEffects<AddSingleDownloadPageEffects> by supportEffects() {
 
+    private val appScope: CoroutineScope by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val appRepository: AppRepository by inject()
     private val client: DownloaderClient by inject()
@@ -446,10 +447,10 @@ class AddSingleDownloadComponent(
     fun openExistingFile() {
         val itemId = (canAddResult.value as? CanAddResult.DownloadAlreadyExists)?.itemId ?: return
         consumeDialog {
-            scope.launch {
+            appScope.launch {
                 downloadItemOpener.openDownloadItem(itemId)
-                onRequestClose()
             }
+            onRequestClose()
         }
     }
 
