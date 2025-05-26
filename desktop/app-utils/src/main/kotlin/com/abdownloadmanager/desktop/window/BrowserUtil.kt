@@ -3,6 +3,7 @@ package com.abdownloadmanager.desktop.window
 import com.abdownloadmanager.shared.utils.BrowserType
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
+import ir.amirab.util.toUpUntil
 import java.io.File
 
 
@@ -14,11 +15,25 @@ abstract class Browser {
     }
 
     open fun openLink(url: String): Boolean {
-        val executablePath = getExecutablePath()?.path
+        val executablePath = getExecutablePath()
         if (executablePath == null) {
             return false
         }
-        Runtime.getRuntime().exec(arrayOf(executablePath, url))
+        val cmd = when (Platform.asDesktop()) {
+            Platform.Desktop.Linux -> arrayOf(executablePath.path, url)
+            Platform.Desktop.Windows -> arrayOf(executablePath.path, url)
+            Platform.Desktop.MacOS -> {
+                val appFolder = executablePath.toUpUntil {
+                    // in macOS app folders are like /Applications/App Name.app/
+                    it.name.endsWith(".app")
+                }?.path
+                if (appFolder == null) {
+                    return false
+                }
+                arrayOf("open", "-a", appFolder, url)
+            }
+        }
+        Runtime.getRuntime().exec(cmd)
         return true
     }
 
