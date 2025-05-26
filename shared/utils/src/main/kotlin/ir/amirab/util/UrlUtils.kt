@@ -1,12 +1,12 @@
 package ir.amirab.util
 
-import java.net.URI
-import java.net.URL
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.net.URLDecoder
 
 object UrlUtils {
-    fun createURL(url: String): URL {
-        return URI.create(url).toURL()
+    fun createURL(url: String): HttpUrl {
+        return url.toHttpUrl()
     }
 
     fun isValidUrl(link: String): Boolean {
@@ -17,8 +17,7 @@ object UrlUtils {
         return runCatching {
             createURL(link)
         }.map { url ->
-            val foundName = url.path
-                .split("/")
+            val foundName = url.pathSegments
                 .lastOrNull { it.isNotBlank() }
                 ?.let {
                     kotlin.runCatching {
