@@ -241,17 +241,21 @@ class DownloadActions(
                 val credentialsList = selections.value
                     .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
                     .map { DownloadCredentials.from(it) }
-                ClipboardUtil.copy(DownloadCredentialsFromCurl.generateCurlCommands(credentialsList).joinToString("\n"))
+                ClipboardUtil.copy(
+                    DownloadCredentialsFromCurl.generateCurlCommands(credentialsList)
+                        .joinToString("\n")
+                )
             }
         }
     )
 
-    val openDownloadDialogAction = simpleAction(Res.string.show_properties.asStringSource(), MyIcons.info) {
-        selections.value.map { it.id }
-            .forEach { id ->
-                downloadDialogManager.openDownloadDialog(id)
-            }
-    }
+    val openDownloadDialogAction =
+        simpleAction(Res.string.show_properties.asStringSource(), MyIcons.info) {
+            selections.value.map { it.id }
+                .forEach { id ->
+                    downloadDialogManager.openDownloadDialog(id)
+                }
+        }
     private val fileChecksumAction = simpleAction(
         title = Res.string.file_checksum.asStringSource(), MyIcons.info,
         checkEnable = selections.mapStateFlow { list ->
@@ -616,7 +620,9 @@ class HomeComponent(
                 icon = MyIcons.remove
             ) {
                 item(Res.string.all_missing_files.asStringSource()) {
-                    requestDelete(downloadSystem.getListOfDownloadThatMissingFileOrHaveNotProgress().map { it.id })
+                    requestDelete(
+                        downloadSystem.getListOfDownloadThatMissingFileOrHaveNotProgress()
+                            .map { it.id })
                 }
                 item(Res.string.all_finished.asStringSource()) {
                     requestDelete(downloadSystem.getFinishedDownloadIds())
@@ -851,8 +857,10 @@ class HomeComponent(
                 .filter {
                     val statusAccepted = filterState.statusFilter.accept(it)
 //                    val typeAccepted = filterState.typeCategoryFilter?.accept(it.name) ?: true
-                    val typeAccepted = filterState.typeCategoryFilter?.items?.contains(it.id) ?: true
-                    val searchAccepted = it.name.contains(filterState.textToSearch, ignoreCase = true)
+                    val typeAccepted =
+                        filterState.typeCategoryFilter?.items?.contains(it.id) ?: true
+                    val searchAccepted =
+                        it.name.contains(filterState.textToSearch, ignoreCase = true)
                     typeAccepted && statusAccepted && searchAccepted
                 }
                 // when restart a completed download item there is a duplication in list

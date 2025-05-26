@@ -39,6 +39,8 @@ import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.ifThen
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.delay
 
 
@@ -122,10 +124,11 @@ fun DownloadList(
             list = downloadList,
             modifier = modifier
                 .onKeyEvent {
-                    val ctrlPressed = it.isCtrlPressed
-                    val shiftPressed = it.isShiftPressed
+                    val ctrlPressed = if (Platform.isMac()) {
+                        it.isMetaPressed
+                    } else it.isCtrlPressed
                     isCtrlPressed = ctrlPressed
-                    isShiftPressed = shiftPressed
+                    isShiftPressed = it.isShiftPressed
                     false
                 }
                 .onKeyEvent {
@@ -154,7 +157,10 @@ fun DownloadList(
                 ),
             drawOnEmpty = {
                 WithContentAlpha(0.75f) {
-                    Text(myStringResource(Res.string.list_is_empty), Modifier.align(Alignment.Center))
+                    Text(
+                        myStringResource(Res.string.list_is_empty),
+                        Modifier.align(Alignment.Center)
+                    )
                 }
             },
             wrapHeader = {
@@ -254,10 +260,20 @@ fun DownloadList(
                                         it
                                             .border(
                                                 1.dp,
-                                                myColors.selectionGradient(0.10f, 0.05f, selectionColor),
+                                                myColors.selectionGradient(
+                                                    0.10f,
+                                                    0.05f,
+                                                    selectionColor
+                                                ),
                                                 shape
                                             )
-                                            .background(myColors.selectionGradient(0.15f, 0.03f, selectionColor))
+                                            .background(
+                                                myColors.selectionGradient(
+                                                    0.15f,
+                                                    0.03f,
+                                                    selectionColor
+                                                )
+                                            )
                                     } else {
                                         it.border(1.dp, Color.Transparent)
                                     }
@@ -373,7 +389,8 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object Speed : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.speedOrNull() ?: 0L }
+        override fun comparator(): Comparator<IDownloadItemState> =
+            compareBy { it.speedOrNull() ?: 0L }
 
         override val id: String = "Speed"
         override val name: StringSource = Res.string.speed.asStringSource()
@@ -382,7 +399,8 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
 
     data object TimeLeft : DownloadListCells,
         SortableCell<IDownloadItemState> {
-        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.remainingOrNull() ?: Long.MAX_VALUE }
+        override fun comparator(): Comparator<IDownloadItemState> =
+            compareBy { it.remainingOrNull() ?: Long.MAX_VALUE }
 
         override val id: String = "Time Left"
         override val name: StringSource = Res.string.time_left.asStringSource()
