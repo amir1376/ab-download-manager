@@ -55,6 +55,7 @@ class SingleDownloadComponent(
 ) : BaseComponent(ctx),
     ContainsEffects<SingleDownloadEffects> by supportEffects(),
     KoinComponent {
+    private val appScope: CoroutineScope by inject()
     private val downloadSystem: DownloadSystem by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val appRepository: AppRepository by inject()
@@ -194,25 +195,25 @@ class SingleDownloadComponent(
 
     fun openFolder() {
         val itemState = itemStateFlow.value
-        scope.launch {
+        appScope.launch {
             if (itemState is CompletedDownloadItemState) {
                 downloadItemOpener.openDownloadItemFolder(downloadId)
             }
-            onDismiss()
         }
+        onDismiss()
     }
 
     fun openFile(alsoClose: Boolean = true) {
         val itemState = itemStateFlow.value
-        scope.launch {
+        appScope.launch {
             if (itemState is CompletedDownloadItemState) {
                 runCatching {
                     downloadItemOpener.openDownloadItem(downloadId)
                 }
             }
-            if (alsoClose) {
-                onDismiss()
-            }
+        }
+        if (alsoClose) {
+            onDismiss()
         }
     }
 
