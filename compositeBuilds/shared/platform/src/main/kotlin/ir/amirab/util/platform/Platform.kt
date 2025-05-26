@@ -21,7 +21,7 @@ sealed class Platform(val name: String) {
             return when (platformName.lowercase()) {
                 "windows" -> Desktop.Windows
                 "linux" -> Desktop.Linux
-                "mac" -> Desktop.Linux
+                "mac" -> Desktop.MacOS
                 "android" -> Android
                 else -> null
             }

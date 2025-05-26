@@ -15,10 +15,6 @@ class DesktopUpdateApplier(
 ) : UpdateApplier {
     private var downloading: Boolean = false
     override fun updateSupported(): Boolean {
-        if (Platform.isMac()) {
-            // TODO support macOS in-app update
-            return false
-        }
         val installationFolder = installationFolder ?: return false
         return File(installationFolder).canWrite()
     }
@@ -55,7 +51,8 @@ class DesktopUpdateApplier(
             return
         }
         downloading = true
-        val downloadableSources = updateInfo.updateSource.filterIsInstance<UpdateSource.DirectDownloadLink>()
+        val downloadableSources =
+            updateInfo.updateSource.filterIsInstance<UpdateSource.DirectDownloadLink>()
         var downloadSource = downloadableSources.find {
             isArchiveFile(it.name)
         }
@@ -72,9 +69,9 @@ class DesktopUpdateApplier(
         }
         val downloadedFile = try {
             updateDownloader.downloadUpdate(downloadSource)
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             downloading = false
-            throw  e
+            throw e
         }
         if (!downloadedFile.exists()) {
             downloading = false
@@ -82,10 +79,14 @@ class DesktopUpdateApplier(
         }
         val updateInstaller = when {
             isArchiveFile(downloadSource.name) -> {
+                val appFolderInArchive = when {
+                    Platform.isMac() -> "$appName.app"
+                    else -> appName
+                }
                 UpdateInstallerFromArchiveFile(
                     archiveFile = downloadedFile,
                     installationFolder = installationFolder,
-                    appFolderInArchive = appName,
+                    appFolderInArchive = appFolderInArchive,
                     folderToExtractUpdate = File(updateFolder).resolve("extracted"),
                     logDir = logDir,
                 )
@@ -113,6 +114,7 @@ class DesktopUpdateApplier(
             )
         }
     }
+
     override suspend fun cleanup() {
         updateDownloader.removeAllUpdates()
     }

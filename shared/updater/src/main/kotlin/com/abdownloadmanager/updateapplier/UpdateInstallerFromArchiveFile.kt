@@ -28,7 +28,7 @@ class UpdateInstallerFromArchiveFile(
     private fun getScriptPath(logFile: String): String {
         val platform = Platform.getCurrentPlatform()
         val scriptForPlatform = when (platform) {
-            Platform.Desktop.Linux -> {
+            Platform.Desktop.Linux, Platform.Desktop.MacOS -> {
                 "com/abdownloadmanager/updater/updater_linux.sh"
             }
 
@@ -74,9 +74,10 @@ class UpdateInstallerFromArchiveFile(
                 logFile = logFile,
             )
 
-            else -> error("platform ${platform} not supported")
+            else -> error("platform $platform not supported")
         }
-        val scriptToRun = FileSystem.SYSTEM_TEMPORARY_DIRECTORY.resolve("abdm-updater.run.$scriptExtension")
+        val scriptToRun =
+            FileSystem.SYSTEM_TEMPORARY_DIRECTORY.resolve("abdm-updater.run.$scriptExtension")
         scriptToRun.toFile().writeText(commandToRun)
         return scriptToRun.toString()
     }
