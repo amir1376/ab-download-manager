@@ -127,8 +127,9 @@ fun DownloadList(
                     val ctrlPressed = if (Platform.isMac()) {
                         it.isMetaPressed
                     } else it.isCtrlPressed
+                    val shiftPressed = it.isShiftPressed
                     isCtrlPressed = ctrlPressed
-                    isShiftPressed = it.isShiftPressed
+                    isShiftPressed = shiftPressed
                     false
                 }
                 .onKeyEvent {
