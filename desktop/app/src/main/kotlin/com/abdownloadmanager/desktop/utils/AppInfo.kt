@@ -27,7 +27,6 @@ object AppInfo {
         .firstOrNull { it.name.endsWith(".app") }
 
     val installationFolder: String? = run {
-        return@run File("/Applications/ABDownloadManager.app").path
         exeFile?.let(::File)
             ?.parentFile // executable path
             ?.let {
