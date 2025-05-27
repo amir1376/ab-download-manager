@@ -39,6 +39,8 @@ import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.ifThen
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.delay
 
 
@@ -122,7 +124,9 @@ fun DownloadList(
             list = downloadList,
             modifier = modifier
                 .onKeyEvent {
-                    val ctrlPressed = it.isCtrlPressed
+                    val ctrlPressed = if (Platform.isMac()) {
+                        it.isMetaPressed
+                    } else it.isCtrlPressed
                     val shiftPressed = it.isShiftPressed
                     isCtrlPressed = ctrlPressed
                     isShiftPressed = shiftPressed
@@ -411,5 +415,4 @@ fun ShowDownloadOptions(
             ShowOptionsInDropDown(options, onDismiss)
         }
     }
-
 }
