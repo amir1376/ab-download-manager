@@ -20,6 +20,7 @@ abstract class DownloadDestination(
     open fun onAllPartsCompleted() {
         allPartsDownloaded = true
         cleanUpJunkFiles()
+        updateLastModified()
     }
 
     open fun cleanUpJunkFiles() {}

@@ -17,7 +17,9 @@ class SimpleDownloadDestination(
     outputFile = file,
 ) {
     // this is only used when appendExtensionToIncompleteDownloads is true
-    val incompleteFile get() = IncompleteFIleUtil.addIncompleteIndicator(outputFile, downloadId)
+    val incompleteFile by lazy {
+        IncompleteFIleUtil.addIncompleteIndicator(outputFile, downloadId)
+    }
 
     private val fileToWrite: File = if (appendExtensionToIncompleteDownloads) {
         incompleteFile
@@ -63,7 +65,7 @@ class SimpleDownloadDestination(
         if (appendExtensionToIncompleteDownloads) {
             // this function maybe called at some point that we may not even start download yet.
             // for example when the download has already completed, the DownloadJob will call this function! so we should do nothing.
-            val incompleteFile = fileToWrite
+            val incompleteFile = incompleteFile
             if (!incompleteFile.exists()) {
                 return
             }
@@ -160,11 +162,10 @@ class SimpleDownloadDestination(
     }
 
     override fun cleanUpJunkFiles() {
-        if (appendExtensionToIncompleteDownloads) {
-            val incompleteFile = incompleteFile
-            if (incompleteFile.exists()) {
-                incompleteFile.delete()
-            }
+        // remove incomplete file if exists
+        val incompleteFile = incompleteFile
+        if (incompleteFile.exists()) {
+            incompleteFile.delete()
         }
     }
 }
