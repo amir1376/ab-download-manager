@@ -155,16 +155,15 @@ class DownloadManager(
         }
         // at this point: job will be created (and booted) if it was not created before
         contextContainer.updateContext(id) { it + context }
-        deleteJob(job.id) {
-            it.downloadRemoved(
-                removeOutputFile = if (itemToDelete.status == DownloadStatus.Completed) {
-                    alsoRemoveFile(itemToDelete)
-                } else {
-                    // always remove file if download is not finished!
-                    true
-                },
-            )
-        }
+        job.downloadRemoved(
+            removeOutputFile = if (itemToDelete.status == DownloadStatus.Completed) {
+                alsoRemoveFile(itemToDelete)
+            } else {
+                // always remove file if download is not finished!
+                true
+            },
+        )
+        deleteJob(job.id)
         dlListDb.remove(itemToDelete)
         partListDb.removeParts(id)
         listOfJobsEvents.tryEmit(
@@ -175,14 +174,12 @@ class DownloadManager(
 
     private fun deleteJob(
         id: Long,
-        beforeDelete: (DownloadJob) -> Unit = {}
     ) {
         synchronized(jobModificationLock) {
             val jobToDelete = downloadJobs.find {
                 it.id == id
             }
             jobToDelete?.let {
-                beforeDelete(it)
                 it.close()
                 downloadJobs = downloadJobs.minusElement(it)
             }
