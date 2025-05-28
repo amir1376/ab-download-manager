@@ -10,16 +10,16 @@ import java.io.File
 
 class SimpleDownloadDestination(
     file: File,
-    val appendExtensionForIncompleteDownload: Boolean,
+    val appendExtensionToIncompleteDownloads: Boolean,
     val downloadId: Long,
     private val emptyFileCreator: EmptyFileCreator,
 ) : DownloadDestination(
     outputFile = file,
 ) {
-    // this is only used when appendExtensionForIncompleteDownload is true
+    // this is only used when appendExtensionToIncompleteDownloads is true
     val incompleteFile get() = IncompleteFIleUtil.addIncompleteIndicator(outputFile, downloadId)
 
-    private val fileToWrite: File = if (appendExtensionForIncompleteDownload) {
+    private val fileToWrite: File = if (appendExtensionToIncompleteDownloads) {
         incompleteFile
     } else {
         outputFile
@@ -60,7 +60,7 @@ class SimpleDownloadDestination(
     }
 
     override fun onAllPartsCompleted() {
-        if (appendExtensionForIncompleteDownload) {
+        if (appendExtensionToIncompleteDownloads) {
             val incompleteFile = fileToWrite
             // it maybe called at some point that we may not even start yet.
             // if a download already download job call this function at some point!
@@ -150,7 +150,7 @@ class SimpleDownloadDestination(
     }
 
     override fun moveOutput(to: File) {
-        if (appendExtensionForIncompleteDownload) {
+        if (appendExtensionToIncompleteDownloads) {
             val incompleteFile = incompleteFile
             if (incompleteFile.exists()) {
                 incompleteFile.renameTo(IncompleteFIleUtil.addIncompleteIndicator(to, downloadId))
@@ -160,7 +160,7 @@ class SimpleDownloadDestination(
     }
 
     override fun cleanUpJunkFiles() {
-        if (appendExtensionForIncompleteDownload) {
+        if (appendExtensionToIncompleteDownloads) {
             val incompleteFile = incompleteFile
             if (incompleteFile.exists()) {
                 incompleteFile.delete()

@@ -61,7 +61,7 @@ class DownloadJob(
         destination = SimpleDownloadDestination(
             file = outFile,
             emptyFileCreator = downloadManager.emptyFileCreator,
-            appendExtensionForIncompleteDownload = downloadManager.settings.appendExtensionToIncompleteDownloads,
+            appendExtensionToIncompleteDownloads = downloadManager.settings.appendExtensionToIncompleteDownloads,
             downloadId = id
         )
     }
