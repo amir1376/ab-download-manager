@@ -628,7 +628,7 @@ class AppComponent(
                     FileUtils.openFolderOfFile(file)
                 } else {
                     val incompleteFile = IncompleteFIleUtil.addIncompleteIndicator(file, downloadItem.id)
-                    if (incompleteFile.exists()) {
+                    if (incompleteFile.exists() && downloadItem.status != DownloadStatus.Completed) {
                         FileUtils.openFolderOfFile(incompleteFile)
                     } else {
                         FileUtils.openFolder(file.parentFile)
