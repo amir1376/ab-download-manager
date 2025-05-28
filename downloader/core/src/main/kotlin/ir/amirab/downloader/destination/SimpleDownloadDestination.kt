@@ -61,9 +61,9 @@ class SimpleDownloadDestination(
 
     override fun onAllPartsCompleted() {
         if (appendExtensionToIncompleteDownloads) {
+            // this function maybe called at some point that we may not even start download yet.
+            // for example when the download has already completed, the DownloadJob will call this function! so we should do nothing.
             val incompleteFile = fileToWrite
-            // it maybe called at some point that we may not even start yet.
-            // if a download already download job call this function at some point!
             if (!incompleteFile.exists()) {
                 return
             }
