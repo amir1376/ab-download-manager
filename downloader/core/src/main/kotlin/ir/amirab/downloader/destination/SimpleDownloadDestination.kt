@@ -1,26 +1,29 @@
 package ir.amirab.downloader.destination
 
-import ir.amirab.downloader.DownloadSettings
 import ir.amirab.downloader.anntation.HeavyCall
-import ir.amirab.downloader.exception.NoSpaceInStorageException
 import ir.amirab.downloader.part.Part
 import ir.amirab.downloader.utils.EmptyFileCreator
-import ir.amirab.downloader.utils.IDiskStat
-import ir.amirab.downloader.utils.calcPercent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
 import okio.FileHandle
 import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import java.io.File
-import java.io.FileOutputStream
 
 class SimpleDownloadDestination(
     file: File,
-    private val diskStat: IDiskStat,
+    val appendExtensionForIncompleteDownload: Boolean,
+    val downloadId: Long,
     private val emptyFileCreator: EmptyFileCreator,
-) : DownloadDestination(file) {
+) : DownloadDestination(
+    outputFile = file,
+) {
+    // this is only used when appendExtensionForIncompleteDownload is true
+    val incompleteFile get() = IncompleteFIleUtil.addIncompleteIndicator(outputFile, downloadId)
+
+    private val fileToWrite: File = if (appendExtensionForIncompleteDownload) {
+        incompleteFile
+    } else {
+        outputFile
+    }
 
     private var _fileHandle: FileHandle? = null
     private val fileHandle: FileHandle
@@ -37,15 +40,16 @@ class SimpleDownloadDestination(
         // lets open a file for writing to it
         // it will be removed when all parts are cancelled so this method
         // maybe called multiple times
-        val handle = FileSystem.SYSTEM.openReadWrite(outputFile.toOkioPath())
+        val handle = FileSystem.SYSTEM.openReadWrite(fileToWrite.toOkioPath())
         _fileHandle = handle
         return handle
     }
+
     private fun removeFileHandle() {
         //close and release handle to unlock the file
-        synchronized(this){
+        synchronized(this) {
             _fileHandle?.close()
-            _fileHandle=null
+            _fileHandle = null
         }
     }
 
@@ -55,6 +59,25 @@ class SimpleDownloadDestination(
         removeFileHandle()
     }
 
+    override fun onAllPartsCompleted() {
+        if (appendExtensionForIncompleteDownload) {
+            val incompleteFile = fileToWrite
+            // it maybe called at some point that we may not even start yet.
+            // if a download already download job call this function at some point!
+            if (!incompleteFile.exists()) {
+                return
+            }
+            val completeFile = outputFile
+            // delete old file if exists to override with new one!
+            if (completeFile.exists()) {
+                completeFile.delete()
+            }
+            incompleteFile.renameTo(completeFile)
+        }
+        // clean up junk files called in the super class
+        super.onAllPartsCompleted()
+    }
+
     var outputSize: Long = -1
     override fun getWriterFor(
         part: Part,
@@ -62,7 +85,7 @@ class SimpleDownloadDestination(
         if (!canGetFileWriter()) {
             throw IllegalStateException("First check then ask for...")
         }
-        val outFile = outputFile
+        val outFile = fileToWrite
         val returned = returnIfAlreadyHaveWriter(part.from)
         returned?.let { return it }
         val writer = DestWriter(
@@ -72,7 +95,7 @@ class SimpleDownloadDestination(
             part.current,
             fileHandle,
         )
-        synchronized(this){
+        synchronized(this) {
             fileParts.add(writer)
         }
         return writer
@@ -88,58 +111,60 @@ class SimpleDownloadDestination(
     override suspend fun prepareFile(onProgressUpdate: (Int?) -> Unit) {
 //        println("preparing file ")
 //        println("file info path=$outputFile size=${outputFile.runCatching { length() }.getOrNull()}")
-        outputFile.parentFile.let {
+        val incompleteFile = fileToWrite
+        incompleteFile.parentFile.let {
             it.canonicalFile.mkdirs()
             if (!it.exists()) {
                 error("can't create folder for destination file $it")
             }
 
             if (!it.isDirectory) {
-                error("${outputFile.parentFile} is not a directory")
+                error("${incompleteFile.parentFile} is not a directory")
             }
         }
         emptyFileCreator
-            .prepareFile(outputFile, outputSize,onProgressUpdate)
+            .prepareFile(incompleteFile, outputSize, onProgressUpdate)
     }
 
     /**
      * restart download if file was deleted by user!
+     * this function will be called when the download is resumed, and it's not completed yet.
      */
     override suspend fun isDownloadedPartsIsValid(): Boolean {
-        val fileExists = outputFile.exists()
-        val fileEqualToContentSize = outputFile.length() == outputSize
+        val targetFile = fileToWrite
+        val fileExists = targetFile.exists()
+        val fileEqualToContentSize = targetFile.length() == outputSize
         return fileExists && fileEqualToContentSize
     }
 
-    private suspend fun fillOutput(onProgressUpdate: (Int) -> Unit) {
-        val much = outputSize - outputFile.length()
-        val remainingSpace = diskStat.getRemainingSpace(outputFile.parentFile)
-        if (remainingSpace < much) {
-            throw NoSpaceInStorageException(remainingSpace, much)
-        }
-//        println("how much to be appended $much")
-        withContext(Dispatchers.IO) {
-            FileOutputStream(outputFile, true).use {
-                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                var writen = 0L
-                while (isActive) {
-                    val writeInThisLoop = if (much - writen > buffer.size) {
-                        buffer.size
-                    } else {
-                        much - writen
-                    }.toInt()
-                    if (writeInThisLoop == 0) break
-//                println(writeInThisLoop)
-                    it.write(buffer, 0, writeInThisLoop)
-                    writen += writeInThisLoop
-                    onProgressUpdate(calcPercent(writen, much))
-                }
+    override fun canGetFileWriter(): Boolean {
+        return true
+    }
+
+    override fun updateLastModified() {
+        runCatching {
+            requestedToChangeLastModified?.let {
+                fileToWrite.setLastModified(it)
             }
         }
     }
 
+    override fun moveOutput(to: File) {
+        if (appendExtensionForIncompleteDownload) {
+            val incompleteFile = incompleteFile
+            if (incompleteFile.exists()) {
+                incompleteFile.renameTo(IncompleteFIleUtil.addIncompleteIndicator(to, downloadId))
+            }
+        }
+        super.moveOutput(to)
+    }
 
-    override fun canGetFileWriter(): Boolean {
-        return true
+    override fun cleanUpJunkFiles() {
+        if (appendExtensionForIncompleteDownload) {
+            val incompleteFile = incompleteFile
+            if (incompleteFile.exists()) {
+                incompleteFile.delete()
+            }
+        }
     }
 }

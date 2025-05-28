@@ -8,5 +8,6 @@ data class DownloadSettings(
     var globalSpeedLimit: Long = 0,//unlimited
     var useSparseFileAllocation: Boolean = true,
     val minPartSize: Long = 2048,//2kB
-    var maxDownloadRetryCount: Int = 0
+    var maxDownloadRetryCount: Int = 0,
+    var appendExtensionToIncompleteDownloads: Boolean = false,
 )

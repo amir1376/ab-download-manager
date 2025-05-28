@@ -40,6 +40,7 @@ class AppRepository : KoinComponent {
     val threadCount = appSettings.threadCount
     val dynamicPartCreation = appSettings.dynamicPartCreation
     val useServerLastModifiedTime = appSettings.useServerLastModifiedTime
+    val appendExtensionToIncompleteDownloads = appSettings.appendExtensionToIncompleteDownloads
     val useSparseFileAllocation = appSettings.useSparseFileAllocation
     val maxDownloadRetryCount = appSettings.maxDownloadRetryCount
     val useAverageSpeed = appSettings.useAverageSpeed
@@ -108,6 +109,12 @@ class AppRepository : KoinComponent {
             .debounce(500)
             .onEach {
                 downloadSettings.useServerLastModifiedTime = it
+                downloadManager.reloadSetting()
+            }.launchIn(scope)
+        appendExtensionToIncompleteDownloads
+            .debounce(500)
+            .onEach {
+                downloadSettings.appendExtensionToIncompleteDownloads = it
                 downloadManager.reloadSetting()
             }.launchIn(scope)
         useSparseFileAllocation

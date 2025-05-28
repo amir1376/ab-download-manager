@@ -23,6 +23,7 @@ data class AppSettingsModel(
     val maxDownloadRetryCount: Int = 0,
     val dynamicPartCreation: Boolean = true,
     val useServerLastModifiedTime: Boolean = false,
+    val appendExtensionToIncompleteDownloads: Boolean = false,
     val useSparseFileAllocation: Boolean = true,
     val useAverageSpeed: Boolean = true,
     val showDownloadProgressDialog: Boolean = true,
@@ -57,6 +58,7 @@ data class AppSettingsModel(
             val maxDownloadRetryCount = intKeyOf("maxDownloadRetryCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
+            val appendExtensionToIncompleteDownloads = booleanKeyOf("appendExtensionToIncompleteDownloads")
             val useSparseFileAllocation = booleanKeyOf("useSparseFileAllocation")
             val useAverageSpeed = booleanKeyOf("useAverageSpeed")
             val showDownloadProgressDialog = booleanKeyOf("showDownloadProgressDialog")
@@ -89,6 +91,8 @@ data class AppSettingsModel(
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
                 useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime)
                     ?: default.useServerLastModifiedTime,
+                appendExtensionToIncompleteDownloads = source.get(Keys.appendExtensionToIncompleteDownloads)
+                    ?: default.appendExtensionToIncompleteDownloads,
                 useSparseFileAllocation = source.get(Keys.useSparseFileAllocation) ?: default.useSparseFileAllocation,
                 useAverageSpeed = source.get(Keys.useAverageSpeed) ?: default.useAverageSpeed,
                 showDownloadProgressDialog = source.get(Keys.showDownloadProgressDialog)
@@ -122,6 +126,7 @@ data class AppSettingsModel(
                 put(Keys.maxDownloadRetryCount, focus.maxDownloadRetryCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
+                put(Keys.appendExtensionToIncompleteDownloads, focus.appendExtensionToIncompleteDownloads)
                 put(Keys.useSparseFileAllocation, focus.useSparseFileAllocation)
                 put(Keys.useAverageSpeed, focus.useAverageSpeed)
                 put(Keys.showDownloadProgressDialog, focus.showDownloadProgressDialog)
@@ -175,6 +180,7 @@ class AppSettingsStorage(
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
+    val appendExtensionToIncompleteDownloads = from(AppSettingsModel.appendExtensionToIncompleteDownloads)
     val useSparseFileAllocation = from(AppSettingsModel.useSparseFileAllocation)
     val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
     val maxDownloadRetryCount = from(AppSettingsModel.maxDownloadRetryCount)

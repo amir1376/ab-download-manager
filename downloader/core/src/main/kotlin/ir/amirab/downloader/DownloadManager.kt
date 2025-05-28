@@ -26,7 +26,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okio.Throttler
 import java.io.File
-import java.net.URL
 
 class DownloadManager(
     val dlListDb: IDownloadListDb,
@@ -52,6 +51,7 @@ class DownloadManager(
         createJobForPendingDownloads()
         _booted.value = true
     }
+
     private val contextContainer = ContextProvider()
 
     private suspend fun createJobForPendingDownloads() {
@@ -70,7 +70,7 @@ class DownloadManager(
     suspend fun addDownload(
         newItem: DownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
-        context: DownloadItemContext=EmptyContext,
+        context: DownloadItemContext = EmptyContext,
     ): Long {
 
         //make sure url is valid
@@ -96,7 +96,7 @@ class DownloadManager(
                         foundItems.forEach {
                             deleteDownload(it.id, { true }, RemovedBy(DuplicateRemoval))
                         }
-                        removedItems=foundItems
+                        removedItems = foundItems
                     }
 
                     Abort -> {
@@ -105,14 +105,14 @@ class DownloadManager(
                 }
             }
 
-            val name=FileNameUtil.numberedIfExists(
+            val name = FileNameUtil.numberedIfExists(
                 File(newItem.folder, newItem.name)
             ).first { candidateNewFile ->
                 val withSameDestination = allDownloads
                     .filter { it !in removedItems }
                     .find {
-                    it.name == candidateNewFile.name && it.folder == candidateNewFile.parent
-                }
+                        it.name == candidateNewFile.name && it.folder == candidateNewFile.parent
+                    }
                 withSameDestination == null
             }.name
 
@@ -128,7 +128,7 @@ class DownloadManager(
             dlListDb.add(downloadItem)
             createJob(downloadItem).apply { boot() }
         }
-        contextContainer.setContext(job.id,context)
+        contextContainer.setContext(job.id, context)
         onDownloadAdded(job.downloadItem)
 //        thisLogger().info("this download added $downloadItem")
 //        println("download created ${job.id}")
@@ -150,60 +150,71 @@ class DownloadManager(
     ) {
         kotlin.runCatching { pause(id) }
         val itemToDelete = dlListDb.getById(id) ?: return
-        contextContainer.updateContext(id){ it+context }
-        deleteJob(id)
+        val job = getDownloadJob(id) ?: run {
+            createJob(itemToDelete).apply { boot() }
+        }
+        // at this point: job will be created (and booted) if it was not created before
+        contextContainer.updateContext(id) { it + context }
+        deleteJob(job.id) {
+            it.downloadRemoved(
+                removeOutputFile = if (itemToDelete.status == DownloadStatus.Completed) {
+                    alsoRemoveFile(itemToDelete)
+                } else {
+                    // always remove file if download is not finished!
+                    true
+                },
+            )
+        }
         dlListDb.remove(itemToDelete)
         partListDb.removeParts(id)
         listOfJobsEvents.tryEmit(
             DownloadManagerEvents.OnJobRemoved(itemToDelete, contextContainer.getContext(id))
         )
         contextContainer.removeContext(id)
-        if (alsoRemoveFile(itemToDelete)) {
-            val fileToDelete = calculateOutputFile(itemToDelete)
-            if (fileToDelete.isFile) {
-                fileToDelete.delete()
-            }
-        }
     }
 
-    private fun deleteJob(id: Long) {
+    private fun deleteJob(
+        id: Long,
+        beforeDelete: (DownloadJob) -> Unit = {}
+    ) {
         synchronized(jobModificationLock) {
             val jobToDelete = downloadJobs.find {
                 it.id == id
             }
-            jobToDelete?.close()
             jobToDelete?.let {
+                beforeDelete(it)
+                it.close()
                 downloadJobs = downloadJobs.minusElement(it)
             }
         }
     }
 
-    suspend fun pause(id: Long,context: DownloadItemContext=EmptyContext) {
+    suspend fun pause(id: Long, context: DownloadItemContext = EmptyContext) {
         val job = getDownloadJob(id)!!
-        contextContainer.updateContext(id){ it+context }
+        contextContainer.updateContext(id) { it + context }
         job.pause()
     }
 
-    suspend fun resume(id: Long,context: DownloadItemContext=EmptyContext) {
-        val job = getDownloadJob(id)?:run {
-            dlListDb.getById(id)?.let {
-                createJob(it)
-            }
-        }
-        job?.let {
-            contextContainer.updateContext(id){ it+context }
-            it.resume()
-        }
-    }
-
-    suspend fun reset(id: Long,context: DownloadItemContext=EmptyContext) {
+    suspend fun resume(id: Long, context: DownloadItemContext = EmptyContext) {
         val job = getDownloadJob(id) ?: run {
             dlListDb.getById(id)?.let {
                 createJob(it)
             }
         }
         job?.let {
-            contextContainer.updateContext(id){ it+context }
+            contextContainer.updateContext(id) { it + context }
+            it.resume()
+        }
+    }
+
+    suspend fun reset(id: Long, context: DownloadItemContext = EmptyContext) {
+        val job = getDownloadJob(id) ?: run {
+            dlListDb.getById(id)?.let {
+                createJob(it)
+            }
+        }
+        job?.let {
+            contextContainer.updateContext(id) { it + context }
             it.reset()
         }
     }
@@ -230,38 +241,48 @@ class DownloadManager(
     }
 
     fun onDownloadResuming(downloadItem: DownloadItem) {
-        listOfJobsEvents.tryEmit(DownloadManagerEvents.OnJobStarting(downloadItem,
-            contextContainer.getContext(downloadItem.id)
-        )
+        listOfJobsEvents.tryEmit(
+            DownloadManagerEvents.OnJobStarting(
+                downloadItem,
+                contextContainer.getContext(downloadItem.id)
+            )
         )
     }
 
     fun onDownloadResumed(downloadItem: DownloadItem) {
-        listOfJobsEvents.tryEmit(DownloadManagerEvents.OnJobStarted(downloadItem,
-            contextContainer.getContext(downloadItem.id)
-        )
+        listOfJobsEvents.tryEmit(
+            DownloadManagerEvents.OnJobStarted(
+                downloadItem,
+                contextContainer.getContext(downloadItem.id)
+            )
         )
     }
 
     fun onDownloadAdded(downloadItem: DownloadItem) {
-        listOfJobsEvents.tryEmit(DownloadManagerEvents.OnJobAdded(downloadItem,
-            contextContainer.getContext(downloadItem.id)
-        )
+        listOfJobsEvents.tryEmit(
+            DownloadManagerEvents.OnJobAdded(
+                downloadItem,
+                contextContainer.getContext(downloadItem.id)
+            )
         )
     }
 
     fun onDownloadCanceled(downloadItem: DownloadItem, throwable: Throwable) {
-        listOfJobsEvents.tryEmit(DownloadManagerEvents.OnJobCanceled(downloadItem,
-            contextContainer.getContext(downloadItem.id), throwable
-        )
+        listOfJobsEvents.tryEmit(
+            DownloadManagerEvents.OnJobCanceled(
+                downloadItem,
+                contextContainer.getContext(downloadItem.id), throwable
+            )
         )
     }
 
     fun onDownloadFinished(downloadItem: DownloadItem) {
         scope.launch {
-            listOfJobsEvents.tryEmit(DownloadManagerEvents.OnJobCompleted(downloadItem,
-                contextContainer.getContext(downloadItem.id)
-            )
+            listOfJobsEvents.tryEmit(
+                DownloadManagerEvents.OnJobCompleted(
+                    downloadItem,
+                    contextContainer.getContext(downloadItem.id)
+                )
             )
             deleteJob(downloadItem.id)
         }
@@ -269,19 +290,21 @@ class DownloadManager(
 
     fun onDownloadItemChange(downloadItem: DownloadItem) {
         scope.launch {
-            listOfJobsEvents.tryEmit(DownloadManagerEvents.OnJobChanged(downloadItem,
-                contextContainer.getContext(downloadItem.id)
-            )
+            listOfJobsEvents.tryEmit(
+                DownloadManagerEvents.OnJobChanged(
+                    downloadItem,
+                    contextContainer.getContext(downloadItem.id)
+                )
             )
         }
     }
 
-    override suspend fun startJob(id: Long,context: DownloadItemContext) {
-        resume(id,context)
+    override suspend fun startJob(id: Long, context: DownloadItemContext) {
+        resume(id, context)
     }
 
-    override suspend fun stopJob(id: Long,context: DownloadItemContext) {
-        pause(id,context)
+    override suspend fun stopJob(id: Long, context: DownloadItemContext) {
+        pause(id, context)
     }
 
     override fun canActivateJob(id: Long): Boolean {
@@ -292,13 +315,13 @@ class DownloadManager(
     }
 
     suspend fun stopAll(
-        context: DownloadItemContext=EmptyContext,
+        context: DownloadItemContext = EmptyContext,
     ) {
         downloadJobs.filter {
             it.status.value == DownloadJobStatus.Downloading
         }.map {
             scope.async {
-                pause(it.id,context)
+                pause(it.id, context)
             }
         }.awaitAll()
     }
@@ -320,7 +343,7 @@ class DownloadManager(
     }
 
     override val listOfJobsEvents: MutableSharedFlow<DownloadManagerEvents> =
-            MutableSharedFlow(extraBufferCapacity = 64)
+        MutableSharedFlow(extraBufferCapacity = 64)
 
     //global speed limiter
     internal val throttler = Throttler()
@@ -352,21 +375,24 @@ class DownloadManager(
 }
 
 private class ContextProvider {
-    val contexts = mutableMapOf<Long,DownloadItemContext>()
-    fun getContext(id: Long):DownloadItemContext{
-        return contexts.getOrDefault(id,EmptyContext)
+    val contexts = mutableMapOf<Long, DownloadItemContext>()
+    fun getContext(id: Long): DownloadItemContext {
+        return contexts.getOrDefault(id, EmptyContext)
     }
-    fun setContext(id:Long,context: DownloadItemContext){
-        if (context==EmptyContext){
+
+    fun setContext(id: Long, context: DownloadItemContext) {
+        if (context == EmptyContext) {
             removeContext(id)
             return
         }
-        contexts[id]=context
+        contexts[id] = context
     }
-    fun removeContext(id: Long){
+
+    fun removeContext(id: Long) {
         contexts.remove(id)
     }
-    fun updateContext(id: Long,block:(DownloadItemContext)->DownloadItemContext){
-        setContext(id,getContext(id).let(block))
+
+    fun updateContext(id: Long, block: (DownloadItemContext) -> DownloadItemContext) {
+        setContext(id, getContext(id).let(block))
     }
 }

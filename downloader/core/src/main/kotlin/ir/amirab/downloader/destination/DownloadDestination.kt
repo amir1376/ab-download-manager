@@ -81,11 +81,20 @@ abstract class DownloadDestination(
         requestedToChangeLastModified=timestamp
     }
 
-    protected fun updateLastModified(){
+    protected open fun updateLastModified() {
         kotlin.runCatching {
             requestedToChangeLastModified?.let {
                 outputFile.setLastModified(it)
             }
+        }
+    }
+
+    /**
+     * after you use this method this class must be recreated
+     */
+    open fun moveOutput(to: File) {
+        if (outputFile.exists()) {
+            outputFile.renameTo(to)
         }
     }
 }

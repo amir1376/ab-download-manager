@@ -7,6 +7,7 @@ import ir.amirab.downloader.connection.response.isWebPage
 import ir.amirab.downloader.destination.SimpleDownloadDestination
 import ir.amirab.downloader.downloaditem.DownloadItem.Companion.LENGTH_UNKNOWN
 import ir.amirab.downloader.exception.DownloadValidationException
+import ir.amirab.downloader.exception.PrepareDestinationFailedException
 import ir.amirab.downloader.exception.FileChangedException
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.part.*
@@ -42,6 +43,8 @@ class DownloadJob(
     val partListDb by downloadManager::partListDb
     private val parts: MutableList<Part> = mutableListOf()
     lateinit var destination: SimpleDownloadDestination
+
+    @Volatile
     private var booted = false
 
 
@@ -57,8 +60,9 @@ class DownloadJob(
         val outFile = downloadManager.calculateOutputFile(downloadItem)
         destination = SimpleDownloadDestination(
             file = outFile,
-            diskStat = downloadManager.diskStat,
-            emptyFileCreator = downloadManager.emptyFileCreator
+            emptyFileCreator = downloadManager.emptyFileCreator,
+            appendExtensionForIncompleteDownload = downloadManager.settings.appendExtensionToIncompleteDownloads,
+            downloadId = id
         )
     }
 
@@ -183,8 +187,17 @@ class DownloadJob(
                 onDownloadResumed()
             } catch (e: Exception) {
                 e.printStackIfNOtUsual()
-                if (ExceptionUtils.isNormalCancellation(e)) {
-                    pause(e)
+                val shouldStop = when {
+                    ExceptionUtils.isNormalCancellation(e) -> true
+                    e is DownloadValidationException -> e.isCritical()
+                    else -> false
+                }
+                if (shouldStop) {
+                    // this function called from activeDownloadScope
+                    // so we change the scope here to prevent cancel this suspend function
+                    scope.launch {
+                        pause(e)
+                    }
                 } else {
                     downloadFailedRetryOrPause(
                         e = e,
@@ -216,7 +229,12 @@ class DownloadJob(
                 saveState()
             }
 //          thisLogger().info("preparing file")
-            destination.prepareFile(onProgressUpdate)
+            try {
+                destination.prepareFile(onProgressUpdate)
+            } catch (e: Exception) {
+                e.throwIfCancelled()
+                throw PrepareDestinationFailedException(e)
+            }
             val lastModified = serverLastModified.takeIf { downloadManager.settings.useServerLastModifiedTime }
             destination.setLastModified(lastModified)
 //            thisLogger().info("file prepared")
@@ -248,19 +266,23 @@ class DownloadJob(
     }
 
     suspend fun changeConfig(updater: (DownloadItem) -> Unit): DownloadItem {
-        val last = downloadItem.copy()
+        boot()
+        val previousItem = downloadItem.copy()
         downloadItem.apply(updater)
-        if (downloadManager.calculateOutputFile(last) != downloadManager.calculateOutputFile(downloadItem)) {
+        val previousDestination = downloadManager.calculateOutputFile(previousItem)
+        val newDestination = downloadManager.calculateOutputFile(downloadItem)
+        if (previousDestination != newDestination) {
             if (isDownloadActive.value) {
                 pause()
             }
+            destination.moveOutput(newDestination)
             // destination should be closed for now!
             initializeDestination()
         }
-        if (last.preferredConnectionCount != downloadItem.preferredConnectionCount) {
+        if (previousItem.preferredConnectionCount != downloadItem.preferredConnectionCount) {
             onPreferredConnectionCountChanged()
         }
-        if (last.link != downloadItem.link) {
+        if (previousItem.link != downloadItem.link) {
             onLinkChanged()
         }
         applySpeedLimit()
@@ -762,6 +784,22 @@ class DownloadJob(
 
     fun close() {
         scope.cancel()
+    }
+
+    private fun ensureBooted() {
+        require(booted) {
+            "DownloadJob is not booted! Call boot() before using this object."
+        }
+    }
+
+    fun downloadRemoved(
+        removeOutputFile: Boolean = true,
+    ) {
+        ensureBooted()
+        destination.cleanUpJunkFiles()
+        if (removeOutputFile) {
+            destination.deleteOutPutFile()
+        }
     }
 }
 
