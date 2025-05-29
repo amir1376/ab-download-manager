@@ -166,7 +166,14 @@ class SimpleDownloadDestination(
         if (appendExtensionToIncompleteDownloads) {
             val incompleteFile = incompleteFile
             if (incompleteFile.exists()) {
-                incompleteFile.renameTo(IncompleteFileUtil.addIncompleteIndicator(to, downloadId))
+                try {
+                    incompleteFile.renameTo(IncompleteFileUtil.addIncompleteIndicator(to, downloadId))
+                } catch (e: Exception) {
+                    throw IllegalStateException(
+                        "Failed to move .part file to the new destination: ${to.path}",
+                        e,
+                    )
+                }
             }
         }
         super.moveOutput(to)

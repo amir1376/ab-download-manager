@@ -268,9 +268,9 @@ class DownloadJob(
     suspend fun changeConfig(updater: (DownloadItem) -> Unit): DownloadItem {
         boot()
         val previousItem = downloadItem.copy()
-        downloadItem.apply(updater)
+        val newItem = previousItem.apply(updater)
         val previousDestination = downloadManager.calculateOutputFile(previousItem)
-        val newDestination = downloadManager.calculateOutputFile(downloadItem)
+        val newDestination = downloadManager.calculateOutputFile(newItem)
         if (previousDestination != newDestination) {
             if (isDownloadActive.value) {
                 pause()
@@ -279,6 +279,8 @@ class DownloadJob(
             // destination should be closed for now!
             initializeDestination()
         }
+        // if there is no error update the actual download item
+        downloadItem.applyFrom(newItem)
         if (previousItem.preferredConnectionCount != downloadItem.preferredConnectionCount) {
             onPreferredConnectionCountChanged()
         }

@@ -11,9 +11,9 @@ abstract class DownloadDestination(
 
     protected val fileParts = mutableListOf<DestWriter>()
     protected var allPartsDownloaded = false
-    protected var requestedToChangeLastModified:Long?=null
+    protected var requestedToChangeLastModified: Long? = null
 
-    protected open fun onAllFilePartsRemoved(){
+    protected open fun onAllFilePartsRemoved() {
         updateLastModified()
     }
 
@@ -43,7 +43,7 @@ abstract class DownloadDestination(
     }
 
     fun returnIfAlreadyHaveWriter(partId: Long): DestWriter? {
-        synchronized(this){
+        synchronized(this) {
             return fileParts.find {
                 val condition = it.id == partId
 //      if (condition) {
@@ -61,13 +61,13 @@ abstract class DownloadDestination(
     abstract suspend fun prepareFile(onProgressUpdate: (Int?) -> Unit)
     abstract suspend fun isDownloadedPartsIsValid(): Boolean
     abstract fun flush()
-    open fun onPartCancelled(part: Part){
-        synchronized(this){
-            val cleanAny=fileParts.removeAll {
-                it.id==part.from
+    open fun onPartCancelled(part: Part) {
+        synchronized(this) {
+            val cleanAny = fileParts.removeAll {
+                it.id == part.from
             }
-            if (cleanAny){
-                if (fileParts.isEmpty()){
+            if (cleanAny) {
+                if (fileParts.isEmpty()) {
                     onAllFilePartsRemoved()
                 }
             }
@@ -79,7 +79,7 @@ abstract class DownloadDestination(
      * for example file paused / finished
      */
     fun setLastModified(timestamp: Long?) {
-        requestedToChangeLastModified=timestamp
+        requestedToChangeLastModified = timestamp
     }
 
     protected open fun updateLastModified() {
@@ -95,7 +95,14 @@ abstract class DownloadDestination(
      */
     open fun moveOutput(to: File) {
         if (outputFile.exists()) {
-            outputFile.renameTo(to)
+            try {
+                outputFile.renameTo(to)
+            } catch (e: Exception) {
+                throw IllegalStateException(
+                    "Failed to move output file to the new destination: ${to.path}",
+                    e,
+                )
+            }
         }
     }
 }
