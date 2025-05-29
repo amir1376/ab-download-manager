@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.home.DownloadItemTransferable
 import com.abdownloadmanager.shared.ui.widget.customtable.*
@@ -38,9 +39,8 @@ import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.desktop.isCtrlPressed
 import ir.amirab.util.ifThen
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.delay
 
 
@@ -107,8 +107,7 @@ fun DownloadList(
         newSelection(downloadList.map { it.id }, isSelected)
     }
 
-    var isCtrlPressed by remember { mutableStateOf(false) }
-    var isShiftPressed by remember { mutableStateOf(false) }
+    val windowInfo = LocalWindowInfo.current
     CompositionLocalProvider(
         LocalDownloadListContext provides DownloadListContext(
             onNewSelection,
@@ -124,16 +123,7 @@ fun DownloadList(
             list = downloadList,
             modifier = modifier
                 .onKeyEvent {
-                    val ctrlPressed = if (Platform.isMac()) {
-                        it.isMetaPressed
-                    } else it.isCtrlPressed
-                    val shiftPressed = it.isShiftPressed
-                    isCtrlPressed = ctrlPressed
-                    isShiftPressed = shiftPressed
-                    false
-                }
-                .onKeyEvent {
-                    if (isCtrlPressed && it.key == Key.A) {
+                    if (it.key == Key.A && isCtrlPressed(windowInfo)) {
                         changeAllSelection(true)
                         true
                     } else {
@@ -213,7 +203,7 @@ fun DownloadList(
                                         onRequestOpenDownload(item.id)
                                         shouldWaitForSecondClick = false
                                     } else {
-                                        if (isCtrlPressed) {
+                                        if (isCtrlPressed(windowInfo)) {
                                             onItemSelectionChange(item.id, !isSelected)
                                         } else {
                                             changeAllSelection(false)
