@@ -85,19 +85,17 @@ private fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Mo
                         alpha(0.5f)
                     }
                 ) {
-                    allDays.chunked(4).forEach { col ->
-                        Column(Modifier.width(IntrinsicSize.Max)) {
-                            col.forEach { dayOfWeek ->
-                                RenderDayOfWeek(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    enabled = enabled,
-                                    dayOfWeek = dayOfWeek,
-                                    selected = isSelected(dayOfWeek),
-                                    onSelect = { s, isSelected ->
-                                        selectDay(dayOfWeek, isSelected)
-                                    }
-                                )
-                            }
+                    FlowRow(Modifier.fillMaxWidth()) {
+                        allDays.forEach { dayOfWeek ->
+                            RenderDayOfWeek(
+                                modifier = Modifier,
+                                enabled = enabled,
+                                dayOfWeek = dayOfWeek,
+                                selected = isSelected(dayOfWeek),
+                                onSelect = { s, isSelected ->
+                                    selectDay(dayOfWeek, isSelected)
+                                }
+                            )
                         }
                     }
                 }
@@ -125,14 +123,14 @@ fun RenderDayOfWeek(
             .clickable(enabled = enabled) {
                 onSelect(dayOfWeek, !selected)
             }
-            .padding(vertical = 2.dp)
-            .padding(horizontal = 4.dp)
+            .padding(vertical = 4.dp)
+            .padding(horizontal = 8.dp)
 
     ) {
         MyIcon(
             MyIcons.check,
             null,
-            Modifier.size(8.dp)
+            Modifier.size(10.dp)
                 .alpha(if (selected) 1f else 0f),
         )
         Spacer(Modifier.width(2.dp))
@@ -142,7 +140,8 @@ fun RenderDayOfWeek(
                 if (selected) 1f
                 else 0.5f
             ),
-            fontSize = myTextSizes.xs,
+            softWrap = false,
+            fontSize = myTextSizes.base,
         )
     }
 }
