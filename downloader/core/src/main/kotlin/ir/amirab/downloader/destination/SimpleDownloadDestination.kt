@@ -1,8 +1,11 @@
 package ir.amirab.downloader.destination
 
 import ir.amirab.downloader.anntation.HeavyCall
+import ir.amirab.downloader.exception.DownloadValidationException
+import ir.amirab.downloader.exception.PrepareDestinationFailedException
 import ir.amirab.downloader.part.Part
 import ir.amirab.downloader.utils.EmptyFileCreator
+import ir.amirab.downloader.utils.throwIfCancelled
 import okio.FileHandle
 import okio.FileSystem
 import okio.Path.Companion.toOkioPath
@@ -74,7 +77,15 @@ class SimpleDownloadDestination(
             if (completeFile.exists()) {
                 completeFile.delete()
             }
-            incompleteFile.renameTo(completeFile)
+            try {
+                incompleteFile.renameTo(completeFile)
+            } catch (e: Exception) {
+                // prevent remove the part file if it can't be moved by us!
+                throw IllegalStateException(
+                    "failed to move .part file to the actual output file! ${e.localizedMessage}",
+                    e
+                )
+            }
         }
         // clean up junk files called in the super class
         super.onAllPartsCompleted()

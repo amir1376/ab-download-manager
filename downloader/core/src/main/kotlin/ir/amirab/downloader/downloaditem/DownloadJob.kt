@@ -582,7 +582,12 @@ class DownloadJob(
 
     private fun onDownloadFinished() {
         scope.launch {
-            destination.onAllPartsCompleted()
+            try {
+                destination.onAllPartsCompleted()
+            } catch (e: Exception) {
+                pause(e)
+                return@launch
+            }
             downloadItem.status = DownloadStatus.Completed
             if (downloadItem.contentLength == LENGTH_UNKNOWN) {
                 //in case of blind part, update download item length

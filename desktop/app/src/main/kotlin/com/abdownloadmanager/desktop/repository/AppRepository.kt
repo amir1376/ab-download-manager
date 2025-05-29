@@ -63,6 +63,20 @@ class AppRepository : KoinComponent {
         appSettings.useBitsForSpeed.value = speedUnit.baseSize == BaseSize.Bits
     }
 
+    fun boot() {
+        updateDownloadSettings()
+    }
+
+    private fun updateDownloadSettings() {
+        downloadSettings.defaultThreadCount = threadCount.value
+        downloadSettings.dynamicPartCreationMode = dynamicPartCreation.value
+        downloadSettings.useServerLastModifiedTime = useServerLastModifiedTime.value
+        downloadSettings.appendExtensionToIncompleteDownloads = appendExtensionToIncompleteDownloads.value
+        downloadSettings.useSparseFileAllocation = useSparseFileAllocation.value
+        downloadSettings.maxDownloadRetryCount = maxDownloadRetryCount.value
+        downloadSettings.globalSpeedLimit = speedLimiter.value
+    }
+
     init {
         saveLocation
             .debounce(500)
