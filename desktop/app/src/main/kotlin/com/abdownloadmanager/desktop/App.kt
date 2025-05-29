@@ -5,6 +5,7 @@ package com.abdownloadmanager.desktop
 
 import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.desktop.di.Di
+import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
@@ -25,6 +26,7 @@ import kotlin.system.exitProcess
 class App : AutoCloseable,
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
+    private val appRepository: AppRepository by inject()
     private val integration: Integration by inject()
     private val previousVersion: PreviousVersion by inject()
     private val updateManager: UpdateManager by inject()
@@ -41,6 +43,9 @@ class App : AutoCloseable,
                 //make sure to not get any dependency until boot the DI Container
                 Di.boot()
                 // it's better to organize these list of boot functions in a separate class
+
+                // boot configs from the storage so download manager can use them on boot!
+                appRepository.boot()
                 integration.boot()
                 downloadSystem.boot()
                 previousVersion.boot()

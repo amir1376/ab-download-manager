@@ -32,6 +32,9 @@ inline fun <T : Throwable> T.throwIf(condition: (T) -> Boolean) {
         throw this
     }
 }
+inline fun <T : Throwable> T.throwIfCancelled() {
+    throwIf { ExceptionUtils.isNormalCancellation(this) }
+}
 
 
 fun Throwable.printStackIfNOtUsual() {

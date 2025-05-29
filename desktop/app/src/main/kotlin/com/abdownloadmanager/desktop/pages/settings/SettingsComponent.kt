@@ -52,6 +52,7 @@ object ThreadCountLimitation {
     const val MAX_ALLOWED_THREAD_COUNT = 256
     const val MAX_NORMAL_VALUE = 32
 }
+
 object MaximumDownloadRetriesLimitation {
     const val MAX_ALLOWED_RETRIES = 1024
 }
@@ -82,6 +83,7 @@ fun threadCountConfig(appRepository: AppRepository): IntConfigurable {
         },
     )
 }
+
 fun maxDownloadRetryCount(appRepository: AppRepository): IntConfigurable {
     return IntConfigurable(
         title = Res.string.settings_download_max_retries_count.asStringSource(),
@@ -124,6 +126,21 @@ fun useServerLastModified(appRepository: AppRepository): BooleanConfigurable {
         title = Res.string.settings_use_server_last_modified_time.asStringSource(),
         description = Res.string.settings_use_server_last_modified_time_description.asStringSource(),
         backedBy = appRepository.useServerLastModifiedTime,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
+fun appendExtensionToIncompleteDownloads(appRepository: AppRepository): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_append_extension_to_incomplete_downloads.asStringSource(),
+        description = Res.string.settings_append_extension_to_incomplete_downloads_description.asStringSource(),
+        backedBy = appRepository.appendExtensionToIncompleteDownloads,
         describe = {
             if (it) {
                 Res.string.enabled.asStringSource()
@@ -580,6 +597,7 @@ class SettingsComponent(
                     autoShowDownloadProgressWindow(appSettings),
                     showDownloadFinishWindow(appSettings),
                     useServerLastModified(appRepository),
+                    appendExtensionToIncompleteDownloads(appRepository),
                     useSparseFileAllocation(appRepository),
                     trackDeletedFilesOnDisk(appRepository),
                     ignoreSSLCertificates(appSettings),

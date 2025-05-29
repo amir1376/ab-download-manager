@@ -1,6 +1,9 @@
 package ir.amirab.util
 
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 import java.io.File
+import java.nio.file.AtomicMoveNotSupportedException
 
 
 fun File.toUpUntil(
@@ -16,4 +19,10 @@ fun File.toUpUntil(
         }
         file = file.parentFile
     }
+}
+
+fun File.atomicMove(destination: File) {
+    val target = destination.toOkioPath()
+    val source = toOkioPath()
+    FileSystem.SYSTEM.atomicMove(source, target)
 }

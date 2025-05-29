@@ -1,8 +1,8 @@
 package ir.amirab.downloader.destination
 
 import ir.amirab.downloader.part.Part
+import ir.amirab.util.atomicMove
 import java.io.File
-import java.io.IOException
 
 abstract class DownloadDestination(
     outputFile: File,
@@ -11,38 +11,25 @@ abstract class DownloadDestination(
 
     protected val fileParts = mutableListOf<DestWriter>()
     protected var allPartsDownloaded = false
-    protected var requestedToChangeLastModified:Long?=null
+    protected var requestedToChangeLastModified: Long? = null
 
-    protected open fun onAllFilePartsRemoved(){
+    protected open fun onAllFilePartsRemoved() {
         updateLastModified()
     }
 
     open fun onAllPartsCompleted() {
         allPartsDownloaded = true
         cleanUpJunkFiles()
+        updateLastModified()
     }
 
     open fun cleanUpJunkFiles() {}
 
     abstract fun getWriterFor(part: Part): DestWriter?
     abstract fun canGetFileWriter(): Boolean
-    protected open fun initializeOut(out: File) {
-        val folder = out.parentFile
-        if (!folder.exists()) {
-            if (folder.mkdirs()) {
-                throw IOException()
-            }
-        }
-        if (!out.exists()) {
-            val newFile = out.createNewFile()
-            if (!newFile) {
-                throw IOException()
-            }
-        }
-    }
 
     fun returnIfAlreadyHaveWriter(partId: Long): DestWriter? {
-        synchronized(this){
+        synchronized(this) {
             return fileParts.find {
                 val condition = it.id == partId
 //      if (condition) {
@@ -53,20 +40,20 @@ abstract class DownloadDestination(
         }
     }
 
-    open fun deleteOutPutFile() {
+    open fun deleteOutputFile() {
         outputFile.delete()
     }
 
     abstract suspend fun prepareFile(onProgressUpdate: (Int?) -> Unit)
     abstract suspend fun isDownloadedPartsIsValid(): Boolean
     abstract fun flush()
-    open fun onPartCancelled(part: Part){
-        synchronized(this){
-            val cleanAny=fileParts.removeAll {
-                it.id==part.from
+    open fun onPartCancelled(part: Part) {
+        synchronized(this) {
+            val cleanAny = fileParts.removeAll {
+                it.id == part.from
             }
-            if (cleanAny){
-                if (fileParts.isEmpty()){
+            if (cleanAny) {
+                if (fileParts.isEmpty()) {
                     onAllFilePartsRemoved()
                 }
             }
@@ -78,13 +65,29 @@ abstract class DownloadDestination(
      * for example file paused / finished
      */
     fun setLastModified(timestamp: Long?) {
-        requestedToChangeLastModified=timestamp
+        requestedToChangeLastModified = timestamp
     }
 
-    protected fun updateLastModified(){
+    protected open fun updateLastModified() {
         kotlin.runCatching {
             requestedToChangeLastModified?.let {
                 outputFile.setLastModified(it)
+            }
+        }
+    }
+
+    /**
+     * after you use this method this class must be recreated
+     */
+    open fun moveOutput(to: File) {
+        if (outputFile.exists()) {
+            try {
+                outputFile.atomicMove(to)
+            } catch (e: Exception) {
+                throw IllegalStateException(
+                    "Failed to move output file to the new destination: ${e.localizedMessage}",
+                    e,
+                )
             }
         }
     }

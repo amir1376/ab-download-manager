@@ -50,6 +50,8 @@ import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.CategorySelectionMode
 import com.abdownloadmanager.shared.utils.subscribeAsStateFlow
 import com.arkivanov.decompose.childContext
+import ir.amirab.downloader.destination.IncompleteFileUtil
+import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.downloaditem.withCredentials
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
@@ -625,7 +627,12 @@ class AppComponent(
                 if (file.exists()) {
                     FileUtils.openFolderOfFile(file)
                 } else {
-                    FileUtils.openFolder(file.parentFile)
+                    val incompleteFile = IncompleteFileUtil.addIncompleteIndicator(file, downloadItem.id)
+                    if (incompleteFile.exists() && downloadItem.status != DownloadStatus.Completed) {
+                        FileUtils.openFolderOfFile(incompleteFile)
+                    } else {
+                        FileUtils.openFolder(file.parentFile)
+                    }
                 }
             }
         }.onFailure {
