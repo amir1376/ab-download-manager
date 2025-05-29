@@ -4,7 +4,7 @@ import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isWindows
 import java.io.File
 
-object IncompleteFIleUtil {
+object IncompleteFileUtil {
     private const val SYSTEM_MAXIMUM_FILE_LENGTH = 255
     private const val SYSTEM_MAXIMUM_FULL_PATH_LENGTH = 259
     private fun createExtension(id: Long): String {

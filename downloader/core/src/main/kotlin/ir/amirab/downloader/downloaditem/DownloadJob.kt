@@ -798,7 +798,7 @@ class DownloadJob(
         ensureBooted()
         destination.cleanUpJunkFiles()
         if (removeOutputFile) {
-            destination.deleteOutPutFile()
+            destination.deleteOutputFile()
         }
     }
 }

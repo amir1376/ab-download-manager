@@ -18,7 +18,7 @@ class SimpleDownloadDestination(
 ) {
     // this is only used when appendExtensionToIncompleteDownloads is true
     val incompleteFile by lazy {
-        IncompleteFIleUtil.addIncompleteIndicator(outputFile, downloadId)
+        IncompleteFileUtil.addIncompleteIndicator(outputFile, downloadId)
     }
 
     private val fileToWrite: File = if (appendExtensionToIncompleteDownloads) {
@@ -155,7 +155,7 @@ class SimpleDownloadDestination(
         if (appendExtensionToIncompleteDownloads) {
             val incompleteFile = incompleteFile
             if (incompleteFile.exists()) {
-                incompleteFile.renameTo(IncompleteFIleUtil.addIncompleteIndicator(to, downloadId))
+                incompleteFile.renameTo(IncompleteFileUtil.addIncompleteIndicator(to, downloadId))
             }
         }
         super.moveOutput(to)

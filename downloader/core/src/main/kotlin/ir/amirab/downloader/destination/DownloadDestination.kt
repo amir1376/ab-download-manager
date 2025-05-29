@@ -54,7 +54,7 @@ abstract class DownloadDestination(
         }
     }
 
-    open fun deleteOutPutFile() {
+    open fun deleteOutputFile() {
         outputFile.delete()
     }
 
