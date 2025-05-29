@@ -1,11 +1,8 @@
 package ir.amirab.downloader.destination
 
 import ir.amirab.downloader.anntation.HeavyCall
-import ir.amirab.downloader.exception.DownloadValidationException
-import ir.amirab.downloader.exception.PrepareDestinationFailedException
 import ir.amirab.downloader.part.Part
 import ir.amirab.downloader.utils.EmptyFileCreator
-import ir.amirab.downloader.utils.throwIfCancelled
 import ir.amirab.util.atomicMove
 import okio.FileHandle
 import okio.FileSystem
@@ -43,7 +40,7 @@ class SimpleDownloadDestination(
         }
 
     private fun initFileHandle(): FileHandle {
-        // lets open a file for writing to it
+        // let's open a file for writing to it!
         // it will be removed when all parts are cancelled so this method
         // maybe called multiple times
         val handle = FileSystem.SYSTEM.openReadWrite(fileToWrite.toOkioPath())
