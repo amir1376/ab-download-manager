@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +42,7 @@ import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.desktop.isCtrlPressed
 import kotlinx.coroutines.*
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
@@ -190,7 +190,6 @@ fun RenderQueueItems(
     component: QueueInfoComponent,
 ) {
     val windowInfo = LocalWindowInfo.current
-    fun isCtrlPressed() = windowInfo.keyboardModifiers.isCtrlPressed
     val queueModel by component.downloadQueue.queueModel.collectAsState()
     val downloadItems by component.downloadQueueItems.collectAsState()
     val selectedIds by component.selectedListItems.collectAsState()
@@ -220,7 +219,7 @@ fun RenderQueueItems(
                         component.setSelectedItem(
                             id = downloadItem.id,
                             selected = selected,
-                            singleSelect = !isCtrlPressed()
+                            singleSelect = !isCtrlPressed(windowInfo)
                         )
                     },
                     index = index

@@ -26,7 +26,6 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowState
-import com.abdownloadmanager.desktop.window.custom.titlebar.CommonRenderTitleBar
 import com.abdownloadmanager.desktop.window.custom.titlebar.TitleBar
 import com.abdownloadmanager.shared.utils.PopUpContainer
 import com.abdownloadmanager.shared.utils.ResponsiveBox
