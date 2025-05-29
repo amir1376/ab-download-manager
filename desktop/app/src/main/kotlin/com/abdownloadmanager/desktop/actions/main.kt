@@ -23,6 +23,7 @@ import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCrede
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
 import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.desktop.PlatformAppActivator
 import ir.amirab.util.flow.combineStateFlows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -159,6 +160,7 @@ val showDownloadList = simpleAction(
     Res.string.show_downloads.asStringSource(),
     MyIcons.settings,
 ) {
+    PlatformAppActivator.active()
     appComponent.openHome()
 }
 
@@ -240,6 +242,7 @@ fun moveToQueueAction(
         }
     }
 }
+
 fun createMoveToCategoryAction(
     category: Category,
     itemIds: List<Long>,
