@@ -1,6 +1,5 @@
 package ir.amirab.downloader.downloaditem
 
-import arrow.optics.copy
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.connection.response.expectSuccess

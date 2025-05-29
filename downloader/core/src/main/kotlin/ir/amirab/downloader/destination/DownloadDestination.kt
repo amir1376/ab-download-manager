@@ -3,7 +3,6 @@ package ir.amirab.downloader.destination
 import ir.amirab.downloader.part.Part
 import ir.amirab.util.atomicMove
 import java.io.File
-import java.io.IOException
 
 abstract class DownloadDestination(
     outputFile: File,
@@ -28,20 +27,6 @@ abstract class DownloadDestination(
 
     abstract fun getWriterFor(part: Part): DestWriter?
     abstract fun canGetFileWriter(): Boolean
-    protected open fun initializeOut(out: File) {
-        val folder = out.parentFile
-        if (!folder.exists()) {
-            if (folder.mkdirs()) {
-                throw IOException()
-            }
-        }
-        if (!out.exists()) {
-            val newFile = out.createNewFile()
-            if (!newFile) {
-                throw IOException()
-            }
-        }
-    }
 
     fun returnIfAlreadyHaveWriter(partId: Long): DestWriter? {
         synchronized(this) {
