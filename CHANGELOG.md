@@ -14,6 +14,27 @@
 
 ### Security
 
+## 1.6.3
+
+### Added
+
+- Korean Language
+- An option to append ".part" extension to incomplete downloads (disabled by default)
+
+### Fixed
+
+- Prevent freeze when opening a file or folder
+- Some websites close the connection if we ask for resume support
+- Some non-standard links not captured correctly
+- Crash when opening browser integration links on macOS
+- Multiselect with Meta key not working as expected on macOS
+- Multiselect not stopped properly after window focus lost
+
+### Improved
+
+- Translations updated
+- Minor UI/UX improvements
+
 ## 1.6.2
 
 ### Added
