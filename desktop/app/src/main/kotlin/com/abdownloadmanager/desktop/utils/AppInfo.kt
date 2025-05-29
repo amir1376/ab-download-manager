@@ -32,7 +32,7 @@ object AppInfo {
             ?.let {
                 when (Platform.getCurrentPlatform()) {
                     Platform.Desktop.Linux -> it.parentFile // <installationFolder>/bin/ABDownloadManager
-                    Platform.Desktop.MacOS -> it.findAppFolder()
+                    Platform.Desktop.MacOS -> it.findAppFolder() // Applications/AbDownloadManager.app
                     Platform.Desktop.Windows -> it // <installationFolder>/ABDownloadManager.exe
                     else -> null
                 }?.path

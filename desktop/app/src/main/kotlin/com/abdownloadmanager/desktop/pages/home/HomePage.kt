@@ -246,7 +246,7 @@ fun HomePage(component: HomeComponent) {
                     .height(1.dp)
                     .background(myColors.surface)
             )
-            Row() {
+            Row {
                 val categoriesWidth by component.categoriesWidth.collectAsState()
                 Categories(
                     modifier = Modifier.padding(top = 8.dp)
