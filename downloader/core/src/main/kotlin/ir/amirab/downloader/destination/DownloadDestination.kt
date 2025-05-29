@@ -1,6 +1,7 @@
 package ir.amirab.downloader.destination
 
 import ir.amirab.downloader.part.Part
+import ir.amirab.util.atomicMove
 import java.io.File
 import java.io.IOException
 
@@ -96,10 +97,10 @@ abstract class DownloadDestination(
     open fun moveOutput(to: File) {
         if (outputFile.exists()) {
             try {
-                outputFile.renameTo(to)
+                outputFile.atomicMove(to)
             } catch (e: Exception) {
                 throw IllegalStateException(
-                    "Failed to move output file to the new destination: ${to.path}",
+                    "Failed to move output file to the new destination: ${e.localizedMessage}",
                     e,
                 )
             }

@@ -6,6 +6,7 @@ import ir.amirab.downloader.exception.PrepareDestinationFailedException
 import ir.amirab.downloader.part.Part
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.downloader.utils.throwIfCancelled
+import ir.amirab.util.atomicMove
 import okio.FileHandle
 import okio.FileSystem
 import okio.Path.Companion.toOkioPath
@@ -78,7 +79,7 @@ class SimpleDownloadDestination(
                 completeFile.delete()
             }
             try {
-                incompleteFile.renameTo(completeFile)
+                incompleteFile.atomicMove(completeFile)
             } catch (e: Exception) {
                 // prevent remove the part file if it can't be moved by us!
                 throw IllegalStateException(
@@ -167,10 +168,10 @@ class SimpleDownloadDestination(
             val incompleteFile = incompleteFile
             if (incompleteFile.exists()) {
                 try {
-                    incompleteFile.renameTo(IncompleteFileUtil.addIncompleteIndicator(to, downloadId))
+                    incompleteFile.atomicMove(IncompleteFileUtil.addIncompleteIndicator(to, downloadId))
                 } catch (e: Exception) {
                     throw IllegalStateException(
-                        "Failed to move .part file to the new destination: ${to.path}",
+                        "Failed to move .part file to the new destination: ${e.localizedMessage}",
                         e,
                     )
                 }
