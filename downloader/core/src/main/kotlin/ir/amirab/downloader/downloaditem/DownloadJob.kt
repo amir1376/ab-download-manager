@@ -272,16 +272,20 @@ class DownloadJob(
         val newItem = previousItem.copy().apply(updater)
         val previousDestination = downloadManager.calculateOutputFile(previousItem)
         val newDestination = downloadManager.calculateOutputFile(newItem)
+        var shouldUpdateDestination = false
         if (previousDestination != newDestination) {
             if (isDownloadActive.value) {
                 pause()
             }
             destination.moveOutput(newDestination)
-            // destination should be closed for now!
-            initializeDestination()
+            shouldUpdateDestination = true
         }
         // if there is no error update the actual download item
         downloadItem.applyFrom(newItem)
+        if (shouldUpdateDestination) {
+            // destination should be closed for now!
+            initializeDestination()
+        }
         if (previousItem.preferredConnectionCount != downloadItem.preferredConnectionCount) {
             onPreferredConnectionCountChanged()
         }
