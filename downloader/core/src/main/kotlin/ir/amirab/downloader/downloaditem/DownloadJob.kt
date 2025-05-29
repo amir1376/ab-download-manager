@@ -1,5 +1,6 @@
 package ir.amirab.downloader.downloaditem
 
+import arrow.optics.copy
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.connection.response.expectSuccess
@@ -268,7 +269,7 @@ class DownloadJob(
     suspend fun changeConfig(updater: (DownloadItem) -> Unit): DownloadItem {
         boot()
         val previousItem = downloadItem.copy()
-        val newItem = previousItem.apply(updater)
+        val newItem = previousItem.copy().apply(updater)
         val previousDestination = downloadManager.calculateOutputFile(previousItem)
         val newDestination = downloadManager.calculateOutputFile(newItem)
         if (previousDestination != newDestination) {
