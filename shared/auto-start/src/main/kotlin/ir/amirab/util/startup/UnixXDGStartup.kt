@@ -23,11 +23,13 @@ class UnixXDGStartup(
 
     @Throws(Exception::class)
     override fun install() {
+        val home = System.getProperty("user.home")
         val out = PrintWriter(FileWriter(getAutoStartFile()))
         out.println("[Desktop Entry]")
         out.println("Type=Application")
         out.println("Name=" + this.name)
         out.println("Exec=" + getExecutableWithArgs())
+        out.println("Icon=$home/.local/ABDownloadManager/lib/ABDownloadManager.png")
         out.println("Terminal=false")
         out.println("NoDisplay=true")
         out.close()
