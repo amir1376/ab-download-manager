@@ -14,6 +14,17 @@ class UnixXDGStartup(
     args = args,
 ) {
 
+    private fun getIconFilePath(): String? {
+        return runCatching {
+            val file = File(path)
+            val name = file.name
+            return file
+                .parentFile.parentFile
+                .resolve("lib/$name.png")
+                .takeIf { it.exists() }?.path
+        }.getOrNull()
+    }
+
     private fun getAutoStartFile(): File {
         if (!autostartDir.exists()) {
             autostartDir.mkdirs()
@@ -23,13 +34,14 @@ class UnixXDGStartup(
 
     @Throws(Exception::class)
     override fun install() {
-        val home = System.getProperty("user.home")
         val out = PrintWriter(FileWriter(getAutoStartFile()))
         out.println("[Desktop Entry]")
         out.println("Type=Application")
         out.println("Name=" + this.name)
         out.println("Exec=" + getExecutableWithArgs())
-        out.println("Icon=$home/.local/ABDownloadManager/lib/ABDownloadManager.png")
+        getIconFilePath()?.let {
+            out.println("Icon=$it")
+        }        
         out.println("Terminal=false")
         out.println("NoDisplay=true")
         out.close()
