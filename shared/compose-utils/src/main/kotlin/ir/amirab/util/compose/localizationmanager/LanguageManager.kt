@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import ir.amirab.util.compose.contants.FILE_PROTOCOL
 import ir.amirab.util.compose.contants.RESOURCE_PROTOCOL
 import ir.amirab.util.flow.mapStateFlow
-import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import okio.FileSystem
@@ -15,7 +14,7 @@ import java.net.URI
 import java.util.*
 
 class LanguageManager(
-    private val storage: LanguageStorage,
+    storage: LanguageStorage,
 ) {
     private val _languageList: MutableStateFlow<List<LanguageInfo>> = MutableStateFlow(emptyList())
     val languageList = _languageList.asStateFlow()
@@ -47,13 +46,13 @@ class LanguageManager(
     }
 
     fun getMessage(key: String): String {
-        return getMessageContainer().getMessage(key)
+        return getMessageContainer().getMessage(key)?.takeIf { it.isNotBlank() }
             ?: defaultLanguageData.value.getMessage(key)
             ?: key
     }
 
     private fun getRequestedLanguage(): String {
-        return selectedLanguage.value ?: systemLanguageOrDefault.toLocaleString()
+        return selectedLanguage.value
     }
 
     @Volatile
