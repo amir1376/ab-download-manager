@@ -1,32 +1,41 @@
 package com.abdownloadmanager.desktop.utils.singleInstance
 
-import org.http4k.routing.RoutingHttpHandler
+import org.http4k.core.HttpHandler
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.routing.bind
+import org.http4k.routing.orElse
 import org.http4k.routing.routes
 
 class MutableSingleInstanceServerHandler : SingleInstanceServerHandler {
     private val handlers = mutableListOf<Pair<Command<Any>, () -> Any>>()
 
-    private var _routes = createRoutes()
+    private var mainHandler = createRoutes()
 
-    private fun createRoutes(): RoutingHttpHandler {
+    private fun createRoutes(): HttpHandler {
+        val handlersArray = handlers.map { (cmd, handler) ->
+            cmd bindSafe {
+                handler()
+            }
+        }.toTypedArray()
         return routes(
-            handlers.map { (cmd, handler) ->
-                cmd bindSafe {
-                    handler()
-                }
+            *handlersArray,
+            // add this since empty routes will crash
+            orElse bind {
+                Response(Status.NOT_FOUND)
             }
         )
     }
 
-    override val definedRoutes: RoutingHttpHandler
-        get() = _routes
+    override val handler: HttpHandler
+        get() = mainHandler
 
-    fun updateRoutes(){
-        _routes=createRoutes()
+    fun updateRoutes() {
+        mainHandler = createRoutes()
     }
 
     fun <T : Any> add(command: Command<T>, handle: () -> T) {
-        synchronized(this){
+        synchronized(this) {
             val element = (command to handle) as Pair<Command<Any>, () -> Any>
             handlers.add(element)
             updateRoutes()
@@ -34,7 +43,7 @@ class MutableSingleInstanceServerHandler : SingleInstanceServerHandler {
     }
 
     fun <T : Any> remove(command: Command<T>) {
-        synchronized(this){
+        synchronized(this) {
             handlers.removeIf {
                 it.first == command
             }
