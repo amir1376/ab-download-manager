@@ -10,6 +10,7 @@ import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem
+import ir.amirab.downloader.downloaditem.applyFrom
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -24,7 +25,7 @@ class EditDownloadComponent(
     val onRequestClose: () -> Unit,
     val downloadId: Long,
     val acceptEdit: StateFlow<Boolean>,
-    private val onEdited: (DownloadItem) -> Unit,
+    private val onEdited: ((DownloadItem) -> Unit) -> Unit,
 ) : BaseComponent(ctx),
     ContainsEffects<EditDownloadPageEffects> by supportEffects(),
     KoinComponent {
@@ -91,11 +92,40 @@ class EditDownloadComponent(
             return
         }
         editDownloadUiChecker.value?.let { editDownloadUiChecker ->
-            onEdited(editDownloadUiChecker.editedDownloadItem.value)
+            onEdited {
+                it.applyOurChanges(editDownloadUiChecker.editedDownloadItem.value)
+            }
         }
     }
 
     fun bringToFront() {
         sendEffect(EditDownloadPageEffects.BringToFront)
+    }
+
+    private fun DownloadItem.applyOurChanges(edited: DownloadItem) {
+        // we don't change some of these properties, so I commented them
+
+        link = edited.link
+        headers = edited.headers
+        username = edited.username
+        password = edited.password
+        downloadPage = edited.downloadPage
+        userAgent = edited.userAgent
+
+//        id = edited.id
+        folder = edited.folder
+        name = edited.name
+
+        contentLength = edited.contentLength
+        serverETag = edited.serverETag
+
+//        dateAdded = edited.dateAdded
+//        startTime = edited.startTime
+//        completeTime = edited.completeTime
+//        status = edited.status
+        preferredConnectionCount = edited.preferredConnectionCount
+        speedLimit = edited.speedLimit
+
+        fileChecksum = edited.fileChecksum
     }
 }
