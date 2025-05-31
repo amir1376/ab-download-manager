@@ -1,8 +1,6 @@
 package ir.amirab.util.startup
 
 import java.io.File
-import java.io.FileWriter
-import java.io.PrintWriter
 
 class UnixXDGStartup(
     name: String,
@@ -34,17 +32,22 @@ class UnixXDGStartup(
 
     @Throws(Exception::class)
     override fun install() {
-        val out = PrintWriter(FileWriter(getAutoStartFile()))
-        out.println("[Desktop Entry]")
-        out.println("Type=Application")
-        out.println("Name=" + this.name)
-        out.println("Exec=" + getExecutableWithArgs())
-        getIconFilePath()?.let {
-            out.println("Icon=$it")
-        }        
-        out.println("Terminal=false")
-        out.println("NoDisplay=true")
-        out.close()
+        val name = this.name
+        val exec = getExecutableWithArgs()
+        val icon = getIconFilePath()
+        getAutoStartFile().writeText(
+            buildString {
+                appendLine("[Desktop Entry]")
+                appendLine("Type=Application")
+                appendLine("Name=$name")
+                appendLine("Exec=$exec")
+                icon?.let { icon ->
+                    appendLine("Icon=$icon")
+                }
+                appendLine("Terminal=false")
+                appendLine("NoDisplay=true")
+            }
+        )
     }
 
     override fun uninstall() {
