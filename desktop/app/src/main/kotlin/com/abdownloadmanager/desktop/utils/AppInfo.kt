@@ -22,13 +22,17 @@ object AppInfo {
 //        }
         System.getProperty("jpackage.app-path")
     }
+
+    private fun File.findAppFolder() = generateSequence(this) { it.parentFile }
+        .firstOrNull { it.name.endsWith(".app") }
+
     val installationFolder: String? = run {
         exeFile?.let(::File)
             ?.parentFile // executable path
             ?.let {
                 when (Platform.getCurrentPlatform()) {
                     Platform.Desktop.Linux -> it.parentFile // <installationFolder>/bin/ABDownloadManager
-                    Platform.Desktop.MacOS -> it.parentFile // not checked yet
+                    Platform.Desktop.MacOS -> it.findAppFolder() // /Applications/ABDownloadManager.app
                     Platform.Desktop.Windows -> it // <installationFolder>/ABDownloadManager.exe
                     else -> null
                 }?.path

@@ -1,6 +1,7 @@
 package com.abdownloadmanager.updateapplier
 
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.PlatformFInder
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer
@@ -27,14 +28,11 @@ class UpdateInstallerFromArchiveFile(
 ) : UpdateInstaller {
     private fun getScriptPath(logFile: String): String {
         val platform = Platform.getCurrentPlatform()
+        val updaterPath = "com/abdownloadmanager/updater"
         val scriptForPlatform = when (platform) {
-            Platform.Desktop.Linux -> {
-                "com/abdownloadmanager/updater/updater_linux.sh"
-            }
-
-            Platform.Desktop.Windows -> {
-                "com/abdownloadmanager/updater/updater_windows.bat"
-            }
+            Platform.Desktop.Linux -> "$updaterPath/updater_linux.sh"
+            Platform.Desktop.MacOS -> "$updaterPath/updater_macos.sh"
+            Platform.Desktop.Windows -> "$updaterPath/updater_windows.bat"
 
             else -> error("script for this platform not found")
         }.toPath()
@@ -74,9 +72,10 @@ class UpdateInstallerFromArchiveFile(
                 logFile = logFile,
             )
 
-            else -> error("platform ${platform} not supported")
+            else -> error("platform $platform not supported")
         }
-        val scriptToRun = FileSystem.SYSTEM_TEMPORARY_DIRECTORY.resolve("abdm-updater.run.$scriptExtension")
+        val scriptToRun =
+            FileSystem.SYSTEM_TEMPORARY_DIRECTORY.resolve("abdm-updater.run.$scriptExtension")
         scriptToRun.toFile().writeText(commandToRun)
         return scriptToRun.toString()
     }
@@ -112,7 +111,7 @@ class UpdateInstallerFromArchiveFile(
         logFile: String,
     ): String {
         return """
-            cmd /c ""${scriptPath}" "${updateFolder}" "${installationFolder}" > "${logFile}" 2>&1"
+            cmd /c ""$scriptPath" "$updateFolder" "$installationFolder" > "$logFile" 2>&1"
         """.trimIndent()
     }
 
@@ -123,7 +122,7 @@ class UpdateInstallerFromArchiveFile(
         logFile: String,
     ): String {
         return """
-            bash "${scriptPath}" "${updateFolder}" "${installationFolder}" > "${logFile}" 2>&1 &
+            bash "$scriptPath" "$updateFolder" "$installationFolder" > "$logFile" 2>&1 &
         """.trimIndent()
     }
 
