@@ -1,0 +1,94 @@
+name: 🐞 Bug Report
+description: Report an issue or unexpected behavior in the app
+title: "[Bug] Brief summary (keep it short)"
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug!
+        **Before submitting, please [search the existing issues](./issues) to make sure this is not a duplicate.**
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Description
+      description: What happened? What were you trying to do? Please provide a clear and concise description of the problem.
+      placeholder: Describe the bug you encountered.
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: 🏷️ App Version
+      description: e.g., 1.2.3
+      placeholder: "1.2.3"
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: 💻 Platform
+      description: e.g., Windows 11, macOS 14.2, Ubuntu 24.04
+      placeholder: "Windows 11"
+    validations:
+      required: true
+  - type: input
+    id: installation-type
+    attributes:
+      label: 📦 Installation Type (optional)
+      description: e.g., .exe installer, dmg file, package manager, installation script
+      placeholder: ".exe installer"
+    validations:
+      required: false
+  - type: input
+    id: system-device-details
+    attributes:
+      label: ⚙️ System/Device Details (optional)
+      description: e.g., CPU, RAM, device model
+      placeholder: "CPU: i7-12700K; RAM: 32GB DDR5"
+    validations:
+      required: false
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 🔁 Steps to Reproduce
+      description: List all necessary steps to reproduce the bug.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: ✅ Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe the expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📷 Screenshots or Recordings (optional)
+      description: Drag and drop, paste images, or attach screen recordings here.
+      placeholder: Attach screenshots or screen recordings if possible.
+    validations:
+      required: false
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 🗒️ Additional Information (optional)
+      description: Any additional info, logs, context, or links to related issues.
+      placeholder: Add any other context about the problem here.
+    validations:
+      required: false
+  - type: textarea
+    id: possible-solution
+    attributes:
+      label: 💡 Possible Solution (optional)
+      description: Suggest a fix or reason for the bug, if you have one.
+      placeholder: Suggest a possible solution or reason for the bug.
+    validations:
+      required: false
