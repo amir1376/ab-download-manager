@@ -281,16 +281,14 @@ class DownloadSystem(
         return downloadMonitor.isDownloadActiveFlow(id).value
     }
 
-    suspend fun editDownload(updatedItem: DownloadItem) {
-        val wasActive = isDownloadActive(updatedItem.id)
+    suspend fun editDownload(id: Long, applyUpdate: (DownloadItem) -> Unit) {
+        val wasActive = isDownloadActive(id)
         if (wasActive) {
-            manualPause(updatedItem.id)
+            manualPause(id)
         }
-        downloadManager.updateDownloadItem(updatedItem.id) { currentItem ->
-            currentItem.applyFrom(updatedItem)
-        }
+        downloadManager.updateDownloadItem(id, applyUpdate)
         if (wasActive) {
-            manualResume(updatedItem.id)
+            manualResume(id)
         }
     }
 }

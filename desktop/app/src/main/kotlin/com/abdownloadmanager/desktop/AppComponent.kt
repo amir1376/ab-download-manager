@@ -195,9 +195,9 @@ class AppComponent(
                 onRequestClose = {
                     closeEditDownloadDialog()
                 },
-                onEdited = {
+                onEdited = { updater ->
                     scope.launch {
-                        downloadSystem.editDownload(it)
+                        downloadSystem.editDownload(editDownloadConfig, updater)
                         closeEditDownloadDialog()
                     }
                 },
