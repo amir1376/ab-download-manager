@@ -26,6 +26,11 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.FrameWindowScope
+import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.MenuBarScope
+import androidx.compose.ui.window.MenuScope
+import androidx.compose.ui.window.WindowScope
 import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
@@ -66,7 +71,7 @@ import java.io.File
 
 
 @Composable
-fun HomePage(component: HomeComponent) {
+fun FrameWindowScope.HomePage(component: HomeComponent) {
     val listState by component.downloadList.collectAsState()
     var isDragging by remember { mutableStateOf(false) }
 
@@ -195,7 +200,11 @@ fun HomePage(component: HomeComponent) {
                     object : DragAndDropTarget {
                         private fun onDraggedIn(event: DragAndDropEvent) {
                             if (event.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                                component.onExternalTextDraggedIn { (event.awtTransferable.getTransferData(DataFlavor.stringFlavor) as String) }
+                                component.onExternalTextDraggedIn {
+                                    (event.awtTransferable.getTransferData(
+                                        DataFlavor.stringFlavor
+                                    ) as String)
+                                }
                                 return
                             }
 
@@ -269,7 +278,10 @@ fun HomePage(component: HomeComponent) {
                         AddUrlButton {
                             component.requestAddNewDownload()
                         }
-                        Actions(component.headerActions, component.showLabels.collectAsState().value)
+                        Actions(
+                            component.headerActions,
+                            component.showLabels.collectAsState().value
+                        )
                     }
                     var lastSelected by remember { mutableStateOf(null as Long?) }
                     DownloadList(
@@ -683,7 +695,11 @@ private fun Categories(
             .padding(1.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        var expendedItem: DownloadStatusCategoryFilter? by remember { mutableStateOf(currentStatusFilter) }
+        var expendedItem: DownloadStatusCategoryFilter? by remember {
+            mutableStateOf(
+                currentStatusFilter
+            )
+        }
         for (statusCategoryFilter in DefinedStatusCategories.values()) {
             StatusFilterItem(
                 isExpanded = expendedItem == statusCategoryFilter,
@@ -732,16 +748,63 @@ fun CategoryOption(
 }
 
 @Composable
-private fun HomeMenuBar(
+private fun FrameWindowScope.HomeMenuBar(
     component: HomeComponent,
     modifier: Modifier,
 ) {
+    val nativeMenuBarWithTitleBarInSettings by component.showNativeMenuBar.collectAsState()
     val menu = component.menu
-    MenuBar(
-        modifier,
-        menu
-    )
+    if (nativeMenuBarWithTitleBarInSettings) {
+        NativeMenuBar(menu)
+    } else {
+        MenuBar(
+            modifier,
+            menu
+        )
+    }
 }
+
+@Composable
+private fun FrameWindowScope.NativeMenuBar(menu: List<MenuItem.SubMenu>) {
+    MenuBar {
+        menu.forEach { item ->
+            val items by item.items.collectAsState()
+            val title by item.title.collectAsState()
+            val enabled by item.isEnabled.collectAsState()
+            Menu(title.rememberString(), enabled = enabled) {
+                items.forEach { renderMenuItem(it) }
+            }
+        }
+    }
+}
+
+@Composable
+fun MenuScope.renderMenuItem(item: MenuItem) {
+    when (item) {
+        is MenuItem.SubMenu -> {
+            val items by item.items.collectAsState()
+            val title by item.title.collectAsState()
+            val enabled by item.isEnabled.collectAsState()
+            Menu(title.rememberString(), enabled = enabled) {
+                items.forEach { renderMenuItem(it) }
+            }
+        }
+
+        is MenuItem.Separator -> Separator()
+        is MenuItem.SingleItem -> {
+            val title by item.title.collectAsState()
+            val icon by item.icon.collectAsState()
+            val enabled by item.isEnabled.collectAsState()
+            Item(
+                title.rememberString(),
+                onClick = item::onClick,
+                icon = icon?.rememberPainter(),
+                enabled = enabled
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun Footer(component: HomeComponent) {
@@ -780,7 +843,7 @@ private fun FooterItem(icon: IconSource, value: String, unit: String) {
 }
 
 @Composable
-private fun TopBar(component: HomeComponent) {
+private fun FrameWindowScope.TopBar(component: HomeComponent) {
     Row(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
