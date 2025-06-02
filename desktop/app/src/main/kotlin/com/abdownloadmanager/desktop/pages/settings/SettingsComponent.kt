@@ -470,8 +470,8 @@ fun mergeTopBarWithTitleBarConfig(appSettings: AppSettingsStorage): BooleanConfi
 
 fun showNativeMenuBarConfig(appSettings: AppSettingsStorage): BooleanConfigurable? {
     return BooleanConfigurable(
-        title = Res.string.show_native_menu_bar.asStringSource(),
-        description = Res.string.show_native_menu_bar_description.asStringSource(),
+        title = Res.string.use_native_menu_bar.asStringSource(),
+        description = Res.string.use_native_menu_bar_description.asStringSource(),
         backedBy = appSettings.showNativeMenuBar,
         describe = {
             if (it) {
