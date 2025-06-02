@@ -27,8 +27,6 @@ import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -38,16 +36,12 @@ sealed class SettingSections(
     val icon: IconSource,
     val name: StringSource,
 ) {
-    data object Appearance :
-        SettingSections(MyIcons.appearance, Res.string.appearance.asStringSource())
+    data object Appearance : SettingSections(MyIcons.appearance, Res.string.appearance.asStringSource())
 
     //    TODO ADD Network section (proxy , etc..)
     //    data object Network : SettingSections(MyIcons.network, "Network")
-    data object DownloadEngine :
-        SettingSections(MyIcons.downloadEngine, Res.string.download_engine.asStringSource())
-
-    data object BrowserIntegration :
-        SettingSections(MyIcons.network, Res.string.browser_integration.asStringSource())
+    data object DownloadEngine : SettingSections(MyIcons.downloadEngine, Res.string.download_engine.asStringSource())
+    data object BrowserIntegration : SettingSections(MyIcons.network, Res.string.browser_integration.asStringSource())
 }
 
 interface SettingSectionGetter {
@@ -232,10 +226,7 @@ fun useCategoryByDefault(appSettingsStorage: AppSettingsStorage): BooleanConfigu
     )
 }
 
-fun speedUnit(
-    appRepository: AppRepository,
-    scope: CoroutineScope
-): EnumConfigurable<ConvertSizeConfig> {
+fun speedUnit(appRepository: AppRepository, scope: CoroutineScope): EnumConfigurable<ConvertSizeConfig> {
     return EnumConfigurable(
         title = Res.string.settings_download_speed_unit.asStringSource(),
         description = Res.string.settings_download_speed_unit_description.asStringSource(),
@@ -286,10 +277,7 @@ fun speedLimitConfig(appRepository: AppRepository): SpeedLimitConfigurable {
             if (it == 0L) {
                 Res.string.unlimited.asStringSource()
             } else {
-                convertPositiveSpeedToHumanReadable(
-                    it,
-                    appRepository.speedUnit.value
-                ).asStringSource()
+                convertPositiveSpeedToHumanReadable(it, appRepository.speedUnit.value).asStringSource()
             }
         }
     )
@@ -466,22 +454,6 @@ fun mergeTopBarWithTitleBarConfig(appSettings: AppSettingsStorage): BooleanConfi
     )
 }
 
-
-fun showNativeMenuBarConfig(appSettings: AppSettingsStorage): BooleanConfigurable? {
-    return BooleanConfigurable(
-        title = Res.string.show_native_menu_bar.asStringSource(),
-        description = Res.string.show_native_menu_bar_description.asStringSource(),
-        backedBy = appSettings.showNativeMenuBar,
-        describe = {
-            if (it) {
-                Res.string.enabled.asStringSource()
-            } else {
-                Res.string.disabled.asStringSource()
-            }
-        },
-    ).takeIf { Platform.isWindows().not() }
-}
-
 fun showIconLabels(appSettings: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_show_icon_labels.asStringSource(),
@@ -592,16 +564,15 @@ class SettingsComponent(
     val proxyManager by inject<ProxyManager>()
     val themeManager by inject<ThemeManager>()
     val languageManager by inject<LanguageManager>()
-    private val allConfigs = object : SettingSectionGetter {
+    val allConfigs = object : SettingSectionGetter {
         override operator fun get(key: SettingSections): List<Configurable<*>> {
             return when (key) {
-                Appearance -> listOfNotNull(
+                Appearance -> listOf(
                     themeConfig(themeManager, scope),
                     languageConfig(languageManager, scope),
                     uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
                     mergeTopBarWithTitleBarConfig(appSettings),
-                    showNativeMenuBarConfig(appSettings),
                     showIconLabels(appSettings),
                     speedUnit(appRepository, scope),
                     playSoundNotification(appSettings),

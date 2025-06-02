@@ -1,4 +1,4 @@
-package com.abdownloadmanager.shared.ui.widget.menu
+package com.abdownloadmanager.shared.ui.widget.menu.custom
 
 import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.layout.Box

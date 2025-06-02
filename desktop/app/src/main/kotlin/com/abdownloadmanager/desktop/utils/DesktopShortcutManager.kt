@@ -32,6 +32,9 @@ class DesktopShortcutManager : ShortcutManager() {
 data class DesktopKeyStroke(
     val awtKeyStroke: KeyStroke,
 ) : PlatformKeyStroke {
+    override val keyCode: Int
+        get() = awtKeyStroke.keyCode
+
     override fun getModifiers(): List<String> {
         return KeyUtil.getModifiers(awtKeyStroke.modifiers)
     }
@@ -49,7 +52,7 @@ object KeyUtil {
     }
 
     fun getModifiers(modifiers: Int): List<String> {
-        return buildList<String> {
+        return buildList {
             if (modifiers and InputEvent.META_DOWN_MASK != 0) {
                 add(Toolkit.getProperty("AWT.meta", "Meta"))
             }

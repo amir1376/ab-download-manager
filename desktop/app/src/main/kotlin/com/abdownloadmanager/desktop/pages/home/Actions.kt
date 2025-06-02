@@ -4,8 +4,8 @@ import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import ir.amirab.util.ifThen
-import com.abdownloadmanager.shared.ui.widget.menu.MyDropDown
-import com.abdownloadmanager.shared.ui.widget.menu.SubMenu
+import com.abdownloadmanager.shared.ui.widget.menu.custom.MyDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.custom.SubMenu
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import ir.amirab.util.compose.action.MenuItem

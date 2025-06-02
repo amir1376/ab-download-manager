@@ -28,9 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
-import androidx.compose.ui.window.MenuBarScope
 import androidx.compose.ui.window.MenuScope
-import androidx.compose.ui.window.WindowScope
 import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
@@ -42,8 +40,9 @@ import com.abdownloadmanager.desktop.window.custom.WindowStart
 import com.abdownloadmanager.desktop.window.custom.WindowTitlePosition
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.*
-import com.abdownloadmanager.shared.ui.widget.menu.MenuBar
-import com.abdownloadmanager.shared.ui.widget.menu.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuBar
+import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.native.NativeMenuBar
 import com.abdownloadmanager.shared.utils.LocalSpeedUnit
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.rememberIconPainter
@@ -62,6 +61,8 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.LocalFrameWindowScope
+import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.flow.launchIn
@@ -71,7 +72,7 @@ import java.io.File
 
 
 @Composable
-fun FrameWindowScope.HomePage(component: HomeComponent) {
+fun HomePage(component: HomeComponent) {
     val listState by component.downloadList.collectAsState()
     var isDragging by remember { mutableStateOf(false) }
 
@@ -258,8 +259,7 @@ fun FrameWindowScope.HomePage(component: HomeComponent) {
             Row {
                 val categoriesWidth by component.categoriesWidth.collectAsState()
                 Categories(
-                    modifier = Modifier.padding(top = 8.dp)
-                        .width(categoriesWidth),
+                    modifier = Modifier.padding(top = 8.dp).width(categoriesWidth),
                     component = component
                 )
                 Spacer(Modifier.size(8.dp))
@@ -748,14 +748,15 @@ fun CategoryOption(
 }
 
 @Composable
-private fun FrameWindowScope.HomeMenuBar(
+private fun HomeMenuBar(
     component: HomeComponent,
     modifier: Modifier,
 ) {
     val nativeMenuBarWithTitleBarInSettings by component.showNativeMenuBar.collectAsState()
     val menu = component.menu
     if (nativeMenuBarWithTitleBarInSettings) {
-        NativeMenuBar(menu)
+        val scope = LocalFrameWindowScope.current
+        NativeMenuBar(scope, menu)
     } else {
         MenuBar(
             modifier,
@@ -763,48 +764,6 @@ private fun FrameWindowScope.HomeMenuBar(
         )
     }
 }
-
-@Composable
-private fun FrameWindowScope.NativeMenuBar(menu: List<MenuItem.SubMenu>) {
-    MenuBar {
-        menu.forEach { item ->
-            val items by item.items.collectAsState()
-            val title by item.title.collectAsState()
-            val enabled by item.isEnabled.collectAsState()
-            Menu(title.rememberString(), enabled = enabled) {
-                items.forEach { renderMenuItem(it) }
-            }
-        }
-    }
-}
-
-@Composable
-fun MenuScope.renderMenuItem(item: MenuItem) {
-    when (item) {
-        is MenuItem.SubMenu -> {
-            val items by item.items.collectAsState()
-            val title by item.title.collectAsState()
-            val enabled by item.isEnabled.collectAsState()
-            Menu(title.rememberString(), enabled = enabled) {
-                items.forEach { renderMenuItem(it) }
-            }
-        }
-
-        is MenuItem.Separator -> Separator()
-        is MenuItem.SingleItem -> {
-            val title by item.title.collectAsState()
-            val icon by item.icon.collectAsState()
-            val enabled by item.isEnabled.collectAsState()
-            Item(
-                title.rememberString(),
-                onClick = item::onClick,
-                icon = icon?.rememberPainter(),
-                enabled = enabled
-            )
-        }
-    }
-}
-
 
 @Composable
 private fun Footer(component: HomeComponent) {
@@ -843,7 +802,7 @@ private fun FooterItem(icon: IconSource, value: String, unit: String) {
 }
 
 @Composable
-private fun FrameWindowScope.TopBar(component: HomeComponent) {
+private fun TopBar(component: HomeComponent) {
     Row(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically

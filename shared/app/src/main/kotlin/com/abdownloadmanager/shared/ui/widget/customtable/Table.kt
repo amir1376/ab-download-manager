@@ -8,7 +8,7 @@ import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import ir.amirab.util.ifThen
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.IconActionButton
-import com.abdownloadmanager.shared.ui.widget.menu.MenuColumn
+import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuColumn
 import com.abdownloadmanager.shared.utils.div
 import ir.amirab.util.flow.saved
 import androidx.compose.foundation.*
