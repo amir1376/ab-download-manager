@@ -468,11 +468,12 @@ fun mergeTopBarWithTitleBarConfig(appSettings: AppSettingsStorage): BooleanConfi
 }
 
 
-fun showNativeMenuBarConfig(appSettings: AppSettingsStorage): BooleanConfigurable? {
+fun useNativeMenuBarConfig(appSettings: AppSettingsStorage): BooleanConfigurable? {
+    if (Platform.isMac().not()) return null
     return BooleanConfigurable(
-        title = Res.string.use_native_menu_bar.asStringSource(),
-        description = Res.string.use_native_menu_bar_description.asStringSource(),
-        backedBy = appSettings.showNativeMenuBar,
+        title = Res.string.settings_use_native_menu_bar.asStringSource(),
+        description = Res.string.settings_use_native_menu_bar_description.asStringSource(),
+        backedBy = appSettings.useNativeMenuBar,
         describe = {
             if (it) {
                 Res.string.enabled.asStringSource()
@@ -480,7 +481,7 @@ fun showNativeMenuBarConfig(appSettings: AppSettingsStorage): BooleanConfigurabl
                 Res.string.disabled.asStringSource()
             }
         },
-    ).takeIf { Platform.isMac() }
+    )
 }
 
 fun showIconLabels(appSettings: AppSettingsStorage): BooleanConfigurable {
@@ -602,7 +603,7 @@ class SettingsComponent(
                     uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
                     mergeTopBarWithTitleBarConfig(appSettings),
-                    showNativeMenuBarConfig(appSettings),
+                    useNativeMenuBarConfig(appSettings),
                     showIconLabels(appSettings),
                     speedUnit(appRepository, scope),
                     playSoundNotification(appSettings),

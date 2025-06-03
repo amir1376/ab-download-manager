@@ -752,7 +752,7 @@ private fun HomeMenuBar(
     component: HomeComponent,
     modifier: Modifier,
 ) {
-    val nativeMenuBarWithTitleBarInSettings by component.showNativeMenuBar.collectAsState()
+    val nativeMenuBarWithTitleBarInSettings by component.useNativeMenuBar.collectAsState()
     val menu = component.menu
     if (nativeMenuBarWithTitleBarInSettings) {
         val scope = LocalFrameWindowScope.current
