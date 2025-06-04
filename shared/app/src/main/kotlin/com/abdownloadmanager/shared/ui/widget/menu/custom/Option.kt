@@ -1,4 +1,4 @@
-package com.abdownloadmanager.shared.ui.widget.menu
+package com.abdownloadmanager.shared.ui.widget.menu.custom
 
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes

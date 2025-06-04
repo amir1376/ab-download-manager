@@ -17,6 +17,7 @@ data class AppSettingsModel(
     val language: String? = null,
     val uiScale: Float? = null,
     val mergeTopBarWithTitleBar: Boolean = false,
+    val useNativeMenuBar: Boolean = false,
     val showIconLabels: Boolean = true,
     val useSystemTray: Boolean = true,
     val threadCount: Int = 8,
@@ -52,6 +53,7 @@ data class AppSettingsModel(
             val language = stringKeyOf("language")
             val uiScale = floatKeyOf("uiScale")
             val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
+            val useNativeMenuBar = booleanKeyOf("useNativeMenuBar")
             val showIconLabels = booleanKeyOf("showIconLabels")
             val useSystemTray = booleanKeyOf("useSystemTray")
             val threadCount = intKeyOf("threadCount")
@@ -84,6 +86,7 @@ data class AppSettingsModel(
                 language = source.get(Keys.language) ?: default.language,
                 uiScale = source.get(Keys.uiScale) ?: default.uiScale,
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
+                useNativeMenuBar = source.get(Keys.useNativeMenuBar) ?: default.useNativeMenuBar,
                 showIconLabels = source.get(Keys.showIconLabels) ?: default.showIconLabels,
                 useSystemTray = source.get(Keys.useSystemTray) ?: default.useSystemTray,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
@@ -120,6 +123,7 @@ data class AppSettingsModel(
                 putNullable(Keys.language, focus.language)
                 putNullable(Keys.uiScale, focus.uiScale)
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
+                put(Keys.useNativeMenuBar, focus.useNativeMenuBar)
                 put(Keys.showIconLabels, focus.showIconLabels)
                 put(Keys.useSystemTray, focus.useSystemTray)
                 put(Keys.threadCount, focus.threadCount)
@@ -175,6 +179,7 @@ class AppSettingsStorage(
     override val selectedLanguage = from(languageLens)
     val uiScale = from(uiScaleLens)
     val mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
+    val useNativeMenuBar = from(AppSettingsModel.useNativeMenuBar)
     val showIconLabels = from(AppSettingsModel.showIconLabels)
     val useSystemTray = from(AppSettingsModel.useSystemTray)
     val threadCount = from(AppSettingsModel.threadCount)

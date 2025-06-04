@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberPopupPositionProviderAtPosition
-import com.abdownloadmanager.shared.ui.widget.menu.SubMenu
+import com.abdownloadmanager.shared.ui.widget.menu.custom.SubMenu
 import com.abdownloadmanager.shared.utils.ui.*
 import com.abdownloadmanager.shared.utils.ui.theme.*
 import com.abdownloadmanager.shared.utils.ui.theme.UiScaledContent

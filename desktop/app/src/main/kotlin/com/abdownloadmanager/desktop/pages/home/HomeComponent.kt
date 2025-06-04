@@ -452,6 +452,7 @@ class HomeComponent(
     private val appVersionTracker: AppVersionTracker by inject()
     val filterState = FilterState()
     val mergeTopBarWithTitleBar = appSettings.mergeTopBarWithTitleBar
+    val useNativeMenuBar = appSettings.useNativeMenuBar
 
     private val homePageStateToPersist = MutableStateFlow(pageStorage.homePageStorage.value)
 

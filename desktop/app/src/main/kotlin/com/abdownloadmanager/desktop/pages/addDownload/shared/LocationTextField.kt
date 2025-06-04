@@ -6,7 +6,7 @@ import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.ui.widget.menu.MyDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.custom.MyDropDown
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

@@ -37,6 +37,7 @@ import com.abdownloadmanager.shared.utils.ui.theme.UiScaledContent
 import com.jetbrains.JBR
 import com.jetbrains.WindowDecorations
 import com.jetbrains.WindowMove
+import ir.amirab.util.desktop.LocalFrameWindowScope
 import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.desktop.screen.applyUiScale
 import ir.amirab.util.ifThen
@@ -375,6 +376,7 @@ fun CustomWindow(
                 LocalWindowController provides windowController,
                 LocalWindowState provides state,
                 LocalWindow provides window,
+                LocalFrameWindowScope provides this
             ) {
                 if (preventMinimize) {
                     PreventMinimize()
@@ -471,8 +473,10 @@ fun rememberWindowController(
     return controller
 }
 
-private val LocalWindowController = compositionLocalOf<WindowController> { error("window controller not provided") }
-private val LocalWindowState = compositionLocalOf<WindowState> { error("window controller not provided") }
+private val LocalWindowController =
+    compositionLocalOf<WindowController> { error("window controller not provided") }
+private val LocalWindowState =
+    compositionLocalOf<WindowState> { error("window controller not provided") }
 
 @Composable
 fun WindowStart(content: @Composable () -> Unit) {

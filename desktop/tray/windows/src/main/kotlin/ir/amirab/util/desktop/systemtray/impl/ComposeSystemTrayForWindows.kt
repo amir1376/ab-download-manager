@@ -5,7 +5,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberDialogState
-import com.abdownloadmanager.shared.ui.widget.menu.SubMenu
+import com.abdownloadmanager.shared.ui.widget.menu.custom.SubMenu
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.action.MenuItem

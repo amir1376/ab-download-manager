@@ -27,8 +27,8 @@ import com.abdownloadmanager.shared.ui.widget.Help
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.ui.widget.customtable.*
 import com.abdownloadmanager.shared.ui.widget.customtable.styled.MyStyledTableHeader
-import com.abdownloadmanager.shared.ui.widget.menu.WithContextMenu
-import com.abdownloadmanager.shared.ui.widget.menu.MyDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.custom.WithContextMenu
+import com.abdownloadmanager.shared.ui.widget.menu.custom.MyDropDown
 import com.abdownloadmanager.shared.utils.FileChecksum
 import com.abdownloadmanager.shared.utils.FileChecksumAlgorithm
 import com.abdownloadmanager.shared.utils.div

@@ -7,9 +7,9 @@ import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.ui.widget.customtable.Table
 import com.abdownloadmanager.shared.ui.widget.customtable.styled.MyStyledTableHeader
-import com.abdownloadmanager.shared.ui.widget.menu.LocalMenuDisabledItemBehavior
-import com.abdownloadmanager.shared.ui.widget.menu.MenuDisabledItemBehavior
-import com.abdownloadmanager.shared.ui.widget.menu.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.custom.LocalMenuDisabledItemBehavior
+import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuDisabledItemBehavior
+import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInDropDown
 import ir.amirab.util.compose.action.MenuItem
 import androidx.compose.foundation.*
 import androidx.compose.foundation.draganddrop.dragAndDropSource

@@ -26,6 +26,9 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.FrameWindowScope
+import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.MenuScope
 import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
@@ -37,8 +40,9 @@ import com.abdownloadmanager.desktop.window.custom.WindowStart
 import com.abdownloadmanager.desktop.window.custom.WindowTitlePosition
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.*
-import com.abdownloadmanager.shared.ui.widget.menu.MenuBar
-import com.abdownloadmanager.shared.ui.widget.menu.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuBar
+import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.native.NativeMenuBar
 import com.abdownloadmanager.shared.utils.LocalSpeedUnit
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.rememberIconPainter
@@ -57,6 +61,8 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.LocalFrameWindowScope
+import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.flow.launchIn
@@ -195,7 +201,11 @@ fun HomePage(component: HomeComponent) {
                     object : DragAndDropTarget {
                         private fun onDraggedIn(event: DragAndDropEvent) {
                             if (event.awtTransferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                                component.onExternalTextDraggedIn { (event.awtTransferable.getTransferData(DataFlavor.stringFlavor) as String) }
+                                component.onExternalTextDraggedIn {
+                                    (event.awtTransferable.getTransferData(
+                                        DataFlavor.stringFlavor
+                                    ) as String)
+                                }
                                 return
                             }
 
@@ -249,8 +259,7 @@ fun HomePage(component: HomeComponent) {
             Row {
                 val categoriesWidth by component.categoriesWidth.collectAsState()
                 Categories(
-                    modifier = Modifier.padding(top = 8.dp)
-                        .width(categoriesWidth),
+                    modifier = Modifier.padding(top = 8.dp).width(categoriesWidth),
                     component = component
                 )
                 Spacer(Modifier.size(8.dp))
@@ -269,7 +278,10 @@ fun HomePage(component: HomeComponent) {
                         AddUrlButton {
                             component.requestAddNewDownload()
                         }
-                        Actions(component.headerActions, component.showLabels.collectAsState().value)
+                        Actions(
+                            component.headerActions,
+                            component.showLabels.collectAsState().value
+                        )
                     }
                     var lastSelected by remember { mutableStateOf(null as Long?) }
                     DownloadList(
@@ -683,7 +695,11 @@ private fun Categories(
             .padding(1.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        var expendedItem: DownloadStatusCategoryFilter? by remember { mutableStateOf(currentStatusFilter) }
+        var expendedItem: DownloadStatusCategoryFilter? by remember {
+            mutableStateOf(
+                currentStatusFilter
+            )
+        }
         for (statusCategoryFilter in DefinedStatusCategories.values()) {
             StatusFilterItem(
                 isExpanded = expendedItem == statusCategoryFilter,
@@ -736,11 +752,17 @@ private fun HomeMenuBar(
     component: HomeComponent,
     modifier: Modifier,
 ) {
+    val nativeMenuBarWithTitleBarInSettings by component.useNativeMenuBar.collectAsState()
     val menu = component.menu
-    MenuBar(
-        modifier,
-        menu
-    )
+    if (nativeMenuBarWithTitleBarInSettings) {
+        val scope = LocalFrameWindowScope.current
+        NativeMenuBar(scope, menu)
+    } else {
+        MenuBar(
+            modifier,
+            menu
+        )
+    }
 }
 
 @Composable
