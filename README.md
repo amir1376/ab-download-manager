@@ -34,19 +34,19 @@ Please visit [Project Website](https://abdownloadmanager.com) for more info
 
 ## Installation
 
-[Download Instructions](https://abdownloadmanager.com)
+### Download and Install The app
+
+[Official Website](https://abdownloadmanager.com)
 
 [GitHub Releases](https://github.com/amir1376/ab-download-manager/releases/latest)
 
-in order to download and install the app
-
-### installation script (Linux)
+#### installation script (Linux)
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh)
 ```
 
-### winget or scoop (for Windows)
+#### winget or scoop (for Windows)
 
 **winget**:
 
@@ -74,14 +74,6 @@ You can download the browser extension to integrate the app with your browser
     </picture>
 </a>
 </p>
-
-## Uninstall
-
-perform below command to uninstall
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/uninstall.sh)
-```
 
 ## Screenshots
 
