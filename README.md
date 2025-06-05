@@ -34,7 +34,7 @@ Please visit [Project Website](https://abdownloadmanager.com) for more info
 
 ## Installation
 
-### Download and Install The app
+### Download and Install the App
 
 [Official Website](https://abdownloadmanager.com)
 
