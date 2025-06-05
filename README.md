@@ -60,6 +60,21 @@ winget install amir1376.ABDownloadManager
 scoop install extras/abdownloadmanager
 ```
 
+### Browser Extensions
+
+You can download the browser extension to integrate the app with your browser
+
+<p align="left">
+<a href="https://addons.mozilla.org/firefox/addon/ab-download-manager/"><img alt="Firefox Addon" src="./assets/banners/firefox-extension.png"></a>
+<a href="https://chromewebstore.google.com/detail/bbobopahenonfdgjgaleledndnnfhooj">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png">
+        <source media="(prefers-color-scheme: light)" srcset="./assets/banners/chrome-extension_light.png">
+        <img alt="Chrome Extension" src="./assets/banners/chrome-extension_dark.png">
+    </picture>
+</a>
+</p>
+
 ## Uninstall
 
 perform below command to uninstall
