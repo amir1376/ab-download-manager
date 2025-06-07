@@ -270,6 +270,26 @@ fun QueueManager.inactiveQueuesFlow(
     return getActiveOrInactiveQueues(false, scope)
 }
 
+fun QueueManager.queueModelsFlow(
+    scope: CoroutineScope
+): StateFlow<List<QueueModel>> {
+    val o = MutableStateFlow<List<QueueModel>>(emptyList())
+    scope.launch {
+        queues.collectLatest { queues ->
+            coroutineScope {
+                combine(
+                    queues.map { queue -> queue.queueModel }
+                ) { queueModelsArray ->
+                    queueModelsArray.toList()
+                }.collect {
+                    o.value = it
+                }
+            }
+        }
+    }
+    return o
+}
+
 fun DownloadQueue.isMainQueue(): Boolean {
     return DefaultQueueInfo.ID == id
 }

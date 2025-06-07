@@ -26,14 +26,12 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.MenuBar
-import androidx.compose.ui.window.MenuScope
 import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
 import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadStatusCategoryFilter
 import com.abdownloadmanager.desktop.pages.home.sections.category.StatusFilterItem
+import com.abdownloadmanager.desktop.pages.home.sections.queue.QueuesSection
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
 import com.abdownloadmanager.desktop.window.custom.WindowEnd
 import com.abdownloadmanager.desktop.window.custom.WindowStart
@@ -62,7 +60,6 @@ import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.LocalFrameWindowScope
-import ir.amirab.util.desktop.LocalWindow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.flow.launchIn
@@ -258,10 +255,22 @@ fun HomePage(component: HomeComponent) {
             )
             Row {
                 val categoriesWidth by component.categoriesWidth.collectAsState()
-                Categories(
-                    modifier = Modifier.padding(top = 8.dp).width(categoriesWidth),
-                    component = component
-                )
+                Column(
+                    Modifier
+                        .padding(top = 8.dp).width(categoriesWidth)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Categories(
+                        modifier = Modifier.fillMaxWidth(),
+                        component = component,
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    QueuesSection(
+                        modifier = Modifier.fillMaxWidth(),
+                        component = component,
+                    )
+                    Spacer(Modifier.size(8.dp))
+                }
                 Spacer(Modifier.size(8.dp))
                 //split pane
                 Handle(
@@ -693,7 +702,6 @@ private fun Categories(
             .clip(clipShape)
             .border(1.dp, myColors.surface, clipShape)
             .padding(1.dp)
-            .verticalScroll(rememberScrollState())
     ) {
         var expendedItem: DownloadStatusCategoryFilter? by remember {
             mutableStateOf(
@@ -708,7 +716,7 @@ private fun Categories(
                 statusFilter = statusCategoryFilter,
                 categories = categories,
                 onFilterChange = {
-                    component.onFilterChange(statusCategoryFilter, it)
+                    component.onCategoryFilterChange(statusCategoryFilter, it)
                 },
                 onRequestExpand = { expand ->
                     expendedItem = statusCategoryFilter.takeIf { expand }
@@ -740,7 +748,8 @@ fun CategoryOption(
     ShowOptionsInDropDown(
         MenuItem.SubMenu(
             icon = categoryOptionMenuState.categoryItem?.rememberIconPainter(),
-            title = categoryOptionMenuState.categoryItem?.name.orEmpty().asStringSource(),
+            title = categoryOptionMenuState.categoryItem?.name?.asStringSource()
+                ?: Res.string.categories.asStringSource(),
             categoryOptionMenuState.menu,
         ),
         onDismiss

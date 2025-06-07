@@ -41,8 +41,12 @@ import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
+import ir.amirab.downloader.db.QueueModel
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.User
+import ir.amirab.downloader.queue.DefaultQueueInfo
+import ir.amirab.downloader.queue.DownloadQueue
+import ir.amirab.downloader.queue.queueModelsFlow
 import ir.amirab.util.AppVersionTracker
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
@@ -62,6 +66,7 @@ import java.io.File
 class FilterState {
     var textToSearch by mutableStateOf("")
     var typeCategoryFilter by mutableStateOf(null as Category?)
+    var queueFilter by mutableStateOf(null as QueueModel?)
     var statusFilter by mutableStateOf<DownloadStatusCategoryFilter>(DefinedStatusCategories.All)
 }
 
@@ -431,6 +436,106 @@ class CategoryActions(
     }
 }
 
+@Stable
+class QueueActions(
+    private val scope: CoroutineScope,
+    private val queueManager: QueueManager,
+    val mainQueueModel: QueueModel?,
+    private val requestDelete: (QueueModel) -> Unit,
+    private val requestEdit: (QueueModel) -> Unit,
+    private val onRequestNewQueue: () -> Unit,
+) {
+    private val mainItemExists = MutableStateFlow(mainQueueModel != null)
+
+    fun downloadQueueOrNull(): DownloadQueue? {
+        val qId = mainQueueModel?.id ?: return null
+        return runCatching {
+            queueManager.getQueue(qId)
+        }.getOrNull()
+    }
+
+    private inline fun useItem(
+        block: (QueueModel) -> Unit,
+    ) {
+        mainQueueModel?.let(block)
+    }
+
+    val deleteAction = simpleAction(
+        title = Res.string.delete.asStringSource(),
+        icon = MyIcons.remove,
+        checkEnable = MutableStateFlow(run {
+            val item = mainQueueModel ?: return@run false
+            item.id != DefaultQueueInfo.ID
+        }),
+        onActionPerformed = {
+            scope.launch {
+                useItem {
+                    requestDelete(it)
+                }
+            }
+        },
+    )
+    val editAction = simpleAction(
+        title = Res.string.edit.asStringSource(),
+        icon = MyIcons.settings,
+        checkEnable = mainItemExists,
+        onActionPerformed = {
+            scope.launch {
+                useItem {
+                    requestEdit(it)
+                }
+            }
+        },
+    )
+
+    val addCategoryAction = simpleAction(
+        title = Res.string.add_new_queue.asStringSource(),
+        icon = MyIcons.add,
+        onActionPerformed = {
+            scope.launch {
+                onRequestNewQueue()
+            }
+        },
+    )
+
+    val start = simpleAction(
+        title = Res.string.start_queue.asStringSource(),
+        icon = MyIcons.queueStart,
+        checkEnable = run {
+            downloadQueueOrNull()?.activeFlow?.mapStateFlow { !it }
+                ?: MutableStateFlow(false)
+        },
+        onActionPerformed = {
+            scope.launch {
+                downloadQueueOrNull()?.start()
+            }
+        },
+    )
+    val stop = simpleAction(
+        title = Res.string.stop_queue.asStringSource(),
+        icon = MyIcons.queueStop,
+        checkEnable = run {
+            downloadQueueOrNull()?.activeFlow
+                ?: MutableStateFlow(false)
+        },
+        onActionPerformed = {
+            scope.launch {
+                downloadQueueOrNull()?.stop()
+            }
+        },
+    )
+
+    val menu: List<MenuItem> = buildMenu {
+        +start
+        +stop
+        separator()
+        +editAction
+        +deleteAction
+        separator()
+        +addCategoryAction
+    }
+}
+
 class HomeComponent(
     ctx: ComponentContext,
     private val downloadItemOpener: DownloadItemOpener,
@@ -438,6 +543,7 @@ class HomeComponent(
     private val editDownloadDialogManager: EditDownloadDialogManager,
     private val addDownloadDialogManager: AddDownloadDialogManager,
     private val fileChecksumDialogManager: FileChecksumDialogManager,
+    private val queuePageManager: QueuePageManager,
     private val categoryDialogManager: CategoryDialogManager,
     private val notificationSender: NotificationSender,
 ) : BaseComponent(ctx),
@@ -445,7 +551,7 @@ class HomeComponent(
     ContainsEffects<HomeEffects> by supportEffects(),
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
-    private val queueManager: QueueManager by inject()
+    val queueManager: QueueManager by inject()
     private val pageStorage: PageStatesStorage by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val updateManager: UpdateManager by inject()
@@ -580,6 +686,12 @@ class HomeComponent(
     fun moveItemsToCategory(category: Category, items: List<Long>) {
         scope.launch {
             categoryManager.addItemsToCategory(category.id, items)
+        }
+    }
+
+    fun moveItemsToQueue(queue: DownloadQueue, items: List<Long>) {
+        scope.launch {
+            queueManager.addToQueue(queue.id, items)
         }
     }
 
@@ -750,12 +862,21 @@ class HomeComponent(
 
     }
 
-    fun onFilterChange(
+    fun onCategoryFilterChange(
         statusCategoryFilter: DownloadStatusCategoryFilter,
         typeCategoryFilter: Category?,
     ) {
+        this.filterState.queueFilter = null
         this.filterState.statusFilter = statusCategoryFilter
         this.filterState.typeCategoryFilter = typeCategoryFilter
+    }
+
+    fun onQueueFilterChange(
+        queueModel: QueueModel
+    ) {
+        this.filterState.statusFilter = DefinedStatusCategories.All
+        this.filterState.typeCategoryFilter = null
+        this.filterState.queueFilter = queueModel
     }
 
     fun importLinks(links: List<DownloadCredentials>) {
@@ -838,6 +959,12 @@ class HomeComponent(
                 it.id == currentCategory.id
             }
         }.launchIn(scope)
+        queueManager.queueModelsFlow(scope).onEach { queueModels ->
+            val currentQueueModel = filterState.queueFilter ?: return@onEach
+            filterState.queueFilter = queueModels.find {
+                it.id == currentQueueModel.id
+            }
+        }.launchIn(scope)
     }
 
     val downloadList = merge(
@@ -846,18 +973,21 @@ class HomeComponent(
         completedList,
         snapshotFlow { filterState.typeCategoryFilter },
         snapshotFlow { filterState.statusFilter },
+        snapshotFlow { filterState.queueFilter },
     )
         .map {
             (activeDownloadList.value + completedList.value)
                 .filter {
                     val statusAccepted = filterState.statusFilter.accept(it)
-//                    val typeAccepted = filterState.typeCategoryFilter?.accept(it.name) ?: true
-                    val typeAccepted = filterState.typeCategoryFilter?.items?.contains(it.id) ?: true
+                    val categoryFilter = filterState.typeCategoryFilter
+                    val queueFilter = filterState.queueFilter
+                    val allowedList = categoryFilter?.items ?: queueFilter?.queueItems
+                    val itemIsInAllowedList = allowedList?.contains(it.id) ?: true
                     val searchAccepted = it.name.contains(filterState.textToSearch, ignoreCase = true)
-                    typeAccepted && statusAccepted && searchAccepted
+                    itemIsInAllowedList && statusAccepted && searchAccepted
                 }
                 // when restart a completed download item there is a duplication in list
-                // so make sure to not pass bad data to download list table as it has  item.id as key
+                // so make sure to not pass bad data to download list table as it has item.id as key
                 .distinctBy { it.id }
         }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
@@ -962,6 +1092,36 @@ class HomeComponent(
         openFolder = this::openFolder,
         requestDelete = this::requestDelete,
     )
+
+    val queueActions = MutableStateFlow(null as QueueActions?)
+
+    fun showCategoryOptions(queue: DownloadQueue?) {
+        queueActions.value = QueueActions(
+            scope = scope,
+            queueManager = queueManager,
+            mainQueueModel = queue?.queueModel?.value,
+            requestDelete = { queueModel ->
+                scope.launch {
+                    queueManager.deleteQueue(queueModel.id)
+                }
+            },
+            requestEdit = { queueModel ->
+                runCatching { queueManager.getQueue(queueModel.id) }
+                    // it shouldn't be happened however I add this
+                    .getOrNull()?.let { q ->
+                        queuePageManager.openQueues(q.id)
+                    }
+            },
+            onRequestNewQueue = {
+                queuePageManager.openNewQueueDialog()
+            }
+        )
+    }
+
+    fun closeQueueOptions() {
+        queueActions.value = null
+    }
+
     val categoryActions = MutableStateFlow(null as CategoryActions?)
 
     fun showCategoryOptions(categoryItem: Category?) {
