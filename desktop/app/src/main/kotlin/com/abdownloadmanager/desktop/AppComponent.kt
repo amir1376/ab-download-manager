@@ -91,6 +91,7 @@ class AppComponent(
     CategoryDialogManager,
     EditDownloadDialogManager,
     FileChecksumDialogManager,
+    QueuePageManager,
     NotificationSender,
     DownloadItemOpener,
     ContainsEffects<AppEffects> by supportEffects(),
@@ -146,19 +147,26 @@ class AppComponent(
                 categoryDialogManager = this,
                 notificationSender = this,
                 editDownloadDialogManager = this,
+                queuePageManager = this,
             )
         }
     ).subscribeAsStateFlow()
 
-    class QueuePageConfig
+    class QueuePageConfig(
+        val selectedQueue: Long? = null
+    )
 
     private val showQueues = SlotNavigation<QueuePageConfig>()
     val showQueuesSlot = childSlot(
         showQueues,
         serializer = null,
         key = "queues",
-        childFactory = { _: QueuePageConfig, componentContext: ComponentContext ->
-            QueuesComponent(componentContext, this::closeQueues)
+        childFactory = { config: QueuePageConfig, componentContext: ComponentContext ->
+            QueuesComponent(componentContext, this::closeQueues).apply {
+                config.selectedQueue?.let {
+                    onQueueSelected(it)
+                }
+            }
         }
     ).subscribeAsStateFlow()
 
@@ -867,20 +875,46 @@ class AppComponent(
         showTranslators.update { false }
     }
 
-    fun openQueues() {
+    override fun openQueues(
+        openQueueId: Long?,
+    ) {
         scope.launch {
             showQueuesSlot.value.child?.instance.let {
                 if (it != null) {
                     it.bringToFront()
+                    if (openQueueId != null) {
+                        it.onQueueSelected(openQueueId)
+                    }
                 } else {
-                    showQueues.activate(QueuePageConfig())
+                    showQueues.activate(
+                        QueuePageConfig(
+                            selectedQueue = openQueueId
+                        )
+                    )
                 }
             }
         }
     }
 
-    fun closeQueues() {
+    override fun closeQueues() {
         showQueues.dismiss()
+    }
+
+    var showCreateQueueDialog = MutableStateFlow(false)
+        private set
+
+    override fun closeNewQueueDialog() {
+        showCreateQueueDialog.update { false }
+    }
+
+    override fun openNewQueueDialog() {
+        showCreateQueueDialog.update { true }
+    }
+
+    fun createNewQueue(name: String) {
+        scope.launch {
+            downloadSystem.addQueue(name)
+        }
     }
 
     fun openBatchDownload() {
@@ -898,23 +932,6 @@ class AppComponent(
 
     fun closeBatchDownload() {
         batchDownload.dismiss()
-    }
-
-    var showCreateQueueDialog = MutableStateFlow(false)
-        private set
-
-    fun closeNewQueueDialog() {
-        showCreateQueueDialog.update { false }
-    }
-
-    fun openNewQueueDialog() {
-        showCreateQueueDialog.update { true }
-    }
-
-    fun createNewQueue(name: String) {
-        scope.launch {
-            downloadSystem.addQueue(name)
-        }
     }
 
     val dialogMessages: MutableStateFlow<List<MessageDialogModel>> = MutableStateFlow(emptyList())
@@ -976,4 +993,14 @@ interface FileChecksumDialogManager {
     fun openFileChecksumPage(ids: List<Long>)
 
     fun closeFileChecksumPage(dialogId: String)
+}
+
+interface QueuePageManager {
+    fun openQueues(
+        openQueueId: Long? = null
+    )
+    fun closeQueues()
+    
+    fun openNewQueueDialog()
+    fun closeNewQueueDialog()
 }
