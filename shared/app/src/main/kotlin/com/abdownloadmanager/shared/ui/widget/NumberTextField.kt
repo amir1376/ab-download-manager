@@ -5,6 +5,8 @@ import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import ir.amirab.util.ifThen
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,14 +14,20 @@ import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
@@ -274,15 +282,21 @@ fun <T : Comparable<T>> NumberTextField(
         keyboardOptions = keyboardOptions,
         interactionSource = interactionSource,
         end = {
-            VerticalDirectionHandle({
-                set(it, true)
-            }, enc, enabled)
+            VerticalDirectionHandle(
+                modifier = Modifier,
+                onValueChange = {
+                    set(it, true)
+                },
+                enc = enc,
+                enabled = enabled,
+            )
         }
     )
 }
 
 @Composable
 private fun <T : Comparable<T>> VerticalDirectionHandle(
+    modifier: Modifier,
     onValueChange: (T) -> Unit,
     enc: (unit: Int) -> T,
     enabled: Boolean,
@@ -294,10 +308,8 @@ private fun <T : Comparable<T>> VerticalDirectionHandle(
     WithContentAlpha(
         animateFloatAsState(if (isDragging || isHovered) 1f else 0.5f).value
     ) {
-        MyIcon(
-            MyIcons.verticalDirection,
-            null,
-            Modifier
+        Column(
+            modifier
                 .ifThen(enabled) {
                     hoverable(interactionSource)
                         .resizeHandle(
@@ -308,8 +320,26 @@ private fun <T : Comparable<T>> VerticalDirectionHandle(
                             onValueChange(enc(-times))
                         }
                 }
-                .padding(end = 8.dp)
-                .size(16.dp),
-        )
+                .pointerHoverIcon(PointerIcon.Default)
+                .padding(end = 2.dp),
+        ) {
+            val iconModifier = Modifier
+                .padding(1.dp)
+                .size(8.dp)
+            MyIcon(
+                MyIcons.up,
+                null,
+                Modifier
+                    .clickable { onValueChange(enc(1)) }
+                    .then(iconModifier),
+            )
+            MyIcon(
+                MyIcons.down,
+                null,
+                Modifier
+                    .clickable { onValueChange(enc(-1)) }
+                    .then(iconModifier),
+            )
+        }
     }
 }
