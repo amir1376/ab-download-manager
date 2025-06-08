@@ -138,7 +138,15 @@ class SingleDownloadComponent(
                 add(
                     SingleDownloadPagePropertyItem(
                         Res.string.download_page_downloaded_size.asStringSource(),
-                        convertPositiveSizeToHumanReadable(it.progress, appRepository.sizeUnit.value)
+                        StringSource.CombinedStringSource(
+                            buildList {
+                                add(convertPositiveSizeToHumanReadable(it.progress, appRepository.sizeUnit.value))
+                                if (it.percent != null) {
+                                    add("(${it.percent}%)".asStringSource())
+                                }
+                            },
+                            " "
+                        )
                     )
                 )
                 add(
