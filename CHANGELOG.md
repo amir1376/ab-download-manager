@@ -14,6 +14,26 @@
 
 ### Security
 
+## 1.6.4
+
+### Added
+
+- Queues are now visible on the home page, next to the categories (#661)
+- In-app update is now supported on macOS (#627)
+- New option to enable the native menu bar on macOS (#646)
+
+### Fixed
+
+- macOS: Window now activates properly when "Show Downloads" is clicked from the system tray (#632)
+- Linux: Startup desktop entry now includes an icon (#634)
+- An issue where the "Edit Download" page could unintentionally change the download status (#641)
+- Queue status not updated properly sometimes (#663)
+
+### Improved
+
+- Translations updated
+- Minor UI improvements
+
 ## 1.6.3
 
 ### Added
