@@ -4,6 +4,7 @@ import ir.amirab.downloader.DownloadManagerMinimalControl
 import ir.amirab.downloader.db.IDownloadQueueDatabase
 import ir.amirab.downloader.db.DownloadQueuePersistedDataAccess
 import ir.amirab.downloader.db.QueueModel
+import ir.amirab.util.ifThen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
@@ -227,35 +228,26 @@ private class QueueInfoPersistedData(
 private fun QueueManager.getActiveOrInactiveQueues(
     active: Boolean, scope: CoroutineScope,
 ): Flow<List<DownloadQueue>> {
-    val output = MutableStateFlow(emptySet<Long>())
+    val output: MutableStateFlow<List<DownloadQueue>> = MutableStateFlow(emptyList())
     scope.launch {
-        queues.collectLatest {
-            it
-                .map { it to it.activeFlow }
-                .onEach { (queue, isActiveFlow) ->
-                    coroutineScope {
-                        isActiveFlow.onEach { isActive ->
-                            if (active == isActive) {
-                                output.update { set ->
-                                    set + queue.id
-                                }
-                            } else {
-                                output.update { set ->
-                                    set - queue.id
-                                }
-                            }
-                        }.launchIn(scope)
+        queues.collectLatest { latestQueues ->
+            combine(
+                latestQueues.map { it.activeFlow }
+            ) {
+                it.mapIndexedNotNull { index, value ->
+                    val shouldAdd = if (active) value else !value
+                    if (shouldAdd) {
+                        latestQueues[index]
+                    } else {
+                        null
                     }
                 }
+            }.collect {
+                output.value = it
+            }
         }
     }
-    return output.map {
-        it.mapNotNull {
-            runCatching {
-                getQueue(it)
-            }.getOrNull()
-        }
-    }
+    return output
 }
 
 fun QueueManager.activeQueuesFlow(
