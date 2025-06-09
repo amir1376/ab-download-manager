@@ -19,7 +19,7 @@
 
 ## Description
 
-[AB Download Manager](https://abdownloadmanager.com) is a desktop app which lets you manage and organize your download files better than before
+[AB Download Manager](https://abdownloadmanager.com) is a desktop app that helps you manage and organize your downloads more efficiently than ever before.
 
 ## Features
 
@@ -30,23 +30,22 @@
 - 🌙 Multiple Themes (Dark/Light) with modern UI
 - ❤️ Free and Open Source
 
-Please visit [Project Website](https://abdownloadmanager.com) for more info
+Please visit [Project Website](https://abdownloadmanager.com) for more info.
 
 ## Installation
 
 ### Download and Install the App
 
-[Official Website](https://abdownloadmanager.com)
+<a href="https://abdownloadmanager.com"><img src="https://img.shields.io/badge/Official%20Website-897BFF?logo=abdownloadmanager&logoColor=fff&style=flat-square" alt="Official Website" height="32" /></a>
+<a href="https://github.com/amir1376/ab-download-manager/releases/latest"><img src="https://img.shields.io/badge/GitHub%20Releases-2a2f36?logo=github&logoColor=fff&style=flat-square" alt="GitHub Releases" height="32" /></a>
 
-[GitHub Releases](https://github.com/amir1376/ab-download-manager/releases/latest)
-
-#### installation script (Linux)
+#### Installation script (Linux)
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh)
 ```
 
-#### winget or scoop (for Windows)
+#### Winget or Scoop (for Windows)
 
 **winget**:
 
@@ -62,15 +61,15 @@ scoop install extras/abdownloadmanager
 
 ### Browser Extensions
 
-You can download the browser extension to integrate the app with your browser
+You can download the browser extension to integrate the app with your browser.
 
 <p align="left">
-<a href="https://addons.mozilla.org/firefox/addon/ab-download-manager/"><img alt="Firefox Addon" src="./assets/banners/firefox-extension.png"></a>
+<a href="https://addons.mozilla.org/firefox/addon/ab-download-manager/"><img alt="Firefox Addon" src="./assets/banners/firefox-extension.png" height="48"></a>
 <a href="https://chromewebstore.google.com/detail/bbobopahenonfdgjgaleledndnnfhooj">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png">
-        <source media="(prefers-color-scheme: light)" srcset="./assets/banners/chrome-extension_light.png">
-        <img alt="Chrome Extension" src="./assets/banners/chrome-extension_dark.png">
+        <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png" height="48">
+        <source media="(prefers-color-scheme: light)" srcset="./assets/banners/chrome-extension_light.png" height="48">
+        <img alt="Chrome Extension" src="./assets/banners/chrome-extension_light.png" height="48">
     </picture>
 </a>
 </p>
@@ -94,22 +93,21 @@ You can download the browser extension to integrate the app with your browser
 ## Project Status & Feedback
 
 Please keep in mind that this project is in the beginning of its journey.
-**lots of features** are on the way!.
+**Lots of features** are on the way!
 
-**But**, in the meantime you may face **Bugs or Problems**. so.
-Please report them (by [Community chat](#community) or `GitHub Issues`) to me,And I'll do my best to fix them ASAP
+**But**, in the meantime you may face **Bugs or Problems**. If you do, please report them to me via the [Community chat](#community) or through `GitHub Issues`, and I'll do my best to fix them ASAP.
 
 ## Community
 
-You can join to our [Telegram Group](https://t.me/abdownloadmanager_discussion) to
+You can join our [Telegram Group](https://t.me/abdownloadmanager_discussion) to:
 
 - Report problems
 - Suggest features
-- Get help about the app
+- Get help with the app
 
 ## Repositories And Source Code
 
-There are multiple repositories related to the **AB Download Manager** project
+There are multiple repositories related to the **AB Download Manager** project:
 
 | Repository                                                                                 | Description                                                                   |
 |--------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
@@ -117,39 +115,39 @@ There are multiple repositories related to the **AB Download Manager** project
 | [Browser Integration](https://github.com/amir1376/ab-download-manager-browser-integration) | Contains the **Browser Extension** to be installed on your  **browser**       |
 | [Website](https://github.com/amir1376/ab-download-manager-website)                         | Contains the **AB Download Manager** [website](https://abdownloadmanager.com) |
 
-I spent a lot of time to create this project.
+I've spent a lot of time to create this project.
 
-If you like my work, Please consider giving it a ⭐ Thanks ❤️
+If you like my work, please consider giving it a ⭐ — thanks! ❤️
 
 ## Bug Report
 
-If you see bugs in the source code! please report them in the `GitHub Issues` section
+If you notice any bugs in the source code, please report them via the `GitHub Issues` section.
 
 ## Build From Source
 
-to compile and test desktop app on your local machine
-follow these steps.
+To compile and test the desktop app on your local machine,
+follow these steps:
 
-1. Clone the project
-2. Download and extract the [JBR](https://github.com/JetBrains/JetBrainsRuntime/releases) and make it available by either
+1. Clone the project.
+2. Download and extract the [JBR](https://github.com/JetBrains/JetBrainsRuntime/releases), and make it available by either:
     
-    - adding it to your `PATH`, or
-    - setting the `JAVA_HOME` environment variable to its installation path.
+    - Adding it to your `PATH`, or
+    - Setting the `JAVA_HOME` environment variable to its installation path.
   
-3. cd into the project, open your terminal and execute the following command
+3. Navigate to the project directory, open your terminal and execute the following command:
 
     ```bash
     ./gradlew createReleaseFolderForCi
     ```
 
-4. The output will be created in:
+4. The output will be available at:
 
     ```
     <project_dir>/build/ci-release
     ```
 
 > **Note**. This project is compiled and published by GitHub actions [here](./.github/workflows/publish.yml), so if you
-> faced any problem you can check that too
+> faced any problem you can check that too.
 
 ## Translations
 
@@ -158,7 +156,7 @@ so on Crowdin. Here’s how:
 
 - Visit the project in [Crowdin](https://crowdin.com/project/ab-download-manager)
 - Please DO NOT submit translations via pull requests.
-- If you want to add a new language, please see [here](https://github.com/amir1376/ab-download-manager/issues/144)
+- If you want to add a new language, please see [this](https://github.com/amir1376/ab-download-manager/issues/144).
 
 ## Contribution
 
@@ -166,7 +164,7 @@ Contributions to this project are very welcome!
 
 If you want to contribute to this project, please read [Contributing Guide](CONTRIBUTING.md) first.
 
-Let's make a better Download Manager together ❤️
+Let's make a better Download Manager together! ❤️
 
 ## Support the Project
 
