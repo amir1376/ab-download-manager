@@ -164,7 +164,7 @@ Contributions to this project are very welcome!
 
 If you want to contribute to this project, please read [Contributing Guide](CONTRIBUTING.md) first.
 
-Let's make a better Download Manager together ❤️
+Let's make a better Download Manager together! ❤️
 
 ## Support the Project
 
