@@ -36,9 +36,8 @@ Please visit [Project Website](https://abdownloadmanager.com) for more info
 
 ### Download and Install the App
 
-<a href="https://abdownloadmanager.com"><img src="https://img.shields.io/badge/Official%20Website-897BFF?logo=abdownloadmanager&logoColor=fff&style=flat-square" alt="Official Website" height="36" /></a>
-
-<a href="https://github.com/amir1376/ab-download-manager/releases/latest"><img src="https://img.shields.io/badge/GitHub%20Releases-2a2f36?logo=github&logoColor=fff&style=flat-square" alt="GitHub Releases" height="36" /></a>
+<a href="https://abdownloadmanager.com"><img src="https://img.shields.io/badge/Official%20Website-897BFF?logo=abdownloadmanager&logoColor=fff&style=flat-square" alt="Official Website" height="32" /></a>
+<a href="https://github.com/amir1376/ab-download-manager/releases/latest"><img src="https://img.shields.io/badge/GitHub%20Releases-2a2f36?logo=github&logoColor=fff&style=flat-square" alt="GitHub Releases" height="32" /></a>
 
 #### installation script (Linux)
 
@@ -65,12 +64,12 @@ scoop install extras/abdownloadmanager
 You can download the browser extension to integrate the app with your browser
 
 <p align="left">
-<a href="https://addons.mozilla.org/firefox/addon/ab-download-manager/"><img alt="Firefox Addon" src="./assets/banners/firefox-extension.png" height="50"></a>
+<a href="https://addons.mozilla.org/firefox/addon/ab-download-manager/"><img alt="Firefox Addon" src="./assets/banners/firefox-extension.png" height="48"></a>
 <a href="https://chromewebstore.google.com/detail/bbobopahenonfdgjgaleledndnnfhooj">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png" height="50">
-        <source media="(prefers-color-scheme: light)" srcset="./assets/banners/chrome-extension_light.png" height="50">
-        <img alt="Chrome Extension" src="./assets/banners/chrome-extension_light.png" height="50">
+        <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png" height="48">
+        <source media="(prefers-color-scheme: light)" srcset="./assets/banners/chrome-extension_light.png" height="48">
+        <img alt="Chrome Extension" src="./assets/banners/chrome-extension_light.png" height="48">
     </picture>
 </a>
 </p>
