@@ -164,7 +164,7 @@ private fun TranslatorsTable(
     Table(
         modifier = modifier,
         list = rememberLanguageTranslationInfo(),
-        state = rememberLazyListState(),
+        listState = rememberLazyListState(),
         tableState = tableState,
         wrapHeader = {
             MyStyledTableHeader(

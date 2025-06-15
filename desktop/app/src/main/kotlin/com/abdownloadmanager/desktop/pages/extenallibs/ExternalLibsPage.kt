@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.pages.extenallibs
 
-import androidx.compose.foundation.background
 import com.abdownloadmanager.shared.utils.ui.ProvideTextStyle
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.customtable.Table
@@ -17,8 +16,6 @@ import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.myColors
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.entity.Library
 
@@ -56,7 +53,7 @@ private fun OpenSourceLibraries(
                 .padding(8.dp)
                 .weight(1f),
             list = libs.libraries,
-            state = rememberLazyListState(),
+            listState = rememberLazyListState(),
             tableState = tableState,
             wrapHeader = {
                 MyStyledTableHeader(

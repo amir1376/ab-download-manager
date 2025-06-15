@@ -158,17 +158,19 @@ fun CellResizeHandle(
         if (isHovered || isDragging) color
         else inactiveColor
     ).value
-    Box(modifier
-        .pointerHoverIcon(hoverIcon, true)
-        .hoverable(interactionSource)
-        .resizeHandle(
-            orientation = orientation,
-            interactionSource = interactionSource,
-            onDrag = onDrag,
-        )
+    Box(
+        modifier
+            .pointerHoverIcon(hoverIcon, true)
+            .hoverable(interactionSource)
+            .resizeHandle(
+                orientation = orientation,
+                interactionSource = interactionSource,
+                onDrag = onDrag,
+            )
     ) {
-        Row(Modifier
-            .fillMaxSize().wrapContentSize()
+        Row(
+            Modifier
+                .fillMaxSize().wrapContentSize()
         ) {
             val m = Modifier
                 .fillMaxHeight()
@@ -225,10 +227,11 @@ class TableState<Item, Cell : TableCell<Item>>(
     private val _customSizes = MutableStateFlow<Map<Cell, Dp>>(initialCustomSizes)
     val customSizes = _customSizes.asStateFlow()
 
-    fun setCustomSizes(sizes: Map<Cell, Dp>){
+    fun setCustomSizes(sizes: Map<Cell, Dp>) {
         setCustomSizes { sizes }
     }
-    fun setCustomSizes(sizes: (Map<Cell, Dp>)->Map<Cell, Dp>){
+
+    fun setCustomSizes(sizes: (Map<Cell, Dp>) -> Map<Cell, Dp>) {
         _customSizes.update {
             sizes(it)
         }
@@ -361,7 +364,7 @@ class TableState<Item, Cell : TableCell<Item>>(
         }
     }
 
-    fun sortedList(list: List<Item>, sortBy: Sort<SortableCell<Item>>? = this.sortBy.value):List<Item> {
+    fun sortedList(list: List<Item>, sortBy: Sort<SortableCell<Item>>? = this.sortBy.value): List<Item> {
         return sortBy.let { sortedBy ->
             if (sortedBy == null) {
                 list
@@ -381,9 +384,9 @@ class TableState<Item, Cell : TableCell<Item>>(
     /**
      * get range of items based on the current sort of table
      */
-    fun <ID>getARangeOfItems(
+    fun <ID> getARangeOfItems(
         list: List<Item>,
-        id:(Item)->ID,
+        id: (Item) -> ID,
         fromItem: ID,
         toItem: ID,
     ): List<ID> {
@@ -394,6 +397,14 @@ class TableState<Item, Cell : TableCell<Item>>(
         }
     }
 
+    fun getItemPosition(
+        list: List<Item>,
+        selector: (Item) -> Boolean,
+    ): Int {
+        return sortedList(list)
+            .indexOfFirst(selector)
+    }
+
     @Serializable
     data class SerializableTableState(
         val sizes: Map<String, Float> = emptyMap(),
@@ -401,6 +412,7 @@ class TableState<Item, Cell : TableCell<Item>>(
         val visibleCells: List<String> = emptyList(),
         val order: List<String> = emptyList(),
     )
+
     @Serializable
     data class SortBy(
         val name: String,

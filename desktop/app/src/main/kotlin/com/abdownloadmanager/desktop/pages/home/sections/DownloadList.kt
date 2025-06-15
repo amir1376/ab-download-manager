@@ -15,7 +15,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -77,8 +77,8 @@ fun DownloadList(
     lastSelectedId: Long?,
     fileIconProvider: FileIconProvider,
     categoryManager: CategoryManager,
+    lazyListState: LazyListState
 ) {
-    val state = rememberLazyListState()
     ShowDownloadOptions(
         downloadOptions, onRequestCloseOption
     )
@@ -118,7 +118,7 @@ fun DownloadList(
         val itemHorizontalPadding = 16.dp
         Table(
             tableState = tableState,
-            state = state,
+            listState = lazyListState,
             key = { it.id },
             list = downloadList,
             modifier = modifier
