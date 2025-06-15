@@ -10,6 +10,7 @@ import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,6 +47,7 @@ import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.rememberIconPainter
 import com.abdownloadmanager.shared.utils.convertPositiveBytesToSizeUnit
 import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.mvi.HandleEffects
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.shared.utils.ui.WithTitleBarDirection
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
@@ -62,8 +64,7 @@ import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.LocalFrameWindowScope
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.awt.datatransfer.DataFlavor
 import java.io.File
 
@@ -85,43 +86,56 @@ fun HomePage(component: HomeComponent) {
         mutableStateOf(null as ConfirmPromptState?)
     }
 
-    LaunchedEffect(Unit) {
-        component.effects.onEach {
-            when (it) {
-                is HomeEffects.DeleteItems -> {
-                    if (it.list.isNotEmpty()) {
-                        showDeletePromptState = DeletePromptState(
-                            downloadList = it.list,
-                            finishedCount = it.finishedCount,
-                            unfinishedCount = it.unfinishedCount,
-                        )
+    val coroutineScope = rememberCoroutineScope()
+    val lazyListState = rememberLazyListState()
+    val tableState = component.tableState
+
+    HandleEffects(component) { effect ->
+        when (effect) {
+            is HomeEffects.DeleteItems -> {
+                if (effect.list.isNotEmpty()) {
+                    showDeletePromptState = DeletePromptState(
+                        downloadList = effect.list,
+                        finishedCount = effect.finishedCount,
+                        unfinishedCount = effect.unfinishedCount,
+                    )
+                }
+            }
+
+            is HomeEffects.DeleteCategory -> {
+                showDeleteCategoryPromptState = CategoryDeletePromptState(effect.category)
+            }
+
+            is HomeEffects.AutoCategorize -> {
+                showConfirmPrompt = ConfirmPromptState(
+                    title = Res.string.confirm_auto_categorize_downloads_title.asStringSource(),
+                    description = Res.string.confirm_auto_categorize_downloads_description.asStringSource(),
+                    onConfirm = component::onConfirmAutoCategorize
+                )
+            }
+
+            is HomeEffects.ResetCategoriesToDefault -> {
+                showConfirmPrompt = ConfirmPromptState(
+                    title = Res.string.confirm_reset_to_default_categories_title.asStringSource(),
+                    description = Res.string.confirm_reset_to_default_categories_description.asStringSource(),
+                    onConfirm = component::onConfirmResetCategories
+                )
+            }
+
+            is HomeEffects.ScrollToDownloadItem -> {
+                val id = effect.downloadId
+                val positionOrNull = tableState
+                    .getItemPosition(listState) { it.id == id }
+                    .takeIf { it != -1 }
+                positionOrNull?.let {
+                    coroutineScope.launch {
+                        lazyListState.scrollToItem(it)
                     }
                 }
-
-                is HomeEffects.DeleteCategory -> {
-                    showDeleteCategoryPromptState = CategoryDeletePromptState(it.category)
-                }
-
-                is HomeEffects.AutoCategorize -> {
-                    showConfirmPrompt = ConfirmPromptState(
-                        title = Res.string.confirm_auto_categorize_downloads_title.asStringSource(),
-                        description = Res.string.confirm_auto_categorize_downloads_description.asStringSource(),
-                        onConfirm = component::onConfirmAutoCategorize
-                    )
-                }
-
-                is HomeEffects.ResetCategoriesToDefault -> {
-                    showConfirmPrompt = ConfirmPromptState(
-                        title = Res.string.confirm_reset_to_default_categories_title.asStringSource(),
-                        description = Res.string.confirm_reset_to_default_categories_description.asStringSource(),
-                        onConfirm = component::onConfirmResetCategories
-                    )
-                }
-
-                else -> {}
             }
+
+            else -> {}
         }
-            .launchIn(this)
     }
     showDeletePromptState?.let {
         ShowDeletePrompts(
@@ -318,9 +332,10 @@ fun HomePage(component: HomeComponent) {
                             component.newSelection(ids = it)
                         },
                         lastSelectedId = lastSelected,
-                        tableState = component.tableState,
+                        tableState = tableState,
                         fileIconProvider = component.fileIconProvider,
                         categoryManager = component.categoryManager,
+                        lazyListState = lazyListState,
                     )
                     Spacer(
                         Modifier

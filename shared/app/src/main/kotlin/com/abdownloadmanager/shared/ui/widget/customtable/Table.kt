@@ -44,7 +44,7 @@ fun <T, C : TableCell<T>> Table(
     key: ((T) -> Any)? = null,
     tableState: TableState<T, C>,
     modifier: Modifier = Modifier,
-    state: LazyListState = rememberLazyListState(),
+    listState: LazyListState = rememberLazyListState(),
     horizontalScrollState: ScrollState = rememberScrollState(),
     resizeCellsOnResizeTableWidth: Boolean = false,
     renderHeaderCell: @Composable (C) -> Unit = { DefaultRenderHeader(it) },
@@ -146,7 +146,7 @@ fun <T, C : TableCell<T>> Table(
                         LazyColumn(
                             Modifier
                                 .fillMaxHeight(),
-                            state = state,
+                            state = listState,
                         ) {
                             itemsIndexed(
                                 sortedList,
@@ -179,7 +179,7 @@ fun <T, C : TableCell<T>> Table(
             }
         },
         horizontalAdapter = rememberScrollbarAdapter(horizontalScrollState),
-        verticalAdapter = rememberScrollbarAdapter(state),
+        verticalAdapter = rememberScrollbarAdapter(listState),
     )
 
 }

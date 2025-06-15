@@ -41,6 +41,7 @@ import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
+import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.db.QueueModel
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.User
@@ -85,6 +86,9 @@ sealed interface HomeEffects {
 
     data object ResetCategoriesToDefault : HomeEffects
     data object AutoCategorize : HomeEffects
+
+    data class ScrollToDownloadItem(val downloadId: Long) : HomeEffects
+
 }
 
 
@@ -997,6 +1001,16 @@ class HomeComponent(
                 downloads.any { it.id == previouslySelectedItem }
             }
         }.launchIn(scope)
+
+        downloadSystem.downloadManager.listOfJobsEvents
+            .filterIsInstance<DownloadManagerEvents.OnJobAdded>()
+            // wait until download list in table is also updated
+            // it also prevents extra emits when multiple download added at the same time
+            .debounce(100)
+            .onEach {
+                sendEffect(HomeEffects.ScrollToDownloadItem(it.downloadItem.id))
+            }.launchIn(scope)
+
         if (isFirstVisitInThisSession()) {
             // if the app is updated then clean downloaded files
             if (appVersionTracker.isUpgraded()) {
