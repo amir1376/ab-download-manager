@@ -83,12 +83,12 @@ class CategoryManager(
         val fileName = categoryItem.fileName
         return getCategories()
             .filter {
+                it.acceptFileName(fileName) || it.acceptUrl(url)
+            }.sortedWith(compareByDescending<Category> {
                 it.acceptFileName(fileName)
-            }.sortedByDescending {
-                it.hasUrlPattern
-            }.firstOrNull {
-                it.acceptUrl(url)
-            }
+            }.thenByDescending {
+                it.hasUrlPattern && it.acceptUrl(url)
+            }).firstOrNull()
 
     }
 

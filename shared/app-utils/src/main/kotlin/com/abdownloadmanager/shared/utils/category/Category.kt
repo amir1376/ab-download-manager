@@ -40,6 +40,7 @@ data class Category(
     val hasUrlPattern = acceptedUrlPatterns.isNotEmpty()
 
     fun acceptFileName(fileName: String): Boolean {
+        if (acceptedFileTypes.any { it == "*" || it == "*.*" }) return true
         return acceptedFileTypes.any { ext ->
             fileName.endsWith(
                 suffix = ".$ext",
