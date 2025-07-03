@@ -12,12 +12,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.settings.ThemeInfo
 import com.abdownloadmanager.desktop.utils.configurable.BaseEnumConfigurable
 import ir.amirab.util.compose.StringSource
+import ir.amirab.util.ifThen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -63,7 +65,12 @@ private fun RenderThemeConfig(cfg: ThemeConfigurable, modifier: Modifier) {
                 modifier = Modifier.widthIn(min = 160.dp),
                 enabled = enabled,
                 render = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.ifThen(!enabled) {
+                            alpha(0.5f)
+                        }
+                    ) {
                         Spacer(
                             Modifier
                                 .clip(CircleShape)

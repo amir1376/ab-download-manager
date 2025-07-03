@@ -14,6 +14,8 @@ import java.io.File
 @Serializable
 data class AppSettingsModel(
     val theme: String = "dark",
+    val defaultDarkTheme: String = "dark",
+    val defaultLightTheme: String = "light",
     val language: String? = null,
     val uiScale: Float? = null,
     val mergeTopBarWithTitleBar: Boolean = false,
@@ -50,6 +52,8 @@ data class AppSettingsModel(
     object ConfigLens : Lens<MapConfig, AppSettingsModel>, KoinComponent {
         object Keys {
             val theme = stringKeyOf("theme")
+            val defaultDarkTheme = stringKeyOf("defaultDarkTheme")
+            val defaultLightTheme = stringKeyOf("defaultLightTheme")
             val language = stringKeyOf("language")
             val uiScale = floatKeyOf("uiScale")
             val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
@@ -83,6 +87,8 @@ data class AppSettingsModel(
             val default by lazy { AppSettingsModel.default }
             return AppSettingsModel(
                 theme = source.get(Keys.theme) ?: default.theme,
+                defaultDarkTheme = source.get(Keys.defaultDarkTheme) ?: default.defaultDarkTheme,
+                defaultLightTheme = source.get(Keys.defaultLightTheme) ?: default.defaultLightTheme,
                 language = source.get(Keys.language) ?: default.language,
                 uiScale = source.get(Keys.uiScale) ?: default.uiScale,
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
@@ -120,6 +126,8 @@ data class AppSettingsModel(
         override fun set(source: MapConfig, focus: AppSettingsModel): MapConfig {
             return source.apply {
                 put(Keys.theme, focus.theme)
+                put(Keys.defaultDarkTheme, focus.defaultDarkTheme)
+                put(Keys.defaultLightTheme, focus.defaultLightTheme)
                 putNullable(Keys.language, focus.language)
                 putNullable(Keys.uiScale, focus.uiScale)
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
@@ -176,6 +184,9 @@ class AppSettingsStorage(
     ConfigBaseSettingsByMapConfig<AppSettingsModel>(settings, AppSettingsModel.ConfigLens),
     LanguageStorage {
     val theme = from(AppSettingsModel.theme)
+    val defaultDarkTheme = from(AppSettingsModel.defaultDarkTheme)
+    val defaultLightTheme = from(AppSettingsModel.defaultLightTheme)
+    
     override val selectedLanguage = from(languageLens)
     val uiScale = from(uiScaleLens)
     val mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)

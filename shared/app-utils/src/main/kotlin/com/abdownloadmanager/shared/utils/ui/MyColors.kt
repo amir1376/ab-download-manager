@@ -28,7 +28,6 @@ class MyColors(
     val secondaryVariant: Color = secondary,
     val onSecondary: Color,
     val background: Color,
-    val backgroundVariant: Color = background,
     val onBackground: Color,
     val onSurface: Color,
     val surface: Color,
@@ -89,7 +88,7 @@ class MyColors(
             secondary, secondaryVariant -> onSecondary
             error -> onError
             success -> onSuccess
-            background, backgroundVariant -> onBackground
+            background -> onBackground
             surface -> onSurface
             else -> Color.Unspecified
         }
@@ -118,7 +117,6 @@ fun AnimatedColors(
     val onSecondary by animated(toBeAnimated.onSecondary, spec)
 
     val background by animated(toBeAnimated.background, spec)
-    val backgroundVariant by animated(toBeAnimated.backgroundVariant, spec)
     val onBackground by animated(toBeAnimated.onBackground, spec)
 
     val surface by animated(toBeAnimated.surface, spec)
@@ -147,7 +145,6 @@ fun AnimatedColors(
         secondaryVariant = secondaryVariant,
         onSecondary = onSecondary,
         background = background,
-        backgroundVariant = backgroundVariant,
         onBackground = onBackground,
         onSurface = onSurface,
         surface = surface,
