@@ -37,9 +37,20 @@ data class Category(
     @SerialName("items")
     val items: List<Long> = emptyList(),
 ) {
+    val hasFileTypes = acceptedFileTypes.isNotEmpty()
     val hasUrlPattern = acceptedUrlPatterns.isNotEmpty()
+    private val filterCount = run {
+        var count = 0
+        if (hasFileTypes) count++
+        if (hasUrlPattern) count++
+        count
+    }
+    val hasFilters = filterCount > 0
 
     fun acceptFileName(fileName: String): Boolean {
+        if (!hasFileTypes) {
+            return true
+        }
         return acceptedFileTypes.any { ext ->
             fileName.endsWith(
                 suffix = ".$ext",
@@ -53,9 +64,11 @@ data class Category(
             items = items.plus(newItems).distinct()
         )
     }
+
     fun getDownloadPath(): String? {
         return if (usePath) path else null
     }
+
     fun acceptUrl(url: String): Boolean {
         if (!hasUrlPattern) {
             return true

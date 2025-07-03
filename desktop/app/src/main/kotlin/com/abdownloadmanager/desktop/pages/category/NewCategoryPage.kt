@@ -68,7 +68,9 @@ fun NewCategory(
             Spacer(Modifier.height(12.dp))
             CategoryAutoTypes(
                 types = categoryComponent.types.collectAsState().value,
-                onTypesChanged = categoryComponent::setTypes
+                onTypesChanged = categoryComponent::setTypes,
+                enabled = categoryComponent.typesEnabled.collectAsState().value,
+                setEnabled = categoryComponent::setTypesEnabled
             )
             Spacer(Modifier.height(12.dp))
             CategoryAutoUrls(
@@ -165,18 +167,23 @@ fun CategoryDefaultPath(
 
 @Composable
 fun CategoryAutoTypes(
+    enabled: Boolean,
+    setEnabled: (Boolean) -> Unit,
     types: String,
     onTypesChanged: (String) -> Unit,
 ) {
-    WithLabel(
+    OptionalWithLabel(
         label = myStringResource(Res.string.category_file_types),
-        helpText = myStringResource(Res.string.category_file_types_description)
+        helpText = myStringResource(Res.string.category_file_types_description),
+        enabled = enabled,
+        setEnabled = setEnabled,
     ) {
         CategoryPageTextField(
             text = types,
             onTextChange = onTypesChanged,
             modifier = Modifier.fillMaxWidth(),
             placeholder = "ext1 ext2 ext3",
+            enabled = enabled,
             singleLine = false,
         )
     }

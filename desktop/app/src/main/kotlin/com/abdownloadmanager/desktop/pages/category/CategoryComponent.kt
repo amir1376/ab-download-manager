@@ -38,6 +38,7 @@ class CategoryComponent(
             val category = categoryManager.getCategoryById(id) ?: return@launch
             setIcon(category.iconSource())
             setName(category.name)
+            setTypesEnabled(category.acceptedFileTypes.isNotEmpty())
             setTypes(category.acceptedFileTypes.joinToString(" "))
             setUrlPatternsEnabled(category.acceptedUrlPatterns.isNotEmpty())
             setUrlPatterns(category.acceptedUrlPatterns.joinToString(" "))
@@ -56,6 +57,12 @@ class CategoryComponent(
     val name = _name.asStateFlow()
     fun setName(name: String) {
         _name.value = name
+    }
+
+    private val _typesEnabled = MutableStateFlow(false)
+    val typesEnabled = _typesEnabled.asStateFlow()
+    fun setTypesEnabled(value: Boolean) {
+        _typesEnabled.value = value
     }
 
     private val _types = MutableStateFlow("")
