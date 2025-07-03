@@ -82,14 +82,21 @@ class CategoryManager(
         val url = categoryItem.url
         val fileName = categoryItem.fileName
         return getCategories()
+            .filter { it.hasFilters }
             .filter {
-                it.acceptFileName(fileName)
-            }.sortedByDescending {
-                it.hasUrlPattern
-            }.firstOrNull {
-                it.acceptUrl(url)
+                it.acceptFileName(fileName) && it.acceptUrl(url)
             }
-
+            .sortedWith(
+                // first prioritize categories which has url pattern filters
+                compareByDescending<Category> { it.hasUrlPattern }
+                    // then prioritize categories with fewer url patterns count
+                    .thenBy { it.acceptedUrlPatterns.size }
+                    // second prioritize categories which has file types
+                    .thenByDescending { it.hasFileTypes }
+                    // then prioritize categories with fewer file type count
+                    .thenBy { it.acceptedFileTypes.size }
+            )
+            .firstOrNull()
     }
 
     fun getCategoryOfItem(id: Long): Category? {
