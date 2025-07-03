@@ -121,19 +121,27 @@ class CategoryComponent(
             Category(
                 id = id,
                 name = name.value,
-                acceptedFileTypes = types.value
-                    .split(" ")
-                    .filterNot { it.isBlank() }
-                    .distinct(),
+                acceptedFileTypes = if (typesEnabled.value) {
+                    types.value
+                        .split(" ")
+                        .filterNot { it.isBlank() }
+                        .distinct()
+                } else {
+                    emptyList()
+                },
                 icon = icon
                     .value!!
                     .uriOrNull()!!,
                 path = path,
                 usePath = usePath.value,
-                acceptedUrlPatterns = urlPatterns.value
-                    .split(" ")
-                    .filterNot { it.isBlank() }
-                    .distinct(),
+                acceptedUrlPatterns = if (urlPatternsEnabled.value) {
+                    urlPatterns.value
+                        .split(" ")
+                        .filterNot { it.isBlank() }
+                        .distinct()
+                } else {
+                    emptyList()
+                },
                 items = emptyList() // ignored!
             )
         )
