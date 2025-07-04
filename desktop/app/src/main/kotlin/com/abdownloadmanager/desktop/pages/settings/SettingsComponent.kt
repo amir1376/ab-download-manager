@@ -75,7 +75,7 @@ fun threadCountConfig(appRepository: AppRepository): IntConfigurable {
                 add(
                     Res.string.settings_download_thread_count_describe
                         .asStringSourceWithARgs(
-                            Res.string.`settings_download_thread_count_describe_createArgs`(
+                            Res.string.settings_download_thread_count_describe_createArgs(
                                 count = it.toString()
                             )
                         )
@@ -356,6 +356,27 @@ fun proxyConfig(proxyManager: ProxyManager, scope: CoroutineScope): ProxyConfigu
                         )
                 }
             }
+        }
+    )
+}
+
+fun fontConfig(
+    fontManager: FontManager,
+    scope: CoroutineScope,
+): FontConfigurable {
+    return FontConfigurable(
+        title = Res.string.settings_font.asStringSource(),
+        description = Res.string.settings_font_description.asStringSource(),
+        backedBy = createMutableStateFlowFromStateFlow(
+            flow = fontManager.currentFontInfo,
+            updater = { font ->
+                fontManager.setFont(font.id)
+            },
+            scope = scope,
+        ),
+        possibleValues = fontManager.selectableFonts.value,
+        describe = {
+            it.name
         }
     )
 }
@@ -645,6 +666,7 @@ class SettingsComponent(
     val proxyManager by inject<ProxyManager>()
     val themeManager by inject<ThemeManager>()
     val languageManager by inject<LanguageManager>()
+    val fontManager by inject<FontManager>()
     private val allConfigs = object : SettingSectionGetter {
         override operator fun get(key: SettingSections): List<Configurable<*>> {
             return when (key) {
@@ -653,6 +675,8 @@ class SettingsComponent(
                     defaultDarkThemeConfig(themeManager, scope),
                     defaultLightThemeConfig(themeManager, scope),
                     languageConfig(languageManager, scope),
+                    fontConfig(fontManager, scope),
+                    uiScaleConfig(appSettings),
                     uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
                     mergeTopBarWithTitleBarConfig(appSettings),

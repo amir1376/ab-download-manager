@@ -17,6 +17,7 @@ data class AppSettingsModel(
     val defaultDarkTheme: String = "dark",
     val defaultLightTheme: String = "light",
     val language: String? = null,
+    val font: String? = null,
     val uiScale: Float? = null,
     val mergeTopBarWithTitleBar: Boolean = false,
     val useNativeMenuBar: Boolean = false,
@@ -55,6 +56,7 @@ data class AppSettingsModel(
             val defaultDarkTheme = stringKeyOf("defaultDarkTheme")
             val defaultLightTheme = stringKeyOf("defaultLightTheme")
             val language = stringKeyOf("language")
+            val font = stringKeyOf("font")
             val uiScale = floatKeyOf("uiScale")
             val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
             val useNativeMenuBar = booleanKeyOf("useNativeMenuBar")
@@ -90,6 +92,7 @@ data class AppSettingsModel(
                 defaultDarkTheme = source.get(Keys.defaultDarkTheme) ?: default.defaultDarkTheme,
                 defaultLightTheme = source.get(Keys.defaultLightTheme) ?: default.defaultLightTheme,
                 language = source.get(Keys.language) ?: default.language,
+                font = source.get(Keys.font) ?: default.font,
                 uiScale = source.get(Keys.uiScale) ?: default.uiScale,
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
                 useNativeMenuBar = source.get(Keys.useNativeMenuBar) ?: default.useNativeMenuBar,
@@ -129,6 +132,7 @@ data class AppSettingsModel(
                 put(Keys.defaultDarkTheme, focus.defaultDarkTheme)
                 put(Keys.defaultLightTheme, focus.defaultLightTheme)
                 putNullable(Keys.language, focus.language)
+                putNullable(Keys.font, focus.font)
                 putNullable(Keys.uiScale, focus.uiScale)
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
                 put(Keys.useNativeMenuBar, focus.useNativeMenuBar)
@@ -159,6 +163,15 @@ data class AppSettingsModel(
     }
 }
 
+private val fontLens: Lens<AppSettingsModel, String?>
+    get() = Lens(
+        get = {
+            it.font
+        },
+        set = { s, f ->
+            s.copy(font = f)
+        }
+    )
 private val uiScaleLens: Lens<AppSettingsModel, Float?>
     get() = Lens(
         get = {
@@ -186,8 +199,9 @@ class AppSettingsStorage(
     val theme = from(AppSettingsModel.theme)
     val defaultDarkTheme = from(AppSettingsModel.defaultDarkTheme)
     val defaultLightTheme = from(AppSettingsModel.defaultLightTheme)
-    
+
     override val selectedLanguage = from(languageLens)
+    val font = from(fontLens)
     val uiScale = from(uiScaleLens)
     val mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
     val useNativeMenuBar = from(AppSettingsModel.useNativeMenuBar)
