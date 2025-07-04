@@ -1,14 +1,13 @@
 package com.abdownloadmanager.shared.ui.theme
 
 import ir.amirab.util.compose.action.buildMenu
-import com.abdownloadmanager.shared.utils.darker
 import com.abdownloadmanager.shared.utils.div
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,6 +53,7 @@ private val textSizes = TextSizes(
 @Composable
 fun ABDownloaderTheme(
     myColors: MyColors,
+    fontFamily: FontFamily? = null,
     uiScale: Float? = null,
     content: @Composable () -> Unit,
 ) {
@@ -73,6 +73,7 @@ fun ABDownloaderTheme(
             LocalTextStyle provides LocalTextStyle.current.copy(
                 lineHeight = TextUnit.Unspecified,
                 fontSize = textSizes.base,
+                fontFamily = fontFamily,
             ),
         ) {
             // it is overridden by [Window] Composable,

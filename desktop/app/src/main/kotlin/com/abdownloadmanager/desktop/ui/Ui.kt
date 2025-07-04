@@ -21,6 +21,7 @@ import com.abdownloadmanager.desktop.pages.filehash.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
 import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
+import com.abdownloadmanager.desktop.pages.settings.FontManager
 import com.abdownloadmanager.desktop.pages.settings.SettingWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialogs
@@ -60,8 +61,10 @@ object Ui : KoinComponent {
     ) {
         val appComponent: AppComponent = get()
         val themeManager: ThemeManager = get()
+        val fontManager: FontManager = get()
         val languageManager: LanguageManager = get()
         themeManager.boot()
+        fontManager.boot()
         languageManager.boot()
         if (!appArguments.startSilent) {
             appComponent.openHome()
@@ -80,11 +83,13 @@ object Ui : KoinComponent {
         }
         application {
             val theme by themeManager.currentThemeColor.collectAsState()
+            val fontFamily by fontManager.currentFontFamily.collectAsState()
             ProvideDebugInfo(AppInfo.isInDebugMode()) {
                 ProvideLanguageManager(languageManager) {
                     ProvideNotificationManager {
                         ABDownloaderTheme(
                             myColors = theme,
+                            fontFamily = fontFamily,
                             uiScale = appComponent.uiScale.collectAsState().value
                         ) {
                             ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
