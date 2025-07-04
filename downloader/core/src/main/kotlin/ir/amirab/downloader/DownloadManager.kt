@@ -13,6 +13,8 @@ import ir.amirab.downloader.utils.FileNameUtil
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.downloader.utils.OnDuplicateStrategy.*
+import ir.amirab.util.FileNameValidator
+import ir.amirab.util.PathValidator
 import ir.amirab.util.UrlUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -77,9 +79,9 @@ class DownloadManager(
         require(UrlUtils.isValidUrl(newItem.link)) {
             "url is not valid"
         }
-
-        require(newItem.folder.isNotEmpty()) { "folder of new download must be set" }
-        require(newItem.name.isNotEmpty()) { "name of new download must be set" }
+        require(PathValidator.isValidPath(newItem.folder)) { "folder of new download is not valid: ${newItem.folder}" }
+        require(PathValidator.canWriteToThisPath(newItem.folder)) { "can't write to this new download's folder: ${newItem.folder}" }
+        require(FileNameValidator.isValidFileName(newItem.name)) { "name of new download is not valid: ${newItem.name}" }
 //        thisLogger().info("adding download")
         val job = dbAddSync.withLock {
             val allDownloads = dlListDb.getAll()

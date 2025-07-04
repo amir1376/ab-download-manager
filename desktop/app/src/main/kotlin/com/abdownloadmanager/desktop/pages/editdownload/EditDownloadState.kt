@@ -13,6 +13,7 @@ import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.downloaditem.DownloadItem.Companion.LENGTH_UNKNOWN
 import ir.amirab.downloader.downloaditem.withCredentials
+import ir.amirab.util.FileNameValidator
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
