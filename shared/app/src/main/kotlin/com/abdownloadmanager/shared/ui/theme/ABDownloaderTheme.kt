@@ -42,54 +42,6 @@ fun MyColors.asMaterial2Colors(): Colors {
 */
 
 
-val darkColors = MyColors(
-    //used
-    primary = Color(0xFF4791BF),
-    onPrimary = Color.White,
-    secondary = Color(0xFFB85DFF),
-    onSecondary = Color.White,
-    background = Color(0xFF16161E),
-    onBackground = Color(0xFFAAAAAA),
-    onSurface = Color(0xFFAAAAAA),
-//        surface = Color(0xff191922),
-    surface = Color(0xFF22222A),
-    error = Color(0xffff5757),
-    onError = Color.White,
-    success = Color(0xff69BA5A),
-    onSuccess = Color.White,
-    warning = Color(0xFFffbe56),
-    onWarning = Color.White,
-    info = Color(0xFF2f77d4),
-    onInfo = Color.White,
-    isLight = false,
-    name = "Dark",
-    id = "dark",
-)
-val lightColors = MyColors(
-    primary = Color(0xFF4791BF),
-    primaryVariant = Color(0xFFAFCEFF).darker(0.5f),
-    onPrimary = Color.Black,
-    secondary = Color(0xFFB85DFF),
-    onSecondary = Color.White,
-//        primary = Color(0xFF3B82F6),
-    background = Color.White.darker(0.1f),
-    backgroundVariant = Color(0xFFfafafa),
-    onBackground = Color(0xFF353535),
-    onSurface = Color(0xFF353535),
-//        surface = Color(0xff191922),
-    surface = Color.White.darker(0.15f),
-    error = Color(0xffff5757),
-    onError = Color.White,
-    success = Color(0xff14a600),
-    onSuccess = Color.White,
-    warning = Color(0xFFffbe56),
-    onWarning = Color.White,
-    info = Color(0xFF2f77d4),
-    onInfo = Color.White,
-    isLight = true,
-    name = "Light",
-    id = "light",
-)
 
 private val textSizes = TextSizes(
     xs = 8.sp,

@@ -5,9 +5,8 @@ import androidx.compose.ui.graphics.Color
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.shared.utils.ui.theme.ISystemThemeDetector
 import com.abdownloadmanager.shared.utils.ui.MyColors
-import com.abdownloadmanager.shared.ui.theme.darkColors
-import com.abdownloadmanager.shared.ui.theme.lightColors
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.theme.DefaultThemes
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
@@ -15,6 +14,8 @@ import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
+import kotlin.collections.filter
+import kotlin.collections.map
 
 class ThemeManager(
     private val scope: CoroutineScope,
@@ -22,13 +23,10 @@ class ThemeManager(
     private val osThemeDetector: ISystemThemeDetector,
 ) {
     companion object {
-        val defaultThemes = listOf(
-            darkColors,
-            lightColors,
-        )
-        val defaultDarkTheme = darkColors
-        val defaultLightTheme = lightColors
-        val DefaultTheme = defaultDarkTheme
+        val defaultThemes = DefaultThemes.getAll()
+        val DefaultDarkTheme = DefaultThemes.getDefaultDark()
+        val DefaultLightTheme = DefaultThemes.getDefaultLight()
+        val DefaultTheme = DefaultDarkTheme
         val DEFAULT_THEME_ID = DefaultTheme.id
         val systemThemeInfo = ThemeInfo(
             id = "system",
@@ -46,23 +44,32 @@ class ThemeManager(
         }
     }
 
-    val possibleThemesToSelect = availableThemes.mapStateFlow {
+    val selectableThemes = availableThemes.mapStateFlow {
         buildList {
-            addAll(it.map {
-                it.toThemeInfo()
-            })
             if (osThemeDetector.isSupported) {
                 add(systemThemeInfo)
             }
+            addAll(it.map {
+                it.toThemeInfo()
+            })
         }
     }
-    private val themeIds = possibleThemesToSelect.mapStateFlow {
+
+    val selectableDarkThemes = availableThemes.mapStateFlow {
+        it.filter { !it.isLight }.map { it.toThemeInfo() }
+    }
+
+    val selectableLightThemes = availableThemes.mapStateFlow {
+        it.filter { it.isLight }.map { it.toThemeInfo() }
+    }
+
+    private val themeIds = selectableThemes.mapStateFlow {
         it.map { it.id }
     }
 
 
     val currentThemeInfo = combineStateFlows(
-        appSettings.theme, possibleThemesToSelect
+        appSettings.theme, selectableThemes
     ) { themeId, possibleThemes ->
         possibleThemes.find {
             it.id == themeId
@@ -71,26 +78,49 @@ class ThemeManager(
         }!!
     }
 
+    val selectedDarkThemeInfo = combineStateFlows(
+        appSettings.defaultDarkTheme, selectableThemes
+    ) { themeId, possibleThemes ->
+        possibleThemes.find {
+            it.id == themeId
+        } ?: possibleThemes.find {
+            it.id == DefaultDarkTheme.id
+        }!!
+    }
 
+    val selectedLightThemeInfo = combineStateFlows(
+        appSettings.defaultLightTheme, selectableThemes
+    ) { themeId, possibleThemes ->
+        possibleThemes.find {
+            it.id == themeId
+        } ?: possibleThemes.find {
+            it.id == DefaultLightTheme.id
+        }!!
+    }
 
 
     private var osDarkModeFlow = MutableStateFlow(true)
 
     val currentThemeColor = combineStateFlows(
-        themeIds, appSettings.theme, osDarkModeFlow
-    ) { themes, themeId, osThemeIsDark ->
-        if (themeId == systemThemeInfo.id) {
+        themeIds,
+        appSettings.theme,
+        appSettings.defaultDarkTheme,
+        appSettings.defaultLightTheme,
+        osDarkModeFlow,
+    ) { themes, themeId, userDefaultDarkThemeId, userDefaultLightThemeId, osThemeIsDark ->
+        val id = if (themeId == systemThemeInfo.id) {
             if (osThemeIsDark) {
-                defaultDarkTheme
+                userDefaultDarkThemeId
             } else {
-                defaultLightTheme
+                userDefaultLightThemeId
             }
         } else {
-            if (themes.contains(themeId)) {
-                getThemeById(themeId)!!
-            } else {
-                defaultDarkTheme
-            }
+            themeId
+        }
+        if (themes.contains(id)) {
+            getThemeById(id)!!
+        } else {
+            DefaultTheme
         }
     }
 
@@ -106,6 +136,28 @@ class ThemeManager(
             } else {
                 // theme id in setting is invalid update it
                 appSettings.theme.value = DEFAULT_THEME_ID
+            }
+        }
+    }
+
+    fun setDarkTheme(themeId: String) {
+        synchronized(this) {
+            appSettings.defaultDarkTheme.value = if (themeIds.value.contains(themeId)) {
+                themeId
+            } else {
+                // theme id in setting is invalid update it
+                DefaultDarkTheme.id
+            }
+        }
+    }
+
+    fun setLightTheme(themeId: String) {
+        synchronized(this) {
+            appSettings.defaultLightTheme.value = if (themeIds.value.contains(themeId)) {
+                themeId
+            } else {
+                // theme id in setting is invalid update it
+                DefaultLightTheme.id
             }
         }
     }

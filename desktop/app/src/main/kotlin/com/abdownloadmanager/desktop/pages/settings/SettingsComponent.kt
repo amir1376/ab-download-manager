@@ -29,7 +29,6 @@ import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
-import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -396,19 +395,71 @@ fun themeConfig(
     themeManager: ThemeManager,
     scope: CoroutineScope,
 ): ThemeConfigurable {
-    val currentThemeName = themeManager.currentThemeInfo
-    val themes = themeManager.possibleThemesToSelect
+    val currentThemeInfo = themeManager.currentThemeInfo
+    val themes = themeManager.selectableThemes
     return ThemeConfigurable(
         title = Res.string.settings_theme.asStringSource(),
         description = Res.string.settings_theme_description.asStringSource(),
         backedBy = createMutableStateFlowFromStateFlow(
-            flow = currentThemeName,
+            flow = currentThemeInfo,
             updater = {
                 themeManager.setTheme(it.id)
             },
             scope = scope,
         ),
         possibleValues = themes.value,
+        describe = {
+            it.name
+        },
+    )
+}
+
+fun defaultDarkThemeConfig(
+    themeManager: ThemeManager,
+    scope: CoroutineScope,
+): ThemeConfigurable {
+    val currentDefaultDarkThemeInfo = themeManager.selectedDarkThemeInfo
+    val darkThemes = themeManager.selectableDarkThemes
+    return ThemeConfigurable(
+        title = Res.string.settings_default_dark_theme.asStringSource(),
+        description = Res.string.settings_default_dark_theme_description.asStringSource(),
+        enabled = themeManager.currentThemeInfo.mapStateFlow {
+            it.id == ThemeManager.systemThemeInfo.id
+        },
+        backedBy = createMutableStateFlowFromStateFlow(
+            flow = currentDefaultDarkThemeInfo,
+            updater = {
+                themeManager.setDarkTheme(it.id)
+            },
+            scope = scope,
+        ),
+        possibleValues = darkThemes.value,
+        describe = {
+            it.name
+        },
+    )
+}
+
+fun defaultLightThemeConfig(
+    themeManager: ThemeManager,
+    scope: CoroutineScope,
+): ThemeConfigurable {
+    val currentDefaultLightThemeInfo = themeManager.selectedLightThemeInfo
+    val lightThemes = themeManager.selectableLightThemes
+    return ThemeConfigurable(
+        title = Res.string.settings_default_light_theme.asStringSource(),
+        description = Res.string.settings_default_light_theme_description.asStringSource(),
+        enabled = themeManager.currentThemeInfo.mapStateFlow {
+            it.id == ThemeManager.systemThemeInfo.id
+        },
+        backedBy = createMutableStateFlowFromStateFlow(
+            flow = currentDefaultLightThemeInfo,
+            updater = {
+                themeManager.setLightTheme(it.id)
+            },
+            scope = scope,
+        ),
+        possibleValues = lightThemes.value,
         describe = {
             it.name
         },
@@ -599,6 +650,8 @@ class SettingsComponent(
             return when (key) {
                 Appearance -> listOfNotNull(
                     themeConfig(themeManager, scope),
+                    defaultDarkThemeConfig(themeManager, scope),
+                    defaultLightThemeConfig(themeManager, scope),
                     languageConfig(languageManager, scope),
                     uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
