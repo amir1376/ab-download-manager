@@ -1,14 +1,14 @@
-package com.abdownloadmanager.shared.utils
+package ir.amirab.util
 
 import java.io.File
 
-object FileNameValidator{
+object FileNameValidator {
     fun isValidFileName(name: String): Boolean {
-        if (name.isEmpty())return false
+        if (name.isEmpty()) return false
         return runCatching {
             File(name).canonicalFile
         }.getOrNull()?.let {
-            it.name==name
-        }?:false
+            it.name == name
+        } ?: false
     }
 }
