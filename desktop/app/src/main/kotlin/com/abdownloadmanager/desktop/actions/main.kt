@@ -6,6 +6,8 @@ import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
+import com.abdownloadmanager.desktop.utils.DesktopEntryCreator
+import com.abdownloadmanager.desktop.utils.isAppInstalled
 import com.abdownloadmanager.desktop.window.Browser
 import ir.amirab.util.compose.action.AnAction
 import ir.amirab.util.compose.action.MenuItem
@@ -149,6 +151,13 @@ val browserIntegrations = MenuItem.SubMenu(
         }
     }
 )
+
+val createDesktopEntryAction = simpleAction(
+    Res.string.create_desktop_entry.asStringSource(),
+    checkEnable = MutableStateFlow(AppInfo.isAppInstalled())
+) {
+    DesktopEntryCreator.createLinuxDesktopEntry()
+}
 
 val gotoSettingsAction = simpleAction(
     Res.string.settings.asStringSource(),
