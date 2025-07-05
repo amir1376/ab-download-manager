@@ -447,6 +447,7 @@ class QueueActions(
     val mainQueueModel: QueueModel?,
     private val requestDelete: (QueueModel) -> Unit,
     private val requestEdit: (QueueModel) -> Unit,
+    private val requestClearItems: (QueueModel) -> Unit,
     private val onRequestNewQueue: () -> Unit,
 ) {
     private val mainItemExists = MutableStateFlow(mainQueueModel != null)
@@ -491,8 +492,20 @@ class QueueActions(
             }
         },
     )
+    val clearItems = simpleAction(
+        title = Res.string.clear_queue_items.asStringSource(),
+        icon = MyIcons.clear,
+        checkEnable = mainItemExists,
+        onActionPerformed = {
+            scope.launch {
+                useItem {
+                    requestClearItems(it)
+                }
+            }
+        },
+    )
 
-    val addCategoryAction = simpleAction(
+    val addQueueAction = simpleAction(
         title = Res.string.add_new_queue.asStringSource(),
         icon = MyIcons.add,
         onActionPerformed = {
@@ -535,8 +548,9 @@ class QueueActions(
         separator()
         +editAction
         +deleteAction
+        +clearItems
         separator()
-        +addCategoryAction
+        +addQueueAction
     }
 }
 
@@ -1125,6 +1139,13 @@ class HomeComponent(
                     .getOrNull()?.let { q ->
                         queuePageManager.openQueues(q.id)
                     }
+            },
+            requestClearItems = {
+                scope.launch {
+                    runCatching {
+                        queueManager.clearQueue(it.id)
+                    }
+                }
             },
             onRequestNewQueue = {
                 queuePageManager.openNewQueueDialog()

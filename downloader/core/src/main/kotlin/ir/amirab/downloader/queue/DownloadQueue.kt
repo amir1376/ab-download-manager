@@ -442,6 +442,15 @@ class DownloadQueue(
         shake()
     }
 
+    fun clearQueue() {
+        _queueModel.update {
+            it.copy(queueItems = emptyList())
+        }
+        activeItems.clear()
+        canceledItems.clear()
+        trimmedItems.clear()
+    }
+
     fun removeFromQueue(ids: List<Long>) {
         _queueModel.update {
             it.copy(

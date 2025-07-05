@@ -195,6 +195,11 @@ class QueueManager(
             addToQueue(queueId, it)
         }
     }
+
+    fun clearQueue(queueId: Long) {
+        val queue = getQueue(queueId)
+        queue.clearQueue()
+    }
 }
 
 private class QueueInfoPersistedData(
