@@ -129,7 +129,11 @@ compose {
             // Define the main class for the application.
             mainClass = "$desktopPackageName.AppKt"
             nativeDistributions {
-                modules("java.instrument", "jdk.unsupported")
+                modules(
+                    "java.instrument",
+                    "jdk.unsupported",
+                    "jdk.accessibility",
+                )
                 targetFormats(Msi, Deb)
                 if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
                     // filekit library requires this module in linux.
