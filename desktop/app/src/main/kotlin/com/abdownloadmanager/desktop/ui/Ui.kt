@@ -1,6 +1,7 @@
 package com.abdownloadmanager.desktop.ui
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.AppArguments
@@ -38,6 +39,7 @@ import com.abdownloadmanager.shared.ui.widget.useNotification
 import com.abdownloadmanager.shared.utils.LocalUseRelativeDateTime
 import com.abdownloadmanager.shared.utils.ProvideSizeAndSpeedUnit
 import com.abdownloadmanager.shared.utils.mvi.HandleEffects
+import com.abdownloadmanager.shared.utils.ui.MyColors
 import com.abdownloadmanager.shared.utils.ui.ProvideDebugInfo
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import ir.amirab.util.compose.action.buildMenu
@@ -83,59 +85,79 @@ object Ui : KoinComponent {
             )
         }
         application {
-            val theme by themeManager.currentThemeColor.collectAsState()
-            val fontFamily by fontManager.currentFontFamily.collectAsState()
-            ProvideDebugInfo(AppInfo.isInDebugMode()) {
-                ProvideLanguageManager(languageManager) {
-                    ProvideCommonSettings(appComponent) {
-                        ProvideNotificationManager {
-                            ABDownloaderTheme(
-                                myColors = theme,
-                                fontFamily = fontFamily,
-                                uiScale = appComponent.uiScale.collectAsState().value
-                            ) {
-                                ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
-                                    ProvideSizeUnits(appComponent) {
-                                        HandleEffectsForApp(appComponent)
-                                        SystemTray(appComponent)
-                                        val showHomeSlot =
-                                            appComponent.showHomeSlot.collectAsState().value
-                                        showHomeSlot.child?.instance?.let {
-                                            HomeWindow(it, appComponent::closeHome)
-                                        }
-                                        val showSettingSlot =
-                                            appComponent.showSettingSlot.collectAsState().value
-                                        showSettingSlot.child?.instance?.let {
-                                            SettingWindow(it, appComponent::closeSettings)
-                                        }
-                                        val showQueuesSlot =
-                                            appComponent.showQueuesSlot.collectAsState().value
-                                        showQueuesSlot.child?.instance?.let {
-                                            QueuesWindow(it)
-                                        }
-                                        val batchDownloadSlot =
-                                            appComponent.batchDownloadSlot.collectAsState().value
-                                        batchDownloadSlot.child?.instance?.let {
-                                            BatchDownloadWindow(it)
-                                        }
-                                        val editDownloadSlot =
-                                            appComponent.editDownloadSlot.collectAsState().value
-                                        editDownloadSlot.child?.instance?.let {
-                                            EditDownloadWindow(it)
-                                        }
-                                        ShowAddDownloadDialogs(appComponent)
-                                        ShowDownloadDialogs(appComponent)
-                                        ShowCategoryDialogs(appComponent)
-                                        FileChecksumWindow(appComponent)
-                                        ShowUpdaterDialog(appComponent.updater)
-                                        ShowAboutDialog(appComponent)
-                                        NewQueueDialog(appComponent)
-                                        ShowMessageDialogs(appComponent)
-                                        ShowOpenSourceLibraries(appComponent)
-                                        ShowTranslators(appComponent)
-                                        ConfirmExit(appComponent)
-                                    }
-                                }
+            ProvideLocalProviders(
+                languageManager = languageManager,
+                appComponent = appComponent,
+                themeManager = themeManager,
+                fontManager = fontManager,
+                globalAppExceptionHandler = globalAppExceptionHandler,
+            ) {
+                HandleEffectsForApp(appComponent)
+                SystemTray(appComponent)
+                val showHomeSlot =
+                    appComponent.showHomeSlot.collectAsState().value
+                showHomeSlot.child?.instance?.let {
+                    HomeWindow(it, appComponent::closeHome)
+                }
+                val showSettingSlot =
+                    appComponent.showSettingSlot.collectAsState().value
+                showSettingSlot.child?.instance?.let {
+                    SettingWindow(it, appComponent::closeSettings)
+                }
+                val showQueuesSlot =
+                    appComponent.showQueuesSlot.collectAsState().value
+                showQueuesSlot.child?.instance?.let {
+                    QueuesWindow(it)
+                }
+                val batchDownloadSlot =
+                    appComponent.batchDownloadSlot.collectAsState().value
+                batchDownloadSlot.child?.instance?.let {
+                    BatchDownloadWindow(it)
+                }
+                val editDownloadSlot =
+                    appComponent.editDownloadSlot.collectAsState().value
+                editDownloadSlot.child?.instance?.let {
+                    EditDownloadWindow(it)
+                }
+                ShowAddDownloadDialogs(appComponent)
+                ShowDownloadDialogs(appComponent)
+                ShowCategoryDialogs(appComponent)
+                FileChecksumWindow(appComponent)
+                ShowUpdaterDialog(appComponent.updater)
+                ShowAboutDialog(appComponent)
+                NewQueueDialog(appComponent)
+                ShowMessageDialogs(appComponent)
+                ShowOpenSourceLibraries(appComponent)
+                ShowTranslators(appComponent)
+                ConfirmExit(appComponent)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProvideLocalProviders(
+    languageManager: LanguageManager,
+    themeManager: ThemeManager,
+    fontManager: FontManager,
+    appComponent: AppComponent,
+    globalAppExceptionHandler: GlobalAppExceptionHandler,
+    content: @Composable () -> Unit
+) {
+    val theme by themeManager.currentThemeColor.collectAsState()
+    val fontFamily by fontManager.currentFontFamily.collectAsState()
+    ProvideDebugInfo(AppInfo.isInDebugMode()) {
+        ProvideLanguageManager(languageManager) {
+            ProvideCommonSettings(appComponent) {
+                ProvideNotificationManager {
+                    ABDownloaderTheme(
+                        myColors = theme,
+                        fontFamily = fontFamily,
+                        uiScale = appComponent.uiScale.collectAsState().value
+                    ) {
+                        ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
+                            ProvideSizeUnits(appComponent) {
+                                content()
                             }
                         }
                     }
