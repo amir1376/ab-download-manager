@@ -116,22 +116,29 @@ fun TimeLeftCell(
 fun DateAddedCell(
     itemState: IDownloadItemState,
 ) {
+    var dateAddedString by remember { mutableStateOf("") }
+    val useRelativeDateTime = LocalUseRelativeDateTime.current
 
-    val t by produceState(
-        key1 = itemState.dateAdded,
-        initialValue = "",
+    LaunchedEffect(
+        itemState.dateAdded,
+        useRelativeDateTime,
     ) {
-        while (isActive) {
-            val now = Clock.System.now()
-            val instant = Instant.fromEpochMilliseconds(itemState.dateAdded)
-            val period = now.periodUntil(instant, TimeZone.UTC)
-            val t = prettifyRelativeTime(period)
-            value = t
-            delay(1000)
+        val instant = Instant.fromEpochMilliseconds(itemState.dateAdded)
+        if (useRelativeDateTime) {
+            while (isActive) {
+                val now = Clock.System.now()
+                val period = now.periodUntil(instant, TimeZone.UTC)
+                val relativeTime = prettifyRelativeTime(period)
+                dateAddedString = relativeTime
+                delay(1000)
+            }
+        } else {
+            val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+            dateAddedString = dateTime.format(MyDateAndTimeFormats.fullDateTime)
         }
     }
     Text(
-        text = t,
+        text = dateAddedString,
         maxLines = 1,
         fontSize = myTextSizes.base,
         overflow = TextOverflow.Ellipsis,

@@ -7,6 +7,7 @@ import ir.amirab.util.compose.asStringSourceWithARgs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.DateTimePeriod
+import kotlinx.datetime.LocalDateTime
 import kotlin.math.absoluteValue
 
 fun formatTime(value: Long): String? {
@@ -279,3 +280,23 @@ interface TimeNames {
 }
 
 private val DefaultTimeNames = TimeNames.SimpleNames
+
+object MyDateAndTimeFormats {
+    val fullDateTime = LocalDateTime.Format {
+        year()
+        chars("/")
+        monthNumber()
+        chars("/")
+        dayOfMonth()
+        chars(" ")
+        hour()
+        chars(":")
+        minute()
+        chars(":")
+        second()
+    }
+}
+
+val LocalUseRelativeDateTime = staticCompositionLocalOf<Boolean> {
+    true
+}

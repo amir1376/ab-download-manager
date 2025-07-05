@@ -35,6 +35,7 @@ import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
 import com.abdownloadmanager.shared.ui.widget.ProvideLanguageManager
 import com.abdownloadmanager.shared.ui.widget.ProvideNotificationManager
 import com.abdownloadmanager.shared.ui.widget.useNotification
+import com.abdownloadmanager.shared.utils.LocalUseRelativeDateTime
 import com.abdownloadmanager.shared.utils.ProvideSizeAndSpeedUnit
 import com.abdownloadmanager.shared.utils.mvi.HandleEffects
 import com.abdownloadmanager.shared.utils.ui.ProvideDebugInfo
@@ -86,52 +87,54 @@ object Ui : KoinComponent {
             val fontFamily by fontManager.currentFontFamily.collectAsState()
             ProvideDebugInfo(AppInfo.isInDebugMode()) {
                 ProvideLanguageManager(languageManager) {
-                    ProvideNotificationManager {
-                        ABDownloaderTheme(
-                            myColors = theme,
-                            fontFamily = fontFamily,
-                            uiScale = appComponent.uiScale.collectAsState().value
-                        ) {
-                            ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
-                                ProvideSizeUnits(appComponent) {
-                                    HandleEffectsForApp(appComponent)
-                                    SystemTray(appComponent)
-                                    val showHomeSlot =
-                                        appComponent.showHomeSlot.collectAsState().value
-                                    showHomeSlot.child?.instance?.let {
-                                        HomeWindow(it, appComponent::closeHome)
+                    ProvideCommonSettings(appComponent) {
+                        ProvideNotificationManager {
+                            ABDownloaderTheme(
+                                myColors = theme,
+                                fontFamily = fontFamily,
+                                uiScale = appComponent.uiScale.collectAsState().value
+                            ) {
+                                ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
+                                    ProvideSizeUnits(appComponent) {
+                                        HandleEffectsForApp(appComponent)
+                                        SystemTray(appComponent)
+                                        val showHomeSlot =
+                                            appComponent.showHomeSlot.collectAsState().value
+                                        showHomeSlot.child?.instance?.let {
+                                            HomeWindow(it, appComponent::closeHome)
+                                        }
+                                        val showSettingSlot =
+                                            appComponent.showSettingSlot.collectAsState().value
+                                        showSettingSlot.child?.instance?.let {
+                                            SettingWindow(it, appComponent::closeSettings)
+                                        }
+                                        val showQueuesSlot =
+                                            appComponent.showQueuesSlot.collectAsState().value
+                                        showQueuesSlot.child?.instance?.let {
+                                            QueuesWindow(it)
+                                        }
+                                        val batchDownloadSlot =
+                                            appComponent.batchDownloadSlot.collectAsState().value
+                                        batchDownloadSlot.child?.instance?.let {
+                                            BatchDownloadWindow(it)
+                                        }
+                                        val editDownloadSlot =
+                                            appComponent.editDownloadSlot.collectAsState().value
+                                        editDownloadSlot.child?.instance?.let {
+                                            EditDownloadWindow(it)
+                                        }
+                                        ShowAddDownloadDialogs(appComponent)
+                                        ShowDownloadDialogs(appComponent)
+                                        ShowCategoryDialogs(appComponent)
+                                        FileChecksumWindow(appComponent)
+                                        ShowUpdaterDialog(appComponent.updater)
+                                        ShowAboutDialog(appComponent)
+                                        NewQueueDialog(appComponent)
+                                        ShowMessageDialogs(appComponent)
+                                        ShowOpenSourceLibraries(appComponent)
+                                        ShowTranslators(appComponent)
+                                        ConfirmExit(appComponent)
                                     }
-                                    val showSettingSlot =
-                                        appComponent.showSettingSlot.collectAsState().value
-                                    showSettingSlot.child?.instance?.let {
-                                        SettingWindow(it, appComponent::closeSettings)
-                                    }
-                                    val showQueuesSlot =
-                                        appComponent.showQueuesSlot.collectAsState().value
-                                    showQueuesSlot.child?.instance?.let {
-                                        QueuesWindow(it)
-                                    }
-                                    val batchDownloadSlot =
-                                        appComponent.batchDownloadSlot.collectAsState().value
-                                    batchDownloadSlot.child?.instance?.let {
-                                        BatchDownloadWindow(it)
-                                    }
-                                    val editDownloadSlot =
-                                        appComponent.editDownloadSlot.collectAsState().value
-                                    editDownloadSlot.child?.instance?.let {
-                                        EditDownloadWindow(it)
-                                    }
-                                    ShowAddDownloadDialogs(appComponent)
-                                    ShowDownloadDialogs(appComponent)
-                                    ShowCategoryDialogs(appComponent)
-                                    FileChecksumWindow(appComponent)
-                                    ShowUpdaterDialog(appComponent.updater)
-                                    ShowAboutDialog(appComponent)
-                                    NewQueueDialog(appComponent)
-                                    ShowMessageDialogs(appComponent)
-                                    ShowOpenSourceLibraries(appComponent)
-                                    ShowTranslators(appComponent)
-                                    ConfirmExit(appComponent)
                                 }
                             }
                         }
@@ -139,6 +142,19 @@ object Ui : KoinComponent {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ProvideCommonSettings(
+    appComponent: AppComponent,
+    content: @Composable () -> Unit,
+) {
+    val useNativeDateTime by appComponent.appSettings.useRelativeDateTime.collectAsState()
+    CompositionLocalProvider(
+        LocalUseRelativeDateTime provides useNativeDateTime
+    ) {
+        content()
     }
 }
 
