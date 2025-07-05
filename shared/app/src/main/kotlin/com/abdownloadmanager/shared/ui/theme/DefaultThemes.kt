@@ -52,30 +52,6 @@ object DefaultThemes {
         isLight = true
     )
 
-    val comfortLight = MyColors(
-        id = "comfort_light",
-        name = "Comfort Light",
-        primary = Color(0xFF4791BF),
-        primaryVariant = Color(0xFF60A6D9),
-        onPrimary = Color(0xFF20303A),
-        secondary = Color(0xFFB85DFF),
-        secondaryVariant = Color(0xFFD1A6FF),
-        onSecondary = Color(0xFF20303A),
-        background = Color(0xFFFAFAF7),
-        onBackground = Color(0xFF232323),
-        surface = Color(0xFFF3F3F0),
-        onSurface = Color(0xFF232323),
-        error = Color(0xFFEA4C3C),
-        onError = Color(0xFFFFFFFF),
-        success = Color(0xFF45B36B),
-        onSuccess = Color(0xFFFFFFFF),
-        warning = Color(0xFFF6C244),
-        onWarning = Color(0xFF232323),
-        info = Color(0xFF40A9F3),
-        onInfo = Color(0xFF232323),
-        isLight = true
-    )
-
     val obsidian = MyColors(
         id = "obsidian",
         name = "Obsidian",
@@ -122,13 +98,38 @@ object DefaultThemes {
         isLight = false
     )
 
+    val lightGray = MyColors(
+        id = "light_gray",
+        name = "Light Gray",
+        primary = Color(0xFF4791BF),
+        primaryVariant = Color(0xFF60A6D9),
+        onPrimary = Color(0xFF20303A),
+        secondary = Color(0xFFB85DFF),
+        secondaryVariant = Color(0xFFD1A6FF),
+        onSecondary = Color(0xFF20303A),
+        background = Color(0xFFF0F0F0),
+        onBackground = Color(0xFF232323),
+        surface = Color(0xFFE0E0E0),
+        onSurface = Color(0xFF232323),
+        error = Color(0xFFEA4C3C),
+        onError = Color(0xFFFFFFFF),
+        success = Color(0xFF45B36B),
+        onSuccess = Color(0xFFFFFFFF),
+        warning = Color(0xFFF6C244),
+        onWarning = Color(0xFF232323),
+        info = Color(0xFF40A9F3),
+        onInfo = Color(0xFF232323),
+        isLight = true
+    )
+
+
     fun getAll(): List<MyColors> {
         return listOf(
             dark,
             light,
             obsidian,
             deepOcean,
-            comfortLight,
+            lightGray,
         )
     }
 
