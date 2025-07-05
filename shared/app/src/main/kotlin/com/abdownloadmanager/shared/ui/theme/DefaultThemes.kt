@@ -13,18 +13,18 @@ object DefaultThemes {
         secondary = Color(0xFFB85DFF),
         secondaryVariant = Color(0xFFD1A6FF),
         onSecondary = Color(0xFFEFF2F6),
-        background = Color(0xFF1E1E1E),
-        onBackground = Color(0xFFE5E5E5),
-        surface = Color(0xFF2D2D30),
-        onSurface = Color(0xFFE5E5E5),
+        background = Color(0xFF1E1F22),
+        onBackground = Color(0xFFD6D6D6),
+        surface = Color(0xFF2A2B2F),
+        onSurface = Color(0xFFE0E0E0),
         error = Color(0xFFEA4C3C),
-        onError = Color(0xFFE5E5E5),
+        onError = Color(0xFFEFEFEF),
         success = Color(0xFF45B36B),
         onSuccess = Color(0xFFE5E5E5),
         warning = Color(0xFFF6C244),
-        onWarning = Color(0xFF232323),
+        onWarning = Color(0xFF1E1E1E),
         info = Color(0xFF40A9F3),
-        onInfo = Color(0xFF232323),
+        onInfo = Color(0xFF1E1E1E),
         isLight = false
     )
 
@@ -98,30 +98,6 @@ object DefaultThemes {
         isLight = false,
     )
 
-    val modernDark = MyColors(
-        id = "modern_dark",
-        name = "Modern Dark",
-        primary = Color(0xFF4791BF),
-        primaryVariant = Color(0xFF60A6D9),
-        onPrimary = Color(0xFFEFF2F6),
-        secondary = Color(0xFFB85DFF),
-        secondaryVariant = Color(0xFFD1A6FF),
-        onSecondary = Color(0xFFEFF2F6),
-        background = Color(0xFF181A20),
-        onBackground = Color(0xFFEAEAEA),
-        surface = Color(0xFF23272F),
-        onSurface = Color(0xFFEAEAEA),
-        error = Color(0xFFEA4C3C),
-        onError = Color(0xFFEAEAEA),
-        success = Color(0xFF45B36B),
-        onSuccess = Color(0xFFEAEAEA),
-        warning = Color(0xFFF6C244),
-        onWarning = Color(0xFF181A20),
-        info = Color(0xFF40A9F3),
-        onInfo = Color(0xFF181A20),
-        isLight = false
-    )
-
     val deepOcean = MyColors(
         id = "deep_ocean",
         name = "Deep Ocean",
@@ -151,7 +127,6 @@ object DefaultThemes {
             dark,
             light,
             obsidian,
-            modernDark,
             deepOcean,
             comfortLight,
         )
