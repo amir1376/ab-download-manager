@@ -97,7 +97,7 @@ class AppComponent(
     ContainsEffects<AppEffects> by supportEffects(),
     KoinComponent {
     val appRepository: AppRepository by inject()
-    private val appSettings: AppSettingsStorage by inject()
+    val appSettings: AppSettingsStorage by inject()
     private val integration: Integration by inject()
     val useSystemTray = appSettings.useSystemTray
 

@@ -571,6 +571,21 @@ fun showIconLabels(appSettings: AppSettingsStorage): BooleanConfigurable {
     )
 }
 
+fun useRelativeDateTime(appSettings: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_use_relative_date_time.asStringSource(),
+        description = Res.string.settings_use_relative_date_time.asStringSource(),
+        backedBy = appSettings.useRelativeDateTime,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
 fun useSystemTray(appSettings: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_use_system_tray.asStringSource(),
@@ -682,6 +697,7 @@ class SettingsComponent(
                     mergeTopBarWithTitleBarConfig(appSettings),
                     useNativeMenuBarConfig(appSettings),
                     showIconLabels(appSettings),
+                    useRelativeDateTime(appSettings),
                     speedUnit(appRepository, scope),
                     playSoundNotification(appSettings),
                     useSystemTray(appSettings),

@@ -22,6 +22,7 @@ data class AppSettingsModel(
     val mergeTopBarWithTitleBar: Boolean = false,
     val useNativeMenuBar: Boolean = false,
     val showIconLabels: Boolean = true,
+    val useRelativeDateTime: Boolean = true,
     val useSystemTray: Boolean = true,
     val threadCount: Int = 8,
     val maxDownloadRetryCount: Int = 0,
@@ -61,6 +62,7 @@ data class AppSettingsModel(
             val mergeTopBarWithTitleBar = booleanKeyOf("mergeTopBarWithTitleBar")
             val useNativeMenuBar = booleanKeyOf("useNativeMenuBar")
             val showIconLabels = booleanKeyOf("showIconLabels")
+            val useRelativeDateTime = booleanKeyOf("useRelativeDateTime")
             val useSystemTray = booleanKeyOf("useSystemTray")
             val threadCount = intKeyOf("threadCount")
             val maxDownloadRetryCount = intKeyOf("maxDownloadRetryCount")
@@ -97,6 +99,7 @@ data class AppSettingsModel(
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
                 useNativeMenuBar = source.get(Keys.useNativeMenuBar) ?: default.useNativeMenuBar,
                 showIconLabels = source.get(Keys.showIconLabels) ?: default.showIconLabels,
+                useRelativeDateTime = source.get(Keys.useRelativeDateTime) ?: default.useRelativeDateTime,
                 useSystemTray = source.get(Keys.useSystemTray) ?: default.useSystemTray,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
                 maxDownloadRetryCount = source.get(Keys.maxDownloadRetryCount) ?: default.maxDownloadRetryCount,
@@ -137,6 +140,7 @@ data class AppSettingsModel(
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
                 put(Keys.useNativeMenuBar, focus.useNativeMenuBar)
                 put(Keys.showIconLabels, focus.showIconLabels)
+                put(Keys.useRelativeDateTime, focus.useRelativeDateTime)
                 put(Keys.useSystemTray, focus.useSystemTray)
                 put(Keys.threadCount, focus.threadCount)
                 put(Keys.maxDownloadRetryCount, focus.maxDownloadRetryCount)
@@ -206,6 +210,7 @@ class AppSettingsStorage(
     val mergeTopBarWithTitleBar = from(AppSettingsModel.mergeTopBarWithTitleBar)
     val useNativeMenuBar = from(AppSettingsModel.useNativeMenuBar)
     val showIconLabels = from(AppSettingsModel.showIconLabels)
+    val useRelativeDateTime = from(AppSettingsModel.useRelativeDateTime)
     val useSystemTray = from(AppSettingsModel.useSystemTray)
     val threadCount = from(AppSettingsModel.threadCount)
     val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
