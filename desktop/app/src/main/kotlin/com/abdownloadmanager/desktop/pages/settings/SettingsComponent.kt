@@ -574,7 +574,7 @@ fun showIconLabels(appSettings: AppSettingsStorage): BooleanConfigurable {
 fun useRelativeDateTime(appSettings: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_use_relative_date_time.asStringSource(),
-        description = Res.string.settings_use_relative_date_time.asStringSource(),
+        description = Res.string.settings_use_relative_date_time_description.asStringSource(),
         backedBy = appSettings.useRelativeDateTime,
         describe = {
             if (it) {
