@@ -692,7 +692,6 @@ class SettingsComponent(
                     languageConfig(languageManager, scope),
                     fontConfig(fontManager, scope),
                     uiScaleConfig(appSettings),
-                    uiScaleConfig(appSettings),
                     autoStartConfig(appSettings),
                     mergeTopBarWithTitleBarConfig(appSettings),
                     useNativeMenuBarConfig(appSettings),
