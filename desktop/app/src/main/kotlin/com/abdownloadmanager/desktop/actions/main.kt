@@ -158,7 +158,7 @@ val gotoSettingsAction = simpleAction(
 }
 val showDownloadList = simpleAction(
     Res.string.show_downloads.asStringSource(),
-    MyIcons.settings,
+    MyIcons.download,
 ) {
     PlatformAppActivator.active()
     appComponent.openHome()
