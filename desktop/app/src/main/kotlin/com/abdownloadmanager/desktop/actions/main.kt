@@ -119,9 +119,10 @@ val stopAllAction = simpleAction(
     }
 ) {
     scope.launch {
+        val activeDownloadIds = downloadSystem.downloadMonitor.activeDownloadListFlow.value.map { it.id }
+        appComponent.closeDownloadDialog(*activeDownloadIds.toLongArray())
         downloadSystem.stopAnything()
     }
-}.apply {
 }
 
 // ui exit

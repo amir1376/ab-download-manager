@@ -730,11 +730,11 @@ class AppComponent(
         }
     }
 
-    override fun closeDownloadDialog(id: Long) {
+    override fun closeDownloadDialog(vararg ids: Long) {
         scope.launch {
             downloadDialogControl.navigate {
                 val newItems = it.items.filter { config ->
-                    config.id != id
+                    config.id !in ids
                 }
                 it.copy(items = newItems, selectedIndex = newItems.lastIndex)
             }
@@ -971,7 +971,7 @@ class AppComponent(
 interface DownloadDialogManager {
     val openedDownloadDialogs: StateFlow<List<SingleDownloadComponent>>
     fun openDownloadDialog(id: Long)
-    fun closeDownloadDialog(id: Long)
+    fun closeDownloadDialog(vararg ids: Long)
 }
 
 interface EditDownloadDialogManager {
@@ -999,8 +999,9 @@ interface QueuePageManager {
     fun openQueues(
         openQueueId: Long? = null
     )
+
     fun closeQueues()
-    
+
     fun openNewQueueDialog()
     fun closeNewQueueDialog()
 }
