@@ -1,4 +1,5 @@
 package com.abdownloadmanager.github
+
 import ir.amirab.util.await
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -19,7 +20,7 @@ data class Release(
     @SerialName("tag_name")
     val version: String,
     @SerialName("body")
-    val body: String?=null,
+    val body: String? = null,
     @SerialName("assets")
     val assets: List<Asset>,
 )
@@ -32,18 +33,21 @@ class GithubApi(
     val json = Json {
         ignoreUnknownKeys = true
     }
+
     suspend fun getLatestReleases(): Release {
         val response = client.newCall(
             Request.Builder()
                 .url("https://api.github.com/repos/${owner}/${repo}/releases/latest")
                 .build()
         ).await()
-        if (!response.isSuccessful) {
-            error(response.message)
+        response.use {
+            if (!response.isSuccessful) {
+                error(response.message)
+            }
+            val release = json.decodeFromString<Release>(
+                response.body!!.string()
+            )
+            return release
         }
-        val release = json.decodeFromString<Release>(
-            response.body!!.string()
-        )
-        return release
     }
 }
