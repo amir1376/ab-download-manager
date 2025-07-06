@@ -13,7 +13,7 @@ object DesktopEntryCreator {
             LinuxDesktopEntryCreator.createDesktopEntry(
                 name = AppInfo.displayName,
                 comment = "Manage and organize your download files better than before",
-                desktopEntryFilename = "abdownloadmanager",
+                desktopEntryFilename = AppInfo.packageName,
                 execFile = requireNotNull(AppInfo.exeFile) {
                     "Exe file not known"
                 },

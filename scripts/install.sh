@@ -154,7 +154,7 @@ delete_old_version() {
 
 # --- Generate a .desktop file for the app
 generate_desktop_file() {
-    cat <<EOF > "$HOME/.local/share/applications/abdownloadmanager.desktop"
+    cat <<EOF > "$HOME/.local/share/applications/com.abdownloadmanager.desktop"
 [Desktop Entry]
 Name=AB Download Manager
 Comment=Manage and organize your download files better than before

@@ -14,6 +14,7 @@ object Startup {
         name: String,
         path: String?,
         args: List<String>,
+        packageName: String,
     ): AbstractStartupManager {
         if (path==null){
             //there is no installation path provided so we use no-op
@@ -25,7 +26,7 @@ object Startup {
                 if (Utils.isHeadless) {
                     HeadlessStartup(name, path, args)
                 } else {
-                    UnixXDGStartup(name, path, args)
+                    UnixXDGStartup(name, path, args, packageName)
                 }
             }
 
