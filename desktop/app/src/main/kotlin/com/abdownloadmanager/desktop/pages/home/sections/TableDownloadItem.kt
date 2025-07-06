@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.abdownloadmanager.desktop.pages.home.sections
 
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
@@ -32,6 +34,9 @@ import ir.amirab.util.compose.resources.MyStringResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.*
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 val LocalDownloadItemProperties =
     compositionLocalOf<DownloadItemProperties> { error("not provided download properties") }
