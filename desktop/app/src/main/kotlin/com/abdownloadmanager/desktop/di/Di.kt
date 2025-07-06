@@ -258,6 +258,7 @@ val startUpModule = module {
             name = AppInfo.displayName,
             path = AppInfo.exeFile,
             args = listOf(AppArguments.Args.BACKGROUND),
+            packageName = AppInfo.packageName,
         )
     }
 }

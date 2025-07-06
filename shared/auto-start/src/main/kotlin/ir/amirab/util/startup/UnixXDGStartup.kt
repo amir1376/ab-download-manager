@@ -6,6 +6,7 @@ class UnixXDGStartup(
     name: String,
     path: String,
     args: List<String>,
+    val desktopEntryFileName: String,
 ) : AbstractStartupManager(
     name = name,
     path = path,
@@ -27,7 +28,7 @@ class UnixXDGStartup(
         if (!autostartDir.exists()) {
             autostartDir.mkdirs()
         }
-        return File(autostartDir, this.name + ".desktop")
+        return File(autostartDir, "$desktopEntryFileName.desktop")
     }
 
     @Throws(Exception::class)
