@@ -64,7 +64,11 @@ scoop install extras/abdownloadmanager
 You can download the browser extension to integrate the app with your browser.
 
 <p align="left">
-<a href="https://addons.mozilla.org/firefox/addon/ab-download-manager/"><img alt="Firefox Addon" src="./assets/banners/firefox-extension.png" height="48"></a>
+<a href="https://addons.mozilla.org/firefox/addon/ab-download-manager/">
+    <picture>
+        <img alt="Chrome Extension" src="./assets/banners/firefox-extension.png" height="48">
+    </picture>
+</a>
 <a href="https://chromewebstore.google.com/detail/bbobopahenonfdgjgaleledndnnfhooj">
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png" height="48">
