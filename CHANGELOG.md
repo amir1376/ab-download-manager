@@ -14,6 +14,25 @@
 
 ### Security
 
+## 1.6.6
+
+### Added
+
+- Option to create desktop entry on Linux (#698)
+
+### Changed
+
+- Renamed Linux desktop and autostart files for better compatibility (#699)
+
+### Fixed
+
+- Removed duplicate UI Scale option in the Settings (#697)
+
+### Improved
+
+- Updated translations
+- Pressing "Stop All" now closes all active download windows (#700)
+
 ## 1.6.5
 
 ### Added
