@@ -53,6 +53,7 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isLinux
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -767,6 +768,9 @@ class HomeComponent(
                 separator()
             }
             +browserIntegrations
+            if (Platform.isLinux()) {
+                +createDesktopEntryAction
+            }
             separator()
             +gotoSettingsAction
         }
