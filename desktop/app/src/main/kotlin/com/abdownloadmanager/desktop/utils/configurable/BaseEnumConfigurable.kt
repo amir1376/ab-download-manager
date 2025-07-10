@@ -10,6 +10,7 @@ abstract class BaseEnumConfigurable<T>(
     backedBy: MutableStateFlow<T>,
     describe: ((T) -> StringSource),
     val possibleValues: List<T>,
+    val valueToString: (T) -> List<String>,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : Configurable<T>(

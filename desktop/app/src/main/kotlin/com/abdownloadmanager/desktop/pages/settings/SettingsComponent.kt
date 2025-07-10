@@ -509,6 +509,17 @@ fun languageConfig(
             },
             scope = scope,
         ),
+        valueToString = {
+            if (it == null) {
+                emptyList()
+            } else {
+                listOfNotNull(
+                    it.nativeName,
+                    it.locale.languageCode,
+                    it.locale.countryCode,
+                )
+            }
+        },
         possibleValues = listOf(null).plus(allLanguages),
         describe = {
             val isAuto = it == null

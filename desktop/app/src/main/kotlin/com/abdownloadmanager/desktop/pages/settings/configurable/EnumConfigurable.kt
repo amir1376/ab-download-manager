@@ -16,6 +16,7 @@ open class EnumConfigurable<T>(
     backedBy: MutableStateFlow<T>,
     describe: ((T) -> StringSource),
     possibleValues: List<T>,
+    valueToString: (T) -> List<String> = ::defaultValueToString,
     val renderMode: RenderMode = RenderMode.Spinner,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
@@ -25,6 +26,7 @@ open class EnumConfigurable<T>(
     backedBy = backedBy,
     describe = describe,
     possibleValues = possibleValues,
+    valueToString = valueToString,
     enabled = enabled,
     visible = visible,
 ) {
@@ -59,6 +61,7 @@ private fun <T> RenderEnumConfig(cfg: EnumConfigurable<T>, modifier: Modifier) {
                     onSelect = {
                         setValue(it)
                     },
+                    valueToString = cfg.valueToString,
                     modifier = Modifier.widthIn(min = 160.dp),
                     enabled = enabled,
                     render = {
