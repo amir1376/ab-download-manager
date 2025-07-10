@@ -23,6 +23,9 @@ class FontConfigurable(
     backedBy: MutableStateFlow<FontInfo>,
     describe: (FontInfo) -> StringSource,
     possibleValues: List<FontInfo>,
+    valueToString: (FontInfo) -> List<String> = {
+        listOf(it.name.getString())
+    },
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : BaseEnumConfigurable<FontInfo>(
@@ -31,6 +34,7 @@ class FontConfigurable(
     backedBy = backedBy,
     describe = describe,
     possibleValues = possibleValues,
+    valueToString = valueToString,
     enabled = enabled,
     visible = visible,
 ) {
@@ -56,6 +60,7 @@ private fun RenderFontConfig(cfg: FontConfigurable, modifier: Modifier) {
                 possibleValues = cfg.possibleValues, value = value, onSelect = {
                     setValue(it)
                 },
+                valueToString = cfg.valueToString,
                 modifier = Modifier.widthIn(min = 160.dp),
                 enabled = enabled,
                 render = {

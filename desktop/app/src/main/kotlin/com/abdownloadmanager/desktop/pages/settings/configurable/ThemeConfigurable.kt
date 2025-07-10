@@ -29,6 +29,9 @@ class ThemeConfigurable(
     backedBy: MutableStateFlow<ThemeInfo>,
     describe: (ThemeInfo) -> StringSource,
     possibleValues: List<ThemeInfo>,
+    valueToString: (ThemeInfo) -> List<String> = {
+        listOf(it.name.getString())
+    },
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : BaseEnumConfigurable<ThemeInfo>(
@@ -37,6 +40,7 @@ class ThemeConfigurable(
     backedBy = backedBy,
     describe = describe,
     possibleValues = possibleValues,
+    valueToString = valueToString,
     enabled = enabled,
     visible = visible,
 ) {
@@ -64,6 +68,7 @@ private fun RenderThemeConfig(cfg: ThemeConfigurable, modifier: Modifier) {
                 },
                 modifier = Modifier.widthIn(min = 160.dp),
                 enabled = enabled,
+                valueToString = cfg.valueToString,
                 render = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

@@ -15,24 +15,70 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.isTypedEvent
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberComponentRectPositionProvider
 import com.abdownloadmanager.desktop.utils.configurable.ConfigGroupInfo
 import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.shared.utils.div
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
+fun <T> defaultValueToString(item: T): List<String> {
+    return emptyList()
+}
+
+private const val SEARCH_RESET_TIMEOUT = 2_000L
+private fun Modifier.onSearch(
+    searchDelayTimeout: Long = SEARCH_RESET_TIMEOUT,
+    onSearchRequested: (String) -> Unit
+): Modifier {
+    return composed {
+        var textToSearch by remember {
+            mutableStateOf("")
+        }
+        LaunchedEffect(textToSearch) {
+            if (textToSearch.isNotEmpty()) {
+                onSearchRequested(textToSearch)
+                delay(searchDelayTimeout)
+                textToSearch = ""
+            }
+        }
+        onKeyEvent {
+            if (it.isTypedEvent) {
+                val char = it.utf16CodePoint.toChar()
+                if (char.isLetterOrDigit()) {
+                    textToSearch += char
+                    true
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        }
+    }
+}
 
 @Composable
 fun <T> RenderSpinner(
@@ -41,6 +87,7 @@ fun <T> RenderSpinner(
     onSelect: (T) -> Unit,
     modifier: Modifier,
     enabled: Boolean = true,
+    valueToString: (T) -> List<String> = ::defaultValueToString,
 //    minWidth:Dp,
     render: @Composable (T) -> Unit,
 ) {
@@ -95,7 +142,27 @@ fun <T> RenderSpinner(
             Popup(
                 popupPositionProvider = rememberComponentRectPositionProvider(),
                 onDismissRequest = { isOpen = false },
+                properties = PopupProperties(
+                    focusable = true
+                )
             ) {
+                val coroutineScope = rememberCoroutineScope()
+                val focusRequester = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+                val possibleValuePositions = remember(possibleValues) {
+                    mutableStateMapOf<Int, Float>()
+                }
+                var itemToBeIndicated: Int by remember {
+                    mutableStateOf(-1)
+                }
+                LaunchedEffect(itemToBeIndicated) {
+                    if (itemToBeIndicated != -1) {
+                        delay(SEARCH_RESET_TIMEOUT)
+                        itemToBeIndicated = -1
+                    }
+                }
                 Box {
                     val scrollState = rememberScrollState()
                     Column(
@@ -103,16 +170,48 @@ fun <T> RenderSpinner(
                             .width(IntrinsicSize.Max)
                             .widthIn(widthForPopup)
                             .heightIn(max = 360.dp)
+                            .onSearch { searchText ->
+                                val itemIndex = possibleValues
+                                    .indexOfFirst { value ->
+                                        valueToString(value).any { string ->
+                                            string.startsWith(
+                                                searchText,
+                                                ignoreCase = true,
+                                            )
+                                        }
+                                    }
+                                if (itemIndex == -1) {
+                                    return@onSearch
+                                }
+                                val position = possibleValuePositions[itemIndex]?.roundToInt()
+                                coroutineScope.launch {
+                                    position?.let {
+                                        scrollState.scrollTo(it)
+                                        itemToBeIndicated = itemIndex
+                                    }
+                                }
+                            }
+                            .focusRequester(focusRequester)
+                            .focusable()
                             .background(myColors.surface)
                             .border(borderWidth, borderColor, shape)
                             .padding(borderWidth)
                             .verticalScroll(scrollState)
                     ) {
                         WithContentColor(myColors.onSurface) {
-                            for (p in possibleValues) {
+                            for ((index, p) in possibleValues.withIndex()) {
                                 key(p) {
+                                    val isIndicating = itemToBeIndicated == index
                                     Row(
                                         modifier = Modifier
+                                            .onGloballyPositioned {
+                                                possibleValuePositions[index] = it.positionInParent().y
+                                            }
+                                            .ifThen(isIndicating) {
+                                                background(
+                                                    myColors.onBackground / 0.05f
+                                                )
+                                            }
                                             .clickable(onClick = {
                                                 isOpen = false
                                                 onSelect(p)
