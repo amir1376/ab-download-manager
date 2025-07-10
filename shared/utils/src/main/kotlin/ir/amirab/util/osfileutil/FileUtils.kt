@@ -1,6 +1,7 @@
 package ir.amirab.util.osfileutil
 
 import ir.amirab.util.platform.Platform
+import okio.Path
 import java.io.File
 
 interface FileUtils {
@@ -8,7 +9,8 @@ interface FileUtils {
     fun openFolderOfFile(file: File): Boolean
     fun openFolder(folder: File): Boolean
     fun canWriteInThisFolder(folder: String): Boolean
-
+    fun isRemovableStorage(path: String): Boolean
+    
     companion object : FileUtils by getPlatformFileUtil()
 }
 

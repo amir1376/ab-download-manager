@@ -2,6 +2,9 @@ package ir.amirab.util.osfileutil
 
 import java.io.File
 import java.io.FileNotFoundException
+import kotlin.io.path.Path
+import kotlin.io.path.absolute
+import kotlin.io.path.fileStore
 
 abstract class FileUtilsBase : FileUtils {
     override fun openFile(file: File): Boolean {
@@ -46,6 +49,21 @@ abstract class FileUtilsBase : FileUtils {
             throw FileNotFoundException("$file not found")
         }
         return file
+    }
+
+    override fun isRemovableStorage(path: String): Boolean {
+        runCatching {
+            val store = Path(path).absolute().fileStore()
+            if (store.supportsFileAttributeView("basic")) {
+                val isRemovable = store.getAttribute("volume:isRemovable")
+                if (isRemovable is Boolean) {
+                    return isRemovable
+                }
+            }
+        }.onFailure {
+            it.printStackTrace()
+        }
+        return false
     }
 
     protected abstract fun openFileInternal(file: File): Boolean

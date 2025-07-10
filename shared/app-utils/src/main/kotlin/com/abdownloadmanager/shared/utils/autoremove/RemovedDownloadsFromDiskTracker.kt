@@ -7,6 +7,10 @@ import ir.amirab.downloader.downloaditem.contexts.CanPerformRemove
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.monitor.*
 import ir.amirab.util.flow.withPrevious
+import ir.amirab.util.ifThen
+import ir.amirab.util.osfileutil.FileUtils
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.File
@@ -34,6 +38,12 @@ class RemovedDownloadsFromDiskTracker(
 
     fun start() {
         stopped = false
+
+        // it seems that if we watch a folder in a removable storage
+        // then it can't be ejected! so we have to ignore it
+        // we know that it happens in Windows!
+        val shouldFilterRemovableStorages = Platform.isWindows()
+
         activeJob = scope.launch {
             val watcher = createWatcher(this)
             watcher
@@ -44,6 +54,7 @@ class RemovedDownloadsFromDiskTracker(
                     onPathRemoved(fullPath)
                 }
                 .launchIn(this)
+
             downloadMonitor.downloadListFlow
                 .map { it.map { it.folder }.distinct() }
                 .distinctUntilChanged()
@@ -53,12 +64,21 @@ class RemovedDownloadsFromDiskTracker(
                         .groupBy { it.second }
                     groups[Change.Removed]
                         ?.takeIf { it.isNotEmpty() }
-                        ?.map { it.first }?.toTypedArray()?.let {
+                        ?.map { it.first }
+                        ?.toTypedArray()
+                        ?.let {
                             watcher.remove(*it)
                         }
                     groups[Change.Added]
                         ?.takeIf { it.isNotEmpty() }
-                        ?.map { it.first }?.toTypedArray()?.let {
+                        ?.map { it.first }
+                        ?.ifThen(shouldFilterRemovableStorages) {
+                            filter {
+                                !FileUtils.isRemovableStorage(it)
+                            }
+                        }
+                        ?.toTypedArray()
+                        ?.let {
                             watcher.add(*it)
                         }
                 }
