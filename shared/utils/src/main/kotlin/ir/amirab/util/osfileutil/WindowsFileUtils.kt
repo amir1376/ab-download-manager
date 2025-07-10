@@ -7,6 +7,8 @@ import com.sun.jna.win32.StdCallLibrary
 import com.sun.jna.win32.W32APIOptions
 import ir.amirab.util.execAndWait
 import java.io.File
+import kotlin.io.path.Path
+import kotlin.io.path.absolute
 
 internal class WindowsFileUtils : FileUtilsBase() {
     override fun openFileInternal(file: File): Boolean {
@@ -29,6 +31,21 @@ internal class WindowsFileUtils : FileUtilsBase() {
         }
         //fallback to use explorer
         return execAndWait(arrayOf("cmd", "/c", "explorer.exe", folder.path.quoted()))
+    }
+
+    override fun isRemovableStorage(path: String): Boolean {
+        return try {
+            isRemovableStorageViaNative(path)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            super.isRemovableStorage(path)
+        }
+    }
+
+    private fun isRemovableStorageViaNative(path: String): Boolean {
+        val rootPath = Path(path).absolute().root.toString()
+        val driveType = Kernel32.INSTANCE.GetDriveType(rootPath)
+        return driveType == WinBase.DRIVE_REMOVABLE
     }
 
     private fun showFileInFolderViaNative(
