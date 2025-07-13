@@ -2,10 +2,11 @@ package ir.amirab.util.desktop.activator.mac
 
 import com.sun.jna.Native
 import ir.amirab.util.desktop.PlatformAppActivator
+import ir.amirab.util.desktop.utils.mac.FoundationLibrary
 
 object MacAppActivator : PlatformAppActivator {
     private val foundation by lazy {
-        runCatching { Native.load("objc", Foundation::class.java) }.getOrNull()
+        runCatching { Native.load("objc", FoundationLibrary::class.java) }.getOrNull()
     }
 
     override fun active() {

@@ -22,7 +22,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.system.exitProcess
 
-
 class App : AutoCloseable,
     KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
