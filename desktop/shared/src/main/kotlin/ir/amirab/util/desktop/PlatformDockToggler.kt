@@ -11,7 +11,7 @@ interface PlatformDockToggler {
 }
 
 
-object EmptyDockDockToggler : PlatformDockToggler {
+class EmptyDockDockToggler : PlatformDockToggler {
     override fun show() {
         // no-op
     }
@@ -23,5 +23,5 @@ object EmptyDockDockToggler : PlatformDockToggler {
 
 private fun getForCurrentOs() = when (Platform.getCurrentPlatform()) {
     Platform.Desktop.MacOS -> MacDockToggler()
-    else -> EmptyDockDockToggler
+    else -> EmptyDockDockToggler()
 }
