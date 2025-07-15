@@ -13,15 +13,15 @@ interface PlatformDockToggler {
 
 object EmptyDockDockToggler : PlatformDockToggler {
     override fun show() {
-        // Nothing
+        // no-op
     }
 
     override fun hide() {
-        // Nothing
+        // no-op
     }
 }
 
 private fun getForCurrentOs() = when (Platform.getCurrentPlatform()) {
-    Platform.Desktop.MacOS -> MacDockToggler
+    Platform.Desktop.MacOS -> MacDockToggler()
     else -> EmptyDockDockToggler
 }

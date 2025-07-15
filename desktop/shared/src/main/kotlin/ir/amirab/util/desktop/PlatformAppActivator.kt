@@ -11,11 +11,11 @@ interface PlatformAppActivator {
 
 object EmptyAppActivator : PlatformAppActivator {
     override fun active() {
-        // Nothing
+        // no-op
     }
 }
 
 private fun getPlatformAppActivatorForCurrentOs() = when (Platform.getCurrentPlatform()) {
-    Platform.Desktop.MacOS -> MacAppActivator
+    Platform.Desktop.MacOS -> MacAppActivator()
     else -> EmptyAppActivator
 }
