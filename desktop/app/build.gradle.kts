@@ -157,6 +157,12 @@ compose {
                     pkgPackageVersion = getAppVersionStringForPackaging(Pkg)
                     dmgPackageVersion = getAppVersionStringForPackaging(Dmg)
                     iconFile = project.file("icons/icon.icns")
+                    infoPlist {
+                        extraKeysRawXml = """
+                            <key>LSUIElement</key>
+                            <string>true</string>
+                        """.trimIndent()
+                    }
                     jvmArgs("-Dapple.awt.enableTemplateImages=true")
                 }
                 windows {

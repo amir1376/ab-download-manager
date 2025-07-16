@@ -1,7 +1,12 @@
 package com.abdownloadmanager.desktop.ui
 
-import androidx.compose.runtime.*
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.AppArguments
@@ -39,12 +44,12 @@ import com.abdownloadmanager.shared.ui.widget.useNotification
 import com.abdownloadmanager.shared.utils.LocalUseRelativeDateTime
 import com.abdownloadmanager.shared.utils.ProvideSizeAndSpeedUnit
 import com.abdownloadmanager.shared.utils.mvi.HandleEffects
-import com.abdownloadmanager.shared.utils.ui.MyColors
 import com.abdownloadmanager.shared.utils.ui.ProvideDebugInfo
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
+import ir.amirab.util.desktop.PlatformDockToggler
 import ir.amirab.util.desktop.mac.event.MacEventHandler
 import ir.amirab.util.desktop.systemtray.IComposeSystemTray
 import ir.amirab.util.platform.Platform
@@ -215,6 +220,7 @@ private fun ApplicationScope.SystemTray(
 ) {
     val useSystemTray by component.useSystemTray.collectAsState()
     if (useSystemTray) {
+        LaunchedEffect(Unit) { PlatformDockToggler.hide() }
         IComposeSystemTray.Instance.ComposeSystemTray(
             icon = MyIcons.appIcon,
             onClick = showDownloadList,
@@ -227,5 +233,7 @@ private fun ApplicationScope.SystemTray(
                 }
             }
         )
+    } else {
+        LaunchedEffect(Unit) { PlatformDockToggler.show() }
     }
 }

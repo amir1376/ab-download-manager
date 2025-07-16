@@ -1,15 +1,11 @@
 package ir.amirab.util.desktop.activator.mac
 
-import com.sun.jna.Native
 import ir.amirab.util.desktop.PlatformAppActivator
+import ir.amirab.util.desktop.utils.mac.FoundationLibrary
 
-object MacAppActivator : PlatformAppActivator {
-    private val foundation by lazy {
-        runCatching { Native.load("objc", Foundation::class.java) }.getOrNull()
-    }
-
+class MacAppActivator : PlatformAppActivator {
     override fun active() {
-        val requiredFoundation = foundation ?: return
+        val requiredFoundation = FoundationLibrary.INSTANCE ?: return
         runCatching {
             val nsAppClass = requiredFoundation.objc_getClass("NSApplication")
             val sharedAppSel = requiredFoundation.sel_registerName("sharedApplication")

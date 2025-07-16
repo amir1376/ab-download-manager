@@ -9,13 +9,13 @@ interface PlatformAppActivator {
     companion object : PlatformAppActivator by getPlatformAppActivatorForCurrentOs()
 }
 
-object EmptyAppActivator : PlatformAppActivator {
+class EmptyAppActivator : PlatformAppActivator {
     override fun active() {
-        // Nothing
+        // no-op
     }
 }
 
 private fun getPlatformAppActivatorForCurrentOs() = when (Platform.getCurrentPlatform()) {
-    Platform.Desktop.MacOS -> MacAppActivator
-    else -> EmptyAppActivator
+    Platform.Desktop.MacOS -> MacAppActivator()
+    else -> EmptyAppActivator()
 }
