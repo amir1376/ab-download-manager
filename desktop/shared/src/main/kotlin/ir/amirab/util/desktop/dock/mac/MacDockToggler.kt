@@ -5,7 +5,7 @@ import ir.amirab.util.desktop.utils.mac.FoundationLibrary
 
 class MacDockToggler : PlatformDockToggler {
 
-    private val foundation = FoundationLibrary.INSTANT
+    private val foundation = FoundationLibrary.INSTANCE
 
     private val isAvailable = foundation != null
 

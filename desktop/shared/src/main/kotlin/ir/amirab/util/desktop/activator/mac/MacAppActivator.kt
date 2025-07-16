@@ -5,7 +5,7 @@ import ir.amirab.util.desktop.utils.mac.FoundationLibrary
 
 class MacAppActivator : PlatformAppActivator {
     override fun active() {
-        val requiredFoundation = FoundationLibrary.INSTANT ?: return
+        val requiredFoundation = FoundationLibrary.INSTANCE ?: return
         runCatching {
             val nsAppClass = requiredFoundation.objc_getClass("NSApplication")
             val sharedAppSel = requiredFoundation.sel_registerName("sharedApplication")

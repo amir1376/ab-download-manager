@@ -17,7 +17,7 @@ internal interface FoundationLibrary : Library {
 
 
     companion object {
-        val INSTANT by lazy {
+        val INSTANCE by lazy {
             runCatching { Native.load("objc", FoundationLibrary::class.java) }.getOrNull()
         }
     }
