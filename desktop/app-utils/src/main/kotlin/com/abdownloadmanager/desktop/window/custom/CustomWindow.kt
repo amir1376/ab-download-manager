@@ -4,6 +4,9 @@ import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import ir.amirab.util.compose.IconSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.*
@@ -17,6 +20,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
@@ -418,18 +422,16 @@ private fun PreventMinimize() {
 }
 
 private fun Modifier.clearFocusOnTap(): Modifier = composed {
-//    for now we don't change it
-    Modifier
-//    val focusManager = LocalFocusManager.current
-//    Modifier.pointerInput(Unit) {
-//        awaitEachGesture {
-//            awaitFirstDown(pass = PointerEventPass.Main)
-//            val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Main)
-//            if (upEvent != null) {
-//                focusManager.clearFocus()
-//            }
-//        }
-//    }
+    val focusManager = LocalFocusManager.current
+    Modifier.pointerInput(Unit) {
+        awaitEachGesture {
+            awaitFirstDown(pass = PointerEventPass.Main)
+            val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Main)
+            if (upEvent != null) {
+                focusManager.clearFocus()
+            }
+        }
+    }
 }
 
 class WindowController(
