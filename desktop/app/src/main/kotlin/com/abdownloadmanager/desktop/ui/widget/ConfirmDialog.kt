@@ -11,8 +11,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -108,9 +111,14 @@ fun ConfirmDialog(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                 ) {
+                    val confirmFocusRequester = remember { FocusRequester() }
+                    LaunchedEffect(Unit) {
+                        confirmFocusRequester.requestFocus()
+                    }
                     ActionButton(
                         myStringResource(Res.string.ok),
-                        onClick = onConfirm
+                        onClick = onConfirm,
+                        modifier = Modifier.focusRequester(confirmFocusRequester)
                     )
                     Spacer(Modifier.width(8.dp))
                     ActionButton(

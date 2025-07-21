@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 
 val LocalMyColors = compositionLocalOf<MyColors> { error("LocalMyColors not provided") }
 
@@ -80,6 +81,8 @@ class MyColors(
     ): Brush {
         return Brush.linearGradient(listOf(color / startAlpha, color / endAlpha))
     }
+
+    val focusedBorderColor = primary
 
 
     fun getContentColorFor(color: Color): Color {

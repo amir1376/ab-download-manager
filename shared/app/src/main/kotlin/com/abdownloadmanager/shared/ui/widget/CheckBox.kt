@@ -15,6 +15,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -35,16 +37,17 @@ import androidx.compose.ui.unit.dp
 fun CheckBox(
     value: Boolean,
     onValueChange: (Boolean) -> Unit,
-    enabled: Boolean=true,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
     size: Dp = 18.dp,
-    interactionSource:MutableInteractionSource= remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     uncheckedAlpha: Float = 0.25f,
 ) {
+    val isFocused by interactionSource.collectIsFocusedAsState()
     val shape = RoundedCornerShape(25)
     Box(
         modifier
-            .ifThen(!enabled){
+            .ifThen(!enabled) {
                 alpha(0.5f)
             }
             .size(size)
@@ -58,14 +61,19 @@ fun CheckBox(
                 onClick = { onValueChange(!value) },
             )
     ) {
+        val borderColor = if (isFocused) {
+            myColors.focusedBorderColor
+        } else {
+            LocalContentColor.current / uncheckedAlpha
+        }
         Spacer(
             Modifier.matchParentSize()
-                .border(1.dp, LocalContentColor.current / uncheckedAlpha, shape)
+                .border(1.dp, borderColor, shape)
         )
         AnimatedContent(
             value,
             transitionSpec = {
-                val tween= tween<Float>(220)
+                val tween = tween<Float>(220)
                 fadeIn(tween) togetherWith fadeOut(tween)
             }
         ) {

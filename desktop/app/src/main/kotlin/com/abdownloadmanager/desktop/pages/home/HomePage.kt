@@ -20,6 +20,9 @@ import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
@@ -446,18 +449,28 @@ private fun ShowDeletePrompts(
             )
             if (deletePromptState.hasFinishedDownloads) {
                 Spacer(Modifier.height(12.dp))
+                val alsoDeleteFileInteractionSource = remember { MutableInteractionSource() }
                 Row(
-                    Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        deletePromptState.alsoDeleteFile = !deletePromptState.alsoDeleteFile
-                    },
+                    Modifier
+                        .clickable(
+                            interactionSource = alsoDeleteFileInteractionSource,
+                            indication = null
+                        ) {
+                            deletePromptState.alsoDeleteFile = !deletePromptState.alsoDeleteFile
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    CheckBox(deletePromptState.alsoDeleteFile, {
-                        deletePromptState.alsoDeleteFile = it
-                    })
+                    CheckBox(
+                        value = deletePromptState.alsoDeleteFile,
+                        onValueChange = {
+                            deletePromptState.alsoDeleteFile = it
+                        },
+                        modifier = Modifier
+                            // the Row itself is clickable (focusable) so we don't need to focus this checkbox
+                            // is there a better way?
+                            .focusProperties { canFocus = false },
+                        interactionSource = alsoDeleteFileInteractionSource,
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text(
                         myStringResource(Res.string.also_delete_file_from_disk),
@@ -471,12 +484,17 @@ private fun ShowDeletePrompts(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val confirmFocusRequester = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    confirmFocusRequester.requestFocus()
+                }
                 Spacer(Modifier.weight(1f))
                 ActionButton(
                     text = myStringResource(Res.string.delete),
                     onClick = onConfirm,
-                    borderColor = SolidColor(myColors.error),
+                    focusedBorderColor = SolidColor(myColors.error),
                     contentColor = myColors.error,
+                    modifier = Modifier.focusRequester(confirmFocusRequester)
                 )
                 Spacer(Modifier.width(8.dp))
                 ActionButton(text = myStringResource(Res.string.cancel), onClick = onCancel)
@@ -526,11 +544,15 @@ private fun ShowConfirmPrompt(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val confirmFocusRequester = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    confirmFocusRequester.requestFocus()
+                }
                 Spacer(Modifier.weight(1f))
                 ActionButton(
                     text = myStringResource(Res.string.ok),
                     onClick = onConfirm,
-                    contentColor = myColors.error,
+                    modifier = Modifier.focusRequester(confirmFocusRequester)
                 )
                 Spacer(Modifier.width(8.dp))
                 ActionButton(text = myStringResource(Res.string.cancel), onClick = onCancel)
@@ -596,11 +618,16 @@ private fun ShowDeleteCategoryPrompt(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val confirmFocusRequester = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    confirmFocusRequester.requestFocus()
+                }
                 Spacer(Modifier.weight(1f))
                 ActionButton(
                     text = myStringResource(Res.string.delete),
                     onClick = onConfirm,
-                    borderColor = SolidColor(myColors.error),
+                    focusedBorderColor = SolidColor(myColors.error),
+                    modifier = Modifier.focusRequester(confirmFocusRequester),
                     contentColor = myColors.error,
                 )
                 Spacer(Modifier.width(8.dp))
