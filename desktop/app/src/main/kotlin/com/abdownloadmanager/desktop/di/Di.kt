@@ -3,11 +3,21 @@ package com.abdownloadmanager.desktop.di
 import com.abdownloadmanager.github.GithubApi
 import com.abdownloadmanager.UpdateDownloadLocationProvider
 import com.abdownloadmanager.UpdateManager
+import com.abdownloadmanager.desktop.AddDownloadDialogManager
 import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.desktop.AppComponent
+import com.abdownloadmanager.desktop.DownloadDialogManager
+import com.abdownloadmanager.desktop.EditDownloadDialogManager
+import com.abdownloadmanager.desktop.FileChecksumDialogManager
+import com.abdownloadmanager.desktop.NotificationSender
+import com.abdownloadmanager.desktop.QueuePageManager
 import com.abdownloadmanager.desktop.SharedConstants
+import com.abdownloadmanager.desktop.PowerActionManager
+import com.abdownloadmanager.desktop.actions.onevennts.DesktopOnDownloadCompletionActionProvider
+import com.abdownloadmanager.desktop.actions.onevennts.DesktopOnQueueEventActionProvider
 import com.abdownloadmanager.desktop.integration.IntegrationHandlerImp
+import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.pages.settings.FontManager
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
 import com.abdownloadmanager.desktop.pages.updater.UpdateDownloaderViaDownloadSystem
@@ -33,6 +43,8 @@ import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.util.startup.Startup
 import com.abdownloadmanager.integration.Integration
+import com.abdownloadmanager.shared.storage.IExtraDownloadSettingsStorage
+import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.utils.*
 import com.abdownloadmanager.updateapplier.DesktopUpdateApplier
 import com.abdownloadmanager.updateapplier.UpdateApplier
@@ -52,6 +64,10 @@ import ir.amirab.util.AppVersionTracker
 import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.utils.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.shared.utils.category.*
+import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionActionProvider
+import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionActionRunner
+import com.abdownloadmanager.shared.utils.onqueuecompletion.OnQueueEventActionRunner
+import com.abdownloadmanager.shared.utils.onqueuecompletion.OnQueueCompletionActionProvider
 import com.abdownloadmanager.shared.utils.ui.IMyIcons
 import com.abdownloadmanager.shared.utils.proxy.IProxyStorage
 import com.abdownloadmanager.shared.utils.proxy.ProxyData
@@ -190,7 +206,51 @@ val downloadSystemModule = module {
     }
 
     single {
-        DownloadSystem(get(), get(), get(), get(), get(), get(), get())
+        DownloadSystem(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+        )
+    }
+    single {
+        val extraDownloadSettingsStorageFolder = get<DownloadFoldersRegistry>().registerAndGet(
+            AppInfo.downloadDbDir.resolve("extra_download_settings")
+        )
+        ExtraDownloadSettingsStorage(extraDownloadSettingsStorageFolder, get())
+    }.bind<IExtraDownloadSettingsStorage<*>>()
+    single {
+        val extraQueueSettingsStorageFolder = get<DownloadFoldersRegistry>().registerAndGet(
+            AppInfo.downloadDbDir.resolve("extra_queue_settings")
+        )
+        ExtraQueueSettingsStorage(extraQueueSettingsStorageFolder, get())
+    }.bind<IExtraQueueSettingsStorage<*>>()
+    single<OnDownloadCompletionActionProvider> {
+        DesktopOnDownloadCompletionActionProvider(get())
+    }
+    single<OnQueueCompletionActionProvider> {
+        DesktopOnQueueEventActionProvider(get())
+    }
+    single {
+        OnDownloadCompletionActionRunner(
+            downloadManagerMinimalControl = get(),
+            scope = get(),
+            onDownloadCompletionActionProvider = get(),
+        )
+    }
+    single {
+        OnQueueEventActionRunner(
+            queueManager = get(),
+            scope = get(),
+            onQueueCompletionActionProvider = get(),
+        )
     }
 }
 val coroutineModule = module {
@@ -329,6 +389,16 @@ val appModule = module {
                 AppComponent(context)
             }
         }
+    }.apply {
+        bind<DownloadDialogManager>()
+        bind<AddDownloadDialogManager>()
+        bind<CategoryDialogManager>()
+        bind<EditDownloadDialogManager>()
+        bind<FileChecksumDialogManager>()
+        bind<QueuePageManager>()
+        bind<NotificationSender>()
+        bind<DownloadItemOpener>()
+        bind<PowerActionManager>()
     }
     single {
         RemovedDownloadsFromDiskTracker(

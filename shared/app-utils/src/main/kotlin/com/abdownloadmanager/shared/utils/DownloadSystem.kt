@@ -1,8 +1,12 @@
 package com.abdownloadmanager.shared.utils
 
+import com.abdownloadmanager.shared.storage.IExtraDownloadSettingsStorage
+import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.utils.category.CategoryItemWithId
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.CategorySelectionMode
+import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionActionRunner
+import com.abdownloadmanager.shared.utils.onqueuecompletion.OnQueueEventActionRunner
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.db.IDownloadListDb
 import ir.amirab.downloader.downloaditem.*
@@ -30,8 +34,12 @@ class DownloadSystem(
     val queueManager: QueueManager,
     val categoryManager: CategoryManager,
     val downloadMonitor: IDownloadMonitor,
+    val onDownloadCompletionActionRunner: OnDownloadCompletionActionRunner,
+    val onQueueEventActionRunner: OnQueueEventActionRunner,
     private val scope: CoroutineScope,
     private val downloadListDB: IDownloadListDb,
+    private val extraQueueSettingsStorage: IExtraQueueSettingsStorage<*>,
+    private val extraDownloadSettingsStorage: IExtraDownloadSettingsStorage<*>,
     private val foldersRegistry: DownloadFoldersRegistry,
 ) {
     private val booted = MutableStateFlow(false)
@@ -44,6 +52,8 @@ class DownloadSystem(
         queueManager.boot()
         downloadManager.boot()
         categoryManager.boot()
+        onDownloadCompletionActionRunner.startListening()
+        onQueueEventActionRunner.startListening()
         booted.update { true }
     }
 
@@ -122,6 +132,7 @@ class DownloadSystem(
             context = context
         )
         categoryManager.removeItemInCategories(listOf(id))
+        extraDownloadSettingsStorage.deleteExtraDownloadItemSettings(id)
     }
 
     suspend fun manualResume(id: Long): Boolean {
@@ -290,5 +301,10 @@ class DownloadSystem(
         if (wasActive) {
             manualResume(id)
         }
+    }
+
+    suspend fun deleteQueue(queueId: Long) {
+        queueManager.deleteQueue(queueId)
+        extraQueueSettingsStorage.deleteExtraQueueSettings(queueId)
     }
 }

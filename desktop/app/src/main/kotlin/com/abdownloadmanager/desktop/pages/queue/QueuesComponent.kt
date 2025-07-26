@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.desktop.actions.newQueueAction
-import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import androidx.compose.runtime.*
 import com.abdownloadmanager.shared.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.shared.utils.asState
 import com.abdownloadmanager.shared.utils.subscribeAsStateFlow
 import com.arkivanov.decompose.ComponentContext
@@ -26,6 +26,7 @@ class QueuesComponent(
 ) : BaseComponent(ctx),
     ContainsEffects<QueuesComponentEffects> by supportEffects(),
     KoinComponent {
+    val downloadSystem: DownloadSystem by inject()
     val queueManager: QueueManager by inject()
     private val queues = queueManager.queues
 
@@ -63,7 +64,7 @@ class QueuesComponent(
 
     fun requestDeleteQueue(id: Long) {
         scope.launch {
-            queueManager.deleteQueue(id)
+            downloadSystem.deleteQueue(id)
         }
     }
 

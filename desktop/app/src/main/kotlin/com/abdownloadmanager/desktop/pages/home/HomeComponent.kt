@@ -765,6 +765,7 @@ class HomeComponent(
             if (AppInfo.isInDebugMode()) {
                 +dummyException
                 +dummyMessage
+                +shutdown
                 separator()
             }
             +browserIntegrations
@@ -1134,7 +1135,7 @@ class HomeComponent(
             mainQueueModel = queue?.queueModel?.value,
             requestDelete = { queueModel ->
                 scope.launch {
-                    queueManager.deleteQueue(queueModel.id)
+                    downloadSystem.deleteQueue(queueModel.id)
                 }
             },
             requestEdit = { queueModel ->

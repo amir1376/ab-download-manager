@@ -7,6 +7,7 @@ import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
 import com.abdownloadmanager.desktop.utils.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
+import com.abdownloadmanager.desktop.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.resources.Res
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.monitor.IDownloadItemState
@@ -15,9 +16,13 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
+import ir.amirab.util.desktop.poweraction.PowerActionConfig
 import ir.amirab.util.flow.combineStateFlows
+import ir.amirab.util.flow.createMutableStateFlowFromFlow
+import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -34,6 +39,21 @@ class QueueInfoComponent(
 
 
     val selectedListItems = MutableStateFlow(emptyList<Long>())
+
+    val extraQueueSettingsStorage by inject<ExtraQueueSettingsStorage>()
+    val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
+        flow = extraQueueSettingsStorage.getExternalQueueSettingsAsFlow(
+            id = id,
+            initialEmit = false,
+        ),
+        initialValue = extraQueueSettingsStorage.getExtraQueueSettings(id),
+        updater = {
+            scope.launch {
+                extraQueueSettingsStorage.setExtraQueueSettings(it)
+            }
+        },
+        scope = scope,
+    )
 
     init {
         downloadQueue.queueModel.map {
@@ -133,6 +153,11 @@ class QueueInfoComponent(
                         range = 1..32,
                         renderMode = IntConfigurable.RenderMode.TextField,
                     ),
+                ),
+            ),
+            ConfigurableGroup(
+                groupTitle = MutableStateFlow(Res.string.on_completion.asStringSource()),
+                nestedConfigurable = listOf(
                     BooleanConfigurable(
                         Res.string.queue_automatic_stop.asStringSource(),
                         Res.string.queue_automatic_stop_description.asStringSource(),
@@ -150,6 +175,22 @@ class QueueInfoComponent(
                             else Res.string.disabled.asStringSource()
                         },
                     ),
+                    BooleanConfigurable(
+                        title = Res.string.queue_shutdown_on_completion.asStringSource(),
+                        description = Res.string.queue_shutdown_on_completion_description.asStringSource(),
+                        backedBy = extraDownloadItemSettingsFlow.mapTwoWayStateFlow(
+                            map = {
+                                it.powerActionTypeOnFinish != null
+                            },
+                            unMap = {
+                                copy(powerActionTypeOnFinish = PowerActionConfig.Type.Shutdown)
+                            },
+                        ),
+                        describe = {
+                            if (it) Res.string.enabled.asStringSource()
+                            else Res.string.disabled.asStringSource()
+                        },
+                    )
                 ),
             ),
             ConfigurableGroup(

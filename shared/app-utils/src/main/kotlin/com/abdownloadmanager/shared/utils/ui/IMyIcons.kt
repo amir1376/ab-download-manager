@@ -13,6 +13,8 @@ interface IMyIcons {
     val appIcon: IconSource
 
     val settings: IconSource
+    val flag: IconSource
+    val fast: IconSource
     val search: IconSource
     val info: IconSource
     val check: IconSource

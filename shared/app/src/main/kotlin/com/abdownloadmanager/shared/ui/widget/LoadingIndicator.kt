@@ -9,7 +9,9 @@ import androidx.compose.foundation.progressSemantics
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
@@ -45,7 +47,7 @@ fun LoadingIndicator(
         modifier = modifier,
         currentArcStartAngle = currentArcStartAngle,
         strokeWidth = strokeWidth,
-        color=color,
+        color = SolidColor(color),
         sweepAngle = sweepAngle,
     )
 }
@@ -60,9 +62,26 @@ fun LoadingIndicator(
     IndicatorCanvas(
         modifier = modifier,
         currentArcStartAngle = 0,
+        sweepAngle = (progress * 360).coerceIn(0f, 360f),
+        strokeWidth = strokeWidth,
+        color = SolidColor(color),
+    )
+}
+
+@Composable
+fun LoadingIndicatorWithBrush(
+    modifier: Modifier,
+    brush: Brush = SolidColor(myColors.primary), // color of indicator arc line
+    strokeWidth: Dp = 4.dp,
+    @FloatRange(0.0, 1.0)
+    progress: Float
+) {
+    IndicatorCanvas(
+        modifier = modifier,
+        currentArcStartAngle = 0,
         sweepAngle = (progress*360).coerceIn(0f,360f),
         strokeWidth = strokeWidth,
-        color=color,
+        color = brush,
     )
 }
 @Composable
@@ -71,11 +90,11 @@ fun IndicatorCanvas(
     currentArcStartAngle: Int,
     sweepAngle:Float,
     strokeWidth: Dp,
-    color: Color,
+    color: Brush,
 ) {
     // define stroke with given width and arc ends type considering device DPI
     val stroke = with(LocalDensity.current) {
-        Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Square)
+        Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
     }
     // draw on canvas
     Canvas(

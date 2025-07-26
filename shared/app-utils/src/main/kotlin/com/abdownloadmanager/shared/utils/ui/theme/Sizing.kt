@@ -23,6 +23,10 @@ data class TextSizes(
     val base: TextUnit,
     val lg: TextUnit,
     val xl: TextUnit,
+    val x2l: TextUnit,
+    val x3l: TextUnit,
+    val x4l: TextUnit,
+    val x5l: TextUnit,
 )
 
 /**
