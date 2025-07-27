@@ -8,6 +8,8 @@ object MyIcons : IMyIcons {
     override val appIcon: IconSource get() = "/icons/app_icon.svg".asIconSource(false)
 
     override val settings get() = "/icons/settings.svg".asIconSource()
+    override val flag get() = "/icons/flag.svg".asIconSource()
+    override val fast get() = "/icons/fast.svg".asIconSource()
     override val search get() = "/icons/search.svg".asIconSource()
     override val info get() = "/icons/info.svg".asIconSource()
     override val check get() = "/icons/check.svg".asIconSource()

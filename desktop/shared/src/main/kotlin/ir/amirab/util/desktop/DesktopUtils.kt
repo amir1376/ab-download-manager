@@ -1,6 +1,7 @@
 package ir.amirab.util.desktop
 
 import ir.amirab.util.desktop.keepawake.KeepAwake
+import ir.amirab.util.desktop.poweraction.PowerAction
 import ir.amirab.util.desktop.utils.linux.LinuxUtils
 import ir.amirab.util.desktop.utils.mac.MacOSUtils
 import ir.amirab.util.desktop.utils.windows.WindowsUtils
@@ -9,6 +10,7 @@ import ir.amirab.util.platform.Platform
 
 interface DesktopUtils {
     fun openSystemProxySettings()
+    fun powerAction(): PowerAction
     fun keepAwakeService(): KeepAwake
 
     companion object : DesktopUtils by getDesktopUtilOfCurrentOS()

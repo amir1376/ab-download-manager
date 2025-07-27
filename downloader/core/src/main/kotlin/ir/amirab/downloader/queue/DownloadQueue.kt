@@ -17,6 +17,7 @@ class DownloadQueue(
     persistedModel: QueueModel,
     val persistedData: DownloadQueuePersistedDataAccess,
     val downloadEvents: DownloadManagerMinimalControl,
+    val onQueueEvent: (QueueEvent) -> Unit,
 ) {
     private val scope = CoroutineScope(SupervisorJob())
 
@@ -45,6 +46,10 @@ class DownloadQueue(
     private val _queueActiveFlow = MutableStateFlow(false)
     val activeFlow = _queueActiveFlow.asStateFlow()
     val isQueueActive: Boolean get() = activeFlow.value
+
+    fun onEvent(event: QueueEvent) {
+        this.onQueueEvent(event)
+    }
 
     suspend fun boot() {
         if (booted) {
@@ -77,7 +82,7 @@ class DownloadQueue(
     }
 
     private suspend fun onDownloadCanceled(id: Long, e: Throwable) {
-        activeItems.remove(id)
+        val removed = activeItems.remove(id)
         if (isQueueActive) {
             if (!trimmedItems.remove(id)){
                 canceledItems.add(id)
@@ -89,13 +94,17 @@ class DownloadQueue(
                     q.lastIndex
                 })
         }
-        shake()
+        shake(
+            itemChangeHappened = removed,
+        )
     }
 
 
     private fun onDownloadFinished(id: Long) {
         removeFromQueue(id)
-        shake()
+        shake(
+            itemChangeHappened = true,
+        )
     }
 
     suspend fun start(): Boolean {
@@ -115,12 +124,19 @@ class DownloadQueue(
         }
     }
 
-    fun shake(): Boolean {
+    fun shake(
+        itemChangeHappened: Boolean = false
+    ): Boolean {
 //        println("shake queue")
         return when {
             !isQueueActive -> false
-            stopQueueOnEmpty && activeItems.isEmpty() && (getDownloadableItemFromQueue() == null) -> {
-                stop()
+            activeItems.isEmpty() && (getDownloadableItemFromQueue() == null) -> {
+                if (stopQueueOnEmpty) {
+                    stop()
+                }
+                if (itemChangeHappened) {
+                    onEvent(QueueEvent.OnQueueBecomesEmpty(id))
+                }
                 false
             }
 
@@ -173,6 +189,8 @@ class DownloadQueue(
         if (scheduleTimes.enabledStartTime) {
             autoStartJob = scope.launch {
                 delay(scheduleTimes.getNearestTimeToStart())
+                val wasActive = isQueueActive
+                onEvent(QueueEvent.OnQueueStartTimeReached(id, wasActive))
                 start()
                 //wait a little
                 delay(1000)
@@ -194,6 +212,8 @@ class DownloadQueue(
         if (scheduleTimes.enabledEndTime) {
             autoStopJob = scope.launch {
                 delay(scheduleTimes.getNearestTimeToStop())
+                val wasActive = isQueueActive
+                onEvent(QueueEvent.QueueEndTimeReached(id, wasActive))
                 stop()
                 //wait a little
                 delay(1000)
@@ -439,7 +459,9 @@ class DownloadQueue(
                     .distinct()
             )
         }
-        shake()
+        shake(
+            itemChangeHappened = true
+        )
     }
 
     fun clearQueue() {

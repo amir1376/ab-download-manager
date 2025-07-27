@@ -6,6 +6,7 @@ import ir.amirab.downloader.db.DownloadQueuePersistedDataAccess
 import ir.amirab.downloader.db.QueueModel
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -30,6 +31,17 @@ class QueueManager(
     val queues = MutableStateFlow(
         emptyList<DownloadQueue>()
     )
+
+    private val _queueEvent = MutableSharedFlow<QueueEvent>(
+        // send events without suspending
+        extraBufferCapacity = 64,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    val queueEvents: SharedFlow<QueueEvent> = _queueEvent.asSharedFlow()
+    private fun onQueueEvent(queueEvent: QueueEvent) {
+        _queueEvent.tryEmit(queueEvent)
+    }
+
 
     private suspend fun addDefaultQueue() {
         val queueModel = QueueModel(
@@ -138,6 +150,7 @@ class QueueManager(
             ),
             downloadEvents = listOfJobs,
             persistedModel = queueModel,
+            onQueueEvent = ::onQueueEvent,
         )
     }
 

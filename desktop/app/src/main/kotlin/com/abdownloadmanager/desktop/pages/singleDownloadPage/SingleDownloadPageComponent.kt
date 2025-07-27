@@ -10,6 +10,7 @@ import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
 import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
+import com.abdownloadmanager.desktop.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.*
@@ -23,7 +24,9 @@ import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
+import ir.amirab.util.desktop.poweraction.PowerActionConfig
 import ir.amirab.util.flow.combineStateFlows
+import ir.amirab.util.flow.createMutableStateFlowFromFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -58,6 +61,7 @@ class SingleDownloadComponent(
     private val appScope: CoroutineScope by inject()
     private val downloadSystem: DownloadSystem by inject()
     private val appSettings: AppSettingsStorage by inject()
+    private val extraDownloadSettingsStorage: ExtraDownloadSettingsStorage by inject()
     private val appRepository: AppRepository by inject()
     private val applicationScope: CoroutineScope by inject()
     val fileIconProvider: FileIconProvider by inject()
@@ -77,6 +81,23 @@ class SingleDownloadComponent(
         item ?: global
     }
     val deletePartialFileOnDownloadCancellation = appSettings.deletePartialFileOnDownloadCancellation.asStateFlow()
+
+    val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
+        extraDownloadSettingsStorage
+            .getExternalDownloadItemSettingsAsFlow(downloadId, initialEmit = false),
+        extraDownloadSettingsStorage
+            .getExtraDownloadItemSettings(downloadId),
+        {
+            scope.launch {
+                extraDownloadSettingsStorage.setExtraDownloadItemSettings(
+                    it
+                )
+            }
+        },
+        scope,
+    )
+
+
 
     private fun shouldShowCompletionDialog(): Boolean {
         return shouldShowCompletionDialog.value
@@ -328,21 +349,6 @@ class SingleDownloadComponent(
 
     val settings by lazy {
         listOf(
-            BooleanConfigurable(
-                title = Res.string.download_item_settings_show_download_completion_dialog.asStringSource(),
-                description = Res.string.download_item_settings_show_download_completion_dialog_description.asStringSource(),
-                backedBy = itemShouldShowCompletionDialog.mapTwoWayStateFlow(
-                    map = {
-                        it ?: globalShowCompletionDialog.value
-                    },
-                    unMap = { it }
-                ),
-                describe = {
-                    (if (it) Res.string.enabled
-                    else Res.string.enabled)
-                        .asStringSource()
-                },
-            ),
             IntConfigurable(
                 title = Res.string.download_item_settings_thread_count.asStringSource(),
                 description = Res.string.download_item_settings_thread_count_description.asStringSource(),
@@ -376,7 +382,42 @@ class SingleDownloadComponent(
             ),
         )
     }
-
+    val onCompletion by lazy {
+        listOf(
+            BooleanConfigurable(
+                title = Res.string.download_item_settings_shutdown_on_completion.asStringSource(),
+                description = Res.string.download_item_settings_shutdown_on_completion_description.asStringSource(),
+                backedBy = extraDownloadItemSettingsFlow.mapTwoWayStateFlow(
+                    map = {
+                        it.powerActionTypeOnFinish != null
+                    },
+                    unMap = {
+                        copy(powerActionTypeOnFinish = PowerActionConfig.Type.Shutdown)
+                    }
+                ),
+                describe = {
+                    (if (it) Res.string.enabled
+                    else Res.string.enabled)
+                        .asStringSource()
+                },
+            ),
+            BooleanConfigurable(
+                title = Res.string.download_item_settings_show_download_completion_dialog.asStringSource(),
+                description = Res.string.download_item_settings_show_download_completion_dialog_description.asStringSource(),
+                backedBy = itemShouldShowCompletionDialog.mapTwoWayStateFlow(
+                    map = {
+                        it ?: globalShowCompletionDialog.value
+                    },
+                    unMap = { it }
+                ),
+                describe = {
+                    (if (it) Res.string.enabled
+                    else Res.string.enabled)
+                        .asStringSource()
+                },
+            ),
+        )
+    }
     data class Config(
         val id: Long,
     )

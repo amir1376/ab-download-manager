@@ -1,5 +1,6 @@
 package com.abdownloadmanager.desktop
 
+import ir.amirab.util.desktop.poweraction.PowerActionConfig
 import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadConfig
 import com.abdownloadmanager.desktop.pages.addDownload.ImportOptions
@@ -14,6 +15,7 @@ import com.abdownloadmanager.desktop.pages.filehash.FileChecksumComponentConfig
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.SettingsComponent
+import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadComponent
 import com.abdownloadmanager.desktop.pages.updater.UpdateComponent
 import com.abdownloadmanager.desktop.repository.AppRepository
@@ -94,6 +96,7 @@ class AppComponent(
     QueuePageManager,
     NotificationSender,
     DownloadItemOpener,
+    PowerActionManager,
     ContainsEffects<AppEffects> by supportEffects(),
     KoinComponent {
     val appRepository: AppRepository by inject()
@@ -956,6 +959,44 @@ class AppComponent(
             IntegrationPortBroadcaster.isInitialized(),
         ).all { it }
     }
+    val powerActionNavigation = SlotNavigation<PowerActionComponent.Config>()
+    val openedPowerAction = childSlot(
+        source = powerActionNavigation,
+        key = "powerAction",
+        serializer = null,
+        childFactory = { config, ctx ->
+            PowerActionComponent(
+                ctx = ctx,
+                powerActionConfig = config.powerActionConfig,
+                powerActionDelay = config.powerActionDelay,
+                powerActionReason = config.powerActionReason,
+                close = ::dismissPowerAction,
+                onBeforePowerAction = {
+                    downloadSystem.stopAnything()
+                },
+            )
+        }
+    ).subscribeAsStateFlow()
+
+    override fun initiatePowerAction(
+        powerActionConfig: PowerActionConfig,
+        reason: PowerActionComponent.PowerActionReason,
+    ) {
+        scope.launch {
+            powerActionNavigation.activate(
+                PowerActionComponent.Config(
+                    powerActionConfig = powerActionConfig,
+                    powerActionReason = reason,
+                )
+            )
+        }
+    }
+
+    override fun dismissPowerAction() {
+        scope.launch {
+            powerActionNavigation.dismiss()
+        }
+    }
 
     val updater = UpdateComponent(
         childContext("updater"),
@@ -1004,4 +1045,12 @@ interface QueuePageManager {
 
     fun openNewQueueDialog()
     fun closeNewQueueDialog()
+}
+interface PowerActionManager {
+    fun initiatePowerAction(
+        powerActionConfig: PowerActionConfig,
+        reason: PowerActionComponent.PowerActionReason,
+    )
+
+    fun dismissPowerAction()
 }

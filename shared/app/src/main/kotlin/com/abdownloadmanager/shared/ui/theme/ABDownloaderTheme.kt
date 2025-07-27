@@ -48,6 +48,10 @@ private val textSizes = TextSizes(
     base = 12.sp,
     lg = 14.sp,
     xl = 16.sp,
+    x2l = 18.sp,
+    x3l = 20.sp,
+    x4l = 22.sp,
+    x5l = 24.sp,
 )
 
 @Composable

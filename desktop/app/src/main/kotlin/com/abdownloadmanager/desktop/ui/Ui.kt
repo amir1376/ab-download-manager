@@ -30,6 +30,7 @@ import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
 import com.abdownloadmanager.desktop.pages.settings.FontManager
 import com.abdownloadmanager.desktop.pages.settings.SettingWindow
 import com.abdownloadmanager.desktop.pages.settings.ThemeManager
+import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionAlert
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialogs
 import com.abdownloadmanager.desktop.pages.updater.ShowUpdaterDialog
 import com.abdownloadmanager.desktop.ui.widget.ShowMessageDialogs
@@ -135,6 +136,7 @@ object Ui : KoinComponent {
                 ShowOpenSourceLibraries(appComponent)
                 ShowTranslators(appComponent)
                 ConfirmExit(appComponent)
+                PowerActionAlert(appComponent)
             }
         }
     }

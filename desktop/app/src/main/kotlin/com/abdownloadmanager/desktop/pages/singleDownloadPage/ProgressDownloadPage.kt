@@ -62,8 +62,12 @@ enum class SingleDownloadPageSections(
         MyIcons.info
     ),
     Settings(
-        Res.string.settings.asStringSource(),
-        MyIcons.settings
+        Res.string.speed.asStringSource(),
+        MyIcons.fast,
+    ),
+    OnCompletion(
+        Res.string.on_completion.asStringSource(),
+        MyIcons.flag
     ),
 }
 
@@ -126,6 +130,12 @@ fun ProgressDownloadPage(singleDownloadComponent: SingleDownloadComponent, itemS
                         horizontalPadding = horizontalPadding,
                         singleDownloadComponent = singleDownloadComponent,
                     )
+
+                    OnCompletion -> RenderOnCompletion(
+                        modifier = tabContentModifier.padding(end = 12.dp),
+                        horizontalPadding = horizontalPadding,
+                        singleDownloadComponent = singleDownloadComponent,
+                    )
                 }
                 VerticalScrollbar(
                     adapter = rememberScrollbarAdapter(scrollState),
@@ -177,6 +187,24 @@ private fun RenderSettings(
 ) {
     Column(modifier) {
         for (configurable in singleDownloadComponent.settings) {
+            RenderConfigurable(
+                configurable, Modifier
+                    // I'm using Configurable object which their renderer by default uses 8.dp, we want 16.dp, so I only add 8.dp here 16-8 == 8
+                    // I may improve this later
+                    .padding(horizontal = (horizontalPadding - 8.dp).coerceAtLeast(0.dp))
+            )
+        }
+    }
+}
+
+@Composable
+private fun RenderOnCompletion(
+    modifier: Modifier,
+    horizontalPadding: Dp,
+    singleDownloadComponent: SingleDownloadComponent,
+) {
+    Column(modifier) {
+        for (configurable in singleDownloadComponent.onCompletion) {
             RenderConfigurable(
                 configurable, Modifier
                     // I'm using Configurable object which their renderer by default uses 8.dp, we want 16.dp, so I only add 8.dp here 16-8 == 8
