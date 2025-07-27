@@ -1,7 +1,9 @@
 package ir.amirab.downloader.db
 
-import kotlinx.serialization.encodeToString
+import ir.amirab.util.tryAtomicMove
 import kotlinx.serialization.json.Json
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 import java.io.File
 
 class TransactionalFileSaver(
@@ -12,16 +14,21 @@ class TransactionalFileSaver(
         val bakFile = getBakFile(file)
         val text = json.encodeToString(t)
         kotlin.runCatching {
-            bakFile.writeText(text)
+            FileSystem.SYSTEM.write(
+                file = bakFile.toOkioPath()
+            ) {
+                writeUtf8(text)
+            }
         }.onSuccess {
-            file.delete()
-            bakFile.renameTo(file)
+            bakFile.tryAtomicMove(file)
         }.getOrThrow()
     }
 
     inline fun <reified T> readObject(file: File): T? {
         return kotlin.runCatching {
-            val text = file.readText()
+            val text = FileSystem.SYSTEM.read(file.toOkioPath()) {
+                readUtf8()
+            }
             json.decodeFromString<T>(text)
         }.getOrNull()
     }
