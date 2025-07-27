@@ -186,6 +186,20 @@ fun trackDeletedFilesOnDisk(appRepository: AppRepository): BooleanConfigurable {
         },
     )
 }
+fun deletePartialFileOnDownloadCancellation(appSettingsStorage: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_delete_partial_file_on_download_cancellation.asStringSource(),
+        description = Res.string.settings_delete_partial_file_on_download_cancellation_description.asStringSource(),
+        backedBy = appSettingsStorage.deletePartialFileOnDownloadCancellation,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
 
 fun ignoreSSLCertificates(appSettingsStorage: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
@@ -734,6 +748,7 @@ class SettingsComponent(
                     appendExtensionToIncompleteDownloads(appRepository),
                     useSparseFileAllocation(appRepository),
                     trackDeletedFilesOnDisk(appRepository),
+                    deletePartialFileOnDownloadCancellation(appSettings),
                     ignoreSSLCertificates(appSettings),
                     userAgent(appSettings),
                 )
