@@ -259,9 +259,12 @@ private fun convertLanguageToMyLocale(language: String): MyLocale {
 private fun rememberLanguageTranslationInfo(): List<LanguageTranslationInfo> {
     return remember {
         val json = Di.get<Json>()
-        val translatorData = FileSystem.RESOURCES.source(
-            "/com/abdownloadmanager/resources/credits/translators.json".toPath()
-        ).buffer().readUtf8().let {
+        val translatorData = FileSystem.RESOURCES.read(
+            "/com/abdownloadmanager/resources/credits/translators.json".toPath(),
+            {
+                readUtf8()
+            }
+        ).let {
             json.decodeFromString<TranslatorData>(it)
         }
         translatorData.map {
