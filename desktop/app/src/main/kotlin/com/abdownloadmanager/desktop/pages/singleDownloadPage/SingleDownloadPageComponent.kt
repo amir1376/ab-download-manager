@@ -76,6 +76,7 @@ class SingleDownloadComponent(
     ) { global, item ->
         item ?: global
     }
+    val deletePartialFileOnDownloadCancellation = appSettings.deletePartialFileOnDownloadCancellation.asStateFlow()
 
     private fun shouldShowCompletionDialog(): Boolean {
         return shouldShowCompletionDialog.value
@@ -263,8 +264,12 @@ class SingleDownloadComponent(
     fun cancel() {
         applicationScope.launch {
             val state = itemStateFlow.value as? ProcessingDownloadItemState
-            if (state?.status is DownloadJobStatus.IsActive) {
-                downloadSystem.manualPause(downloadId)
+            if (deletePartialFileOnDownloadCancellation.value) {
+                downloadSystem.reset(downloadId)
+            } else {
+                if (state?.status is DownloadJobStatus.IsActive) {
+                    downloadSystem.manualPause(downloadId)
+                }
             }
         }
         scope.launch {

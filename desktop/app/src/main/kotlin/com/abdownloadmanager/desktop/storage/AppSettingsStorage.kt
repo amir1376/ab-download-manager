@@ -42,6 +42,7 @@ data class AppSettingsModel(
     val browserIntegrationEnabled: Boolean = true,
     val browserIntegrationPort: Int = 15151,
     val trackDeletedFilesOnDisk: Boolean = false,
+    val deletePartialFileOnDownloadCancellation: Boolean = false,
     val useBitsForSpeed: Boolean = false,
     val ignoreSSLCertificates: Boolean = false,
     val useCategoryByDefault: Boolean = true,
@@ -80,6 +81,7 @@ data class AppSettingsModel(
             val browserIntegrationEnabled = booleanKeyOf("browserIntegrationEnabled")
             val browserIntegrationPort = intKeyOf("browserIntegrationPort")
             val trackDeletedFilesOnDisk = booleanKeyOf("trackDeletedFilesOnDisk")
+            val deletePartialFileOnDownloadCancellation = booleanKeyOf("deletePartialFileOnDownloadCancellation")
             val useBitsForSpeed = booleanKeyOf("useBitsForSpeed")
             val ignoreSSLCertificates = booleanKeyOf("ignoreSSLCertificates")
             val useCategoryByDefault = booleanKeyOf("useCategoryByDefault")
@@ -122,6 +124,8 @@ data class AppSettingsModel(
                     ?: default.browserIntegrationEnabled,
                 browserIntegrationPort = source.get(Keys.browserIntegrationPort) ?: default.browserIntegrationPort,
                 trackDeletedFilesOnDisk = source.get(Keys.trackDeletedFilesOnDisk) ?: default.trackDeletedFilesOnDisk,
+                deletePartialFileOnDownloadCancellation = source.get(Keys.deletePartialFileOnDownloadCancellation)
+                    ?: default.deletePartialFileOnDownloadCancellation,
                 useBitsForSpeed = source.get(Keys.useBitsForSpeed) ?: default.useBitsForSpeed,
                 ignoreSSLCertificates = source.get(Keys.ignoreSSLCertificates) ?: default.ignoreSSLCertificates,
                 useCategoryByDefault = source.get(Keys.useCategoryByDefault) ?: default.useCategoryByDefault,
@@ -158,6 +162,7 @@ data class AppSettingsModel(
                 put(Keys.browserIntegrationEnabled, focus.browserIntegrationEnabled)
                 put(Keys.browserIntegrationPort, focus.browserIntegrationPort)
                 put(Keys.trackDeletedFilesOnDisk, focus.trackDeletedFilesOnDisk)
+                put(Keys.deletePartialFileOnDownloadCancellation, focus.deletePartialFileOnDownloadCancellation)
                 put(Keys.useBitsForSpeed, focus.useBitsForSpeed)
                 put(Keys.ignoreSSLCertificates, focus.ignoreSSLCertificates)
                 put(Keys.useCategoryByDefault, focus.useCategoryByDefault)
@@ -228,6 +233,7 @@ class AppSettingsStorage(
     val browserIntegrationEnabled = from(AppSettingsModel.browserIntegrationEnabled)
     val browserIntegrationPort = from(AppSettingsModel.browserIntegrationPort)
     val trackDeletedFilesOnDisk = from(AppSettingsModel.trackDeletedFilesOnDisk)
+    val deletePartialFileOnDownloadCancellation = from(AppSettingsModel.deletePartialFileOnDownloadCancellation)
     val useBitsForSpeed = from(AppSettingsModel.useBitsForSpeed)
     val ignoreSSLCertificates = from(AppSettingsModel.ignoreSSLCertificates)
     val useCategoryByDefault = from(AppSettingsModel.useCategoryByDefault)

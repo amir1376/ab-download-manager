@@ -51,6 +51,7 @@ import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
+import kotlin.math.sin
 
 enum class SingleDownloadPageSections(
     val title: StringSource,
@@ -66,7 +67,7 @@ enum class SingleDownloadPageSections(
     ),
 }
 
-private val tabs = SingleDownloadPageSections.entries.toList()
+private val tabs = entries.toList()
 
 @Composable
 fun ProgressDownloadPage(singleDownloadComponent: SingleDownloadComponent, itemState: ProcessingDownloadItemState) {
@@ -553,7 +554,14 @@ private fun RenderActions(
             pause = singleDownloadComponent::pause,
         )
         Spacer(Modifier.width(8.dp))
-        CancelButton(singleDownloadComponent::cancel)
+        CancelButton(
+            cancel = singleDownloadComponent::cancel,
+            icon = if (singleDownloadComponent.deletePartialFileOnDownloadCancellation.collectAsState().value) {
+                MyIcons.stop
+            } else {
+                null
+            },
+        )
     }
 }
 
@@ -604,11 +612,13 @@ private fun SingleDownloadPageButton(
 @Composable
 private fun CancelButton(
     cancel: () -> Unit,
+    icon: IconSource?,
 ) {
     SingleDownloadPageButton(
         {
             cancel()
         },
+        icon = icon,
         text = myStringResource(Res.string.cancel)
     )
 }
