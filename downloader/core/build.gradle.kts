@@ -9,5 +9,6 @@ dependencies {
     implementation(libs.kotlin.coroutines.core)
     api(libs.okio.okio)
     api(libs.okhttp.okhttp)
+    api(libs.okhttp.coroutines)
     implementation(project(":shared:utils"))
 }

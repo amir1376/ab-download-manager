@@ -24,7 +24,6 @@ import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.DayOfWeek
-import java.time.DayOfWeek.*
 
 class DayOfWeekConfigurable(
     title: StringSource,
@@ -53,7 +52,7 @@ class DayOfWeekConfigurable(
 private fun RenderDayOfWeekConfigurable(cfg: DayOfWeekConfigurable, modifier: Modifier) {
     val value by cfg.stateFlow.collectAsState()
     val setValue = cfg::set
-    val allDays = entries.toSet()
+    val allDays = DayOfWeek.entries.toSet()
     val enabled = isConfigEnabled()
     fun isSelected(dayOfWeek: DayOfWeek): Boolean {
         return dayOfWeek in value
@@ -147,11 +146,11 @@ fun RenderDayOfWeek(
 }
 
 private fun DayOfWeek.asStringSource() = when (this) {
-    MONDAY -> Res.string.monday
-    TUESDAY -> Res.string.tuesday
-    WEDNESDAY -> Res.string.wednesday
-    THURSDAY -> Res.string.thursday
-    FRIDAY -> Res.string.friday
-    SATURDAY -> Res.string.saturday
-    SUNDAY -> Res.string.sunday
+    DayOfWeek.MONDAY -> Res.string.monday
+    DayOfWeek.TUESDAY -> Res.string.tuesday
+    DayOfWeek.WEDNESDAY -> Res.string.wednesday
+    DayOfWeek.THURSDAY -> Res.string.thursday
+    DayOfWeek.FRIDAY -> Res.string.friday
+    DayOfWeek.SATURDAY -> Res.string.saturday
+    DayOfWeek.SUNDAY -> Res.string.sunday
 }.asStringSource()

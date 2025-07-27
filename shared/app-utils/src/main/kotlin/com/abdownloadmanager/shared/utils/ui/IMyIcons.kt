@@ -3,10 +3,10 @@ package com.abdownloadmanager.shared.utils.ui
 import androidx.compose.ui.graphics.vector.ImageVector
 import ir.amirab.util.compose.IconSource
 
-context (IMyIcons)
+context (_: IMyIcons)
 fun ImageVector.asIconSource(requiredTint: Boolean = true) = IconSource.VectorIconSource(this, requiredTint)
 
-context (IMyIcons)
+context (_: IMyIcons)
 fun String.asIconSource(requiredTint: Boolean = true) = IconSource.ResourceIconSource(this, requiredTint)
 
 interface IMyIcons {

@@ -1,5 +1,5 @@
 plugins{
-    alias(libs.plugins.kotlin.jvm)
+    kotlin("jvm")
 }
 repositories{
     mavenCentral()

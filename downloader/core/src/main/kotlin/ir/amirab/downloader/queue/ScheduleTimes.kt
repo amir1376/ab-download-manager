@@ -1,7 +1,18 @@
+@file:OptIn(ExperimentalTime::class)
+
 package ir.amirab.downloader.queue
 
-import kotlinx.datetime.*
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @Serializable
 data class ScheduleTimes(
@@ -90,4 +101,10 @@ data class ScheduleTimes(
             }.toInstant(TimeZone.currentSystemDefault())
         return (nextTime - now).inWholeMilliseconds
     }
+}
+
+private fun DayOfWeek.plus(days: Int): DayOfWeek {
+    val entries = DayOfWeek.entries
+    val index = (entries.indexOf(this) + days) % entries.size
+    return entries[index]
 }
