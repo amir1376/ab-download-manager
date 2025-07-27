@@ -1,9 +1,12 @@
 package ir.amirab.util.desktop.utils.windows
 
 import ir.amirab.util.desktop.DesktopUtils
+import ir.amirab.util.desktop.keepawake.KeepAwake
+import ir.amirab.util.desktop.keepawake.WindowsKeepAwake
 import ir.amirab.util.execAndWait
 
 class WindowsUtils : DesktopUtils {
+    private val keepAwakeService = WindowsKeepAwake()
     override fun openSystemProxySettings() {
         val result = execAndWait(
             arrayOf(
@@ -18,5 +21,9 @@ class WindowsUtils : DesktopUtils {
                 )
             )
         }
+    }
+
+    override fun keepAwakeService(): KeepAwake {
+        return keepAwakeService
     }
 }

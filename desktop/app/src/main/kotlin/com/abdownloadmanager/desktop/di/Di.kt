@@ -65,6 +65,7 @@ import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.datastore.kotlinxSerializationDataStore
+import ir.amirab.util.desktop.DesktopUtils
 import okhttp3.internal.tls.OkHostnameVerifier
 
 val downloaderModule = module {
@@ -379,6 +380,13 @@ val appModule = module {
             )
             .hostnameVerifier(appHostNameVerifier)
             .build()
+    }
+    single {
+        KeepAwakeManager(
+            DesktopUtils.keepAwakeService(),
+            get(),
+            get(),
+        )
     }
 
 }
