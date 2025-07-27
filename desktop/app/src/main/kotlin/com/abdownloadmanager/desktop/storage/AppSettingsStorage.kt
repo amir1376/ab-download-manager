@@ -25,7 +25,7 @@ data class AppSettingsModel(
     val useRelativeDateTime: Boolean = true,
     val useSystemTray: Boolean = true,
     val threadCount: Int = 8,
-    val maxDownloadRetryCount: Int = 0,
+    val maxDownloadRetryCount: Int = 3,
     val dynamicPartCreation: Boolean = true,
     val useServerLastModifiedTime: Boolean = false,
     val appendExtensionToIncompleteDownloads: Boolean = false,
