@@ -14,6 +14,32 @@
 
 ### Security
 
+## 1.6.7
+
+### Added
+
+- Lithuanian language support
+- Kurdish (Sorani) language support
+- Option to automatically shut down the system when downloads or queues complete (#726)
+- Option to delete partial files on download cancellation (#724)
+
+### Changed
+
+- App icon is now hidden from the Dock at runtime on macOS when the system tray is used (#710)
+- Default max download retry count changed to 3
+
+### Fixed
+
+- Removable storages are no longer monitored on Windows (#705)
+
+### Improved
+
+- Translations updated
+- System stays awake while downloads are in progress (#725)
+- Confirm dialogs and buttons now have better focus behavior
+- Dropdowns are now searchable (#706)
+- IO Operations improvements
+
 ## 1.6.6
 
 ### Added
