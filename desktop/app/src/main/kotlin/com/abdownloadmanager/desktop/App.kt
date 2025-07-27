@@ -29,6 +29,7 @@ class App : AutoCloseable,
     private val integration: Integration by inject()
     private val previousVersion: PreviousVersion by inject()
     private val updateManager: UpdateManager by inject()
+    private val keepAwakeManager: KeepAwakeManager by inject()
 
     //TODO Setup Native Messaging Feature
     //private val browserNativeMessaging: NativeMessaging by inject()
@@ -48,6 +49,8 @@ class App : AutoCloseable,
                 integration.boot()
                 downloadSystem.boot()
                 previousVersion.boot()
+                keepAwakeManager.boot()
+
                 //TODO Setup Native Messaging Feature
                 //waiting for compose kmp to add multi launcher to nativeDistributions,the PR is already exists but not merger
                 //or maybe I should use a custom solution
