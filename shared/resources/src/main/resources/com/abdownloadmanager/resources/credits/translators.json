@@ -37,6 +37,12 @@
       "link": "https://crowdin.com/profile/hosseinabaspanah"
     }
   ],
+  "ckb": [
+    {
+      "name": "Halbast Abdullah (halbast)",
+      "link": "https://crowdin.com/profile/halbast"
+    }
+  ],
   "de": [
     {
       "name": "u!^DEV (uDEV)",
@@ -73,6 +79,10 @@
     {
       "name": "AmirHossein Abdolmotallebi (amira1376)",
       "link": "https://crowdin.com/profile/amira1376"
+    },
+    {
+      "name": "HAM3D",
+      "link": "https://crowdin.com/profile/HAM3D"
     },
     {
       "name": "Ehsan Narmani (kotlinx)",
@@ -153,6 +163,16 @@
     {
       "name": "doda (ddarkr)",
       "link": "https://crowdin.com/profile/ddarkr"
+    },
+    {
+      "name": "VenusGirl",
+      "link": "https://crowdin.com/profile/VenusGirl"
+    }
+  ],
+  "lt": [
+    {
+      "name": "arvaidasr",
+      "link": "https://crowdin.com/profile/arvaidasr"
     }
   ],
   "pl": [
