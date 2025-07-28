@@ -14,6 +14,12 @@
 
 ### Security
 
+## 1.6.8
+
+### Fixed
+
+- Can't change Auto Shutdown option if it was enabled
+
 ## 1.6.7
 
 ### Added
