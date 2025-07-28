@@ -392,7 +392,12 @@ class SingleDownloadComponent(
                         it.powerActionTypeOnFinish != null
                     },
                     unMap = {
-                        copy(powerActionTypeOnFinish = PowerActionConfig.Type.Shutdown)
+                        copy(
+                            powerActionTypeOnFinish = when (it) {
+                                true -> PowerActionConfig.Type.Shutdown
+                                false -> null
+                            },
+                        )
                     }
                 ),
                 describe = {
