@@ -112,7 +112,9 @@ LATEST_VERSION=$(curl -fSs "${RELEASE_URL}" | grep '"tag_name":' | sed -E 's/.*"
 ASSET_NAME="${APP_NAME}_${LATEST_VERSION:1}_${PLATFORM}_${ARCH}.${EXT}"
 DOWNLOAD_URL="$GITHUB_RELEASE_DOWNLOAD/${LATEST_VERSION}/$ASSET_NAME"
 
-BINARY_PATH="$HOME/.local/$APP_NAME/bin/$APP_NAME"
+APP_PATH="$HOME/.local/$APP_NAME"
+BINARY_PATH="$APP_PATH/bin/$APP_NAME"
+ICON_PATH="$APP_PATH/lib/$APP_NAME.png"
 
 
 # --- Delete the old version Application if exists
@@ -160,8 +162,8 @@ Name=AB Download Manager
 Comment=Manage and organize your download files better than before
 GenericName=Downloader
 Categories=Utility;Network;
-Exec=$BINARY_PATH
-Icon=$HOME/.local/$APP_NAME/lib/$APP_NAME.png
+Exec="$BINARY_PATH"
+Icon=$ICON_PATH
 Terminal=false
 Type=Application
 StartupWMClass=com-abdownloadmanager-desktop-AppKt
