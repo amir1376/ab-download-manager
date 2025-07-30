@@ -98,7 +98,6 @@ class SingleDownloadComponent(
     )
 
 
-
     private fun shouldShowCompletionDialog(): Boolean {
         return shouldShowCompletionDialog.value
     }
@@ -401,9 +400,10 @@ class SingleDownloadComponent(
                     }
                 ),
                 describe = {
-                    (if (it) Res.string.enabled
-                    else Res.string.enabled)
-                        .asStringSource()
+                    when (it) {
+                        true -> Res.string.enabled
+                        false -> Res.string.disabled
+                    }.asStringSource()
                 },
             ),
             BooleanConfigurable(
@@ -416,13 +416,15 @@ class SingleDownloadComponent(
                     unMap = { it }
                 ),
                 describe = {
-                    (if (it) Res.string.enabled
-                    else Res.string.enabled)
-                        .asStringSource()
+                    when (it) {
+                        true -> Res.string.enabled
+                        false -> Res.string.disabled
+                    }.asStringSource()
                 },
             ),
         )
     }
+
     data class Config(
         val id: Long,
     )
