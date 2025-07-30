@@ -43,14 +43,14 @@ private object LinuxDesktopEntryCreator {
             appendLine("Comment=$comment")
             appendLine("GenericName=Downloader")
             appendLine("Categories=Utility;Network;")
-            appendLine("Exec=$execFile")
-            appendLine("Icon=$iconFilePath")
+            appendLine("Exec=\"$execFile\"")
+            appendLine("Icon=${iconFilePath}")
             appendLine("Terminal=false")
             appendLine("Type=Application")
             appendLine("StartupWMClass=${startupWMClass}")
         }
         val homePath = System.getProperty("user.home")
-        val desktopEntryFile = File(homePath, "/.local/share/applications/${desktopEntryFilename}.desktop")
+        val desktopEntryFile = File(homePath, ".local/share/applications/${desktopEntryFilename}.desktop")
         desktopEntryFile.writeText(desktopEntryContent)
     }
 
@@ -58,7 +58,7 @@ private object LinuxDesktopEntryCreator {
         return runCatching {
             val file = File(execFile)
             val name = file.name
-            return file
+            file
                 .parentFile.parentFile
                 .resolve("lib/$name.png")
                 .takeIf { it.exists() }?.path
