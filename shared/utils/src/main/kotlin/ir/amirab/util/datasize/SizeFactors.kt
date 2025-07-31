@@ -37,7 +37,7 @@ sealed class SizeFactors(
         }
         // we need lowest
         if (value == 0L) {
-            acceptedFactors.first()
+            return acceptedFactors.first()
         }
         // no other choice
         if (acceptedFactors.size == 1) return acceptedFactors.first()
