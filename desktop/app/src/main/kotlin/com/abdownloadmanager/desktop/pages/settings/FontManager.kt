@@ -95,8 +95,17 @@ class FontManager(
         if (booted) return
 
         val systemFontFamilies = getUsableFontFamilyNamesOfSystem()
-            .mapNotNull {
-                val uri = URI(SYSTEM_PROTOCOL, it, null).toString()
+            .mapNotNull { fontFamilyName ->
+                val uri = runCatching {
+                    URI(SYSTEM_PROTOCOL, fontFamilyName, null).toString()
+                }.onFailure { throwable ->
+                    // it seems that some fonts has empty name, which causes URI creation to fail
+                    // in order to not break the app, we will just ignore those fonts
+                    println("system font family with name:\"$fontFamilyName\" can't be used: $throwable")
+                }.getOrNull()
+                if (uri == null) {
+                    return@mapNotNull null
+                }
                 val fontFamily = getFontByUri(uri)
                 if (fontFamily == null) {
                     return@mapNotNull null
@@ -104,7 +113,7 @@ class FontManager(
                 FontInfo(
                     id = uri,
                     uri = uri,
-                    name = it.asStringSource(),
+                    name = fontFamilyName.asStringSource(),
                     fontFamily = fontFamily,
                 )
             }
