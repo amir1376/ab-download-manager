@@ -10,9 +10,14 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
 import java.io.File
+import javax.inject.Inject
 
 abstract class CreateDmgTask : DefaultTask() {
+    @get:Inject
+    abstract val execOps: ExecOperations
+
     @get:InputDirectory
     abstract val inputDir: DirectoryProperty
 
@@ -129,7 +134,7 @@ abstract class CreateDmgTask : DefaultTask() {
 
         logger.debug("Creating DMG with shell command: {}", fullCommand)
 
-        project.exec {
+        execOps.exec {
             commandLine("sh", "-c", fullCommand)
             isIgnoreExitValue = false
         }
