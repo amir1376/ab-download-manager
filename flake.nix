@@ -128,7 +128,7 @@
           meta = with pkgs.lib; {
             description = "A download manager to manage and organize your download files better than before";
             homepage = "https://github.com/amir1376/ab-download-manager";
-            license = licenses.gpl3;
+            license = licenses.asl20;
             maintainers = with maintainers; [ ];
             platforms = platforms.linux;
           };
