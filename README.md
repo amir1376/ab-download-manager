@@ -59,6 +59,76 @@ winget install amir1376.ABDownloadManager
 scoop install extras/abdownloadmanager
 ```
 
+#### Install on NixOS
+
+You can install AB Download Manager on NixOS by adding the community flake to your system configuration.
+
+**Prerequisites:** You must have [Nix Flakes](https://nixos.wiki/wiki/Flakes) enabled on your NixOS system.
+
+1.  **Add the Flake to your NixOS Configuration**
+
+    In your system's `flake.nix` (usually at `/etc/nixos/flake.nix`), add `ab-download-manager` as an input:
+
+    ```nix
+    # /etc/nixos/flake.nix
+    {
+      inputs = {
+        nixpkgs.url = "github:Nixos/nixpkgs/nixos-unstable";
+        
+        # Add this line
+        ab-download-manager.url = "github:amir1376/ab-download-manager";
+      };
+
+      outputs = { self, nixpkgs, ab-download-manager, ... }: {
+        # ...
+      };
+    }
+    ```
+
+2.  **Add the Package to your System**
+
+    In the same `flake.nix`, pass the package to your modules using `specialArgs`. Then, in your `configuration.nix`, add it to `environment.systemPackages`.
+
+    ```nix
+    # /etc/nixos/flake.nix
+    {
+      # ... inputs from step 1
+      outputs = { self, nixpkgs, ab-download-manager, ... }: {
+        nixosConfigurations."your-hostname" = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            # Pass the package to configuration.nix
+            ab-download-manager-pkg = ab-download-manager.packages.x86_64-linux.default;
+          };
+          modules = [ ./configuration.nix ];
+        };
+      };
+    }
+    ```
+    
+    Now add the package in your `configuration.nix`:
+    ```nix
+    # /etc/nixos/configuration.nix
+    { config, pkgs, ab-download-manager-pkg, ... }:
+    {
+      environment.systemPackages = [
+        # ... your other packages
+        ab-download-manager-pkg
+      ];
+    }
+    ```
+
+3.  **Rebuild your System**
+
+    Apply the changes with:
+
+    ```bash
+    sudo nixos-rebuild switch --flake /etc/nixos#your-hostname
+    ```
+    *(Replace `your-hostname` with your system's actual hostname)*
+
+    After rebuilding, AB Download Manager will be installed and available in your applications menu.
+
 ### Browser Extensions
 
 You can download the browser extension to integrate the app with your browser.
