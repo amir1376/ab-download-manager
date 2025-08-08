@@ -1,6 +1,6 @@
 package ir.amirab.downloader.connection.response.headers
 
-import java.net.URLDecoder
+import java.nio.charset.Charset
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -8,7 +8,7 @@ fun extractFileNameFromContentDisposition(contentDispositionValue: String): Stri
     utf8FileNameRegex.find(contentDispositionValue)
         ?.groups?.get("fileName")
         ?.value?.let {
-            runCatching { URLDecoder.decode(it, Charsets.UTF_8) }
+            runCatching { FilenameDecoder.decode(it, Charsets.UTF_8) }
                 .getOrNull()
         }?.let {
             return it
@@ -21,7 +21,7 @@ fun extractFileNameFromContentDisposition(contentDispositionValue: String): Stri
             fileName = runCatching {
                 EmailMimeWordDecoder.decode(fileName)
             }.getOrNull() ?: fileName
-            runCatching { URLDecoder.decode(fileName, Charsets.UTF_8) }
+            runCatching { FilenameDecoder.decode(fileName, Charsets.UTF_8) }
                 .getOrNull()
         }?.let {
             return it
@@ -34,6 +34,35 @@ private val asciiFileNameRegex = """filename=(["']?)(?<fileName>.*?[^\\])\1(?:; 
 
 private val utf8FileNameRegex = """filename\*=UTF-8''(?<fileName>[\w%\-\.]+)(?:; ?|${'$'})"""
     .toRegex(RegexOption.IGNORE_CASE)
+
+/**
+ * this is very similar to URLDecoder however it doesn't replace "+" with " "
+ * RFC 5987
+ */
+private object FilenameDecoder {
+    fun decode(
+        encoded: String,
+        charset: Charset = Charsets.UTF_8,
+    ): String {
+        var strIndex = 0
+        var byteIndex = 0
+        val bytes = ByteArray(encoded.length)
+        while (strIndex < encoded.length) {
+            val ch = encoded[strIndex]
+            if (ch == '%' && (strIndex + 2) < encoded.length) {
+                bytes[byteIndex++] = encoded
+                    .substring(strIndex + 1, strIndex + 3) // after % take two chars
+                    .toInt(16)
+                    .toByte()
+                strIndex += 3 // %ab (3 chars)
+            } else {
+                bytes[byteIndex++] = ch.code.toByte()
+                strIndex++
+            }
+        }
+        return String(bytes, 0, byteIndex, charset)
+    }
+}
 
 /**
  * we use this class to decode the filename in content-disposition header in mail servers
