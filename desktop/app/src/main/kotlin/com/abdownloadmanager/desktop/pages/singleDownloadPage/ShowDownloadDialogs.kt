@@ -22,24 +22,10 @@ import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.desktop.screen.applyUiScale
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
 import java.awt.Dimension
 import java.awt.Taskbar
 import java.awt.Window
 
-//@Composable
-//fun DownloadDialogTitle(itemState: IDownloadItemState) {
-//    Row {
-//        if (itemState is ProcessingDownloadItemState) {
-//            Text("${itemState.percent}%")
-//            Text(" | ")
-//        }
-//        Text("${itemState.name}", Modifier.basicMarquee(iterations = Int.MAX_VALUE), maxLines = 1)
-//    }
-//}
 @Composable
 private fun getDownloadTitle(itemState: IDownloadItemState): String {
     return buildString {
@@ -64,28 +50,34 @@ class SingleProgressDownloadPageSizing {
 fun ShowDownloadDialogs(component: DownloadDialogManager) {
     val openedDownloadDialogs = component.openedDownloadDialogs.collectAsState().value
     for (singleDownloadComponent in openedDownloadDialogs) {
-        val itemState by singleDownloadComponent.itemStateFlow.collectAsState()
-        itemState?.let {
-            key(it.id) {
-                when (it) {
-                    is CompletedDownloadItemState -> {
-                        CompletedWindow(
-                            singleDownloadComponent,
-                            it,
-                        )
-                    }
+        key(singleDownloadComponent.downloadId) {
+            ShowDownloadDialog(singleDownloadComponent)
+        }
+    }
+}
 
-                    is ProcessingDownloadItemState -> {
-                        ProgressWindow(
-                            singleDownloadComponent = singleDownloadComponent,
-                            itemState = it,
-                        )
-                    }
-                }
+@Composable
+private fun ShowDownloadDialog(singleDownloadComponent: SingleDownloadComponent) {
+    val itemState by singleDownloadComponent.itemStateFlow.collectAsState()
+    itemState?.let {
+        when (it) {
+            is CompletedDownloadItemState -> {
+                CompletedWindow(
+                    singleDownloadComponent,
+                    it,
+                )
+            }
+
+            is ProcessingDownloadItemState -> {
+                ProgressWindow(
+                    singleDownloadComponent = singleDownloadComponent,
+                    itemState = it,
+                )
             }
         }
     }
 }
+
 
 @Composable
 private fun FrameWindowScope.CommonContent(
