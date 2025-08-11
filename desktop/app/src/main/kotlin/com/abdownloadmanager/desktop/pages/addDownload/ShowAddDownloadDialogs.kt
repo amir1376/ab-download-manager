@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
@@ -28,68 +29,79 @@ import java.awt.Dimension
 
 @Composable
 fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
-
     val openedAddDownloadDialogs = component.openedAddDownloadDialogs.collectAsState().value
     for (addDownloadComponent in openedAddDownloadDialogs) {
-        val shouldShowWindow by addDownloadComponent.shouldShowWindow.collectAsState()
-        if (!shouldShowWindow) return
-        val onRequestClose = {
-            component.closeAddDownloadDialog(addDownloadComponent.id)
+        key(addDownloadComponent.id) {
+            AddDownloadWindow(
+                addDownloadComponent = addDownloadComponent,
+                onRequestClose = {
+                    component.closeAddDownloadDialog(addDownloadComponent.id)
+                }
+            )
         }
-        val uiScale = LocalUiScale.current
-        when (addDownloadComponent) {
-            is AddSingleDownloadComponent -> {
-                val h = 265.applyUiScale(uiScale)
-                val w = 500.applyUiScale(uiScale)
-                val size = remember {
-                    DpSize(
-                        height = h.dp,
-                        width = w.dp,
-                    )
-                }
+    }
+}
 
-                val state = rememberWindowState(
-                    size = size,
-                    position = WindowPosition(Alignment.Center)
-                )
-                CustomWindow(
-                    state = state,
-                    onCloseRequest = onRequestClose,
-                    alwaysOnTop = true,
-                ) {
-                    LaunchedEffect(Unit) {
-                        window.minimumSize = Dimension(w, h)
-                        PlatformAppActivator.active()
-                    }
-//                    BringToFront()
-                    WindowTitle(myStringResource(Res.string.add_download))
-                    WindowIcon(MyIcons.appIcon)
-                    AddDownloadPage(addDownloadComponent)
-                }
-            }
-
-            is AddMultiDownloadComponent -> {
-                val h = 450
-                val w = 800
-                val state = rememberWindowState(
+@Composable
+private fun AddDownloadWindow(
+    addDownloadComponent: AddDownloadComponent,
+    onRequestClose: () -> Unit,
+) {
+    val shouldShowWindow by addDownloadComponent.shouldShowWindow.collectAsState()
+    if (!shouldShowWindow) return
+    val uiScale = LocalUiScale.current
+    when (addDownloadComponent) {
+        is AddSingleDownloadComponent -> {
+            val h = 265.applyUiScale(uiScale)
+            val w = 500.applyUiScale(uiScale)
+            val size = remember {
+                DpSize(
                     height = h.dp,
                     width = w.dp,
-                    position = WindowPosition(Alignment.Center)
                 )
-                CustomWindow(
-                    state = state,
-                    onCloseRequest = onRequestClose,
-                    alwaysOnTop = true,
-                ) {
-                    LaunchedEffect(Unit) {
-                        window.minimumSize = Dimension(w, h)
-                        PlatformAppActivator.active()
-                    }
-//                    BringToFront()
-                    WindowTitle(myStringResource(Res.string.add_download))
-                    WindowIcon(MyIcons.appIcon)
-                    AddMultiItemPage(addDownloadComponent)
+            }
+
+            val state = rememberWindowState(
+                size = size,
+                position = WindowPosition(Alignment.Center)
+            )
+            CustomWindow(
+                state = state,
+                onCloseRequest = onRequestClose,
+                alwaysOnTop = true,
+            ) {
+                LaunchedEffect(Unit) {
+                    window.minimumSize = Dimension(w, h)
+                    PlatformAppActivator.active()
                 }
+//                    BringToFront()
+                WindowTitle(myStringResource(Res.string.add_download))
+                WindowIcon(MyIcons.appIcon)
+                AddDownloadPage(addDownloadComponent)
+            }
+        }
+
+        is AddMultiDownloadComponent -> {
+            val h = 450
+            val w = 800
+            val state = rememberWindowState(
+                height = h.dp,
+                width = w.dp,
+                position = WindowPosition(Alignment.Center)
+            )
+            CustomWindow(
+                state = state,
+                onCloseRequest = onRequestClose,
+                alwaysOnTop = true,
+            ) {
+                LaunchedEffect(Unit) {
+                    window.minimumSize = Dimension(w, h)
+                    PlatformAppActivator.active()
+                }
+//                    BringToFront()
+                WindowTitle(myStringResource(Res.string.add_download))
+                WindowIcon(MyIcons.appIcon)
+                AddMultiItemPage(addDownloadComponent)
             }
         }
     }
