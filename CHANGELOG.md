@@ -14,6 +14,22 @@
 
 ### Security
 
+## 1.6.9
+
+### Fixed
+
+- "Keep System Awake" was not properly cancelled on Windows (#755)
+- "Create Desktop Entry" had issue if the path contains spaces on Linux (#733)
+- Application crash on systems that have invalid font names (#737)
+- Some settings statuses were not updating correctly (#732)
+- "Download Dialog" position shifted when multiple dialogs were open simultaneously (#758)
+- "Add Download Dialog" position shifted when multiple dialogs were open simultaneously (#761)
+
+### Improved
+
+- Translations updated
+- Better handling of filenames received from the server (#759)
+
 ## 1.6.8
 
 ### Fixed
