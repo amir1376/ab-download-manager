@@ -9,19 +9,19 @@ import kotlin.io.path.fileStore
 
 object SparseFile {
     private val fileSystemsSupportingSparseFiles = listOf(
-        "NTFS",
-        "ext4",
-        "ext3",
-        "XFS",
-        "Btrfs",
-        "ZFS",
-        "ReiserFS",
-        "APFS",
-        "exFAT",
-        "HFS+",
-        "UFS",
-        "ReFS"
+        // Windows
+        "NTFS", "ReFS",
+        // Linux / Unix
+        "ext4", "ext3", "ext2",
+        "XFS", "Btrfs", "ZFS", "ReiserFS", "JFS", "F2FS",
+        "UFS", "UFS2", "tmpfs", "OverlayFS",
+        // macOS
+        "APFS", "HFS+",
+        // Network file systems (if server supports sparse files)
+        "SMB", "CIFS", "NFS", "NFSv4",
     )
+        .map { it.lowercase() }
+        .toSet()
 
     fun createSparseFile(file: File): Boolean {
         if (!file.exists()) {
@@ -30,9 +30,13 @@ object SparseFile {
                 StandardOpenOption.CREATE_NEW,
                 StandardOpenOption.SPARSE
             )
-            Files.newByteChannel(file.toPath(), *options).use {
-                return true
-            }
+            return runCatching {
+                Files.newByteChannel(
+                    file.toPath(),
+                    *options,
+                ).use {}
+                true
+            }.getOrElse { false }
         }
         return false
     }
@@ -42,24 +46,26 @@ object SparseFile {
      */
     fun canWeCreateSparseFile(file: File): Boolean {
         return kotlin.runCatching {
-            val nearestFileExist = file.findNearestExistingFile()?:return false
+            val nearestFileExist = file.findNearestExistingFile() ?: return false
             val type = nearestFileExist
                 .toPath()
                 .fileStore()
                 .type()
-            fileSystemsSupportingSparseFiles
-                .find { it.equals(type, true) } != null
+                .lowercase()
+            // both must be lowercase
+            fileSystemsSupportingSparseFiles.contains(type)
         }.getOrElse { false }
     }
+
     private fun File.findNearestExistingFile(): File? {
-        var f:File? = this
-        while (true){
-            if (f==null){
+        var f: File? = this
+        while (true) {
+            if (f == null) {
                 return null
             }
-            if (f.exists()){
+            if (f.exists()) {
                 return f
-            }else{
+            } else {
                 f = f.parentFile
             }
         }
