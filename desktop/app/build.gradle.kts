@@ -326,12 +326,26 @@ fun AbstractArchiveTask.fromAppImagePath() {
     destinationDirectory.set(distributableAppArchiveDir)
 }
 
+/**
+ * gradle 9 removes file permissions and timestamp by default in archive tasks!. but we want them!
+ */
+fun AbstractArchiveTask.preserveFileAttributes() {
+    // Make file order based on the file system
+    isReproducibleFileOrder = false
+    // Use file timestamps from the file system
+    isPreserveFileTimestamps = true
+    // Use permissions from the file system
+    useFileSystemPermissions()
+}
+
 val createDistributableAppArchiveTar by tasks.registering(Tar::class) {
+    preserveFileAttributes()
     archiveFileName.set("app.tar.gz")
     compression = Compression.GZIP
     fromAppImagePath()
 }
 val createDistributableAppArchiveZip by tasks.registering(Zip::class) {
+    preserveFileAttributes()
     archiveFileName.set("app.zip")
     fromAppImagePath()
 }
