@@ -206,7 +206,7 @@ private fun RenderChangeLog(
     changeLog: String,
     horizontalPadding: Dp,
 ) {
-    val trimmedChangelog = remember {
+    val trimmedChangelog = remember(changeLog) {
         changeLog
             .lines()
             .filterNot { it.isBlank() }
