@@ -242,6 +242,9 @@ fun DownloadList(
                                     indication = LocalIndication.current
                                 )
                                 .hoverable(itemInteractionSource)
+                                .focusable(
+                                    interactionSource = itemInteractionSource
+                                )
                                 .let {
                                     if (isSelected) {
                                         val selectionColor = myColors.onBackground
