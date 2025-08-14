@@ -14,6 +14,24 @@
 
 ### Security
 
+## 1.6.10
+
+### Added
+
+- New Black theme (#767)
+
+### Fixed
+
+- Restored missing executable permissions for files inside archives (macOS & Linux) (#765)
+- Eliminated flickering on the "New Update" page (#770)
+
+### Improved
+
+- Updated translations
+- Hovering between menus now works without closing the open one (#766)
+- Better item selection and new keyboard shortcuts on the queue items page (#769)
+- Small UI improvements
+
 ## 1.6.9
 
 ### Fixed
