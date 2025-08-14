@@ -59,9 +59,17 @@ fun MenuBar(
     ) {
         for (subMenu in subMenuList) {
             val isSelected = openedItem == subMenu
+            val interactionSource = remember { MutableInteractionSource() }
+            val isHovered by interactionSource.collectIsHoveredAsState()
+            LaunchedEffect(isHovered) {
+                if (isHovered && openedItem != null) {
+                    openedItem = subMenu
+                }
+            }
             Column {
                 Column(
                     modifier
+                        .hoverable(interactionSource)
                         .clickable {
                             openedItem = subMenu
                         }
@@ -81,7 +89,8 @@ fun MenuBar(
                 }
                 if (isSelected) {
                     MyDropDown(
-                        onDismissRequest = onRequestClose
+                        onDismissRequest = onRequestClose,
+                        focusable = false,
                     ) {
                         CompositionLocalProvider(
                             LocalMenuBoxClip provides RectangleShape
@@ -200,7 +209,8 @@ private fun ReactableItem(
         ?.isEnabled
         ?.collectAsState()
         ?.value ?: true
-    Row(modifier
+    Row(
+        modifier
         .ifThen(!isEnabled) { alpha(0.5f) }
         .hoverable(interactionSource)
         .background(
