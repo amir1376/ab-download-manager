@@ -98,6 +98,30 @@ object DefaultThemes {
         isLight = false
     )
 
+    val black = MyColors(
+        id = "black",
+        name = "Black",
+        primary = Color(0xFF4791BF),
+        primaryVariant = Color(0xFF60A6D9),
+        onPrimary = Color(0xFFEFF2F6),
+        secondary = Color(0xFFB85DFF),
+        secondaryVariant = Color(0xFFD1A6FF),
+        onSecondary = Color(0xFFEFF2F6),
+        background = Color(0xFF000000),
+        onBackground = Color(0xFFEFEFEF),
+        surface = Color(0xFF1A1F26),
+        onSurface = Color(0xFFEFEFEF),
+        error = Color(0xFFEA4C3C),
+        onError = Color(0xFFFFFFFF),
+        success = Color(0xFF45B36B),
+        onSuccess = Color(0xFFFFFFFF),
+        warning = Color(0xFFF6C244),
+        onWarning = Color(0xFF000000),
+        info = Color(0xFF40A9F3),
+        onInfo = Color(0xFF000000),
+        isLight = false
+    )
+
     val lightGray = MyColors(
         id = "light_gray",
         name = "Light Gray",
@@ -129,6 +153,7 @@ object DefaultThemes {
             light,
             obsidian,
             deepOcean,
+            black,
             lightGray,
         )
     }
