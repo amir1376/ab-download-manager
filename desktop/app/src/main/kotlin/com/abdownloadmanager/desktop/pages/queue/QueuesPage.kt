@@ -10,9 +10,10 @@ import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
@@ -27,6 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +50,7 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.desktop.isCtrlPressed
+import ir.amirab.util.desktop.isSiftPressed
 import kotlinx.coroutines.*
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
@@ -190,7 +198,6 @@ fun RenderQueueItems(
     component: QueueInfoComponent,
 ) {
     val windowInfo = LocalWindowInfo.current
-    val queueModel by component.downloadQueue.queueModel.collectAsState()
     val downloadItems by component.downloadQueueItems.collectAsState()
     val selectedIds by component.selectedListItems.collectAsState()
     val lazyListState = rememberLazyListState()
@@ -200,13 +207,54 @@ fun RenderQueueItems(
             component.swapItem(from.index, to.index)
         }
     )
-
+    val listInteractionSource = remember { MutableInteractionSource() }
     Column(modifier) {
         LazyColumn(
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .weight(1f)
+                .clickable(
+                    indication = null,
+                    interactionSource = listInteractionSource
+                ) {
+                    component.clearSelection()
+                }
+                .onKeyEvent {
+                    if (it.type != KeyEventType.KeyDown) {
+                        return@onKeyEvent false
+                    }
+                    when (it.key) {
+                        Key.A if it.isCtrlPressed -> {
+                            component.selectAll()
+                            true
+                        }
+
+                        Key.Escape -> {
+                            component.clearSelection()
+                            true
+                        }
+
+                        Key.Delete -> {
+                            component.deleteItems()
+                            true
+                        }
+
+                        Key.DirectionUp -> {
+                            component.moveUpItems()
+                            true
+                        }
+
+                        Key.DirectionDown -> {
+                            component.moveDownItems()
+                            true
+                        }
+
+                        else -> {
+                            false
+                        }
+                    }
+                }
         ) {
             itemsIndexed(downloadItems,
                 key = { _, item -> item.id }
@@ -219,7 +267,8 @@ fun RenderQueueItems(
                         component.setSelectedItem(
                             id = downloadItem.id,
                             selected = selected,
-                            singleSelect = !isCtrlPressed(windowInfo)
+                            ctrlPressed = isCtrlPressed(windowInfo),
+                            shiftPressed = isSiftPressed(windowInfo),
                         )
                     },
                     index = index
@@ -278,15 +327,6 @@ private fun LazyItemScope.RenderQueueItem(
     ) { dragging ->
         Box(
             modifier = Modifier
-                .background(
-                    animateColorAsState(
-                        if (dragging) {
-                            myColors.onBackground / 10
-                        } else {
-                            Color.Transparent
-                        }
-                    ).value
-                )
                 .draggableHandle()
         ) {
             NavigateableItem(

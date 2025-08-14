@@ -4,8 +4,8 @@ import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,7 +37,7 @@ fun NavigateableItem(
                             .background(myColors.selectionGradient(0.15f, 0f, selectionColor))
                     } else it
                 }
-                .onClick {
+                .clickable {
                     onClick()
                 }
                 .padding(8.dp),

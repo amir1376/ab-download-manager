@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.collections.map
 
 class QueueInfoComponent(
     ctx: ComponentContext,
@@ -39,6 +40,7 @@ class QueueInfoComponent(
 
 
     val selectedListItems = MutableStateFlow(emptyList<Long>())
+    private val lastSelectedItem = MutableStateFlow(null as Long?)
 
     val extraQueueSettingsStorage by inject<ExtraQueueSettingsStorage>()
     val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
@@ -65,20 +67,32 @@ class QueueInfoComponent(
         }.launchIn(scope)
     }
 
+    fun selectAll() {
+        val all = downloadQueueItems.value.map {
+            it.id
+        }
+        selectedListItems.value = all
+        lastSelectedItem.value = all.last()
+    }
+
+    fun clearSelection() {
+        selectedListItems.value = emptyList()
+        lastSelectedItem.value = null
+    }
+
     fun setSelectedItem(
         id: Long,
         selected: Boolean,
-        singleSelect: Boolean,
+        ctrlPressed: Boolean,
+        shiftPressed: Boolean,
     ) {
-        selectedListItems.update {
-            if (singleSelect) {
-                if (selected) {
-                    listOf(id)
-                } else {
-                    emptyList()
-                }
-            } else {
-                it.toMutableStateList().also { mutableList ->
+        val selectedIds = selectedListItems.value
+        val availableItems = downloadQueueItems.value
+
+        selectedListItems.value = selectedIds.let { selectedIds ->
+            if (ctrlPressed) {
+                lastSelectedItem.value = id
+                selectedIds.toMutableStateList().also { mutableList ->
                     val contains = mutableList.contains(id)
                     if (contains && !selected) {
                         mutableList.remove(id)
@@ -86,8 +100,34 @@ class QueueInfoComponent(
                         mutableList.add(id)
                     }
                 }.toList()
+            } else if (shiftPressed) {
+                val lastSelected = lastSelectedItem.value
+                val fromIndex = lastSelected?.let { lastSelectedId ->
+                    availableItems.indexOfFirst { itemState ->
+                        itemState.id == lastSelectedId
+                    }.takeIf { it != -1 }
+                }
+                val toIndex = availableItems.indexOfFirst { itemState ->
+                    itemState.id == id
+                }.takeIf { it != -1 }
+                if (fromIndex != null && toIndex != null) {
+                    availableItems.map { it.id }.subList(
+                        minOf(fromIndex, toIndex),
+                        maxOf(fromIndex, toIndex) + 1,
+                    )
+                } else {
+                    lastSelectedItem.value = id
+                    listOf(id)
+                }
+            } else {
+                if (selected) {
+                    lastSelectedItem.value = id
+                    listOf(id)
+                } else {
+                    lastSelectedItem.value = null
+                    emptyList()
+                }
             }
-
         }
     }
 
