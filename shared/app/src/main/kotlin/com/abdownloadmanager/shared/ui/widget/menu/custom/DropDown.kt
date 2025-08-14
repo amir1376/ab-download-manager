@@ -13,6 +13,7 @@ fun MyDropDown(
     offset: DpOffset = DpOffset.Zero,
     anchor: Alignment = Alignment.BottomStart,
     alignment: Alignment = Alignment.BottomEnd,
+    focusable: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val positionProvider = rememberComponentRectPositionProvider(
@@ -23,7 +24,7 @@ fun MyDropDown(
     Popup(
         popupPositionProvider = positionProvider,
         onDismissRequest = onDismissRequest,
-        properties = PopupProperties(focusable = true),
+        properties = PopupProperties(focusable = focusable),
         content = {
             content()
         })
