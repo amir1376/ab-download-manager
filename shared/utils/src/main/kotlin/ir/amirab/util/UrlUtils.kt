@@ -2,7 +2,6 @@ package ir.amirab.util
 
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import java.net.URLDecoder
 
 object UrlUtils {
     fun createURL(url: String): HttpUrl {
@@ -21,7 +20,7 @@ object UrlUtils {
                 .lastOrNull { it.isNotBlank() }
                 ?.let {
                     kotlin.runCatching {
-                        URLDecoder.decode(it, Charsets.UTF_8)
+                        FilenameDecoder.decode(it, Charsets.UTF_8)
                     }.getOrNull()
                 }
             if (foundName != null) {
