@@ -5,6 +5,7 @@ import ir.amirab.downloader.connection.response.headers.extractFileNameFromConte
 import ir.amirab.downloader.exception.UnSuccessfulResponseException
 import ir.amirab.downloader.utils.FileNameUtil
 import ir.amirab.util.UrlUtils
+import ir.amirab.util.ifThen
 
 data class ResponseInfo(
     val statusCode: Int,
@@ -48,28 +49,25 @@ data class ResponseInfo(
 
     val resumeSupport by lazy {
         // maybe server does not give us content-length or content-range, so we ignore resume support
-        isPartial && contentLength != null && contentRange?.fullSize!=null
+        isPartial && contentLength != null && contentRange?.fullSize != null
     }
 
     val fileName: String? by lazy {
-        val foundName = run {
+        run {
             val nameFromHeader = responseHeaders["content-disposition"]?.let {
                 extractFileNameFromContentDisposition(it)
             }
-            if (nameFromHeader != null) {
-                return@lazy nameFromHeader
+            nameFromHeader ?: UrlUtils.extractNameFromLink(requestUrl)
+        }
+            .orEmpty()
+            .ifThen(isWebPage()) {
+                FileNameUtil.replaceExtension(
+                    this,
+                    "html",
+                    true
+                )
             }
-            UrlUtils.extractNameFromLink(requestUrl).orEmpty()
-        }
-        var valueToReturn = foundName
-        if (isWebPage()) {
-            valueToReturn = FileNameUtil.replaceExtension(
-                valueToReturn,
-                "html",
-                true
-            )
-        }
-        valueToReturn
+            .takeIf { it.isNotEmpty() }
     }
 
     // It is good to use these properties to check file is valid
