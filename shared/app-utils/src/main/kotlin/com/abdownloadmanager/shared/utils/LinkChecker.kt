@@ -62,15 +62,13 @@ class LinkChecker(
 
 
     private fun updateNameAndLength(responseInfo: ResponseInfo?) {
-        val suggestedName = responseInfo?.fileName ?: kotlin.run {
-            UrlUtils.extractNameFromLink(this.credentials.value.link)
+        val suggestedName = responseInfo
+            ?.fileName
+            ?.let(FilenameFixer::fix)
+        val length = responseInfo?.run {
+            totalLength.takeIf { isSuccessFul }
         }
         _suggestedName.update { suggestedName }
-
-        _length.update {
-            responseInfo?.run {
-                totalLength.takeIf { isSuccessFul }
-            }
-        }
+        _length.update { length }
     }
 }
