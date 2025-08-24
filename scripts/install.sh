@@ -193,6 +193,10 @@ install_app() {
     # Create a .desktop file in ~/.local/share/applications
     cp "$HOME/.local/$APP_NAME/lib/com.abdownloadmanager.abdownloadmanager.desktop" "$HOME/.local/share/applications"
 
+    # Edit the .desktop file to put hard path bin
+    HARDPATH="$HOME/.local/bin/$APP_NAME"
+    sed -i -E "s|^(Exec=\")ABDownloadManager(\")|\1${HARDPATH}\2|" "$HOME/.local/share/applications/com.abdownloadmanager.abdownloadmanager.desktop"
+
     # Create the icon .png file in ~/.local/share/icons/hicolor/512x512/apps
     cp "$HOME/.local/$APP_NAME/lib/ABDownloadManager.png" "$HOME/.local/share/icons/hicolor/512x512/apps/com.abdownloadmanager.abdownloadmanager.png"
 
