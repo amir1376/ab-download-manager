@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<component type="desktop-application">
+  <id>com.abdownloadmanager.abdownloadmanager</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+
+  <developer_name>Amir Hossein Aghajari</developer_name>
+
+  <name>AB Download Manager</name>
+  <summary>A Download Manager that speeds up your downloads</summary>
+
+  <description>
+    <p>
+      AB Download Manager is a desktop application that helps you manage and organize your downloads more efficiently than ever before.
+    </p>
+    <p>Key Features:</p>
+    <ul>
+      <li>⚡️ Faster Download Speed</li>
+      <li>⏰ Queues and Schedulers</li>
+      <li>🌐 Browser Extensions</li>
+      <li>💻 Multiplatform (Windows / Linux / Mac)</li>
+      <li>🌙 Multiple Themes (Dark/Light) with modern UI</li>
+      <li>❤️ Free and Open Source</li>
+      <li>⏸️ Pause, resume, and retry downloads</li>
+      <li>📊 Download progress and statistics</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">com.abdownloadmanager.abdownloadmanager.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/amir1376/ab-download-manager/master/assets/screenshots/app-home_light.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/amir1376/ab-download-manager/master/assets/screenshots/app-download_light.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://abdownloadmanager.com</url>
+  <url type="bugtracker">https://github.com/amir1376/ab-download-manager/issues</url>
+  <url type="donation">https://github.com/amir1376/ab-download-manager/blob/master/DONATE.md</url>
+  <url type="translate">https://crowdin.com/project/ab-download-manager</url>
+  <url type="contribute" >https://github.com/amir1376/ab-download-manager/blob/master/CONTRIBUTING.md</url>
+
+  <categories>
+    <category>Utility</category>
+    <category>Network</category>
+    <category>FileTransfer</category>
+  </categories>
+
+  <keywords>
+    <keyword>download</keyword>
+    <keyword>manager</keyword>
+    <keyword>downloader</keyword>
+    <keyword>file</keyword>
+    <keyword>transfer</keyword>
+    <keyword>queue</keyword>
+    <keyword>scheduler</keyword>
+    <keyword>browser</keyword>
+    <keyword>extension</keyword>
+    <keyword>resume</keyword>
+    <keyword>accelerator</keyword>
+  </keywords>
+
+  <provides>
+    <binary>ABDownloadManager</binary>
+  </provides>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <releases>
+    <release version="1.6.10" date="2025-08-14" />
+  </releases>
+</component>
