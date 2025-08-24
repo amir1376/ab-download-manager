@@ -84,8 +84,14 @@ delete_app() {
     fi
 
     logger "removing $APP_NAME desktop file ..."
-    # --- Remove the .desktop file in ~/.local/share/applications
+    # --- Remove the .desktop file in ~/.local/share/applications (OLD VERSION)
     remove_if_exists "$HOME/.local/share/applications/com.abdownloadmanager.desktop"
+
+    # --- Remove the .desktop file in ~/.local/share/applications
+    remove_if_exists "$HOME/.local/share/applications/com.abdownloadmanager.abdownloadmanager.desktop"
+
+    # --- Remove the .png file in ~/.local/share/icons/hicolor/512x512/apps
+    remove_if_exists "$HOME/.local/share/icons/hicolor/512x512/apps/com.abdownloadmanager.abdownloadmanager.png"
 
     logger "removing $APP_NAME link ..."
     remove_if_exists "$HOME/.local/bin/$APP_NAME"
@@ -93,8 +99,11 @@ delete_app() {
     logger "removing $APP_NAME binary ..."
     remove_if_exists "$HOME/.local/$APP_NAME"
 
-    logger "removing $APP_NAME autostart at boot file ..."
+    logger "removing $APP_NAME autostart at boot file ..." # OLD VERSION
     remove_if_exists "$HOME/.config/autostart/com.abdownloadmanager.desktop"
+
+    logger "removing $APP_NAME autostart at boot file ..."
+    remove_if_exists "$HOME/.config/autostart/com.abdownloadmanager.abdownloadmanager.desktop"
 
     if [ -e "$HOME/.abdm" ]; then
         logger "removing $APP_NAME settings and download lists $HOME/.abdm"

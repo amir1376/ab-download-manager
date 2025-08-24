@@ -149,25 +149,13 @@ delete_old_version() {
     # then Remove the main binary files directory
     remove_if_exists "$HOME/.local/$APP_NAME"
 
+    # Remove old version autostart file
+    remove_if_exists "$HOME/.config/autostart/com.abdownloadmanager.abdownloadmanager.desktop"
+    # Remove old desktop file
+    remove_if_exists "$HOME/.local/share/applications/com.abdownloadmanager.desktop"
 
     # Log the removal action
     logger "Removed old version of $APP_NAME"
-}
-
-# --- Generate a .desktop file for the app
-generate_desktop_file() {
-    cat <<EOF > "$HOME/.local/share/applications/com.abdownloadmanager.desktop"
-[Desktop Entry]
-Name=AB Download Manager
-Comment=Manage and organize your download files better than before
-GenericName=Downloader
-Categories=Utility;Network;
-Exec="$BINARY_PATH"
-Icon=$ICON_PATH
-Terminal=false
-Type=Application
-StartupWMClass=com-abdownloadmanager-desktop-AppKt
-EOF
 }
 
 # --- Download the latest version of the app
@@ -203,13 +191,16 @@ install_app() {
     ln -sf "$BINARY_PATH" "$HOME/.local/bin/$APP_NAME"
 
     # Create a .desktop file in ~/.local/share/applications
-    generate_desktop_file
+    cp "$HOME/.local/$APP_NAME/lib/com.abdownloadmanager.abdownloadmanager.desktop" "$HOME/.local/share/applications"
+
+    # Create the icon .png file in ~/.local/share/icons/hicolor/512x512/apps
+    cp "$HOME/.local/$APP_NAME/lib/ABDownloadManager.png" "$HOME/.local/share/icons/hicolor/512x512/apps/com.abdownloadmanager.abdownloadmanager.png"
 
     logger "AB Download Manager installed successfully"
     logger "it can be found in Applications menu or run '$APP_NAME' in terminal"
     logger "Make sure $HOME/.local/bin exists in PATH"
     logger "installation logs saved in: ${LOG_FILE}"
-    
+
 }
 
 # --- Check if the app is installed
