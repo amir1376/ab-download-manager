@@ -197,8 +197,8 @@ install_app() {
     HARDPATH="$HOME/.local/bin/$APP_NAME"
     sed -i -E "s|^(Exec=\")ABDownloadManager(\")|\1${HARDPATH}\2|" "$HOME/.local/share/applications/com.abdownloadmanager.abdownloadmanager.desktop"
 
-    # Create the icon .png file in ~/.local/share/icons/hicolor/512x512/apps
-    cp "$HOME/.local/$APP_NAME/lib/ABDownloadManager.png" "$HOME/.local/share/icons/hicolor/512x512/apps/com.abdownloadmanager.abdownloadmanager.png"
+    # Install icon in the user context
+    xdg-icon-resource install --novendor --mode user --context apps --size 512 "$HOME/.local/$APP_NAME/lib/ABDownloadManager.png" com.abdownloadmanager.abdownloadmanager
 
     logger "AB Download Manager installed successfully"
     logger "it can be found in Applications menu or run '$APP_NAME' in terminal"

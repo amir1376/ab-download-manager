@@ -90,8 +90,8 @@ delete_app() {
     # --- Remove the .desktop file in ~/.local/share/applications
     remove_if_exists "$HOME/.local/share/applications/com.abdownloadmanager.abdownloadmanager.desktop"
 
-    # --- Remove the .png file in ~/.local/share/icons/hicolor/512x512/apps
-    remove_if_exists "$HOME/.local/share/icons/hicolor/512x512/apps/com.abdownloadmanager.abdownloadmanager.png"
+    # --- Remove the icon in the user context
+    xdg-icon-resource uninstall --mode user --context apps --size 512 com.abdownloadmanager.abdownloadmanager
 
     logger "removing $APP_NAME link ..."
     remove_if_exists "$HOME/.local/bin/$APP_NAME"
