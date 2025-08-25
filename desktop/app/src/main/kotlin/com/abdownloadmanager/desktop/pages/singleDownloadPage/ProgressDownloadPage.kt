@@ -534,7 +534,9 @@ private fun RenderPropertyItem(propertyItem: SingleDownloadPagePropertyItem) {
             Text(
                 text = value.rememberString(),
                 modifier = Modifier
-                    .basicMarquee()
+                    .basicMarquee(
+                        iterations = Int.MAX_VALUE
+                    )
                     .weight(0.7f),
                 maxLines = 1,
                 fontSize = myTextSizes.base,

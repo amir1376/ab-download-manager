@@ -164,9 +164,11 @@ private fun RenderName(
         }
         Spacer(Modifier.height(8.dp))
         Text(
-            name,
+            text = name,
             maxLines = 1,
-            modifier = Modifier.basicMarquee()
+            modifier = Modifier.basicMarquee(
+                iterations = Int.MAX_VALUE
+            )
         )
     }
 }
