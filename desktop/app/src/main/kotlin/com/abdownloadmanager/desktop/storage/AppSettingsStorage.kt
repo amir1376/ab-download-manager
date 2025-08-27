@@ -147,6 +147,7 @@ data class AppSettingsModel(
                 put(Keys.mergeTopBarWithTitleBar, focus.mergeTopBarWithTitleBar)
                 put(Keys.useNativeMenuBar, focus.useNativeMenuBar)
                 put(Keys.showIconLabels, focus.showIconLabels)
+                put(Keys.hideIconFromDock, focus.hideIconFromDock)
                 put(Keys.useRelativeDateTime, focus.useRelativeDateTime)
                 put(Keys.useSystemTray, focus.useSystemTray)
                 put(Keys.threadCount, focus.threadCount)
