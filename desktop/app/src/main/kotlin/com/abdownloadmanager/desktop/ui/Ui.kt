@@ -7,7 +7,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.desktop.AppComponent
@@ -99,6 +98,7 @@ object Ui : KoinComponent {
                 globalAppExceptionHandler = globalAppExceptionHandler,
             ) {
                 HandleEffectsForApp(appComponent)
+                SetDockIconVisibility(appComponent)
                 SystemTray(appComponent)
                 val showHomeSlot =
                     appComponent.showHomeSlot.collectAsState().value
@@ -139,6 +139,16 @@ object Ui : KoinComponent {
                 PowerActionAlert(appComponent)
             }
         }
+    }
+}
+
+
+@Composable
+private fun SetDockIconVisibility(appComponent: AppComponent) {
+    if (!Platform.isMac()) return
+    val hideIconFromDock by appComponent.hideIconFromDock.collectAsState()
+    LaunchedEffect(hideIconFromDock) {
+        if (hideIconFromDock) PlatformDockToggler.hide() else PlatformDockToggler.show()
     }
 }
 
@@ -217,12 +227,11 @@ private fun HandleEffectsForApp(appComponent: AppComponent) {
 }
 
 @Composable
-private fun ApplicationScope.SystemTray(
+private fun SystemTray(
     component: AppComponent,
 ) {
     val useSystemTray by component.useSystemTray.collectAsState()
     if (useSystemTray) {
-        LaunchedEffect(Unit) { PlatformDockToggler.hide() }
         IComposeSystemTray.Instance.ComposeSystemTray(
             icon = MyIcons.appIcon,
             onClick = showDownloadList,
@@ -235,7 +244,5 @@ private fun ApplicationScope.SystemTray(
                 }
             }
         )
-    } else {
-        LaunchedEffect(Unit) { PlatformDockToggler.show() }
     }
 }

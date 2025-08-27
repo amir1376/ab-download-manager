@@ -186,6 +186,7 @@ fun trackDeletedFilesOnDisk(appRepository: AppRepository): BooleanConfigurable {
         },
     )
 }
+
 fun deletePartialFileOnDownloadCancellation(appSettingsStorage: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_delete_partial_file_on_download_cancellation.asStringSource(),
@@ -626,6 +627,23 @@ fun useSystemTray(appSettings: AppSettingsStorage): BooleanConfigurable {
     )
 }
 
+
+fun hideIconFromDock(appSettings: AppSettingsStorage): BooleanConfigurable? {
+    if (!Platform.isMac()) return null
+    return BooleanConfigurable(
+        title = Res.string.settings_hide_icon_from_dock.asStringSource(),
+        description = Res.string.settings_hide_icon_from_dock_description.asStringSource(),
+        backedBy = appSettings.hideIconFromDock,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
 fun autoStartConfig(appSettings: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_start_on_boot.asStringSource(),
@@ -724,6 +742,7 @@ class SettingsComponent(
                     useRelativeDateTime(appSettings),
                     speedUnit(appRepository, scope),
                     playSoundNotification(appSettings),
+                    hideIconFromDock(appSettings),
                     useSystemTray(appSettings),
                 )
 

@@ -103,6 +103,7 @@ class AppComponent(
     val appSettings: AppSettingsStorage by inject()
     private val integration: Integration by inject()
     val useSystemTray = appSettings.useSystemTray
+    val hideIconFromDock = appSettings.hideIconFromDock
 
     fun openHome() {
         scope.launch {
