@@ -3,29 +3,38 @@ package ir.amirab.downloader.utils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
-
 
 class LockList<I, T>(
     private val getId: (T) -> I,
 ) {
     private data class LockWithCounter(
         val lock: Any = Any(),
-        val counter: AtomicInteger = AtomicInteger(),
+        var counter: Int = 1,
     )
 
     private val locks: ConcurrentHashMap<I, LockWithCounter> = ConcurrentHashMap()
     fun <R> withLock(item: T, block: (T) -> R): R {
         val id = getId(item)
-        val itemLock = locks.computeIfAbsent(id) { LockWithCounter() }
-        itemLock.counter.incrementAndGet()
-        return synchronized(itemLock.lock) {
-            try {
+        val itemLock = locks.compute(id) { k, existing ->
+            if (existing == null) {
+                return@compute LockWithCounter()
+            }
+            existing.counter++
+            existing
+        }!!
+        try {
+            return synchronized(itemLock.lock) {
                 block(item)
-            } finally {
-                if (itemLock.counter.decrementAndGet() == 0) {
-                    locks.remove(id)
+            }
+        } finally {
+            locks.compute(id) { k, existing ->
+                if (existing == null) {
+                    return@compute null
                 }
+                if ((--existing.counter) == 0) {
+                    return@compute null
+                }
+                existing
             }
         }
     }
@@ -36,21 +45,32 @@ class SuspendLockList<I, T>(
 ) {
     private data class LockWithCounter(
         val lock: Mutex = Mutex(),
-        val counter: AtomicInteger = AtomicInteger(),
+        var counter: Int = 1,
     )
 
     private val locks: ConcurrentHashMap<I, LockWithCounter> = ConcurrentHashMap()
     suspend fun <R> withLock(item: T, block: suspend (T) -> R): R {
         val id = getId(item)
-        val itemLock = locks.computeIfAbsent(id) { LockWithCounter() }
-        itemLock.counter.incrementAndGet()
-        return itemLock.lock.withLock {
-            try {
+        val itemLock = locks.compute(id) { key, existing ->
+            if (existing == null) {
+                return@compute LockWithCounter()
+            }
+            existing.counter++
+            existing
+        }!!
+        return try {
+            itemLock.lock.withLock {
                 block(item)
-            } finally {
-                if (itemLock.counter.decrementAndGet() == 0) {
-                    locks.remove(id)
+            }
+        } finally {
+            locks.compute(id) { key, existing ->
+                if (existing == null) {
+                    return@compute null
                 }
+                if ((--existing.counter) == 0) {
+                    return@compute null
+                }
+                existing
             }
         }
     }
