@@ -23,7 +23,7 @@ class ExtraQueueSettingsStorage(
     private fun getFileOf(id: Long) = folder
         .resolve("${id}.json")
 
-    private val updateLocks = SuspendLockList(ExtraQueueSettings::id)
+    private val updateLocks = SuspendLockList<Long>()
     private val lastEmits = MutableSharedFlow<ExtraQueueSettings>(
         extraBufferCapacity = 64,// too big!
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -47,7 +47,7 @@ class ExtraQueueSettingsStorage(
         val file = getFileOf(extraQueueSettings.id)
         lastEmits.tryEmit(extraQueueSettings)
         return withContext(Dispatchers.IO) {
-            updateLocks.withLock(extraQueueSettings) {
+            updateLocks.withLock(extraQueueSettings.id) {
                 transactionalFileSaver.writeObject(
                     file,
                     extraQueueSettings,
