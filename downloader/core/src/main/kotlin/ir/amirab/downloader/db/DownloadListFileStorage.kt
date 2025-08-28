@@ -1,20 +1,19 @@
 package ir.amirab.downloader.db
 
 import ir.amirab.downloader.downloaditem.DownloadItem
-import ir.amirab.downloader.utils.LockList
 import ir.amirab.downloader.utils.SuspendLockList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 
 class DownloadListFileStorage(
     private val downloadListFolder: File,
     private val fileSaver: TransactionalFileSaver,
 ) : IDownloadListDb {
+
+    private val fileLocks = SuspendLockList<Long>()
 
     fun getDownloadItemFile(id: Long): File {
         return downloadListFolder.resolve("$id.json")
@@ -36,7 +35,9 @@ class DownloadListFileStorage(
 
     override suspend fun getById(id: Long): DownloadItem? {
         return withContext(Dispatchers.IO) {
-            get(getDownloadItemFile(id))
+            fileLocks.withLock(id) {
+                get(getDownloadItemFile(id))
+            }
         }
     }
 
@@ -44,20 +45,21 @@ class DownloadListFileStorage(
     override suspend fun add(item: DownloadItem) {
         withContext(Dispatchers.IO) {
             addLock.withLock {
-                fileSaver.writeObject(getDownloadItemFile(item.id), item)
-                val lastId = getLastId()
-                if (lastId < item.id) {
-                    setLastId(item.id)
+                fileLocks.withLock(item.id) {
+                    fileSaver.writeObject(getDownloadItemFile(item.id), item)
+                    val lastId = getLastId()
+                    if (lastId < item.id) {
+                        setLastId(item.id)
+                    }
                 }
             }
         }
     }
 
-    private val updateLocks = SuspendLockList(DownloadItem::id)
     override suspend fun update(item: DownloadItem) {
         withContext(Dispatchers.IO) {
             // we don't use same lock for all items , but create lock for each item
-            updateLocks.withLock(item) {
+            fileLocks.withLock(item.id) {
                 fileSaver.writeObject(getDownloadItemFile(item.id), item)
             }
         }
@@ -91,11 +93,10 @@ class DownloadListFileStorage(
     private fun getLastIdFromFiles(): Long {
         return downloadListFolder.listFiles()!!.filter {
             it.name.endsWith(".json") && it.isFile
-        }.map {
-//                println(it.name)
-            it.name.substring(0, it.name.length - ".json".length).also {
-//                    println(it)
-            }.toLong()
-        }.maxOrNull() ?: -1L
+        }.maxOfOrNull {
+            it.name
+                .substring(0, it.name.length - ".json".length)
+                .toLong()
+        } ?: -1L
     }
 }

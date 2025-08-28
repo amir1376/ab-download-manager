@@ -4,18 +4,15 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
 
-class LockList<I, T>(
-    private val getId: (T) -> I,
-) {
+class LockList<T> {
     private data class LockWithCounter(
         val lock: Any = Any(),
         var counter: Int = 1,
     )
 
-    private val locks: ConcurrentHashMap<I, LockWithCounter> = ConcurrentHashMap()
+    private val locks: ConcurrentHashMap<T, LockWithCounter> = ConcurrentHashMap()
     fun <R> withLock(item: T, block: (T) -> R): R {
-        val id = getId(item)
-        val itemLock = locks.compute(id) { k, existing ->
+        val itemLock = locks.compute(item) { k, existing ->
             if (existing == null) {
                 return@compute LockWithCounter()
             }
@@ -27,7 +24,7 @@ class LockList<I, T>(
                 block(item)
             }
         } finally {
-            locks.compute(id) { k, existing ->
+            locks.compute(item) { k, existing ->
                 if (existing == null) {
                     return@compute null
                 }
@@ -40,18 +37,15 @@ class LockList<I, T>(
     }
 }
 
-class SuspendLockList<I, T>(
-    private val getId: (T) -> I,
-) {
+class SuspendLockList<T> {
     private data class LockWithCounter(
         val lock: Mutex = Mutex(),
         var counter: Int = 1,
     )
 
-    private val locks: ConcurrentHashMap<I, LockWithCounter> = ConcurrentHashMap()
+    private val locks: ConcurrentHashMap<T, LockWithCounter> = ConcurrentHashMap()
     suspend fun <R> withLock(item: T, block: suspend (T) -> R): R {
-        val id = getId(item)
-        val itemLock = locks.compute(id) { key, existing ->
+        val itemLock = locks.compute(item) { key, existing ->
             if (existing == null) {
                 return@compute LockWithCounter()
             }
@@ -63,7 +57,7 @@ class SuspendLockList<I, T>(
                 block(item)
             }
         } finally {
-            locks.compute(id) { key, existing ->
+            locks.compute(item) { key, existing ->
                 if (existing == null) {
                     return@compute null
                 }
