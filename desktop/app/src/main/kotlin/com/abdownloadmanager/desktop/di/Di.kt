@@ -82,6 +82,11 @@ import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.datastore.kotlinxSerializationDataStore
 import ir.amirab.util.desktop.DesktopUtils
+import ir.amirab.util.desktop.downloadlocation.LinuxDownloadLocationProvider
+import ir.amirab.util.desktop.downloadlocation.MacDownloadLocationProvider
+import ir.amirab.util.desktop.downloadlocation.WindowsDownloadLocationProvider
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.asDesktop
 import okhttp3.internal.tls.OkHostnameVerifier
 
 val downloaderModule = module {
@@ -457,6 +462,13 @@ val appModule = module {
             get(),
             get(),
         )
+    }
+    single<SystemDownloadLocationProvider> {
+        when (Platform.asDesktop()) {
+            Platform.Desktop.Windows -> WindowsDownloadLocationProvider()
+            Platform.Desktop.Linux -> LinuxDownloadLocationProvider()
+            Platform.Desktop.MacOS -> MacDownloadLocationProvider()
+        }
     }
 
 }

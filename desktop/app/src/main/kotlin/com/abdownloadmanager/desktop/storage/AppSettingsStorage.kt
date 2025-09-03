@@ -4,11 +4,11 @@ import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
 import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
+import com.abdownloadmanager.shared.utils.SystemDownloadLocationProvider
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.*
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
-import java.io.File
 
 @optics([arrow.optics.OpticsTarget.LENS])
 @Serializable
@@ -36,8 +36,9 @@ data class AppSettingsModel(
     val speedLimit: Long = 0,
     val autoStartOnBoot: Boolean = true,
     val notificationSound: Boolean = true,
-    val defaultDownloadFolder: String = File(System.getProperty("user.home"))
-        .resolve("Downloads/ABDM")
+    val defaultDownloadFolder: String = SystemDownloadLocationProvider
+        .instance.getDownloadLocation()
+        .resolve("ABDM")
         .canonicalFile.absolutePath,
     val browserIntegrationEnabled: Boolean = true,
     val browserIntegrationPort: Int = 15151,
@@ -91,13 +92,14 @@ data class AppSettingsModel(
 
         override fun get(source: MapConfig): AppSettingsModel {
             val default by lazy { AppSettingsModel.default }
+            // for nullable types we don't get default value
             return AppSettingsModel(
                 theme = source.get(Keys.theme) ?: default.theme,
                 defaultDarkTheme = source.get(Keys.defaultDarkTheme) ?: default.defaultDarkTheme,
                 defaultLightTheme = source.get(Keys.defaultLightTheme) ?: default.defaultLightTheme,
-                language = source.get(Keys.language) ?: default.language,
-                font = source.get(Keys.font) ?: default.font,
-                uiScale = source.get(Keys.uiScale) ?: default.uiScale,
+                language = source.get(Keys.language),
+                font = source.get(Keys.font),
+                uiScale = source.get(Keys.uiScale),
                 mergeTopBarWithTitleBar = source.get(Keys.mergeTopBarWithTitleBar) ?: default.mergeTopBarWithTitleBar,
                 useNativeMenuBar = source.get(Keys.useNativeMenuBar) ?: default.useNativeMenuBar,
                 showIconLabels = source.get(Keys.showIconLabels) ?: default.showIconLabels,
