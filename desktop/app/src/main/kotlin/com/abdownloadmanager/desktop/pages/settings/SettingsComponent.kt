@@ -23,6 +23,8 @@ import ir.amirab.util.compose.localizationmanager.LanguageInfo
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.datasize.CommonSizeConvertConfigs
 import ir.amirab.util.datasize.ConvertSizeConfig
+import ir.amirab.util.datasize.SizeFactors
+import ir.amirab.util.datasize.SizeUnit
 import ir.amirab.util.osfileutil.FileUtils
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
@@ -186,6 +188,7 @@ fun trackDeletedFilesOnDisk(appRepository: AppRepository): BooleanConfigurable {
         },
     )
 }
+
 fun deletePartialFileOnDownloadCancellation(appSettingsStorage: AppSettingsStorage): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_delete_partial_file_on_download_cancellation.asStringSource(),
@@ -246,6 +249,33 @@ fun useCategoryByDefault(appSettingsStorage: AppSettingsStorage): BooleanConfigu
     )
 }
 
+fun sizeUnit(
+    appRepository: AppRepository,
+    scope: CoroutineScope
+): EnumConfigurable<ConvertSizeConfig> {
+    return EnumConfigurable(
+        title = Res.string.settings_download_size_unit.asStringSource(),
+        description = Res.string.settings_download_size_unit_description.asStringSource(),
+        backedBy = createMutableStateFlowFromStateFlow(
+            appRepository.sizeUnit,
+            updater = { appRepository.setSizeUnit(it) },
+            scope = scope
+        ),
+        possibleValues = listOf(
+            CommonSizeConvertConfigs.BinaryBytes,
+            CommonSizeConvertConfigs.DecimalBytes,
+        ),
+        describe = {
+            val sizeUnit = SizeUnit(
+                SizeFactors.FactorValue.Kilo,
+                it.baseSize,
+                it.factors,
+            )
+            "$sizeUnit".asStringSource()
+        },
+    )
+}
+
 fun speedUnit(
     appRepository: AppRepository,
     scope: CoroutineScope
@@ -260,11 +290,18 @@ fun speedUnit(
         ),
         possibleValues = listOf(
             CommonSizeConvertConfigs.BinaryBytes,
+            CommonSizeConvertConfigs.DecimalBytes,
             CommonSizeConvertConfigs.BinaryBits,
+            CommonSizeConvertConfigs.DecimalBits,
         ),
         describe = {
-            val u = it.baseSize.longString()
-            "$u/s".asStringSource()
+            val sizeUnit = SizeUnit(
+                SizeFactors.FactorValue.Kilo,
+                it.baseSize,
+                it.factors,
+            )
+            val extraInfo = "${it.factors.baseValue} ${it.baseSize.longString()}/s"
+            "${sizeUnit}/s ($extraInfo)".asStringSource()
         },
     )
 }
@@ -722,6 +759,7 @@ class SettingsComponent(
                     useNativeMenuBarConfig(appSettings),
                     showIconLabels(appSettings),
                     useRelativeDateTime(appSettings),
+                    sizeUnit(appRepository, scope),
                     speedUnit(appRepository, scope),
                     playSoundNotification(appSettings),
                     useSystemTray(appSettings),

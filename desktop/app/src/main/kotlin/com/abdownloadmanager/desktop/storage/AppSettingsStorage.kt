@@ -7,6 +7,7 @@ import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
 import com.abdownloadmanager.shared.utils.SystemDownloadLocationProvider
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.*
+import ir.amirab.util.enumValueOrNull
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 
@@ -44,7 +45,8 @@ data class AppSettingsModel(
     val browserIntegrationPort: Int = 15151,
     val trackDeletedFilesOnDisk: Boolean = false,
     val deletePartialFileOnDownloadCancellation: Boolean = false,
-    val useBitsForSpeed: Boolean = false,
+    val sizeUnit: SupportedSizeUnits = SupportedSizeUnits.BinaryBytes,
+    val speedUnit: SupportedSizeUnits = SupportedSizeUnits.BinaryBytes,
     val ignoreSSLCertificates: Boolean = false,
     val useCategoryByDefault: Boolean = true,
     val userAgent: String = "",
@@ -83,7 +85,8 @@ data class AppSettingsModel(
             val browserIntegrationPort = intKeyOf("browserIntegrationPort")
             val trackDeletedFilesOnDisk = booleanKeyOf("trackDeletedFilesOnDisk")
             val deletePartialFileOnDownloadCancellation = booleanKeyOf("deletePartialFileOnDownloadCancellation")
-            val useBitsForSpeed = booleanKeyOf("useBitsForSpeed")
+            val sizeUnit = stringKeyOf("sizeUnit")
+            val speedUnit = stringKeyOf("speedUnit")
             val ignoreSSLCertificates = booleanKeyOf("ignoreSSLCertificates")
             val useCategoryByDefault = booleanKeyOf("useCategoryByDefault")
             val userAgent = stringKeyOf("userAgent")
@@ -128,7 +131,8 @@ data class AppSettingsModel(
                 trackDeletedFilesOnDisk = source.get(Keys.trackDeletedFilesOnDisk) ?: default.trackDeletedFilesOnDisk,
                 deletePartialFileOnDownloadCancellation = source.get(Keys.deletePartialFileOnDownloadCancellation)
                     ?: default.deletePartialFileOnDownloadCancellation,
-                useBitsForSpeed = source.get(Keys.useBitsForSpeed) ?: default.useBitsForSpeed,
+                sizeUnit = source.get(Keys.sizeUnit)?.enumValueOrNull<SupportedSizeUnits>() ?: default.sizeUnit,
+                speedUnit = source.get(Keys.speedUnit)?.enumValueOrNull<SupportedSizeUnits>() ?: default.speedUnit,
                 ignoreSSLCertificates = source.get(Keys.ignoreSSLCertificates) ?: default.ignoreSSLCertificates,
                 useCategoryByDefault = source.get(Keys.useCategoryByDefault) ?: default.useCategoryByDefault,
                 userAgent = source.get(Keys.userAgent) ?: default.userAgent,
@@ -165,7 +169,8 @@ data class AppSettingsModel(
                 put(Keys.browserIntegrationPort, focus.browserIntegrationPort)
                 put(Keys.trackDeletedFilesOnDisk, focus.trackDeletedFilesOnDisk)
                 put(Keys.deletePartialFileOnDownloadCancellation, focus.deletePartialFileOnDownloadCancellation)
-                put(Keys.useBitsForSpeed, focus.useBitsForSpeed)
+                put(Keys.sizeUnit, focus.sizeUnit.name)
+                put(Keys.speedUnit, focus.speedUnit.name)
                 put(Keys.ignoreSSLCertificates, focus.ignoreSSLCertificates)
                 put(Keys.useCategoryByDefault, focus.useCategoryByDefault)
                 put(Keys.userAgent, focus.userAgent)
@@ -236,7 +241,8 @@ class AppSettingsStorage(
     val browserIntegrationPort = from(AppSettingsModel.browserIntegrationPort)
     val trackDeletedFilesOnDisk = from(AppSettingsModel.trackDeletedFilesOnDisk)
     val deletePartialFileOnDownloadCancellation = from(AppSettingsModel.deletePartialFileOnDownloadCancellation)
-    val useBitsForSpeed = from(AppSettingsModel.useBitsForSpeed)
+    val sizeUnit = from(AppSettingsModel.sizeUnit)
+    val speedUnit = from(AppSettingsModel.speedUnit)
     val ignoreSSLCertificates = from(AppSettingsModel.ignoreSSLCertificates)
     val useCategoryByDefault = from(AppSettingsModel.useCategoryByDefault)
     val userAgent = from(AppSettingsModel.userAgent)
