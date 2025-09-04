@@ -131,11 +131,7 @@ private fun RenderSpeedConfig(cfg: SpeedLimitConfigurable, modifier: Modifier) {
                         setValue(
                             SizeConverter.sizeToBytes(
                                 SizeWithUnit(
-                                    256.0, SizeUnit(
-                                        SizeFactors.FactorValue.Kilo,
-                                        BaseSize.Bytes,
-                                        SizeFactors.BinarySizeFactors,
-                                    )
+                                    256.0, currentUnit
                                 )
                             )
                         )
