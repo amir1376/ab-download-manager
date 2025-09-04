@@ -14,6 +14,24 @@
 
 ### Security
 
+## 1.6.11
+
+### Added
+
+- Option to change the download size unit (#804)
+
+### Fixed
+
+- "Permission denied" error when starting a new download
+
+### Improved
+
+- Updated translations
+- Improved settings page (#805)
+- Automatically fix illegal characters in server-provided filenames (#781)
+- Better handling of filenames received from the server (#780)
+- Use the OS default download location on first launch (#789)
+
 ## 1.6.10
 
 ### Added
