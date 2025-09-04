@@ -14,21 +14,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun RenderConfigurableGroup(
     group: ConfigurableGroup,
     modifier: Modifier,
+    itemPadding: PaddingValues = PaddingValues(),
+    spaceBy: Dp = 8.dp,
 ) {
     val enabled by group.nestedEnabled.collectAsState()
     val visible by group.nestedVisible.collectAsState()
     val title by group.groupTitle.collectAsState()
-    val verticalPadding = 8
     Column(modifier
         .clip(RoundedCornerShape(6.dp))
         .background(myColors.surface/50)
-        .padding(start = verticalPadding.dp)
         .padding(horizontal = 4.dp)
     ) {
         title?.rememberString()?.let {
@@ -50,6 +51,7 @@ fun RenderConfigurableGroup(
             RenderConfigurable(it,
                 Modifier.fillMaxWidth()
                     .padding(vertical = 4.dp)
+                    .padding(itemPadding)
             )
         }
         AnimatedVisibility(visible) {
@@ -57,15 +59,15 @@ fun RenderConfigurableGroup(
                 Modifier
                     .padding(top = 4.dp)
                     .padding(horizontal = 4.dp)
-                    .padding(bottom = verticalPadding.dp)
                 ,
-                verticalArrangement = Arrangement
-                    .spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(spaceBy)
             ) {
                 group.nestedConfigurable.forEach {
                     RenderConfigurable(
                         cfg = it,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(itemPadding),
                         groupInfo = ConfigGroupInfo(
                             enabled = enabled,
                             visible = visible,

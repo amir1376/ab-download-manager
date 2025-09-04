@@ -5,6 +5,7 @@ import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -76,7 +77,7 @@ private fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
                 onTextChange = {
                     setValue(it)
                 },
-                shape = RectangleShape,
+                shape = RoundedCornerShape(6.dp),
                 textPadding = PaddingValues(4.dp),
                 placeholder = cfg.title.rememberString(),
                 end = {

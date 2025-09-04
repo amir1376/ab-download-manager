@@ -2,7 +2,9 @@ package com.abdownloadmanager.desktop.pages.settings.configurable
 
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,12 +50,12 @@ fun RenderStringConfig(cfg: StringConfigurable, modifier: Modifier) {
         },
         value = {
             MyTextField(
-                modifier = Modifier.width(100.dp),
+                modifier = Modifier.fillMaxWidth(),
                 text = value,
                 onTextChange = {
                     setValue(it)
                 },
-                shape = RectangleShape,
+                shape = RoundedCornerShape(6.dp),
                 textPadding = PaddingValues(4.dp),
                 placeholder = "",
             )

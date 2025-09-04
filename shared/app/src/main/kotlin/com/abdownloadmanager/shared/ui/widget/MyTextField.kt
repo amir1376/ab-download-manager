@@ -51,7 +51,7 @@ fun MyTextField(
         ?: LocalContentColor.current,
     focusedBorderColor: Color = myColors.primary,
     borderColor: Color = myColors.onBackground / 0.1f,
-    shape: Shape = RoundedCornerShape(12.dp),
+    shape: Shape = RoundedCornerShape(6.dp),
     textPadding: PaddingValues = PaddingValues(8.dp),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     fontSize: TextUnit = TextUnit.Unspecified,
