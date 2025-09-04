@@ -13,7 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
-import com.abdownloadmanager.desktop.utils.configurable.Configurable
+import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import com.abdownloadmanager.shared.utils.proxy.ProxyMode
@@ -53,7 +53,7 @@ sealed class SettingSections(
 }
 
 interface SettingSectionGetter {
-    operator fun get(key: SettingSections): List<Configurable<*>>
+    operator fun get(key: SettingSections): List<ConfigurableGroup>
 }
 
 object ThreadCountLimitation {
@@ -378,7 +378,7 @@ fun defaultDownloadFolderConfig(appSettings: AppSettingsStorage): FolderConfigur
     )
 }
 
-fun proxyConfig(proxyManager: ProxyManager, scope: CoroutineScope): ProxyConfigurable {
+fun proxyConfig(proxyManager: ProxyManager): ProxyConfigurable {
     return ProxyConfigurable(
         title = Res.string.settings_use_proxy.asStringSource(),
         description = Res.string.settings_use_proxy_description.asStringSource(),
@@ -495,9 +495,6 @@ fun defaultDarkThemeConfig(
     return ThemeConfigurable(
         title = Res.string.settings_default_dark_theme.asStringSource(),
         description = Res.string.settings_default_dark_theme_description.asStringSource(),
-        enabled = themeManager.currentThemeInfo.mapStateFlow {
-            it.id == ThemeManager.systemThemeInfo.id
-        },
         backedBy = createMutableStateFlowFromStateFlow(
             flow = currentDefaultDarkThemeInfo,
             updater = {
@@ -521,9 +518,6 @@ fun defaultLightThemeConfig(
     return ThemeConfigurable(
         title = Res.string.settings_default_light_theme.asStringSource(),
         description = Res.string.settings_default_light_theme_description.asStringSource(),
-        enabled = themeManager.currentThemeInfo.mapStateFlow {
-            it.id == ThemeManager.systemThemeInfo.id
-        },
         backedBy = createMutableStateFlowFromStateFlow(
             flow = currentDefaultLightThemeInfo,
             updater = {
@@ -745,50 +739,97 @@ class SettingsComponent(
     val languageManager by inject<LanguageManager>()
     val fontManager by inject<FontManager>()
     private val allConfigs = object : SettingSectionGetter {
-        override operator fun get(key: SettingSections): List<Configurable<*>> {
+        override operator fun get(key: SettingSections): List<ConfigurableGroup> {
             return when (key) {
-                Appearance -> listOfNotNull(
-                    themeConfig(themeManager, scope),
-                    defaultDarkThemeConfig(themeManager, scope),
-                    defaultLightThemeConfig(themeManager, scope),
-                    languageConfig(languageManager, scope),
-                    fontConfig(fontManager, scope),
-                    uiScaleConfig(appSettings),
-                    autoStartConfig(appSettings),
-                    mergeTopBarWithTitleBarConfig(appSettings),
-                    useNativeMenuBarConfig(appSettings),
-                    showIconLabels(appSettings),
-                    useRelativeDateTime(appSettings),
-                    sizeUnit(appRepository, scope),
-                    speedUnit(appRepository, scope),
-                    playSoundNotification(appSettings),
-                    useSystemTray(appSettings),
+                Appearance -> listOf(
+                    ConfigurableGroup(
+                        mainConfigurable = themeConfig(themeManager, scope),
+                        nestedVisible = themeManager.currentThemeInfo.mapStateFlow {
+                            it.id == ThemeManager.systemThemeInfo.id
+                        },
+                        nestedConfigurable = listOfNotNull(
+                            defaultDarkThemeConfig(themeManager, scope),
+                            defaultLightThemeConfig(themeManager, scope),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            languageConfig(languageManager, scope),
+                            fontConfig(fontManager, scope),
+                            uiScaleConfig(appSettings),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOfNotNull(
+                            useNativeMenuBarConfig(appSettings),
+                            mergeTopBarWithTitleBarConfig(appSettings),
+                            showIconLabels(appSettings),
+                            useRelativeDateTime(appSettings),
+                            playSoundNotification(appSettings),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            autoStartConfig(appSettings),
+                            useSystemTray(appSettings),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            sizeUnit(appRepository, scope),
+                            speedUnit(appRepository, scope),
+                            useAverageSpeedConfig(appRepository),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            autoShowDownloadProgressWindow(appSettings),
+                            showDownloadFinishWindow(appSettings),
+                        )
+                    )
                 )
 
 //                Network -> listOf()
                 BrowserIntegration -> listOf(
-                    browserIntegrationEnabled(appRepository),
-                    browserIntegrationPort(appRepository)
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            browserIntegrationEnabled(appRepository),
+                            browserIntegrationPort(appRepository)
+                        )
+                    )
                 )
 
                 DownloadEngine -> listOf(
-                    defaultDownloadFolderConfig(appSettings),
-                    proxyConfig(proxyManager, scope),
-                    useAverageSpeedConfig(appRepository),
-                    speedLimitConfig(appRepository),
-                    threadCountConfig(appRepository),
-                    maxDownloadRetryCount(appRepository),
-                    useCategoryByDefault(appSettings),
-                    dynamicPartDownloadConfig(appRepository),
-                    autoShowDownloadProgressWindow(appSettings),
-                    showDownloadFinishWindow(appSettings),
-                    useServerLastModified(appRepository),
-                    appendExtensionToIncompleteDownloads(appRepository),
-                    useSparseFileAllocation(appRepository),
-                    trackDeletedFilesOnDisk(appRepository),
-                    deletePartialFileOnDownloadCancellation(appSettings),
-                    ignoreSSLCertificates(appSettings),
-                    userAgent(appSettings),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            defaultDownloadFolderConfig(appSettings),
+                            useCategoryByDefault(appSettings),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            speedLimitConfig(appRepository),
+                            threadCountConfig(appRepository),
+                            maxDownloadRetryCount(appRepository),
+                            dynamicPartDownloadConfig(appRepository),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            proxyConfig(proxyManager),
+                            userAgent(appSettings),
+                            ignoreSSLCertificates(appSettings),
+                            useServerLastModified(appRepository),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            trackDeletedFilesOnDisk(appRepository),
+                            appendExtensionToIncompleteDownloads(appRepository),
+                            deletePartialFileOnDownloadCancellation(appSettings),
+                            useSparseFileAllocation(appRepository),
+                        )
+                    ),
                 )
             }
         }

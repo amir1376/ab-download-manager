@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -95,7 +96,7 @@ fun <T> RenderSpinner(
     val horizontalPadding = 4.dp
 
     var isOpen by remember { mutableStateOf(false) }
-    val shape = RectangleShape
+    val shape = RoundedCornerShape(6.dp)
     val borderWidth = 1.dp
     val borderColor = myColors.onBackground / 10
     var widthForPopup by remember {
@@ -140,7 +141,9 @@ fun <T> RenderSpinner(
         }
         if (isOpen) {
             Popup(
-                popupPositionProvider = rememberComponentRectPositionProvider(),
+                popupPositionProvider = rememberComponentRectPositionProvider(
+                    offset = DpOffset(y = 2.dp, x = 0.dp)
+                ),
                 onDismissRequest = { isOpen = false },
                 properties = PopupProperties(
                     focusable = true
@@ -167,6 +170,7 @@ fun <T> RenderSpinner(
                     val scrollState = rememberScrollState()
                     Column(
                         Modifier
+                            .clip(shape)
                             .width(IntrinsicSize.Max)
                             .widthIn(widthForPopup)
                             .heightIn(max = 360.dp)

@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.pages.settings
 
-import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurable
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
@@ -28,8 +27,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurableGroup
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.needScroll
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
@@ -181,37 +182,39 @@ fun SettingsPage(
             ) {
                 sideBarWidth = (sideBarWidth + it).coerceIn(150.dp..300.dp)
             }
-            AnimatedContent(currentConfigurables) { configurables ->
+            AnimatedContent(currentConfigurables) { configurableGroups ->
                 val scrollState = rememberScrollState()
                 val scrollbarAdapter = rememberScrollbarAdapter(scrollState)
-                Box {
+                Row {
                     Column(
                         Modifier
+                            .weight(1f)
                             .verticalScroll(scrollState)
                             .padding(
-                                horizontal = 16.dp,
+                                horizontal = 8.dp,
                                 vertical = 8.dp
-                            )
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        for (cfg in configurables) {
-                            Box(
-                                Modifier
-                                    .background(myColors.surface / 50)
-                            ) {
-                                RenderConfigurable(cfg, Modifier.padding(vertical = 16.dp, horizontal = 32.dp))
-                            }
-                            Spacer(Modifier.height(1.dp))
-
-//                    Divider()
+                        for (cfgGroup in configurableGroups) {
+                            RenderConfigurableGroup(
+                                cfgGroup,
+                                Modifier,
+                                itemPadding = PaddingValues(
+                                    vertical = 8.dp,
+                                    horizontal = 16.dp
+                                )
+                            )
                         }
                     }
-                    VerticalScrollbar(
-                        adapter = scrollbarAdapter,
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(vertical = 16.dp)
-                            .padding(end = 2.dp),
-                    )
+                    if (scrollbarAdapter.needScroll()) {
+                        VerticalScrollbar(
+                            adapter = scrollbarAdapter,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .padding(end = 2.dp),
+                        )
+                    }
                 }
             }
 

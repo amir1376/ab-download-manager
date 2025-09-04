@@ -104,6 +104,7 @@ private fun RenderSpeedConfig(cfg: SpeedLimitConfigurable, modifier: Modifier) {
                             unit = 1.0,
                             modifier = Modifier.weight(1f),
                         )
+                        Spacer(Modifier.width(2.dp))
                         RenderSpinner(
                             possibleValues = units,
                             value = currentUnit,
