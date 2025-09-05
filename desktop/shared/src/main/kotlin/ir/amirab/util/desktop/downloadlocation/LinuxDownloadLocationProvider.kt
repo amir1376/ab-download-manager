@@ -1,7 +1,7 @@
 package ir.amirab.util.desktop.downloadlocation
 
 import java.io.File
-import java.io.InputStream
+import java.io.Reader
 import java.util.Properties
 
 class LinuxDownloadLocationProvider : DesktopDownloadLocationProvider() {
@@ -17,12 +17,18 @@ class LinuxDownloadLocationProvider : DesktopDownloadLocationProvider() {
             ?.canonicalFile
     }
 
-    private fun getConfigFileReader(): InputStream? {
-        val configFile = File(System.getProperty("user.home"), ".config/user-dirs.dirs")
-        if (configFile.exists()) {
-            return configFile.inputStream().buffered()
-        }
-        return null
+    private fun getUserDirsFile(): File {
+        val xdgConfigFromEnv: File? = System.getenv("XDG_CONFIG_HOME")
+            ?.takeIf { it.isNotEmpty() }
+            ?.let(::File)
+        val configDir = (xdgConfigFromEnv ?: File(System.getProperty("user.home"), ".config"))
+        return File(configDir, "user-dirs.dirs")
+    }
+
+    private fun getConfigFileReader(): Reader? {
+        return getUserDirsFile()
+            .takeIf { it.exists() }
+            ?.bufferedReader(Charsets.UTF_8)
     }
 
     private fun Properties.getWithResolvedVariables(key: String): String? {
