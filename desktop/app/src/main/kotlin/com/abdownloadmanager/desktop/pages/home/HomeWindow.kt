@@ -20,9 +20,15 @@ fun HomeWindow(
     onCLoseRequest: () -> Unit,
 ) {
     val size by homeComponent.windowSize.collectAsState()
+    val isMaximized by homeComponent.isMaximized.collectAsState()
     val windowState = rememberWindowState(
         size = size,
-        position = WindowPosition.Aligned(Alignment.Center)
+        position = WindowPosition.Aligned(Alignment.Center),
+        placement = if (isMaximized) {
+            WindowPlacement.Maximized
+        } else {
+            WindowPlacement.Floating
+        }
     )
     val onCloseRequest = onCLoseRequest
     val windowIcon = MyIcons.appIcon
@@ -46,6 +52,9 @@ fun HomeWindow(
                 if (!windowState.isMinimized && windowState.placement == WindowPlacement.Floating) {
                     homeComponent.setWindowSize(windowState.size)
                 }
+            }
+            LaunchedEffect(windowState.placement) {
+                homeComponent.setIsMaximized(windowState.placement == WindowPlacement.Maximized)
             }
             window.minimumSize = Dimension(
                 400, 400

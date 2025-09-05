@@ -618,6 +618,19 @@ class HomeComponent(
         _windowSize.value = dpSize
     }
 
+    private val _isMaximized = homePageStateToPersist.mapTwoWayStateFlow(
+        map = {
+            it.isMaximized
+        },
+        unMap = {
+            copy(isMaximized = it)
+        }
+    )
+    val isMaximized = _isMaximized.asStateFlow()
+    fun setIsMaximized(value: Boolean) {
+        _isMaximized.value = value
+    }
+
     private val _categoriesWidth = homePageStateToPersist.mapTwoWayStateFlow(
         map = {
             it.categoriesWidth.dp.coerceIn(CATEGORIES_SIZE_RANGE)
