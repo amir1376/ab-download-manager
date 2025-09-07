@@ -5,6 +5,7 @@ import arrow.optics.Lens
 import arrow.optics.optics
 import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
 import com.abdownloadmanager.shared.utils.SystemDownloadLocationProvider
+import com.abdownloadmanager.shared.utils.ui.theme.DEFAULT_UI_SCALE
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.*
 import ir.amirab.util.enumValueOrNull
@@ -188,13 +189,15 @@ private val fontLens: Lens<AppSettingsModel, String?>
             s.copy(font = f)
         }
     )
-private val uiScaleLens: Lens<AppSettingsModel, Float?>
+
+// use null for default scale!
+private val uiScaleLens: Lens<AppSettingsModel, Float>
     get() = Lens(
         get = {
-            it.uiScale
+            it.uiScale ?: DEFAULT_UI_SCALE
         },
         set = { s, f ->
-            s.copy(uiScale = f)
+            s.copy(uiScale = f.takeIf { it != DEFAULT_UI_SCALE })
         }
     )
 private val languageLens: Lens<AppSettingsModel, String?>

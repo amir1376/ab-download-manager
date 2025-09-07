@@ -17,6 +17,7 @@ import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import com.abdownloadmanager.shared.utils.proxy.ProxyMode
+import com.abdownloadmanager.shared.utils.ui.theme.DEFAULT_UI_SCALE
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.compose.*
 import ir.amirab.util.compose.localizationmanager.LanguageInfo
@@ -35,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.math.roundToInt
 
 sealed class SettingSections(
     val icon: IconSource,
@@ -432,13 +434,12 @@ fun fontConfig(
     )
 }
 
-fun uiScaleConfig(appSettings: AppSettingsStorage): EnumConfigurable<Float?> {
+fun uiScaleConfig(appSettings: AppSettingsStorage): EnumConfigurable<Float> {
     return EnumConfigurable(
         title = Res.string.settings_ui_scale.asStringSource(),
         description = Res.string.settings_ui_scale_description.asStringSource(),
         backedBy = appSettings.uiScale,
         possibleValues = listOf(
-            null,
             0.8f,
             0.9f,
             1f,
@@ -447,17 +448,20 @@ fun uiScaleConfig(appSettings: AppSettingsStorage): EnumConfigurable<Float?> {
             1.5f,
             1.75f,
             2f,
-            2.25f,
-            2.5f,
-            2.75f,
-            3f,
         ),
         renderMode = EnumConfigurable.RenderMode.Spinner,
         describe = {
-            if (it == null) {
-                Res.string.system.asStringSource()
+            val percent = (it * 100).roundToInt()
+            if (it == DEFAULT_UI_SCALE) {
+                StringSource.CombinedStringSource(
+                    listOf(
+                        Res.string.system.asStringSource(),
+                        "($percent%)".asStringSource()
+                    ),
+                    " "
+                )
             } else {
-                "$it x".asStringSource()
+                "$percent%".asStringSource()
             }
         }
     )
