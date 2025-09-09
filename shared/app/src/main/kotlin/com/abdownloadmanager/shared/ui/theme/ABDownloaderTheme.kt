@@ -58,7 +58,7 @@ private val textSizes = TextSizes(
 fun ABDownloaderTheme(
     myColors: MyColors,
     fontFamily: FontFamily? = null,
-    uiScale: Float? = null,
+    uiScale: Float = DEFAULT_UI_SCALE,
     content: @Composable () -> Unit,
 ) {
     val systemDensity = LocalDensity.current
