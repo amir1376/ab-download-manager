@@ -143,7 +143,15 @@ fun FrameWindowScope.SnapDraggableToolbar(
         LaunchedEffect(headerHeight) {
             customTitleBar.height = headerHeight
             customTitleBar.putProperty("controls.visible", false)
+            val previousPlacement = window.placement
             JBR.getWindowDecorations().setCustomTitleBar(window, customTitleBar)
+            // JBR resets window placement to Floating so we should restore our placement
+            // is there a better way?
+            if (window.placement != previousPlacement) {
+                withContext(Dispatchers.Main) {
+                    window.placement = previousPlacement
+                }
+            }
         }
         Box(
             Modifier

@@ -7,6 +7,7 @@ import ir.amirab.util.config.getDecoded
 import ir.amirab.util.config.keyOfEncoded
 import ir.amirab.util.config.putEncodedNullable
 import ir.amirab.util.config.MapConfig
+import ir.amirab.util.config.booleanKeyOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
@@ -17,6 +18,7 @@ import org.koin.core.component.inject
 data class HomePageStateToPersist(
     val downloadListState: TableState.SerializableTableState? = null,
     val windowSize: Pair<Float, Float> = 1000f to 500f,
+    val isMaximized: Boolean = false,
     val categoriesWidth: Float = 185f,
 ) {
     class ConfigLens(prefix: String) : Lens<MapConfig, HomePageStateToPersist>,
@@ -26,6 +28,7 @@ data class HomePageStateToPersist(
         class Keys(prefix: String) {
             val windowWidth = floatKeyOf("${prefix}window.width")
             val windowHeight = floatKeyOf("${prefix}window.height")
+            val isMaximized = booleanKeyOf("${prefix}window.isMaximized")
             val categoriesWidth = floatKeyOf("${prefix}categories.width")
             val downloadListTableState = keyOfEncoded<TableState.SerializableTableState>("${prefix}downloadListState")
         }
@@ -45,7 +48,8 @@ data class HomePageStateToPersist(
                         } else {
                             default.windowSize
                         }
-                    }
+                    },
+                    isMaximized = source.get(keys.isMaximized) ?: default.isMaximized,
                 )
             }
         }
@@ -54,6 +58,7 @@ data class HomePageStateToPersist(
             with(json) {
                 source.put(keys.windowWidth, focus.windowSize.first)
                 source.put(keys.windowHeight, focus.windowSize.second)
+                source.put(keys.isMaximized, focus.isMaximized)
                 source.put(keys.categoriesWidth, focus.categoriesWidth)
                 source.putEncodedNullable(keys.downloadListTableState, focus.downloadListState)
             }
