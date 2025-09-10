@@ -176,6 +176,21 @@ fun useSparseFileAllocation(appRepository: AppRepository): BooleanConfigurable {
     )
 }
 
+fun moveFilesOnDragAndDrop(appSettings: AppSettingsStorage): BooleanConfigurable {
+    return BooleanConfigurable(
+        title = Res.string.settings_move_files_on_drag_and_drop.asStringSource(),
+        description = Res.string.settings_move_files_on_drag_and_drop_description.asStringSource(),
+        backedBy = appSettings.moveFilesOnDragAndDrop,
+        describe = {
+            if (it) {
+                Res.string.enabled.asStringSource()
+            } else {
+                Res.string.disabled.asStringSource()
+            }
+        },
+    )
+}
+
 fun trackDeletedFilesOnDisk(appRepository: AppRepository): BooleanConfigurable {
     return BooleanConfigurable(
         title = Res.string.settings_track_deleted_files_on_disk.asStringSource(),
@@ -832,6 +847,7 @@ class SettingsComponent(
                             appendExtensionToIncompleteDownloads(appRepository),
                             deletePartialFileOnDownloadCancellation(appSettings),
                             useSparseFileAllocation(appRepository),
+                            moveFilesOnDragAndDrop(appSettings),
                         )
                     ),
                 )

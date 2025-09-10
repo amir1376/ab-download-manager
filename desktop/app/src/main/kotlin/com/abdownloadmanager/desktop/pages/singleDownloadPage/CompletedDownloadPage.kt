@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropTransferAction
@@ -19,6 +21,7 @@ import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.ActionButton
+import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.utils.LocalSizeUnit
 import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
@@ -67,6 +70,7 @@ private fun Actions(
     component: SingleDownloadComponent,
 ) {
     val iDownloadItemState by component.itemStateFlow.collectAsState()
+    val (moveFilesOnDragAndDrop, setmoveFilesOnDragAndDrop) = remember { mutableStateOf(component.moveFilesOnDragAndDrop.value) }
     Column(modifier) {
         Spacer(
             Modifier
@@ -117,7 +121,11 @@ private fun Actions(
                                         )
                                     ),
                                     supportedActions = listOf(
-                                        DragAndDropTransferAction.Copy,
+                                        if (moveFilesOnDragAndDrop) {
+                                            DragAndDropTransferAction.Move
+                                        } else {
+                                            DragAndDropTransferAction.Copy
+                                        }
                                     ),
                                 )
                             }
@@ -126,6 +134,16 @@ private fun Actions(
                 )
             }
 
+            Spacer(Modifier.width(8.dp))
+            Tooltip(Res.string.settings_move_files_on_drag_and_drop_description.asStringSource()) {
+                CheckBox(moveFilesOnDragAndDrop, { setmoveFilesOnDragAndDrop(it) })
+            }
+            Spacer(Modifier.width(8.dp))
+            Text(
+                myStringResource(Res.string.settings_move_files_on_drag_and_drop_labels),
+                fontSize = myTextSizes.sm,
+                fontWeight = FontWeight.Bold,
+            )
             Spacer(Modifier.weight(1f))
             ActionButton(
                 myStringResource(Res.string.close),

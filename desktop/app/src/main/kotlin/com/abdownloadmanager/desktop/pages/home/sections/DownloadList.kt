@@ -77,7 +77,8 @@ fun DownloadList(
     lastSelectedId: Long?,
     fileIconProvider: FileIconProvider,
     categoryManager: CategoryManager,
-    lazyListState: LazyListState
+    lazyListState: LazyListState,
+    moveFilesOnDragAndDrop: Boolean,
 ) {
     ShowDownloadOptions(
         downloadOptions, onRequestCloseOption
@@ -190,7 +191,11 @@ fun DownloadList(
                                                     DownloadItemTransferable(selectedDownloads)
                                                 ),
                                                 supportedActions = listOf(
-                                                    DragAndDropTransferAction.Copy,
+                                                    if (moveFilesOnDragAndDrop) {
+                                                        DragAndDropTransferAction.Move
+                                                    } else {
+                                                        DragAndDropTransferAction.Copy
+                                                    }
                                                 ),
                                             )
                                         }

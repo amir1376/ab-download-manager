@@ -32,6 +32,7 @@ data class AppSettingsModel(
     val useServerLastModifiedTime: Boolean = false,
     val appendExtensionToIncompleteDownloads: Boolean = false,
     val useSparseFileAllocation: Boolean = true,
+    val moveFilesOnDragAndDrop: Boolean = false,
     val useAverageSpeed: Boolean = true,
     val showDownloadProgressDialog: Boolean = true,
     val showDownloadCompletionDialog: Boolean = true,
@@ -75,6 +76,7 @@ data class AppSettingsModel(
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
             val appendExtensionToIncompleteDownloads = booleanKeyOf("appendExtensionToIncompleteDownloads")
             val useSparseFileAllocation = booleanKeyOf("useSparseFileAllocation")
+            val moveFilesOnDragAndDrop = booleanKeyOf("moveFilesOnDragAndDrop")
             val useAverageSpeed = booleanKeyOf("useAverageSpeed")
             val showDownloadProgressDialog = booleanKeyOf("showDownloadProgressDialog")
             val showDownloadCompletionDialog = booleanKeyOf("showDownloadCompletionDialog")
@@ -117,6 +119,7 @@ data class AppSettingsModel(
                 appendExtensionToIncompleteDownloads = source.get(Keys.appendExtensionToIncompleteDownloads)
                     ?: default.appendExtensionToIncompleteDownloads,
                 useSparseFileAllocation = source.get(Keys.useSparseFileAllocation) ?: default.useSparseFileAllocation,
+                moveFilesOnDragAndDrop = source.get(Keys.moveFilesOnDragAndDrop) ?: default.moveFilesOnDragAndDrop,
                 useAverageSpeed = source.get(Keys.useAverageSpeed) ?: default.useAverageSpeed,
                 showDownloadProgressDialog = source.get(Keys.showDownloadProgressDialog)
                     ?: default.showDownloadProgressDialog,
@@ -159,6 +162,7 @@ data class AppSettingsModel(
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
                 put(Keys.appendExtensionToIncompleteDownloads, focus.appendExtensionToIncompleteDownloads)
                 put(Keys.useSparseFileAllocation, focus.useSparseFileAllocation)
+                put(Keys.moveFilesOnDragAndDrop, focus.moveFilesOnDragAndDrop)
                 put(Keys.useAverageSpeed, focus.useAverageSpeed)
                 put(Keys.showDownloadProgressDialog, focus.showDownloadProgressDialog)
                 put(Keys.showDownloadCompletionDialog, focus.showDownloadCompletionDialog)
@@ -232,6 +236,7 @@ class AppSettingsStorage(
     val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
     val appendExtensionToIncompleteDownloads = from(AppSettingsModel.appendExtensionToIncompleteDownloads)
     val useSparseFileAllocation = from(AppSettingsModel.useSparseFileAllocation)
+    val moveFilesOnDragAndDrop = from(AppSettingsModel.moveFilesOnDragAndDrop)
     val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
     val maxDownloadRetryCount = from(AppSettingsModel.maxDownloadRetryCount)
     val showDownloadProgressDialog = from(AppSettingsModel.showDownloadProgressDialog)

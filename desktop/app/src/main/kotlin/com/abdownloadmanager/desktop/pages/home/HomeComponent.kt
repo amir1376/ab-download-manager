@@ -584,6 +584,7 @@ class HomeComponent(
     val categoryManager: CategoryManager by inject()
     private val defaultCategories: DefaultCategories by inject()
     val fileIconProvider: FileIconProvider by inject()
+    val moveFilesOnDragAndDrop = appSettings.moveFilesOnDragAndDrop
 
     init {
         HomeComponent.homeComponentCreationCount++

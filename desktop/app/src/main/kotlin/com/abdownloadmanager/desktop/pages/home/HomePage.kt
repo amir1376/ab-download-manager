@@ -339,6 +339,7 @@ fun HomePage(component: HomeComponent) {
                         fileIconProvider = component.fileIconProvider,
                         categoryManager = component.categoryManager,
                         lazyListState = lazyListState,
+                        moveFilesOnDragAndDrop = component.moveFilesOnDragAndDrop.collectAsState().value,
                     )
                     Spacer(
                         Modifier

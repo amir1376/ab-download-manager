@@ -81,6 +81,7 @@ class SingleDownloadComponent(
         item ?: global
     }
     val deletePartialFileOnDownloadCancellation = appSettings.deletePartialFileOnDownloadCancellation.asStateFlow()
+    val moveFilesOnDragAndDrop = appSettings.moveFilesOnDragAndDrop.asStateFlow()
 
     val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
         extraDownloadSettingsStorage
