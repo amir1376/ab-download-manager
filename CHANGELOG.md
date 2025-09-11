@@ -14,6 +14,27 @@
 
 ### Security
 
+## 1.6.12
+
+### Added
+
+- **Per Host Settings** — save username, password, thread count, user-agent, and more for specific hosts (#820)
+- Support for using **Move** action by holding **Shift** during drag & drop (#821)
+
+### Changed
+
+- UI scale is now relative to the system scale instead of using a fixed value (#814)
+
+### Fixed
+
+- Encoding issue with the default download folder on Linux (#810)
+
+### Improved
+
+- Updated translations
+- Enhanced multi-display support (#814)
+- Main window now remembers its maximized state (#815)
+
 ## 1.6.11
 
 ### Added
@@ -22,7 +43,7 @@
 
 ### Fixed
 
-- "Permission denied" error when starting a new download
+- "Permission denied" error when starting a new download (#795)
 
 ### Improved
 
