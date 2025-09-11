@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropTransferAction
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.draganddrop.DragAndDropTransferable
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.home.DownloadItemTransferable
@@ -31,6 +32,7 @@ import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.desktop.isShiftPressed
 
 @Composable
 fun CompletedDownloadPage(
@@ -99,6 +101,7 @@ private fun Actions(
             )
             Spacer(Modifier.width(8.dp))
             val dragTheFileDescription = Res.string.drag_the_file_to_another_app.asStringSource()
+            val windowInfo = LocalWindowInfo.current
             Tooltip(dragTheFileDescription) {
                 IconActionButton(
                     icon = MyIcons.dragAndDrop,
@@ -110,15 +113,22 @@ private fun Actions(
                                 val completedDownloadItemState =
                                     iDownloadItemState as? CompletedDownloadItemState
                                         ?: return@dragAndDropSource null
+
+                                val shiftPressed = isShiftPressed(windowInfo)
+                                val supportedActions = listOf(
+                                    if (shiftPressed) {
+                                        DragAndDropTransferAction.Move
+                                    } else {
+                                        DragAndDropTransferAction.Copy
+                                    }
+                                )
                                 DragAndDropTransferData(
                                     transferable = DragAndDropTransferable(
                                         DownloadItemTransferable(
                                             listOf(completedDownloadItemState)
                                         )
                                     ),
-                                    supportedActions = listOf(
-                                        DragAndDropTransferAction.Copy,
-                                    ),
+                                    supportedActions = supportedActions,
                                 )
                             }
                         ),
