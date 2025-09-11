@@ -26,6 +26,7 @@ import com.abdownloadmanager.desktop.pages.extenallibs.ShowOpenSourceLibraries
 import com.abdownloadmanager.desktop.pages.filehash.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
+import com.abdownloadmanager.desktop.pages.perhostsettings.PerHostSettingsWindow
 import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
 import com.abdownloadmanager.desktop.pages.settings.FontManager
 import com.abdownloadmanager.desktop.pages.settings.SettingWindow
@@ -137,6 +138,7 @@ object Ui : KoinComponent {
                 ShowTranslators(appComponent)
                 ConfirmExit(appComponent)
                 PowerActionAlert(appComponent)
+                PerHostSettingsWindow(appComponent)
             }
         }
     }

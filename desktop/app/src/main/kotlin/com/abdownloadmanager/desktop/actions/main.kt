@@ -133,6 +133,14 @@ val requestExitAction = simpleAction(
     scope.launch { appComponent.requestExitApp() }
 }
 
+
+val perHostSettings = simpleAction(
+    Res.string.settings_per_host_settings.asStringSource(),
+    MyIcons.earth,
+) {
+    scope.launch { appComponent.openPerHostSettings(null) }
+}
+
 val browserIntegrations = MenuItem.SubMenu(
     title = Res.string.download_browser_integration.asStringSource(),
     icon = MyIcons.download,

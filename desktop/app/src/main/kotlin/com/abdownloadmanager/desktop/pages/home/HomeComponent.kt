@@ -786,6 +786,7 @@ class HomeComponent(
                 +createDesktopEntryAction
             }
             separator()
+            +perHostSettings
             +gotoSettingsAction
         }
         subMenu(Res.string.help.asStringSource()) {
