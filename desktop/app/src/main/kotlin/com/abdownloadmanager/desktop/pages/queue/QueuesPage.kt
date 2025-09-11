@@ -50,7 +50,7 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.desktop.isCtrlPressed
-import ir.amirab.util.desktop.isSiftPressed
+import ir.amirab.util.desktop.isShiftPressed
 import kotlinx.coroutines.*
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
@@ -268,7 +268,7 @@ fun RenderQueueItems(
                             id = downloadItem.id,
                             selected = selected,
                             ctrlPressed = isCtrlPressed(windowInfo),
-                            shiftPressed = isSiftPressed(windowInfo),
+                            shiftPressed = isShiftPressed(windowInfo),
                         )
                     },
                     index = index

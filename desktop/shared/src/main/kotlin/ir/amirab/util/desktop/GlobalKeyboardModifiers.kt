@@ -16,6 +16,6 @@ fun isCtrlPressed(windowInfo: WindowInfo): Boolean {
     }
 }
 
-fun isSiftPressed(windowInfo: WindowInfo): Boolean {
+fun isShiftPressed(windowInfo: WindowInfo): Boolean {
     return windowInfo.keyboardModifiers.isShiftPressed
 }

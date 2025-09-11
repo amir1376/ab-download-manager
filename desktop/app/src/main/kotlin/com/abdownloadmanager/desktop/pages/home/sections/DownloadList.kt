@@ -40,6 +40,7 @@ import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.desktop.isCtrlPressed
+import ir.amirab.util.desktop.isShiftPressed
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.delay
 
@@ -172,6 +173,7 @@ fun DownloadList(
                         item,
                     )
                 ) {
+                    val windowInfo = LocalWindowInfo.current
                     WithContentAlpha(1f) {
                         val shape = RoundedCornerShape(6.dp)
                         Box(
@@ -185,13 +187,19 @@ fun DownloadList(
                                             if (selectedDownloads.isEmpty() || !isSelected) {
                                                 return@dragAndDropSource null
                                             }
+                                            val shiftPressed = isShiftPressed(windowInfo)
+                                            val supportedActions = listOf(
+                                                if (shiftPressed) {
+                                                    DragAndDropTransferAction.Move
+                                                } else {
+                                                    DragAndDropTransferAction.Copy
+                                                }
+                                            )
                                             DragAndDropTransferData(
                                                 transferable = DragAndDropTransferable(
                                                     DownloadItemTransferable(selectedDownloads)
                                                 ),
-                                                supportedActions = listOf(
-                                                    DragAndDropTransferAction.Copy,
-                                                ),
+                                                supportedActions = supportedActions,
                                             )
                                         }
                                     )
