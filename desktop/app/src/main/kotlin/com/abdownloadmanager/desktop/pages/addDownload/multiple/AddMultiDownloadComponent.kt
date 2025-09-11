@@ -14,6 +14,9 @@ import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.CategoryItem
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.CategorySelectionMode
+import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsManager
+import com.abdownloadmanager.shared.utils.perhostsettings.applyToHttpDownload
+import com.abdownloadmanager.shared.utils.perhostsettings.getSettingsForURL
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.connection.DownloaderClient
 import ir.amirab.downloader.downloaditem.DownloadCredentials
@@ -43,6 +46,7 @@ class AddMultiDownloadComponent(
         )
     )
     private val appSettings by inject<AppRepository>()
+    private val perHostSettingsManager by inject<PerHostSettingsManager>()
     private val client by inject<DownloaderClient>()
     val downloadSystem by inject<DownloadSystem>()
     val fileIconProvider: FileIconProvider by inject()
@@ -102,10 +106,23 @@ class AddMultiDownloadComponent(
                 it.credentials.value
             }
         }.map {
-            newChecker(it)
+            newChecker(it.withAppliedDefaultHostSettings())
         }
         enqueueCheck(newItemsToAdd)
         this.list = this.list.plus(newItemsToAdd)
+    }
+
+    // [perHostSettingsManager.getConfigForURL(this.link)] will be called two times for each item (DownloadCredentials, DownloadItem) which is not ideal
+    // the current logic of AddMultipleDownloadComponent it's not possible
+    private fun DownloadCredentials.withAppliedDefaultHostSettings(): DownloadCredentials {
+        return perHostSettingsManager.getSettingsForURL(this.link)
+            ?.applyToHttpDownload(this) ?: this
+    }
+
+    private fun DownloadItem.withAppliedDefaultHostSettings(): DownloadItem {
+        return perHostSettingsManager
+            .getSettingsForURL(this.link)
+            ?.applyToHttpDownload(this) ?: this
     }
 
     var list: List<DownloadUiChecker> by mutableStateOf(emptyList())
@@ -226,7 +243,7 @@ class AddMultiDownloadComponent(
                     name = it.name.value,
                     link = it.credentials.value.link,
                     contentLength = it.length.value ?: -1,
-                )
+                ).withAppliedDefaultHostSettings()
             }
         consumeDialog {
             onRequestAdd(

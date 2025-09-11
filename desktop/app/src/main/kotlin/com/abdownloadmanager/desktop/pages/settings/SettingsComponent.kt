@@ -12,6 +12,7 @@ import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.desktop.PerHostSettingsPageManager
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
@@ -326,6 +327,16 @@ fun autoShowDownloadProgressWindow(settingsStorage: AppSettingsStorage): Boolean
         backedBy = settingsStorage.showDownloadProgressDialog,
         describe = {
             (if (it) Res.string.enabled else Res.string.disabled).asStringSource()
+        },
+    )
+}
+
+fun perHostSettings(perHostSettingsPageManager: PerHostSettingsPageManager): PerHostSettingsConfigurable {
+    return PerHostSettingsConfigurable(
+        title = Res.string.settings_per_host_settings.asStringSource(),
+        description = Res.string.settings_per_host_settings_descriptions.asStringSource(),
+        onRequestOpenPerHostSettingsWindow = {
+            perHostSettingsPageManager.openPerHostSettings(null)
         },
     )
 }
@@ -732,6 +743,7 @@ sealed class SettingPageEffects {
 
 class SettingsComponent(
     ctx: ComponentContext,
+    val perHostSettingsPageManager: PerHostSettingsPageManager,
 ) : BaseComponent(ctx),
     KoinComponent,
     ContainsEffects<SettingPageEffects> by supportEffects() {
@@ -816,6 +828,11 @@ class SettingsComponent(
                             threadCountConfig(appRepository),
                             maxDownloadRetryCount(appRepository),
                             dynamicPartDownloadConfig(appRepository),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            perHostSettings(perHostSettingsPageManager),
                         )
                     ),
                     ConfigurableGroup(

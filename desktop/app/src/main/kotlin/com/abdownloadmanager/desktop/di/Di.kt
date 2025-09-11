@@ -11,6 +11,7 @@ import com.abdownloadmanager.desktop.DownloadDialogManager
 import com.abdownloadmanager.desktop.EditDownloadDialogManager
 import com.abdownloadmanager.desktop.FileChecksumDialogManager
 import com.abdownloadmanager.desktop.NotificationSender
+import com.abdownloadmanager.desktop.PerHostSettingsPageManager
 import com.abdownloadmanager.desktop.QueuePageManager
 import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.desktop.PowerActionManager
@@ -68,6 +69,9 @@ import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadComplet
 import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionActionRunner
 import com.abdownloadmanager.shared.utils.onqueuecompletion.OnQueueEventActionRunner
 import com.abdownloadmanager.shared.utils.onqueuecompletion.OnQueueCompletionActionProvider
+import com.abdownloadmanager.shared.utils.perhostsettings.IPerHostSettingsStorage
+import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsItem
+import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.utils.ui.IMyIcons
 import com.abdownloadmanager.shared.utils.proxy.IProxyStorage
 import com.abdownloadmanager.shared.utils.proxy.ProxyData
@@ -403,6 +407,7 @@ val appModule = module {
         bind<QueuePageManager>()
         bind<NotificationSender>()
         bind<DownloadItemOpener>()
+        bind<PerHostSettingsPageManager>()
         bind<PowerActionManager>()
     }
     single {
@@ -469,6 +474,18 @@ val appModule = module {
             Platform.Desktop.Linux -> LinuxDownloadLocationProvider()
             Platform.Desktop.MacOS -> MacDownloadLocationProvider()
         }
+    }
+    single<IPerHostSettingsStorage> {
+        PerHostSettingsDatastoreStorage(
+            kotlinxSerializationDataStore<List<PerHostSettingsItem>>(
+                AppInfo.optionsDir.resolve("perHostSettings.json"),
+                get(),
+                ::emptyList,
+            )
+        )
+    }
+    single {
+        PerHostSettingsManager(get())
     }
 
 }

@@ -13,6 +13,7 @@ import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadComponent
 import com.abdownloadmanager.desktop.pages.filehash.FileChecksumComponent
 import com.abdownloadmanager.desktop.pages.filehash.FileChecksumComponentConfig
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
+import com.abdownloadmanager.desktop.pages.perhostsettings.PerHostSettingsComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.SettingsComponent
 import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
@@ -50,6 +51,7 @@ import com.abdownloadmanager.shared.utils.DownloadItemOpener
 import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.CategorySelectionMode
+import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.utils.subscribeAsStateFlow
 import com.arkivanov.decompose.childContext
 import ir.amirab.downloader.destination.IncompleteFileUtil
@@ -62,6 +64,7 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -96,12 +99,15 @@ class AppComponent(
     QueuePageManager,
     NotificationSender,
     DownloadItemOpener,
+    PerHostSettingsPageManager,
     PowerActionManager,
     ContainsEffects<AppEffects> by supportEffects(),
     KoinComponent {
+    val applicationScope: CoroutineScope by inject()
     val appRepository: AppRepository by inject()
     val appSettings: AppSettingsStorage by inject()
     private val integration: Integration by inject()
+    private val perHostSettingsManager: PerHostSettingsManager by inject()
     val useSystemTray = appSettings.useSystemTray
 
     fun openHome() {
@@ -260,7 +266,10 @@ class AppComponent(
         serializer = null,
         key = "settings",
         childFactory = { configuration: AppSettingPageConfig, componentContext: ComponentContext ->
-            SettingsComponent(componentContext)
+            SettingsComponent(
+                componentContext,
+                this
+            )
         }
     ).subscribeAsStateFlow()
 
@@ -959,6 +968,7 @@ class AppComponent(
             IntegrationPortBroadcaster.isInitialized(),
         ).all { it }
     }
+
     val powerActionNavigation = SlotNavigation<PowerActionComponent.Config>()
     val openedPowerAction = childSlot(
         source = powerActionNavigation,
@@ -1002,6 +1012,48 @@ class AppComponent(
         childContext("updater"),
         this,
     )
+
+
+    private val perHostSettings = SlotNavigation<PerHostSettingsComponent.Config>()
+    val perHostSettingsSlot = childSlot(
+        perHostSettings,
+        serializer = null,
+        key = "perHostSettings",
+        childFactory = { cfg: PerHostSettingsComponent.Config, componentContext: ComponentContext ->
+            PerHostSettingsComponent(
+                ctx = componentContext,
+                closeRequested = this::closePerHostSettings,
+                appScope = applicationScope,
+                perHostSettingsManager = perHostSettingsManager,
+                appRepository = appRepository,
+            ).apply {
+                cfg.openedHost?.let(this::onHostSelected)
+            }
+        }
+    ).subscribeAsStateFlow()
+
+    override fun openPerHostSettings(
+        openedHost: String?
+    ) {
+        scope.launch {
+            perHostSettingsSlot.value.child?.instance.let { component ->
+                if (component != null) {
+                    component.bringToFront()
+                    openedHost?.let {
+                        component.onHostSelected(it)
+                    }
+                } else {
+                    perHostSettings.activate(PerHostSettingsComponent.Config(openedHost))
+                }
+            }
+        }
+    }
+
+    override fun closePerHostSettings() {
+        perHostSettings.dismiss { }
+    }
+
+
     val showAboutPage = MutableStateFlow(false)
     val showOpenSourceLibraries = MutableStateFlow(false)
     val showTranslators = MutableStateFlow(false)
@@ -1046,6 +1098,7 @@ interface QueuePageManager {
     fun openNewQueueDialog()
     fun closeNewQueueDialog()
 }
+
 interface PowerActionManager {
     fun initiatePowerAction(
         powerActionConfig: PowerActionConfig,
@@ -1053,4 +1106,9 @@ interface PowerActionManager {
     )
 
     fun dismissPowerAction()
+}
+
+interface PerHostSettingsPageManager {
+    fun openPerHostSettings(openedHost: String?)
+    fun closePerHostSettings()
 }

@@ -35,6 +35,10 @@ import org.koin.core.component.inject
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.CategoryItem
 import com.abdownloadmanager.shared.utils.category.CategoryManager
+import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsItem
+import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsManager
+import com.abdownloadmanager.shared.utils.perhostsettings.applyToHttpDownload
+import com.abdownloadmanager.shared.utils.perhostsettings.getSettingsForURL
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.util.compose.asStringSource
@@ -64,6 +68,7 @@ class AddSingleDownloadComponent(
     private val appScope: CoroutineScope by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val appRepository: AppRepository by inject()
+    private val perHostSettingsManager: PerHostSettingsManager by inject()
     private val client: DownloaderClient by inject()
     val downloadSystem: DownloadSystem by inject()
     val iconProvider: FileIconProvider by inject()
@@ -151,6 +156,17 @@ class AddSingleDownloadComponent(
     }
 
     init {
+        credentials
+            .map { it.link }
+            .distinctUntilChanged()
+            .debounce(250)
+            .onEachLatest { link ->
+                perHostSettingsManager
+                    .getSettingsForURL(link)
+                    ?.let(::applyHostSettingsToExtraConfig)
+            }
+            .flowOn(Dispatchers.IO)
+            .launchIn(scope)
         merge(
             credentials.mapStateFlow { it.link },
             name,
@@ -180,6 +196,16 @@ class AddSingleDownloadComponent(
                 setUseCategory(suggestedUseCategory)
             }
         }.launchIn(scope)
+    }
+
+    private fun applyHostSettingsToExtraConfig(extraConfig: PerHostSettingsItem) {
+        extraConfig.applyToHttpDownload(
+            setUsername = { setCredentials(credentials.value.copy(username = it)) },
+            setPassword = { setCredentials(credentials.value.copy(password = it)) },
+            setUserAgent = { setCredentials(credentials.value.copy(userAgent = it)) },
+            setThreadCount = { threadCount.value = it },
+            setSpeedLimit = { speedLimit.value = it }
+        )
     }
 
     private var wasOpened = false
