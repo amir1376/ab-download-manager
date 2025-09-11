@@ -155,6 +155,7 @@ val browserIntegrations = MenuItem.SubMenu(
 
 val createDesktopEntryAction = simpleAction(
     Res.string.create_desktop_entry.asStringSource(),
+    MyIcons.applicationFile,
     checkEnable = MutableStateFlow(AppInfo.isAppInstalled())
 ) {
     DesktopEntryCreator.createLinuxDesktopEntry()
