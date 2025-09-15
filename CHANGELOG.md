@@ -14,6 +14,18 @@
 
 ### Security
 
+## 1.6.13
+
+### Fixed
+
+- **Access Denied** error could sometimes happen when adding a list of downloads (#826)
+
+### Improved
+
+- Updated translations
+- Download engine improvements (#828)
+- **Customize Table Columns** popup now supports drag to reorder (#830)
+
 ## 1.6.12
 
 ### Added
