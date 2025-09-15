@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
@@ -28,10 +29,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import okio.*
 import kotlin.concurrent.thread
-import kotlin.coroutines.coroutineContext
 import kotlin.math.min
 
-val PART_MAX_TRIES = 10
+const val PART_MAX_TRIES = 10
 const val RetryDelay = 1_000L
 
 /**
@@ -54,7 +54,7 @@ class PartDownloader(
     val client: DownloaderClient,
     val speedLimiters: List<Throttler>,
     val strictMode: Boolean,
-    private val partSplitLock: Any,
+    partSplitLock: Any,
 ) {
     class ShouldNotHappened(msg: String?) : RuntimeException(msg)
 
@@ -80,7 +80,7 @@ class PartDownloader(
             throttler.source(acc)
         }
         return connect.copy(
-            source = source.buffer()
+            source = source
         )
     }
 
@@ -251,7 +251,7 @@ class PartDownloader(
         val partCopy = part.copy()
         val conn = establishConnection(partCopy.current, partCopy.to)
 //        thisLogger().info("connection established")
-        if (stop || !coroutineContext.isActive) {
+        if (stop || !currentCoroutineContext().isActive) {
             conn.closeable.close()
             throw CancellationException()
         }
@@ -319,7 +319,7 @@ class PartDownloader(
 
     @Volatile
     var stop = false
-    suspend fun stop() {
+    fun stop() {
         stop = true
         thread?.interrupt()
         scope?.coroutineContext?.job?.cancel()
@@ -333,7 +333,7 @@ class PartDownloader(
     }
 
     @HeavyCall
-    private fun copyDataSync(source: BufferedSource, destWriter: DestWriter) {
+    private fun copyDataSync(source: Source, destWriter: DestWriter) {
 //        println("copying range to file --- ${part.current}-${part.to}")
         val buffer = Buffer()
         var totalReadCount = 0L
@@ -393,12 +393,12 @@ class PartDownloader(
         val canceled = PartDownloadStatus.Canceled(e)
         onNewStatus(canceled)
         e.printStackIfNOtUsual()
-        if (!canceled.isNormalCancellation()) {
+//        if (!canceled.isNormalCancellation()) {
 //            e.printStackTrace()
-        } else {
+//        } else {
 //            println("part cancelled because of ${e.localizedMessage ?: e::class.simpleName}")
 //            e.printStackTrace()
-        }
+//        }
     }
 
     private fun onFinish() {
@@ -480,7 +480,7 @@ suspend fun PartDownloader.awaitToEnsureDataBeingTransferred(): Boolean {
 }
 
 suspend fun PartDownloader.awaitIdle() {
-    val first = statusFlow.filter {
+    statusFlow.filter {
         when (it) {
             is PartDownloadStatus.Canceled,
             PartDownloadStatus.Completed,
