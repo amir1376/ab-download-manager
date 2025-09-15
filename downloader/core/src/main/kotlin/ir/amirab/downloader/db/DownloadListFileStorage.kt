@@ -24,12 +24,11 @@ class DownloadListFileStorage(
             val jsonExtension = ".json"
             downloadListFolder.listFiles()
                 ?.mapNotNull { file ->
-                    file.name.takeIf { it.endsWith(jsonExtension) }
+                    file.name
+                        .takeIf { it.endsWith(jsonExtension) }
                         ?.removeSuffix(jsonExtension)
                         ?.toLongOrNull()
-                        ?.let { id -> file to id }
-                }?.mapNotNull { (file, id) ->
-                    get(file, id)
+                        ?.let { get(file, it) }
                 }.orEmpty()
         }
     }
