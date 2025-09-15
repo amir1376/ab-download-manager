@@ -74,6 +74,7 @@ interface IMyIcons {
     val otherFile: IconSource
     val lock: IconSource
     val question: IconSource
+    val grip: IconSource
     val sortUp: IconSource
     val sortDown: IconSource
     val verticalDirection: IconSource

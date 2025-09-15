@@ -12,21 +12,31 @@ import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuColumn
 import com.abdownloadmanager.shared.utils.div
 import ir.amirab.util.flow.saved
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragData
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberCursorPositionProvider
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.widget.ActionButton
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.shifted
+import ir.amirab.util.swapped
 import kotlinx.coroutines.flow.*
+import sh.calvin.reorderable.ReorderableColumn
+import sh.calvin.reorderable.ReorderableScope
 
 val LocalCellPadding = compositionLocalOf {
     PaddingValues(horizontal = 4.dp, vertical = 0.dp)
@@ -68,7 +78,7 @@ fun <T, C : TableCell<T>> Table(
     val sortedBy by tableState.sortBy.collectAsState()
     val customWidths by tableState.customSizes.collectAsState()
     TwoDimensionScrollbar(
-        modifier=modifier,
+        modifier = modifier,
         content = {
             BoxWithConstraints(Modifier.fillMaxSize()) {
                 CompositionLocalProvider(
@@ -242,84 +252,89 @@ private fun <T, C : TableCell<T>> ShowColumnConfigMenu(
                 Modifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                MyIcon(MyIcons.settings, null, Modifier.size(12.dp))
+                Spacer(Modifier.size(8.dp))
                 Text(
                     myStringResource(Res.string.customize_columns),
                     fontSize = myTextSizes.base
                 )
-                Spacer(Modifier.width(8.dp))
-                IconActionButton(
-                    MyIcons.undo,
-                    myStringResource(Res.string.reset),
-                    onClick = {
-                        tableState.reset()
-                    }
-                )
             }
             Spacer(Modifier.fillMaxWidth().height(1.dp).background(myColors.onSurface / 5))
             val orderedCells by tableState.order.collectAsState()
-            orderedCells.forEach { cell ->
-                CellConfigItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    cell = cell,
-                    isVisible = cell in visibleItems,
-                    isForceVisible = cell in forceVisibleItems,
-                    setVisible = { checked ->
-                        tableState.setVisibleCells {
-                            val contains = it.contains(cell)
-                            if (checked) {
-                                it.ifThen(!contains) { plus(cell) }
-                            } else {
-                                it.ifThen(contains) { minus(cell) }
-                            }
-                        }
-                    },
-                    move = { up ->
-                        val delta = if (up) -1 else 1
-                        tableState.setOrder(cell, delta)
-                    },
-                    setSort = { sort ->
-                        tableState.setSortBy(sort)
-                    },
-                    sortBy = tableState.sortBy.collectAsState().value
-                )
+            ReorderableColumn(
+                list = orderedCells,
+                onSettle = { from, to ->
+                    tableState.setOrder {
+                        it.shifted(from, to - from)
+                    }
+                },
+                content = { _, cell, _ ->
+                    key(cell) {
+                        CellConfigItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            cell = cell,
+                            isVisible = cell in visibleItems,
+                            isForceVisible = cell in forceVisibleItems,
+                            setVisible = { checked ->
+                                tableState.setVisibleCells {
+                                    val contains = it.contains(cell)
+                                    if (checked) {
+                                        it.ifThen(!contains) { plus(cell) }
+                                    } else {
+                                        it.ifThen(contains) { minus(cell) }
+                                    }
+                                }
+                            },
+                            setSort = { sort ->
+                                tableState.setSortBy(sort)
+                            },
+                            sortBy = tableState.sortBy.collectAsState().value
+                        )
+                    }
+                },
+            )
+            Spacer(Modifier.fillMaxWidth().height(1.dp).background(myColors.onSurface / 5))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clickable(onClick = tableState::reset)
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                MyIcon(MyIcons.undo, null, Modifier.size(12.dp))
+                Spacer(Modifier.size(8.dp))
+                Text(myStringResource(Res.string.reset))
             }
         }
     }
 }
 
 @Composable
-private fun <T, Cell : TableCell<T>> CellConfigItem(
+private fun <T, Cell : TableCell<T>> ReorderableScope.CellConfigItem(
     modifier: Modifier,
     cell: Cell,
     isVisible: Boolean,
     isForceVisible: Boolean,
     setVisible: (Boolean) -> Unit,
-    move: (up: Boolean) -> Unit,
     sortBy: Sort<SortableCell<T>>?,
     setSort: (Sort<SortableCell<T>>?) -> Unit,
 ) {
     Row(
-        modifier.padding(8.dp).height(IntrinsicSize.Max),
+        modifier
+            .padding(8.dp)
+            .height(IntrinsicSize.Max),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            MyIcon(
-                MyIcons.up,
-                null,
-                Modifier
-                    .size(12.dp)
-                    .clickable {
-                        move(true)
-                    })
-            MyIcon(
-                MyIcons.down,
-                null,
-                Modifier
-                    .size(12.dp)
-                    .clickable {
-                        move(false)
-                    })
-        }
+        MyIcon(
+            icon = MyIcons.grip,
+            contentDescription = null,
+            modifier = Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .clickable {}
+                .padding(4.dp)
+                .size(12.dp)
+                .draggableHandle(),
+        )
         Spacer(Modifier.width(8.dp))
         CheckBox(
             value = isVisible,
