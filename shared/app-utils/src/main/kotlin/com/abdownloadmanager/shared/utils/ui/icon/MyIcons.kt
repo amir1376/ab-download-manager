@@ -85,6 +85,7 @@ override val back get() = "/icons/back.svg".asIconSource()
 
     override val question get() = "/icons/question_mark.svg".asIconSource()
 
+    override val grip get() = "/icons/grip.svg".asIconSource()
     override val sortUp get() = "/icons/sort_321.svg".asIconSource()
     override val sortDown get() = "/icons/sort_123.svg".asIconSource()
     override val verticalDirection get() = "/icons/vertical_direction.svg".asIconSource()
