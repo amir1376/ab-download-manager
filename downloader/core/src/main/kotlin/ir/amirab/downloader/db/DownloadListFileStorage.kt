@@ -21,23 +21,27 @@ class DownloadListFileStorage(
 
     override suspend fun getAll(): List<DownloadItem> {
         return withContext(Dispatchers.IO) {
-            downloadListFolder.listFiles()?.filter {
-                it.name.endsWith(".json")
-            }?.mapNotNull {
-                get(it)
-            }.orEmpty()
+            val jsonExtension = ".json"
+            downloadListFolder.listFiles()
+                ?.mapNotNull { file ->
+                    file.name
+                        .takeIf { it.endsWith(jsonExtension) }
+                        ?.removeSuffix(jsonExtension)
+                        ?.toLongOrNull()
+                        ?.let { get(file, it) }
+                }.orEmpty()
         }
     }
 
-    private fun get(file: File): DownloadItem? {
-        return fileSaver.readObject(file)
+    private suspend fun get(file: File, id: Long): DownloadItem? {
+        return fileLocks.withLock(id) {
+            fileSaver.readObject(file)
+        }
     }
 
     override suspend fun getById(id: Long): DownloadItem? {
         return withContext(Dispatchers.IO) {
-            fileLocks.withLock(id) {
-                get(getDownloadItemFile(id))
-            }
+            get(getDownloadItemFile(id), id)
         }
     }
 
