@@ -14,7 +14,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.isTypedEvent
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,6 +40,7 @@ import androidx.compose.ui.window.rememberComponentRectPositionProvider
 import com.abdownloadmanager.desktop.utils.configurable.ConfigGroupInfo
 import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -96,7 +96,7 @@ fun <T> RenderSpinner(
     val horizontalPadding = 4.dp
 
     var isOpen by remember { mutableStateOf(false) }
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     val borderWidth = 1.dp
     val borderColor = myColors.onBackground / 10
     var widthForPopup by remember {
@@ -436,7 +436,7 @@ private fun Help(
                 ),
                 onDismissRequest = onRequestCloseShowHelpContent
             ) {
-                val shape = RoundedCornerShape(6.dp)
+                val shape = myShapes.defaultRounded
                 Box(
                     Modifier
                         .padding(vertical = 4.dp)

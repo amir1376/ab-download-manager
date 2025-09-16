@@ -15,7 +15,6 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -24,6 +23,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 
 @Composable
 fun alphaFlicker(): Float {
@@ -44,7 +44,7 @@ fun IconActionButton(
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
     val isActiveOrFocused = indicateActive || isFocused
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Box(
         modifier
             .ifThen(!enabled) {

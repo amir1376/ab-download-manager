@@ -11,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.mikepenz.aboutlibraries.entity.Developer
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.entity.License
@@ -43,7 +43,7 @@ fun LibraryDialog(
         ProvideTextStyle(
             TextStyle(fontSize = myTextSizes.base)
         ) {
-            val shape = RoundedCornerShape(6.dp)
+            val shape = myShapes.defaultRounded
             Column(
                 Modifier
                     .clip(shape)

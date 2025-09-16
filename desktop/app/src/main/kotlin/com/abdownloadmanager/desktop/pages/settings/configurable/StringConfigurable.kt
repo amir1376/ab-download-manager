@@ -3,15 +3,13 @@ package com.abdownloadmanager.desktop.pages.settings.configurable
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.utils.configurable.Configurable
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,7 +53,7 @@ fun RenderStringConfig(cfg: StringConfigurable, modifier: Modifier) {
                 onTextChange = {
                     setValue(it)
                 },
-                shape = RoundedCornerShape(6.dp),
+                shape = myShapes.defaultRounded,
                 textPadding = PaddingValues(4.dp),
                 placeholder = "",
             )

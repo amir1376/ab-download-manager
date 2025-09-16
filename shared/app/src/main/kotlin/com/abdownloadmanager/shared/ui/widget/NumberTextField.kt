@@ -31,8 +31,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 
-private val DefaultShape get() = RoundedCornerShape(6.dp)
+private val DefaultShape
+    @Composable
+    get() = myShapes.defaultRounded
 
 @Composable
 fun IntTextField(

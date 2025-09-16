@@ -16,7 +16,6 @@ import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +34,7 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.rememberCategoryOf
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
@@ -175,7 +175,7 @@ fun DownloadList(
                 ) {
                     val windowInfo = LocalWindowInfo.current
                     WithContentAlpha(1f) {
-                        val shape = RoundedCornerShape(6.dp)
+                        val shape = myShapes.defaultRounded
                         Box(
                             Modifier
                                 .widthIn(min = getTableSize().visibleWidth)

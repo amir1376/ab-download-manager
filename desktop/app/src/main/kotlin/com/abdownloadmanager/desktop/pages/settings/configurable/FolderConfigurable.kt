@@ -5,14 +5,13 @@ import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.utils.configurable.Configurable
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
 import ir.amirab.util.compose.StringSource
@@ -77,7 +76,7 @@ private fun RenderFolderConfig(cfg: FolderConfigurable, modifier: Modifier) {
                 onTextChange = {
                     setValue(it)
                 },
-                shape = RoundedCornerShape(6.dp),
+                shape = myShapes.defaultRounded,
                 textPadding = PaddingValues(4.dp),
                 placeholder = cfg.title.rememberString(),
                 end = {

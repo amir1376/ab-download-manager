@@ -37,6 +37,7 @@ import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.URLOpener
 import ir.amirab.util.UrlUtils
 import ir.amirab.util.compose.IconSource
@@ -303,7 +304,7 @@ private fun AboutPageListItemButton(
     description: StringSource,
     onClick: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Row(
         modifier
             .border(1.dp, myColors.onBackground / 0.15f, shape)

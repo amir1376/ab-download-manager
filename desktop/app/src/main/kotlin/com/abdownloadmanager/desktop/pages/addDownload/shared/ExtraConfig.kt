@@ -9,7 +9,6 @@ import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.desktop.window.moveSafe
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
 import com.abdownloadmanager.desktop.utils.configurable.Configurable
 import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 import java.awt.MouseInfo
@@ -53,7 +53,7 @@ fun ExtraConfig(
         }
 
 
-        val shape = RoundedCornerShape(6.dp)
+        val shape = myShapes.defaultRounded
         Column(
             Modifier
                 .fillMaxSize()

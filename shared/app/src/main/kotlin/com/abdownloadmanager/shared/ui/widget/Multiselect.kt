@@ -18,6 +18,7 @@ import ir.amirab.util.ifThen
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 
 @Composable
 fun <T> Multiselect(
@@ -25,7 +26,7 @@ fun <T> Multiselect(
     selectedItem: T,
     onSelectionChange: (T) -> Unit,
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(6.dp),
+    shape: Shape = myShapes.defaultRounded,
     backgroundColour: Color = myColors.surface,
     selectedColor: Color = LocalContentColor.current / 10,
     unselectedAlpha: Float = 0.5f,

@@ -55,6 +55,7 @@ import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.shared.utils.ui.WithTitleBarDirection
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
@@ -390,7 +391,7 @@ private fun ShowDeletePrompts(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Dialog(onDismissRequest = onCancel) {
         Column(
             Modifier
@@ -509,7 +510,7 @@ private fun ShowConfirmPrompt(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Dialog(onDismissRequest = onCancel) {
         Column(
             Modifier
@@ -567,7 +568,7 @@ private fun ShowDeleteCategoryPrompt(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Dialog(onDismissRequest = onCancel) {
         Column(
             Modifier
@@ -728,7 +729,7 @@ private fun Categories(
     val currentTypeFilter = component.filterState.typeCategoryFilter
     val currentStatusFilter = component.filterState.statusFilter
     val categories by component.categoryManager.categoriesFlow.collectAsState()
-    val clipShape = RoundedCornerShape(6.dp)
+    val clipShape = myShapes.defaultRounded
     val showCategoryOption by component.categoryActions.collectAsState()
 
     fun showCategoryOption(item: Category?) {

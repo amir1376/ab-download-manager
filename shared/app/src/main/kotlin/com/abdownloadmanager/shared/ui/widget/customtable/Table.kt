@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberCursorPositionProvider
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.shifted
 import kotlinx.coroutines.flow.*
@@ -323,7 +324,7 @@ private fun <T, Cell : TableCell<T>> ReorderableScope.CellConfigItem(
             icon = MyIcons.grip,
             contentDescription = null,
             modifier = Modifier
-                .clip(RoundedCornerShape(6.dp))
+                .clip(myShapes.defaultRounded)
                 .clickable {}
                 .draggableHandle()
                 .padding(4.dp)

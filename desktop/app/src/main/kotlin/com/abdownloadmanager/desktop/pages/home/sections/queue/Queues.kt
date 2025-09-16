@@ -59,6 +59,7 @@ import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.downloader.db.QueueModel
@@ -76,7 +77,7 @@ internal fun QueuesSection(
 
     val currentSelectedQueue = component.filterState.queueFilter
     val queues by component.queueManager.queues.collectAsState()
-    val clipShape = RoundedCornerShape(6.dp)
+    val clipShape = myShapes.defaultRounded
     val showQueueOption by component.queueActions.collectAsState()
 
     fun showQueueOption(downloadQueue: DownloadQueue?) {

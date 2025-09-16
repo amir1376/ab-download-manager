@@ -15,7 +15,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,6 +36,7 @@ import com.abdownloadmanager.shared.utils.CanAddResult
 import com.abdownloadmanager.shared.utils.LocalSizeUnit
 import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.compose.asStringSource
@@ -223,7 +223,7 @@ private fun ShowSolutionsOnDuplicateDownload(component: AddSingleDownloadCompone
         }
 
 
-        val shape = RoundedCornerShape(6.dp)
+        val shape = myShapes.defaultRounded
         Column(
             Modifier
                 .clip(shape)
@@ -684,7 +684,7 @@ fun AddDownloadPageTextField(
             modifier = Modifier.fillMaxWidth(),
             background = myColors.surface / 50,
             interactionSource = interactionSource,
-            shape = RoundedCornerShape(6.dp),
+            shape = myShapes.defaultRounded,
             start = start?.let {
                 {
                     WithContentAlpha(0.5f) {

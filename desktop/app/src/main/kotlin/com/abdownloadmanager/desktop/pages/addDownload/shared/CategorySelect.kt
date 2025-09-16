@@ -20,6 +20,7 @@ import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.rememberIconPainter
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
@@ -113,7 +114,7 @@ fun CategoryAddButton(
 ) {
     val borderColor = myColors.onBackground / 0.1f
     val background = myColors.surface / 50
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Box(
         modifier
             .clip(shape)
