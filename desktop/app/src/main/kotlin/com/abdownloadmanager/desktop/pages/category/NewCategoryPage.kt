@@ -22,6 +22,7 @@ import ir.amirab.util.ifThen
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
@@ -437,7 +438,7 @@ private fun CategoryPageTextField(
             singleLine = singleLine,
             background = myColors.surface / 50,
             interactionSource = interactionSource,
-            shape = RoundedCornerShape(6.dp),
+            shape = myShapes.defaultRounded,
             enabled = enabled,
             start = start?.let {
                 {

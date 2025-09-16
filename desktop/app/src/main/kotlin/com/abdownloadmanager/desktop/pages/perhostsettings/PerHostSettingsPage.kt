@@ -32,6 +32,7 @@ import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
@@ -163,7 +164,7 @@ private fun HostList(
     setSelected: (String) -> Unit,
     component: PerHostSettingsComponent,
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     val borderColor = myColors.surface / 0.5f
     var search by remember { mutableStateOf("") }
     val defaultEmptyName = myStringResource(Res.string.settings_per_host_settings_new_host)

@@ -15,7 +15,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +41,7 @@ import com.abdownloadmanager.shared.utils.LocalSizeUnit
 import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.asStringSource
@@ -384,7 +384,7 @@ fun WarningPrompt(
         ),
         onDismissRequest = onClose
     ) {
-        val shape = RoundedCornerShape(6.dp)
+        val shape = myShapes.defaultRounded
         Box(
             Modifier
                 .padding(vertical = 4.dp)
@@ -575,7 +575,7 @@ private fun AddDownloadPageTextField(
             modifier = Modifier.fillMaxWidth(),
             background = myColors.surface / 50,
             interactionSource = interactionSource,
-            shape = RoundedCornerShape(6.dp),
+            shape = myShapes.defaultRounded,
             start = start?.let {
                 {
                     WithContentAlpha(0.5f) {

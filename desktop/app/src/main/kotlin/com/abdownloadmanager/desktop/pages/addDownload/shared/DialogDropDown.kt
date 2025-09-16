@@ -32,6 +32,7 @@ import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.desktop.window.moveSafe
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.screen.applyUiScale
@@ -99,7 +100,7 @@ fun <T> DropDownContent(
                     }
                 )
             }
-            val shape = RoundedCornerShape(6.dp)
+            val shape = myShapes.defaultRounded
 
             Box(
                 Modifier
@@ -196,7 +197,7 @@ private fun <T> DropDownHeader(
 ) {
     val borderColor = myColors.onBackground / 0.1f
     val background = myColors.surface / 50
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Row(
         Modifier
             .height(IntrinsicSize.Max)

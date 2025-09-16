@@ -6,7 +6,6 @@ import com.abdownloadmanager.shared.utils.div
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 
 @Composable
 fun RenderConfigurableGroup(
@@ -28,7 +28,7 @@ fun RenderConfigurableGroup(
     val visible by group.nestedVisible.collectAsState()
     val title by group.groupTitle.collectAsState()
     Column(modifier
-        .clip(RoundedCornerShape(6.dp))
+        .clip(myShapes.defaultRounded)
         .background(myColors.surface/50)
         .padding(horizontal = 4.dp)
     ) {

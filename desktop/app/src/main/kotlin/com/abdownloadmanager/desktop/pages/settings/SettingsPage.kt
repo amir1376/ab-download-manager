@@ -31,6 +31,7 @@ import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurableGroup
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.needScroll
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
@@ -40,7 +41,7 @@ private fun SideBar(
     settingsComponent: SettingsComponent,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Column(
         modifier
             .fillMaxHeight()

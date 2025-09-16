@@ -5,7 +5,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +28,7 @@ import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.IconSource
@@ -205,7 +205,7 @@ fun LinkPreview(link: String) {
         link,
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(6.dp))
+            .clip(myShapes.defaultRounded)
             .background(myColors.surface)
             .padding(vertical = 4.dp, horizontal = 6.dp)
     )
@@ -315,7 +315,7 @@ private fun BatchDownloadPageTextField(
             modifier = Modifier.fillMaxWidth(),
             background = myColors.surface / 50,
             interactionSource = interactionSource,
-            shape = RoundedCornerShape(6.dp),
+            shape = myShapes.defaultRounded,
             start = start?.let {
                 {
                     WithContentAlpha(0.5f) {

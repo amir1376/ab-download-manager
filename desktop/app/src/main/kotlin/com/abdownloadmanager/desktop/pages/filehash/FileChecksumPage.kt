@@ -5,7 +5,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +35,7 @@ import com.abdownloadmanager.shared.utils.rememberDotLoading
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
@@ -255,7 +255,7 @@ private data object FileChecksumTableCellRenderers {
                     surroundingColor = myColors.onBackground / 0.1f,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(myShapes.defaultRounded)
                         .height(myTextSizes.base.value.dp)
                 )
             } else if (item.isError) {
@@ -346,7 +346,7 @@ private data object FileChecksumTableCellRenderers {
             anchor = Alignment.BottomEnd,
             alignment = Alignment.BottomStart,
         ) {
-            val shape = RoundedCornerShape(6.dp)
+            val shape = myShapes.defaultRounded
             Column(
                 Modifier
                     .shadow(24.dp)

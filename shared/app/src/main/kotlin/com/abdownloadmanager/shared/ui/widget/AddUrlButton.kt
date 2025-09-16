@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -22,7 +23,7 @@ fun AddUrlButton(
     modifier: Modifier=Modifier,
     onClick:()->Unit
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     val addUrlIcon = MyIcons.link
     val downloadIcon = MyIcons.download
     Row(
@@ -49,7 +50,7 @@ fun AddUrlButton(
         Spacer(Modifier.width(10.dp))
         Box(
             Modifier
-                .clip(RoundedCornerShape(6.dp))
+                .clip(myShapes.defaultRounded)
                 .background(
                     myColors.primaryGradient
                 ).padding(4.dp)

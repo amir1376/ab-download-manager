@@ -21,6 +21,7 @@ import androidx.compose.ui.window.rememberComponentRectPositionProvider
 import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.utils.ui.WithContentColor
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.delay
 
@@ -73,7 +74,7 @@ fun TooltipPopup(
         ),
         onDismissRequest = onRequestCloseShowHelpContent
     ) {
-        val shape = RoundedCornerShape(6.dp)
+        val shape = myShapes.defaultRounded
         Box(
             Modifier
                 .padding(vertical = 4.dp)

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.takeOrElse
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 
 @Composable
 fun MyTextField(
@@ -51,7 +52,7 @@ fun MyTextField(
         ?: LocalContentColor.current,
     focusedBorderColor: Color = myColors.primary,
     borderColor: Color = myColors.onBackground / 0.1f,
-    shape: Shape = RoundedCornerShape(6.dp),
+    shape: Shape = myShapes.defaultRounded,
     textPadding: PaddingValues = PaddingValues(8.dp),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     fontSize: TextUnit = TextUnit.Unspecified,

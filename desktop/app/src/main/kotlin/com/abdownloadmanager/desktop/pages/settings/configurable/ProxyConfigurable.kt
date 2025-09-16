@@ -23,6 +23,7 @@ import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.proxy.*
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.downloader.connection.proxy.Proxy
 import ir.amirab.downloader.connection.proxy.ProxyType
@@ -190,7 +191,7 @@ private fun ProxyEditDialog(
                 headerTitle = myStringResource(Res.string.proxy_change_title),
                 onDismiss = onDismiss,
                 content = {
-                    val shape = RoundedCornerShape(6.dp)
+                    val shape = myShapes.defaultRounded
                     Column(
                         Modifier
                             .verticalScroll(rememberScrollState())
@@ -466,7 +467,7 @@ private fun SettingsDialog(
     content: @Composable () -> Unit,
     actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Column(
         modifier = Modifier
             .clip(shape)

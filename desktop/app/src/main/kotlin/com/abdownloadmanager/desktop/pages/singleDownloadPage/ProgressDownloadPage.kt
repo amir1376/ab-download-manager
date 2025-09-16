@@ -44,6 +44,7 @@ import com.abdownloadmanager.shared.utils.LocalSizeUnit
 import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.utils.ui.useIsInDebugMode
 import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.part.PartDownloadStatus
@@ -91,7 +92,7 @@ fun ProgressDownloadPage(singleDownloadComponent: SingleDownloadComponent, itemS
     ) {
         Column(
             Modifier
-                .clip(RoundedCornerShape(6.dp))
+                .clip(myShapes.defaultRounded)
                 .padding(1.dp),
         ) {
             //tabs
@@ -249,7 +250,7 @@ private fun RenderProgressBar(itemState: IDownloadItemState) {
     Box(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(6.dp))
+            .clip(myShapes.defaultRounded)
             .height(14.dp)
             .background(myColors.onBackground / 15)
     ) {
@@ -338,7 +339,7 @@ private fun RenderPartInfo(
                 Modifier
                     .padding(horizontal = horizontalPadding)
                     .height(4.dp)
-                    .clip(RoundedCornerShape(6.dp))
+                    .clip(myShapes.defaultRounded)
                     .background(myColors.onBackground / 15)
             )
             Box(
@@ -702,7 +703,7 @@ private fun ToggleButton(
             },
         )
         if (showPromptOnNonePresumablePause) {
-            val shape = RoundedCornerShape(6.dp)
+            val shape = myShapes.defaultRounded
             val closePopup = {
                 showPromptOnNonePresumablePause = false
             }

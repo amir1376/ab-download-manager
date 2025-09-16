@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 
 @Composable
 fun ActionButton(
@@ -43,7 +44,7 @@ fun ActionButton(
     end: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     val borderColor = if (isFocused) focusedBorderColor else borderColor
     Row(
         modifier

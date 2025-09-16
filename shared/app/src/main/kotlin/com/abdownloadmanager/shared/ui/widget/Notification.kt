@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.*
@@ -122,7 +123,7 @@ private fun RenderNotification(
     modifier: Modifier,
     notificationModel: NotificationModel
 ) {
-    val shape = RoundedCornerShape(6.dp)
+    val shape = myShapes.defaultRounded
     Row(modifier
         .animateContentSize()
         .height(IntrinsicSize.Max)

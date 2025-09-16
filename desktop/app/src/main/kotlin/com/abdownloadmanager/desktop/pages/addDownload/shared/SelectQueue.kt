@@ -27,6 +27,7 @@ import androidx.compose.ui.window.rememberDialogState
 import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.CheckBox
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.util.desktop.screen.applyUiScale
@@ -69,7 +70,7 @@ fun ShowAddToQueueDialog(
         }
 
 
-        val shape = RoundedCornerShape(6.dp)
+        val shape = myShapes.defaultRounded
         Column(
             Modifier
                 .fillMaxSize()

@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.utils.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
@@ -62,7 +62,7 @@ fun QueuePage(component: QueuesComponent) {
     val queues = component.queuesState
     val activeItem: DownloadQueue = component.selectedItem
     WindowTitle(myStringResource(Res.string.queues))
-    val borderShape = RoundedCornerShape(6.dp)
+    val borderShape = myShapes.defaultRounded
     val borderColor = myColors.surface
     Column {
         Row(
