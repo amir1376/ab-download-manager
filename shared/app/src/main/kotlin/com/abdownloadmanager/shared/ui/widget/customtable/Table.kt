@@ -7,21 +7,17 @@ import com.abdownloadmanager.shared.utils.ui.myColors
 import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import ir.amirab.util.ifThen
 import com.abdownloadmanager.shared.ui.widget.CheckBox
-import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuColumn
 import com.abdownloadmanager.shared.utils.div
 import ir.amirab.util.flow.saved
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draganddrop.DragData
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerButton
@@ -30,10 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberCursorPositionProvider
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.ui.widget.ActionButton
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.shifted
-import ir.amirab.util.swapped
 import kotlinx.coroutines.flow.*
 import sh.calvin.reorderable.ReorderableColumn
 import sh.calvin.reorderable.ReorderableScope
@@ -331,9 +325,9 @@ private fun <T, Cell : TableCell<T>> ReorderableScope.CellConfigItem(
             modifier = Modifier
                 .clip(RoundedCornerShape(6.dp))
                 .clickable {}
+                .draggableHandle()
                 .padding(4.dp)
-                .size(12.dp)
-                .draggableHandle(),
+                .size(12.dp),
         )
         Spacer(Modifier.width(8.dp))
         CheckBox(
