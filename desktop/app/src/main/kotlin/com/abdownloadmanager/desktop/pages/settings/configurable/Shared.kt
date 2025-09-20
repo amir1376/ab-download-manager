@@ -26,7 +26,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -66,7 +69,7 @@ private fun Modifier.onSearch(
             }
         }
         onKeyEvent {
-            if (it.isTypedEvent) {
+            if (it.type == KeyEventType.KeyDown) {
                 val char = it.utf16CodePoint.toChar()
                 if (char.isLetterOrDigit()) {
                     textToSearch += char

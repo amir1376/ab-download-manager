@@ -13,7 +13,6 @@ import ir.amirab.util.flow.saved
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,7 +30,7 @@ import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.shifted
 import kotlinx.coroutines.flow.*
 import sh.calvin.reorderable.ReorderableColumn
-import sh.calvin.reorderable.ReorderableScope
+import sh.calvin.reorderable.ReorderableListItemScope
 
 val LocalCellPadding = compositionLocalOf {
     PaddingValues(horizontal = 4.dp, vertical = 0.dp)
@@ -265,26 +264,28 @@ private fun <T, C : TableCell<T>> ShowColumnConfigMenu(
                 },
                 content = { _, cell, _ ->
                     key(cell) {
-                        CellConfigItem(
-                            modifier = Modifier.fillMaxWidth(),
-                            cell = cell,
-                            isVisible = cell in visibleItems,
-                            isForceVisible = cell in forceVisibleItems,
-                            setVisible = { checked ->
-                                tableState.setVisibleCells {
-                                    val contains = it.contains(cell)
-                                    if (checked) {
-                                        it.ifThen(!contains) { plus(cell) }
-                                    } else {
-                                        it.ifThen(contains) { minus(cell) }
+                        ReorderableItem {
+                            CellConfigItem(
+                                modifier = Modifier.fillMaxWidth(),
+                                cell = cell,
+                                isVisible = cell in visibleItems,
+                                isForceVisible = cell in forceVisibleItems,
+                                setVisible = { checked ->
+                                    tableState.setVisibleCells {
+                                        val contains = it.contains(cell)
+                                        if (checked) {
+                                            it.ifThen(!contains) { plus(cell) }
+                                        } else {
+                                            it.ifThen(contains) { minus(cell) }
+                                        }
                                     }
-                                }
-                            },
-                            setSort = { sort ->
-                                tableState.setSortBy(sort)
-                            },
-                            sortBy = tableState.sortBy.collectAsState().value
-                        )
+                                },
+                                setSort = { sort ->
+                                    tableState.setSortBy(sort)
+                                },
+                                sortBy = tableState.sortBy.collectAsState().value
+                            )
+                        }
                     }
                 },
             )
@@ -305,7 +306,7 @@ private fun <T, C : TableCell<T>> ShowColumnConfigMenu(
 }
 
 @Composable
-private fun <T, Cell : TableCell<T>> ReorderableScope.CellConfigItem(
+private fun <T, Cell : TableCell<T>> ReorderableListItemScope.CellConfigItem(
     modifier: Modifier,
     cell: Cell,
     isVisible: Boolean,
