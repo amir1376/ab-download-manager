@@ -2,8 +2,6 @@ package ir.amirab.downloader.monitor
 
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.util.flow.mapStateFlow
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface IDownloadMonitor {

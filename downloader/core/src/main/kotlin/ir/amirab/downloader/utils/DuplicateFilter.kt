@@ -1,17 +1,17 @@
 package ir.amirab.downloader.utils
 
-import ir.amirab.downloader.downloaditem.DownloadItem
+import ir.amirab.downloader.downloaditem.IDownloadItem
 import java.io.File
 
 interface DuplicateDownloadFilter {
-    fun isDuplicate(downloadItem: DownloadItem): Boolean
+    fun isDuplicate(downloadItem: IDownloadItem): Boolean
 }
 
 // I moved this logic here because it used multiple times
 class DuplicateFilterByPath(
     private val file: File,
 ) : DuplicateDownloadFilter {
-    override fun isDuplicate(downloadItem: DownloadItem): Boolean {
+    override fun isDuplicate(downloadItem: IDownloadItem): Boolean {
         return file == File(downloadItem.folder, downloadItem.name)
     }
 }

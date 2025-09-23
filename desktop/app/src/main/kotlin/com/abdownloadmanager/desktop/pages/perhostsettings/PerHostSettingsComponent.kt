@@ -1,12 +1,12 @@
 package com.abdownloadmanager.desktop.pages.perhostsettings
 
 import arrow.core.prependTo
-import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
-import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
-import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
-import com.abdownloadmanager.desktop.pages.settings.configurable.StringConfigurable
+import com.abdownloadmanager.shared.util.ThreadCountLimitation
+import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.desktop.repository.AppRepository
-import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.BaseComponent
 import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable

@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurableGroup
+import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.div
 import com.abdownloadmanager.shared.utils.ui.needScroll

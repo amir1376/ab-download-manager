@@ -1,13 +1,13 @@
 package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import androidx.compose.runtime.Immutable
-import com.abdownloadmanager.desktop.pages.settings.configurable.IntConfigurable
-import com.abdownloadmanager.desktop.pages.settings.configurable.SpeedLimitConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import arrow.optics.copy
-import com.abdownloadmanager.desktop.pages.settings.ThreadCountLimitation
-import com.abdownloadmanager.desktop.pages.settings.configurable.BooleanConfigurable
+import com.abdownloadmanager.shared.util.ThreadCountLimitation
+import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.ExtraDownloadSettingsStorage

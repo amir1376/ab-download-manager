@@ -22,6 +22,7 @@ import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
 import com.abdownloadmanager.desktop.pages.confirmexit.ConfirmExit
 import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
+import com.abdownloadmanager.desktop.pages.enterurl.EnterNewDownloadWindow
 import com.abdownloadmanager.desktop.pages.extenallibs.ShowOpenSourceLibraries
 import com.abdownloadmanager.desktop.pages.filehash.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
@@ -30,7 +31,7 @@ import com.abdownloadmanager.desktop.pages.perhostsettings.PerHostSettingsWindow
 import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
 import com.abdownloadmanager.desktop.pages.settings.FontManager
 import com.abdownloadmanager.desktop.pages.settings.SettingWindow
-import com.abdownloadmanager.desktop.pages.settings.ThemeManager
+import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionAlert
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialogs
 import com.abdownloadmanager.desktop.pages.updater.ShowUpdaterDialog
@@ -126,6 +127,7 @@ object Ui : KoinComponent {
                 editDownloadSlot.child?.instance?.let {
                     EditDownloadWindow(it)
                 }
+                EnterNewDownloadWindow(appComponent)
                 ShowAddDownloadDialogs(appComponent)
                 ShowDownloadDialogs(appComponent)
                 ShowCategoryDialogs(appComponent)

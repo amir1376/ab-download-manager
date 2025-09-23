@@ -6,7 +6,7 @@ import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
 import com.abdownloadmanager.desktop.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionAction
 import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionActionProvider
-import ir.amirab.downloader.downloaditem.DownloadItem
+import ir.amirab.downloader.downloaditem.IDownloadItem
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.getValue
@@ -20,7 +20,7 @@ class DesktopOnDownloadCompletionActionProvider(
     // I need to redesign the dependency graph to prevent these sorts of issues!
     private val powerActionManager: PowerActionManager by inject()
 
-    override suspend fun getOnDownloadCompletionAction(downloadItem: DownloadItem): List<OnDownloadCompletionAction> {
+    override suspend fun getOnDownloadCompletionAction(downloadItem: IDownloadItem): List<OnDownloadCompletionAction> {
         val downloadId = downloadItem.id
         val extraDownloadItemSettings = extraDownloadSettingsStorage.getExtraDownloadItemSettings(downloadId)
         return buildList {
@@ -38,7 +38,7 @@ class PowerActionOnDownloadFinish(
     val powerActionManager: PowerActionManager,
     val powerActionConfig: PowerActionConfig,
 ) : OnDownloadCompletionAction {
-    override suspend fun onDownloadCompleted(downloadItem: DownloadItem) {
+    override suspend fun onDownloadCompleted(downloadItem: IDownloadItem) {
         powerActionManager.initiatePowerAction(
             powerActionConfig,
             PowerActionComponent.PowerActionReason.DownloadFinished,
@@ -49,7 +49,7 @@ class PowerActionOnDownloadFinish(
 class CleanExtraSettingsOnDownloadFinish(
     private val storage: ExtraDownloadSettingsStorage
 ) : OnDownloadCompletionAction {
-    override suspend fun onDownloadCompleted(downloadItem: DownloadItem) {
+    override suspend fun onDownloadCompleted(downloadItem: IDownloadItem) {
         storage.deleteExtraDownloadItemSettings(downloadItem.id)
     }
 }

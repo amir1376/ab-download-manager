@@ -3,8 +3,8 @@ package com.abdownloadmanager.desktop.pages.perhostsettings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
-import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurableGroup
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
+import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.shared.utils.ui.myColors

@@ -6,6 +6,8 @@ import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.utils.intervalFlow
 import ir.amirab.util.flow.saved
 import ir.amirab.downloader.DownloadManager
+import ir.amirab.downloader.downloaditem.DownloadJob
+import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.util.flow.combineStateFlows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -17,7 +19,10 @@ import kotlinx.coroutines.launch
 
 class DownloadMonitor(
     private val downloadManager: DownloadManager,
+    downloadItemStateFactory: Lazy<DownloadItemStateFactory<IDownloadItem, DownloadJob>>
 ) : IDownloadMonitor {
+    val downloadItemStateFactory by downloadItemStateFactory
+
     private val scope = CoroutineScope(SupervisorJob())
 
     private var avSpeedCollectorJob: Job? = null
@@ -161,7 +166,7 @@ class DownloadMonitor(
             val initialData = downloadManager.getDownloadList().filter {
                 it.status == DownloadStatus.Completed
             }.map {
-                CompletedDownloadItemState.fromDownloadItem(it)
+                downloadItemStateFactory.createCompletedDownloadItemStateFromDownloadItem(it)
             }
             completedDownloadListFlow.update { initialData }
             downloadManager.listOfJobsEvents
@@ -169,8 +174,8 @@ class DownloadMonitor(
 
                     when (event) {
                         is DownloadManagerEvents.OnJobCompleted -> {
-                            val item =
-                                CompletedDownloadItemState.fromDownloadItem(event.downloadItem)
+                            val item = downloadItemStateFactory
+                                .createCompletedDownloadItemStateFromDownloadItem(event.downloadItem)
                             completedDownloadListFlow.update { current ->
                                 //replace if this id is already in the completed list
                                 // this is happened when we are creating a job from a completed download
@@ -201,7 +206,8 @@ class DownloadMonitor(
                             val shouldAdd = event.downloadItem.status == DownloadStatus.Completed
                             completedDownloadListFlow.update { current ->
                                 if (shouldAdd) {
-                                    val item = CompletedDownloadItemState.fromDownloadItem(event.downloadItem)
+                                    val item =
+                                        downloadItemStateFactory.createCompletedDownloadItemStateFromDownloadItem(event.downloadItem)
                                     val exists = current.find {
                                         it.id == item.id
                                     } != null
@@ -254,7 +260,7 @@ class DownloadMonitor(
                 val speed = if (status is DownloadJobStatus.IsActive) {
                     getSpeedOf(it.id)
                 } else 0L
-                ProcessingDownloadItemState.fromDownloadJob(
+                downloadItemStateFactory.createProcessingDownloadItemStateFromDownloadJob(
                     it,
                     speed = speed
                 )

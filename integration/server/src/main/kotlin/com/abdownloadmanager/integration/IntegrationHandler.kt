@@ -2,7 +2,7 @@ package com.abdownloadmanager.integration
 
 interface IntegrationHandler{
     suspend fun addDownload(
-        list: List<DownloadCredentialsFromIntegration>,
+        list: List<IDownloadCredentialsFromIntegration>,
         options: AddDownloadOptionsFromIntegration,
     )
     fun listQueues(): List<ApiQueueModel>

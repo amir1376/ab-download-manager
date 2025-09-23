@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
-import com.abdownloadmanager.desktop.utils.configurable.RenderConfigurable
+import com.abdownloadmanager.shared.ui.configurable.RenderConfigurable
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageSections.*
 import com.abdownloadmanager.shared.utils.ui.LocalContentColor
 import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
@@ -17,7 +17,6 @@ import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -52,7 +51,6 @@ import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
-import kotlin.math.sin
 
 enum class SingleDownloadPageSections(
     val title: StringSource,
@@ -358,7 +356,7 @@ private fun RenderPartInfo(
                                         PartDownloadStatus.Completed -> false
                                         PartDownloadStatus.IDLE -> false
                                         PartDownloadStatus.ReceivingData -> true
-                                        PartDownloadStatus.SendGet -> true
+                                        PartDownloadStatus.Connecting -> true
                                     }
                                 }
                             } else {
@@ -468,7 +466,7 @@ private fun prettifyStatus(status: PartDownloadStatus): StringSource {
         PartDownloadStatus.IDLE -> Res.string.idle
         PartDownloadStatus.Completed -> Res.string.finished
         PartDownloadStatus.ReceivingData -> Res.string.receiving_data
-        PartDownloadStatus.SendGet -> Res.string.connecting
+        PartDownloadStatus.Connecting -> Res.string.connecting
     }.asStringSource()
 }
 
@@ -789,7 +787,7 @@ private fun RenderPart(part: UiPart, modifier: Modifier) {
         PartDownloadStatus.Completed -> myColors.info
         PartDownloadStatus.IDLE -> myColors.info / 25
         PartDownloadStatus.ReceivingData -> myColors.success
-        PartDownloadStatus.SendGet -> myColors.warning
+        PartDownloadStatus.Connecting -> myColors.warning
     }
     Row(modifier) {
         Box(

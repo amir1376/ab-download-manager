@@ -13,6 +13,7 @@ import ir.amirab.downloader.downloaditem.*
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.StoppedBy
 import ir.amirab.downloader.downloaditem.contexts.User
+import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
@@ -58,8 +59,8 @@ class DownloadSystem(
     }
 
     suspend fun addDownload(
-        newItemsToAdd: List<DownloadItem>,
-        onDuplicateStrategy: (DownloadItem) -> OnDuplicateStrategy,
+        newItemsToAdd: List<IDownloadItem>,
+        onDuplicateStrategy: (IDownloadItem) -> OnDuplicateStrategy,
         queueId: Long? = null,
         categorySelectionMode: CategorySelectionMode? = null,
     ): List<Long> {
@@ -100,7 +101,7 @@ class DownloadSystem(
     }
 
     suspend fun addDownload(
-        downloadItem: DownloadItem,
+        downloadItem: IDownloadItem,
         onDuplicateStrategy: OnDuplicateStrategy,
         queueId: Long?,
         categoryId: Long?,
@@ -183,22 +184,22 @@ class DownloadSystem(
             .stop()
     }
 
-    suspend fun getDownloadItemById(id: Long): DownloadItem? {
+    suspend fun getDownloadItemById(id: Long): IDownloadItem? {
         return downloadListDB.getById(id) ?: return null
     }
 
-    suspend fun getDownloadItemByLink(link: String): List<DownloadItem> {
+    suspend fun getDownloadItemByLink(link: String): List<IDownloadItem> {
         return downloadListDB.getAll().filter {
             it.link == link
         }
     }
 
-    suspend fun getDownloadItemsBy(selector: (DownloadItem) -> Boolean): List<DownloadItem> {
+    suspend fun getDownloadItemsBy(selector: (IDownloadItem) -> Boolean): List<IDownloadItem> {
         return downloadListDB.getAll().filter(selector)
     }
 
     suspend fun getOrCreateDownloadByLink(
-        downloadItem: DownloadItem,
+        downloadItem: IDownloadItem,
     ): Long {
         val items = getDownloadItemByLink(downloadItem.link)
         if (items.isNotEmpty()) {
@@ -218,7 +219,7 @@ class DownloadSystem(
         return id
     }
 
-    fun getDownloadFile(downloadItem: DownloadItem): File {
+    fun getDownloadFile(downloadItem: IDownloadItem): File {
         return downloadManager.calculateOutputFile(downloadItem)
     }
 
@@ -292,7 +293,7 @@ class DownloadSystem(
         return downloadMonitor.isDownloadActiveFlow(id).value
     }
 
-    suspend fun editDownload(id: Long, applyUpdate: (DownloadItem) -> Unit) {
+    suspend fun editDownload(id: Long, applyUpdate: (IDownloadItem) -> Unit) {
         val wasActive = isDownloadActive(id)
         if (wasActive) {
             manualPause(id)

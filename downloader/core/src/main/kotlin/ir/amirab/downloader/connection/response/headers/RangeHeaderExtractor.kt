@@ -1,13 +1,13 @@
 package ir.amirab.downloader.connection.response.headers
 
-import ir.amirab.downloader.connection.response.ResponseInfo
+import ir.amirab.downloader.connection.response.HttpResponseInfo
 
 data class ContentRangeValue(
     val range: LongRange?,
     val fullSize: Long?,
 )
 
-fun ResponseInfo.getContentRange(): ContentRangeValue? {
+fun HttpResponseInfo.getContentRange(): ContentRangeValue? {
     val value = responseHeaders["content-range"] ?: return null
     val actualValue = runCatching {
         // some servers don't append "bytes " to the start of the value

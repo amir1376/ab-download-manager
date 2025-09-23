@@ -1,47 +1,47 @@
 package ir.amirab.downloader
 
-import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.downloaditem.DownloadItemContext
 import ir.amirab.downloader.downloaditem.EmptyContext
+import ir.amirab.downloader.downloaditem.IDownloadItem
 import kotlinx.coroutines.flow.SharedFlow
 
 sealed interface DownloadManagerEvents {
-    val downloadItem: DownloadItem
+    val downloadItem: IDownloadItem
     val context: DownloadItemContext
 
     data class OnJobAdded(
-        override val downloadItem: DownloadItem,
+        override val downloadItem: IDownloadItem,
         override val context: DownloadItemContext
     ) : DownloadManagerEvents
 
     data class OnJobChanged(
-        override val downloadItem: DownloadItem,
+        override val downloadItem: IDownloadItem,
         override val context: DownloadItemContext
     ) : DownloadManagerEvents
 
     data class OnJobStarting(
-        override val downloadItem: DownloadItem,
+        override val downloadItem: IDownloadItem,
         override val context: DownloadItemContext
     ) : DownloadManagerEvents
 
     data class OnJobStarted(
-        override val downloadItem: DownloadItem,
+        override val downloadItem: IDownloadItem,
         override val context: DownloadItemContext
     ) : DownloadManagerEvents
 
     data class OnJobCompleted(
-        override val downloadItem: DownloadItem,
+        override val downloadItem: IDownloadItem,
         override val context: DownloadItemContext
     ) : DownloadManagerEvents
 
     data class OnJobCanceled(
-        override val downloadItem: DownloadItem,
+        override val downloadItem: IDownloadItem,
         override val context: DownloadItemContext,
         val e: Throwable
     ) : DownloadManagerEvents
 
     data class OnJobRemoved(
-        override val downloadItem: DownloadItem,
+        override val downloadItem: IDownloadItem,
         override val context: DownloadItemContext
     ) : DownloadManagerEvents
 }

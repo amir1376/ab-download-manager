@@ -4,7 +4,7 @@ import ir.amirab.downloader.connection.proxy.Proxy
 import ir.amirab.downloader.connection.proxy.ProxyStrategy
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
 import ir.amirab.downloader.connection.proxy.ProxyType
-import ir.amirab.util.UrlUtils
+import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.wildcardMatch
 import java.net.Authenticator
 import java.net.PasswordAuthentication
@@ -37,7 +37,7 @@ class ProxyManager(
             }
             ProxyMode.Pac -> {
                 val pacURI = usingProxy.pac.uri
-                if (UrlUtils.isValidUrl(pacURI)) {
+                if (HttpUrlUtils.isValidUrl(pacURI)) {
                     ProxyStrategy.ByScript(pacURI)
                 } else {
                     ProxyStrategy.Direct

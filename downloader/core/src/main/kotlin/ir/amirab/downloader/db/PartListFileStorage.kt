@@ -1,6 +1,6 @@
 package ir.amirab.downloader.db
 
-import ir.amirab.downloader.part.Part
+import ir.amirab.downloader.part.Parts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -14,13 +14,13 @@ class PartListFileStorage(
         return resolve
     }
 
-    override suspend fun getParts(id: Long): List<Part>? {
+    override suspend fun getParts(id: Long): Parts? {
         return withContext(Dispatchers.IO) {
             fileSaver.readObject(getFileForId(id))
         }
     }
 
-    override suspend fun setParts(id: Long, parts: List<Part>) {
+    override suspend fun setParts(id: Long, parts: Parts) {
         withContext(Dispatchers.IO) {
             kotlin.runCatching {
                 val file = getFileForId(id)

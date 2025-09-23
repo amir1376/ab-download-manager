@@ -303,7 +303,7 @@ fun HomePage(component: HomeComponent) {
                     ) {
                         Spacer(Modifier.size(4.dp))
                         AddUrlButton {
-                            component.requestAddNewDownload()
+                            component.requestEnterNewURL()
                         }
                         Actions(
                             component.headerActions,

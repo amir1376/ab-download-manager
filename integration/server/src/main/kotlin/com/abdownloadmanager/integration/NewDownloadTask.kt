@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NewDownloadTask(
-    val downloadSource: DownloadCredentialsFromIntegration,
+    val downloadSource: HttpDownloadCredentialsFromIntegration,
     var folder: String? = null,
     var name: String? = null,
     var queueId: Long? = null,

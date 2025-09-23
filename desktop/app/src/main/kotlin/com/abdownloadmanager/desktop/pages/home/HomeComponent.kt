@@ -31,7 +31,7 @@ import com.abdownloadmanager.shared.utils.category.CategoryItemWithId
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.category.DefaultCategories
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.DownloadCredentials
+import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.monitor.*
@@ -39,12 +39,14 @@ import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
-import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
-import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialsFromCurl
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.db.QueueModel
+import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.User
+import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.queueModelsFlow
@@ -250,7 +252,8 @@ class DownloadActions(
             scope.launch {
                 val credentialsList = selections.value
                     .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
-                    .map { DownloadCredentials.from(it) }
+                    .filterIsInstance<HttpDownloadItem>()
+                    .map { HttpDownloadCredentials.from(it) }
                 ClipboardUtil.copy(DownloadCredentialsFromCurl.generateCurlCommands(credentialsList).joinToString("\n"))
             }
         }
@@ -560,6 +563,7 @@ class HomeComponent(
     private val downloadItemOpener: DownloadItemOpener,
     private val downloadDialogManager: DownloadDialogManager,
     private val editDownloadDialogManager: EditDownloadDialogManager,
+    private val enterNewURLDialogManager: EnterNewURLDialogManager,
     private val addDownloadDialogManager: AddDownloadDialogManager,
     private val fileChecksumDialogManager: FileChecksumDialogManager,
     private val queuePageManager: QueuePageManager,
@@ -729,7 +733,7 @@ class HomeComponent(
 
 
     fun requestAddNewDownload(
-        link: List<DownloadCredentials> = listOf(DownloadCredentials.empty()),
+        link: List<IDownloadCredentials>,
     ) {
         addDownloadDialogManager.openAddDownloadDialog(link)
     }
@@ -916,7 +920,7 @@ class HomeComponent(
         this.filterState.queueFilter = queueModel
     }
 
-    fun importLinks(links: List<DownloadCredentials>) {
+    fun importLinks(links: List<IDownloadCredentials>) {
         val size = links.size
         when {
             size <= 0 -> {
@@ -929,10 +933,10 @@ class HomeComponent(
         }
     }
 
-    val currentActiveDrops: MutableStateFlow<List<DownloadCredentials>?> = MutableStateFlow(null)
+    val currentActiveDrops: MutableStateFlow<List<IDownloadCredentials>?> = MutableStateFlow(null)
 
 
-    private fun parseLinks(v: String): List<DownloadCredentials> {
+    private fun parseLinks(v: String): List<IDownloadCredentials> {
         return DownloadCredentialFromStringExtractor.extract(v)
             .distinctBy { it.link }
     }
@@ -1213,6 +1217,10 @@ class HomeComponent(
 
     fun closeCategoryOptions() {
         categoryActions.value = null
+    }
+
+    fun requestEnterNewURL() {
+        enterNewURLDialogManager.openEnterNewURLWindow()
     }
 
     override val shortcutManager = DesktopShortcutManager().apply {

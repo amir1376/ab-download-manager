@@ -1,14 +1,15 @@
 package com.abdownloadmanager.desktop.pages.filehash
 
 import androidx.compose.runtime.Immutable
+import arrow.core.Some
 import com.abdownloadmanager.shared.utils.*
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.ContainsScreenState
 import com.abdownloadmanager.shared.utils.mvi.SupportsScreenState
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.DownloadItem
 import ir.amirab.downloader.downloaditem.DownloadStatus
+import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +39,7 @@ class FileChecksumComponent(
     ContainsEffects<FileChecksumUiEffects> by supportEffects() {
     val downloadSystem: DownloadSystem by inject()
 
-    private var downloadItems: List<DownloadItem> by Delegates.notNull()
+    private var downloadItems: List<IDownloadItem> by Delegates.notNull()
 
     private val isChecking = MutableStateFlow(false)
     private val selectedDefaultAlgorithm: MutableStateFlow<FileChecksumAlgorithm> =
@@ -123,7 +124,7 @@ class FileChecksumComponent(
             // update this class internal download items
             downloadItems = downloadItems.map {
                 it.ifThen(it.id == downloadId) {
-                    copy(fileChecksum = newChecksumString)
+                    copy(fileChecksum = Some(newChecksumString))
                 }
             }
             updateItem(downloadId) {
@@ -131,7 +132,7 @@ class FileChecksumComponent(
                 // update the download item (in this component only)
                 modified = modified.copy(
                     downloadItem = it.downloadItem.copy(
-                        fileChecksum = newChecksumString
+                        fileChecksum = Some(newChecksumString)
                     ),
                     savedChecksum = fileChecksum?.value
                 )
@@ -187,7 +188,7 @@ class FileChecksumComponent(
         }
     }
 
-    private fun processItem(item: DownloadItem) {
+    private fun processItem(item: IDownloadItem) {
         val file = downloadSystem.getDownloadFile(item)
         if (item.status != DownloadStatus.Completed) {
             scope.launch {
@@ -245,7 +246,7 @@ class FileChecksumComponent(
         }
     }
 
-    private fun getChecksumAlgorithmForItem(downloadItem: DownloadItem): String {
+    private fun getChecksumAlgorithmForItem(downloadItem: IDownloadItem): String {
         return downloadItem.fileChecksum?.let {
             FileChecksum.fromString(it).algorithm
         } ?: selectedDefaultAlgorithm.value.algorithm
@@ -306,7 +307,7 @@ sealed interface ChecksumStatus {
 
 @Immutable
 data class DownloadItemWithChecksum(
-    val downloadItem: DownloadItem,
+    val downloadItem: IDownloadItem,
     val checksumStatus: ChecksumStatus,
     val algorithm: String,
     val savedChecksum: String?,

@@ -7,6 +7,7 @@ import com.abdownloadmanager.shared.utils.DownloadSystem
 import ir.amirab.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
+import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.utils.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.shared.utils.category.CategoryManager
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
@@ -20,7 +21,9 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class AppRepository : KoinComponent {
+class AppRepository :
+    KoinComponent,
+    SizeAndSpeedUnitProvider {
     private val scope: CoroutineScope by inject()
     private val appSettings: AppSettingsStorage by inject()
     private val proxyManager: ProxyManager by inject()
@@ -48,10 +51,10 @@ class AppRepository : KoinComponent {
     val integrationPort = appSettings.browserIntegrationPort
     val trackDeletedFilesOnDisk = appSettings.trackDeletedFilesOnDisk
 
-    val sizeUnit = appSettings.sizeUnit.mapStateFlow {
+    override val sizeUnit = appSettings.sizeUnit.mapStateFlow {
         it.toConfig()
     }
-    val speedUnit = appSettings.speedUnit.mapStateFlow {
+    override val speedUnit = appSettings.speedUnit.mapStateFlow {
         it.toConfig()
     }
 
