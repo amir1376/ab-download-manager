@@ -361,14 +361,12 @@ class DownloadJob(
 //            c.incrementAndGet()
             try {
                 val activeCount = getPartDownloaderList()
-//                    .also { println("values count " + it.size) }
-                    .filter {
-                        it.active
-                    }.count()
+                    .count { it.active }
                 val howMuchCreate = getRequestedPartitionCount() - activeCount
                 if (howMuchCreate > 0) {
                     val mutableInactivePartDownloaderList = getPartDownloaderList()
                         .filter { !it.active && !it.part.isCompleted }
+                        .sortedBy { it.part.from }
                         .toMutableList()
 //                    println(mutableInactivePartDownloaderList)
 
@@ -415,7 +413,7 @@ class DownloadJob(
                     partDownloaderList.values
                         .toList()
                         .filter { it.active }
-                        .reversed()
+                        .sortedByDescending { it.part.from }
                         .take(-howMuchCreate)
                         .onEach {
                             it.stop()
