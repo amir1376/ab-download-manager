@@ -91,6 +91,7 @@ import ir.amirab.util.desktop.downloadlocation.MacDownloadLocationProvider
 import ir.amirab.util.desktop.downloadlocation.WindowsDownloadLocationProvider
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
+import okhttp3.Protocol
 import okhttp3.internal.tls.OkHostnameVerifier
 
 val downloaderModule = module {
@@ -449,6 +450,7 @@ val appModule = module {
         val appHostNameVerifier: AppHostNameVerifier = get()
         OkHttpClient
             .Builder()
+            .protocols(listOf(Protocol.HTTP_1_1))
             .dispatcher(Dispatcher().apply {
                 //bypass limit on concurrent connections!
                 maxRequests = Int.MAX_VALUE
