@@ -203,6 +203,7 @@ fun <T> RenderSpinner(
                             .background(myColors.surface)
                             .border(borderWidth, borderColor, shape)
                             .padding(borderWidth)
+                            .clip(shape)
                             .verticalScroll(scrollState)
                     ) {
                         WithContentColor(myColors.onSurface) {
