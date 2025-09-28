@@ -14,6 +14,18 @@
 
 ### Security
 
+## 1.6.14
+
+### Fixed
+
+- An issue causing slow download speeds on some websites
+
+### Improved
+
+- Updated translations
+- Download Engine improvements
+- Minor UI improvements
+
 ## 1.6.13
 
 ### Fixed
