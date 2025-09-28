@@ -16,6 +16,7 @@ import ir.amirab.downloader.utils.OnDuplicateStrategy.*
 import ir.amirab.util.FileNameValidator
 import ir.amirab.util.PathValidator
 import ir.amirab.util.UrlUtils
+import ir.amirab.util.ifThen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
@@ -119,10 +120,14 @@ class DownloadManager(
             }.name
 
             val id = dlListDb.getLastId() + 1
+            val dateAdded = newItem.dateAdded
+                .takeIf { it != 0L }
+                ?: System.currentTimeMillis()
+
             val downloadItem = newItem.copy(
                 id = id,
                 name = name,
-                dateAdded = System.currentTimeMillis(),
+                dateAdded = dateAdded,
                 startTime = null,
                 completeTime = null,
                 status = DownloadStatus.Added

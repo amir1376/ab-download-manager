@@ -77,6 +77,9 @@ class AddSingleDownloadComponent(
 
     private val categoryManager: CategoryManager by inject()
 
+    // the time that this page opened, I use it in DownloadItem::createdAt
+    private val openedTime = System.currentTimeMillis()
+
     val categories = categoryManager.categoriesFlow
     private val _selectedCategory: MutableStateFlow<Category?> = MutableStateFlow(categories.value.firstOrNull())
     val selectedCategory = _selectedCategory.asStateFlow()
@@ -284,7 +287,7 @@ class AddSingleDownloadComponent(
             name = name,
             link = credentials.link,
             contentLength = length ?: DownloadItem.LENGTH_UNKNOWN,
-            dateAdded = 0,
+            dateAdded = openedTime,
             startTime = null,
             completeTime = null,
             status = DownloadStatus.Added,
