@@ -4,7 +4,6 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+*"
   workflow_dispatch:
 
-
 permissions:
   contents: write
 
@@ -64,40 +63,7 @@ jobs:
           path: ./build/ci-release
           name: app-${{ matrix.os }}
 
-  release:
-    runs-on: "ubuntu-latest"
-    needs: [ "create-packages" ]
-    steps:
-      - uses: "actions/download-artifact@v4"
-        name: "Download All Artifacts Into One Directory"
-        with:
-          path: release
-          pattern: app-*
-          merge-multiple: true
-
-      - name: Version Info
-        id: version
-        uses: nowsprinting/check-version-format-action@v3
-        with:
-          prefix: "v"
-
-      - name: "Show the output tree of release"
-        run: |
-          tree .
-      - uses: softprops/action-gh-release@v2
-        with:
-          prerelease: ${{ !steps.version.outputs.is_stable }}
-          make_latest: legacy
-          draft: true
-          files: |
-            release/binaries/*
-          body_path: release/release-notes.md
-      - name: "Remove artifacts to free space"
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: app-*
-
-    build-linux-rpms:
+  build-linux-rpms:
     runs-on: ${{ matrix.runner }}
     needs: [ "create-packages" ]
     strategy:
@@ -106,11 +72,11 @@ jobs:
           - runner: ubuntu-24.04
             arch_arg: x64
             rpm_arch: x86_64
-            out_name: ABDownloadManager_${{ github.ref_name }}_linux_x64.rpm
+            out_name: ABDownloadManager_${{ env.VERSION }}_linux_x64.rpm
           - runner: ubuntu-24.04-arm
             arch_arg: arm64
             rpm_arch: aarch64
-            out_name: ABDownloadManager_${{ github.ref_name }}_linux_arm64.rpm
+            out_name: ABDownloadManager_${{ env.VERSION }}_linux_arm64.rpm
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -141,3 +107,48 @@ jobs:
         with:
           name: rpm-${{ matrix.arch_arg }}
           path: out/*.rpm
+
+  release:
+    runs-on: "ubuntu-latest"
+    needs: [ "create-packages", "build-linux-rpms" ]
+    steps:
+      - uses: "actions/download-artifact@v4"
+        name: "Download All App Artifacts"
+        with:
+          path: release
+          pattern: app-*
+          merge-multiple: true
+
+      - uses: "actions/download-artifact@v4"
+        name: "Download RPM Artifacts"
+        with:
+          path: release/rpms
+          pattern: rpm-*
+          merge-multiple: true
+
+      - name: Version Info
+        id: version
+        uses: nowsprinting/check-version-format-action@v3
+        with:
+          prefix: "v"
+
+      - name: "Show the output tree of release"
+        run: |
+          tree .
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          prerelease: ${{ !steps.version.outputs.is_stable }}
+          make_latest: legacy
+          draft: true
+          files: |
+            release/binaries/*
+            release/rpms/*.rpm
+          body_path: release/release-notes.md
+
+      - name: "Remove artifacts to free space"
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: |
+            app-*
+            rpm-*
