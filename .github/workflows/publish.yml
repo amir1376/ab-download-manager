@@ -96,3 +96,48 @@ jobs:
         uses: geekyeggo/delete-artifact@v5
         with:
           name: app-*
+
+    build-linux-rpms:
+    runs-on: ${{ matrix.runner }}
+    needs: [ "create-packages" ]
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch_arg: x64
+            rpm_arch: x86_64
+            out_name: ABDownloadManager_${{ github.ref_name }}_linux_x64.rpm
+          - runner: ubuntu-24.04-arm
+            arch_arg: arm64
+            rpm_arch: aarch64
+            out_name: ABDownloadManager_${{ github.ref_name }}_linux_arm64.rpm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Extract version
+        id: v
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Ensure tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y openjdk-21-jdk openjdk-21-jre-headless unzip zip rpm rpm2cpio rpmdevtools git which desktop-file-utils
+
+      - name: Make script executable
+        run: chmod +x ./package-rhel.sh
+
+      - name: Build RPM for ${{ matrix.arch_arg }}
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          ./package-rhel.sh "${VERSION}" --arch ${{ matrix.arch_arg }}
+          mkdir -p out
+          SRC_RPM="$(ls -1 dist/ab-download-manager-${VERSION}-1.${{ matrix.rpm_arch }}.rpm)"
+          cp -f "${SRC_RPM}" "out/${{ matrix.out_name }}"
+
+      - name: Upload RPM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm-${{ matrix.arch_arg }}
+          path: out/*.rpm
