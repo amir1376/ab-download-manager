@@ -17,12 +17,12 @@ import com.abdownloadmanager.shared.utils.getIcon
 import com.abdownloadmanager.shared.utils.getName
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.category.Category
-import ir.amirab.downloader.downloaditem.DownloadCredentials
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.inactiveQueuesFlow
-import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialFromStringExtractor
-import com.abdownloadmanager.shared.utils.extractors.linkextractor.DownloadCredentialsFromCurl
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialsFromCurl
+import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.desktop.PlatformAppActivator
@@ -49,7 +49,7 @@ val newDownloadAction = simpleAction(
     Res.string.new_download.asStringSource(),
     MyIcons.add,
 ) {
-    appComponent.openAddDownloadDialog(listOf(DownloadCredentials.empty()))
+    appComponent.openEnterNewURLWindow()
 }
 val newDownloadFromClipboardAction = simpleAction(
     Res.string.import_from_clipboard.asStringSource(),
@@ -64,7 +64,7 @@ val newDownloadFromClipboardAction = simpleAction(
         appComponent.openAddDownloadDialog(curlItems)
         return@simpleAction
     }
-    val items: List<DownloadCredentials> = DownloadCredentialFromStringExtractor
+    val items: List<IDownloadCredentials> = DownloadCredentialFromStringExtractor
         .extract(contentsInClipboard)
         .distinctBy { it.link }
     if (items.isEmpty()) {

@@ -1,7 +1,7 @@
 package ir.amirab.downloader.destination
 
 import ir.amirab.downloader.anntation.HeavyCall
-import ir.amirab.downloader.part.Part
+import ir.amirab.downloader.part.RangedPart
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.util.tryAtomicMove
 import okio.FileHandle
@@ -91,7 +91,7 @@ class SimpleDownloadDestination(
 
     var outputSize: Long = -1
     override fun getWriterFor(
-        part: Part,
+        part: RangedPart,
     ): DestWriter {
         if (!canGetFileWriter()) {
             throw IllegalStateException("First check then ask for...")

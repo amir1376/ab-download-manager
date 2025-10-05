@@ -1,7 +1,6 @@
 package com.abdownloadmanager.desktop.pages.queue
 
-import com.abdownloadmanager.desktop.pages.settings.configurable.*
-import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.utils.BaseComponent
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
@@ -9,6 +8,11 @@ import com.abdownloadmanager.desktop.utils.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
 import com.abdownloadmanager.desktop.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.DayOfWeekConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.TimeConfigurable
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadMonitor

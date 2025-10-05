@@ -1,7 +1,6 @@
 package com.abdownloadmanager.desktop.pages.settings
 
 import com.abdownloadmanager.desktop.pages.settings.SettingSections.*
-import com.abdownloadmanager.desktop.pages.settings.configurable.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
@@ -14,8 +13,20 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.PerHostSettingsPageManager
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
-import com.abdownloadmanager.desktop.utils.configurable.ConfigurableGroup
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
+import com.abdownloadmanager.desktop.ui.configurable.item.FolderConfigurable
+import com.abdownloadmanager.desktop.ui.configurable.item.FontConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.PerHostSettingsConfigurable
+import com.abdownloadmanager.desktop.ui.configurable.item.ProxyConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
+import com.abdownloadmanager.shared.ui.theme.ThemeManager
+import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.utils.proxy.ProxyManager
 import com.abdownloadmanager.shared.utils.proxy.ProxyMode
 import com.abdownloadmanager.shared.utils.ui.theme.DEFAULT_UI_SCALE
@@ -57,11 +68,6 @@ sealed class SettingSections(
 
 interface SettingSectionGetter {
     operator fun get(key: SettingSections): List<ConfigurableGroup>
-}
-
-object ThreadCountLimitation {
-    const val MAX_ALLOWED_THREAD_COUNT = 256
-    const val MAX_NORMAL_VALUE = 32
 }
 
 object MaximumDownloadRetriesLimitation {

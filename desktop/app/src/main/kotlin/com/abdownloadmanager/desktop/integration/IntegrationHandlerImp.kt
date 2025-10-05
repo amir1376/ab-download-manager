@@ -6,12 +6,13 @@ import com.abdownloadmanager.desktop.pages.addDownload.SilentImportOptions
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.integration.IntegrationHandler
-import com.abdownloadmanager.integration.DownloadCredentialsFromIntegration
+import com.abdownloadmanager.integration.HttpDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.NewDownloadTask
 import com.abdownloadmanager.integration.ApiQueueModel
 import com.abdownloadmanager.integration.AddDownloadOptionsFromIntegration
-import ir.amirab.downloader.downloaditem.DownloadCredentials
-import ir.amirab.downloader.downloaditem.DownloadItem
+import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
+import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import org.koin.core.component.KoinComponent
@@ -23,16 +24,20 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
     val queueManager by inject<QueueManager>()
     val appSettings by inject<AppRepository>()
     override suspend fun addDownload(
-        list: List<DownloadCredentialsFromIntegration>,
+        list: List<IDownloadCredentialsFromIntegration>,
         options: AddDownloadOptionsFromIntegration,
     ) {
         appComponent.externalCredentialComingIntoApp(
             list.map {
-                DownloadCredentials(
-                    link = it.link,
-                    headers = it.headers,
-                    downloadPage = it.downloadPage,
-                )
+                when (it) {
+                    is HttpDownloadCredentialsFromIntegration -> {
+                        HttpDownloadCredentials(
+                            link = it.link,
+                            headers = it.headers,
+                            downloadPage = it.downloadPage,
+                        )
+                    }
+                }
             },
             options = ImportOptions(
                 silentImport = if (options.silentAdd) {
@@ -53,7 +58,7 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
 
     override suspend fun addDownloadTask(task: NewDownloadTask) {
         val downloadItem =
-            DownloadItem(
+            HttpDownloadItem(
                 link = task.downloadSource.link,
                 headers = task.downloadSource.headers,
                 downloadPage = task.downloadSource.downloadPage,

@@ -13,7 +13,7 @@ import kotlin.math.min
 //}
 
 class PartSplitSupport(
-    val part: Part,
+    val part: RangedPart,
     private val partEndLock: Any = Any(),
 ) {
     //initial remainingSafe will be 0
@@ -67,7 +67,7 @@ class PartSplitSupport(
         }
     }
 
-    fun splitPart(): Part? {
+    fun splitPart(): RangedPart? {
         synchronized(partEndLock) {
             if (!canSplit()) return null
 
@@ -78,7 +78,7 @@ class PartSplitSupport(
                 //new part will exceed current part boundaries
                 return null
             }
-            val newPart = Part(
+            val newPart = RangedPart(
                 from = safeZoneToEnd + 1,
                 to = part.to!!
             )
@@ -112,9 +112,9 @@ class PartSplitSupport(
 
     companion object {
         private fun isSplitValid(
-            oldPart: Part,
-            reducedPart: Part,
-            newPart: Part,
+            oldPart: RangedPart,
+            reducedPart: RangedPart,
+            newPart: RangedPart,
         ): Boolean {
             return (reducedPart.to == newPart.from - 1) && (oldPart.to == newPart.to)
         }

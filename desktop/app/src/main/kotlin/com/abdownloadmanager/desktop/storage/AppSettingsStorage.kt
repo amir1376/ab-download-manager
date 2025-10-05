@@ -3,6 +3,7 @@ package com.abdownloadmanager.desktop.storage
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
+import com.abdownloadmanager.shared.ui.theme.ThemeSettingsStorage
 import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
 import com.abdownloadmanager.shared.utils.SystemDownloadLocationProvider
 import com.abdownloadmanager.shared.utils.ui.theme.DEFAULT_UI_SCALE
@@ -214,10 +215,11 @@ class AppSettingsStorage(
     settings: DataStore<MapConfig>,
 ) :
     ConfigBaseSettingsByMapConfig<AppSettingsModel>(settings, AppSettingsModel.ConfigLens),
-    LanguageStorage {
-    val theme = from(AppSettingsModel.theme)
-    val defaultDarkTheme = from(AppSettingsModel.defaultDarkTheme)
-    val defaultLightTheme = from(AppSettingsModel.defaultLightTheme)
+    LanguageStorage,
+    ThemeSettingsStorage {
+    override val theme = from(AppSettingsModel.theme)
+    override val defaultDarkTheme = from(AppSettingsModel.defaultDarkTheme)
+    override val defaultLightTheme = from(AppSettingsModel.defaultLightTheme)
 
     override val selectedLanguage = from(languageLens)
     val font = from(fontLens)

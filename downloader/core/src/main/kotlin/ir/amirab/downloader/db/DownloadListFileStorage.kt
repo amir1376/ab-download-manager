@@ -1,6 +1,6 @@
 package ir.amirab.downloader.db
 
-import ir.amirab.downloader.downloaditem.DownloadItem
+import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.utils.SuspendLockList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -19,7 +19,7 @@ class DownloadListFileStorage(
         return downloadListFolder.resolve("$id.json")
     }
 
-    override suspend fun getAll(): List<DownloadItem> {
+    override suspend fun getAll(): List<IDownloadItem> {
         return withContext(Dispatchers.IO) {
             val jsonExtension = ".json"
             downloadListFolder.listFiles()
@@ -33,20 +33,20 @@ class DownloadListFileStorage(
         }
     }
 
-    private suspend fun get(file: File, id: Long): DownloadItem? {
+    private suspend fun get(file: File, id: Long): IDownloadItem? {
         return fileLocks.withLock(id) {
             fileSaver.readObject(file)
         }
     }
 
-    override suspend fun getById(id: Long): DownloadItem? {
+    override suspend fun getById(id: Long): IDownloadItem? {
         return withContext(Dispatchers.IO) {
             get(getDownloadItemFile(id), id)
         }
     }
 
     private val addLock = Mutex()
-    override suspend fun add(item: DownloadItem) {
+    override suspend fun add(item: IDownloadItem) {
         withContext(Dispatchers.IO) {
             addLock.withLock {
                 fileLocks.withLock(item.id) {
@@ -60,7 +60,7 @@ class DownloadListFileStorage(
         }
     }
 
-    override suspend fun update(item: DownloadItem) {
+    override suspend fun update(item: IDownloadItem) {
         withContext(Dispatchers.IO) {
             // we don't use same lock for all items , but create lock for each item
             fileLocks.withLock(item.id) {
@@ -73,7 +73,7 @@ class DownloadListFileStorage(
         getDownloadItemFile(itemId).delete()
     }
 
-    override suspend fun remove(item: DownloadItem) {
+    override suspend fun remove(item: IDownloadItem) {
         removeById(item.id)
     }
 

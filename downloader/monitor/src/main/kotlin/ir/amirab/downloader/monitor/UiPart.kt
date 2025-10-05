@@ -1,7 +1,7 @@
 package ir.amirab.downloader.monitor
 
 import androidx.compose.runtime.Immutable
-import ir.amirab.downloader.part.Part
+import ir.amirab.downloader.part.RangedPart
 import ir.amirab.downloader.part.PartDownloadStatus
 
 @Immutable
@@ -15,7 +15,7 @@ data class UiPart(
     val length: Long?,
 ) {
     companion object {
-        fun fromPart(part: Part): UiPart {
+        fun fromPart(part: RangedPart): UiPart {
             return UiPart(
                 from = part.from,
                 to = part.to,

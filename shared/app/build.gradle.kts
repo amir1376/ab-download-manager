@@ -7,4 +7,5 @@ dependencies {
     api(project(":shared:app-utils"))
     api(libs.markdownRenderer.core)
     api(libs.compose.reorderable)
+    api(libs.composeFileKit)
 }

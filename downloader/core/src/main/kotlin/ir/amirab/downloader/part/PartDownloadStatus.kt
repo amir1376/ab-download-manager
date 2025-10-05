@@ -19,6 +19,6 @@ sealed class PartDownloadStatus {
     }
 
     object Completed : PartDownloadStatus(),IsInactive
-    object SendGet : PartDownloadStatus(),IsActive
+    object Connecting : PartDownloadStatus(), IsActive
     object ReceivingData : PartDownloadStatus(),IsActive
 }

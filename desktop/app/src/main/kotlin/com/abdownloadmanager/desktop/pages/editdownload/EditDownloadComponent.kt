@@ -1,16 +1,16 @@
 package com.abdownloadmanager.desktop.pages.editdownload
 
-import com.abdownloadmanager.desktop.repository.AppRepository
+import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
+import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
+import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadInputs
 import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
 import com.abdownloadmanager.shared.utils.mvi.supportEffects
 import com.abdownloadmanager.shared.utils.BaseComponent
 import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.connection.DownloaderClient
-import ir.amirab.downloader.downloaditem.DownloadCredentials
-import ir.amirab.downloader.downloaditem.DownloadItem
-import ir.amirab.downloader.downloaditem.applyFrom
+import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import ir.amirab.downloader.downloaditem.IDownloadItem
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -25,15 +25,15 @@ class EditDownloadComponent(
     val onRequestClose: () -> Unit,
     val downloadId: Long,
     val acceptEdit: StateFlow<Boolean>,
-    private val onEdited: ((DownloadItem) -> Unit) -> Unit,
+    private val onEdited: ((IDownloadItem) -> Unit) -> Unit,
 ) : BaseComponent(ctx),
     ContainsEffects<EditDownloadPageEffects> by supportEffects(),
     KoinComponent {
-    private val downloaderClient: DownloaderClient by inject()
+    private val downloaderInUiRegistry: DownloaderInUiRegistry by inject()
     val iconProvider: FileIconProvider by inject()
     val downloadSystem: DownloadSystem by inject()
-    private val appRepository: AppRepository by inject()
-    val editDownloadUiChecker = MutableStateFlow(null as EditDownloadState?)
+    val editDownloadUiChecker =
+        MutableStateFlow(null as EditDownloadInputs<IDownloadItem, IDownloadCredentials, *, *, *>?)
 
     init {
         scope.launch {
@@ -41,10 +41,10 @@ class EditDownloadComponent(
         }
     }
 
-    private var pendingCredential: DownloadCredentials? = null
+    private var pendingCredential: IDownloadCredentials? = null
     private val _credentialsImportedFromExternal = MutableStateFlow(false)
     val credentialsImportedFromExternal = _credentialsImportedFromExternal.asStateFlow()
-    fun importCredential(credentials: DownloadCredentials) {
+    fun importCredential(credentials: IDownloadCredentials) {
         editDownloadUiChecker.value?.let {
             it.importCredentials(credentials)
         } ?: run {
@@ -60,28 +60,21 @@ class EditDownloadComponent(
             println("item with id $id not found")
             return
         }
-        val editDownloadState = EditDownloadState(
+        val downloader = downloaderInUiRegistry.getDownloaderOf(downloadItem)
+        if (downloader == null) {
+            onRequestClose()
+            println("downloader for id $id not found")
+            return
+        }
+        val httpEditDownloadInputs = downloader.createEditDownloadInputs(
             currentDownloadItem = MutableStateFlow(downloadItem),
             editedDownloadItem = MutableStateFlow(downloadItem),
-            downloaderClient = downloaderClient,
-            conflictDetector = object : DownloadConflictDetector {
-                override fun checkAlreadyExists(current: DownloadItem, edited: DownloadItem): Boolean {
-                    val editedDownloadFile = downloadSystem.getDownloadFile(edited)
-                    val alreadyExists = editedDownloadFile.exists()
-                    if (alreadyExists) {
-                        return true
-                    }
-                    return downloadSystem
-                        .getAllRegisteredDownloadFiles()
-                        .contains(editedDownloadFile)
-                }
-            },
+            conflictDetector = DownloadConflictDetector(downloadSystem),
             scope = scope,
-            appRepository = appRepository,
         )
-        editDownloadUiChecker.value = editDownloadState
+        editDownloadUiChecker.value = httpEditDownloadInputs
         pendingCredential?.let { credentials ->
-            editDownloadState.importCredentials(credentials)
+            httpEditDownloadInputs.importCredentials(credentials)
             pendingCredential = null
         }
     }
@@ -92,40 +85,11 @@ class EditDownloadComponent(
             return
         }
         editDownloadUiChecker.value?.let { editDownloadUiChecker ->
-            onEdited {
-                it.applyOurChanges(editDownloadUiChecker.editedDownloadItem.value)
-            }
+            onEdited(editDownloadUiChecker::applyEditedItemTo)
         }
     }
 
     fun bringToFront() {
         sendEffect(EditDownloadPageEffects.BringToFront)
-    }
-
-    private fun DownloadItem.applyOurChanges(edited: DownloadItem) {
-        // we don't change some of these properties, so I commented them
-
-        link = edited.link
-        headers = edited.headers
-        username = edited.username
-        password = edited.password
-        downloadPage = edited.downloadPage
-        userAgent = edited.userAgent
-
-//        id = edited.id
-        folder = edited.folder
-        name = edited.name
-
-        contentLength = edited.contentLength
-        serverETag = edited.serverETag
-
-//        dateAdded = edited.dateAdded
-//        startTime = edited.startTime
-//        completeTime = edited.completeTime
-//        status = edited.status
-        preferredConnectionCount = edited.preferredConnectionCount
-        speedLimit = edited.speedLimit
-
-        fileChecksum = edited.fileChecksum
     }
 }
