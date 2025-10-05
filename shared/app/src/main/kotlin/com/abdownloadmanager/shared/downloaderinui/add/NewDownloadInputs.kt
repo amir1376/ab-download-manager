@@ -38,5 +38,7 @@ abstract class NewDownloadInputs<
     fun getLengthString(): StringSource {
         return lengthStringFlow.value
     }
+
+    fun getUniqueId() = hashCode()
 }
 typealias TANewDownloadInputs = NewDownloadInputs<IDownloadItem, IDownloadCredentials, IResponseInfo, LinkChecker<IDownloadCredentials, IResponseInfo>>
