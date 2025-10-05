@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import arrow.core.Some
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.downloaderinui.add.TANewDownloadInputs
+import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.abdownloadmanager.shared.utils.category.Category
 import com.abdownloadmanager.shared.utils.category.CategoryItem
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+
 class AddMultiDownloadComponent(
     ctx: ComponentContext,
     id: String,
@@ -267,6 +269,20 @@ class AddMultiDownloadComponent(
 
     var showAddToQueue by mutableStateOf(false)
         private set
+
+    fun getIdOf(item: TANewDownloadInputs): Int {
+        return item.getUniqueId()
+    }
+
+    fun openConfigurableList(
+        itemID: Int?
+    ) {
+        currentDownloadConfigurableList.value = itemID?.let { id ->
+            list.find { getIdOf(it) == id }
+        }?.configurableList
+    }
+
+    val currentDownloadConfigurableList: MutableStateFlow<List<Configurable<*>>?> = MutableStateFlow(null)
 
     fun openAddToQueueDialog() {
         showAddToQueue = true

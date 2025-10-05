@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.CategoryAddButton
 import com.abdownloadmanager.desktop.pages.addDownload.shared.CategorySelect
+import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.pages.addDownload.shared.LocationTextField
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ShowAddToQueueDialog
 import com.abdownloadmanager.shared.utils.ui.myColors
@@ -46,6 +47,15 @@ fun AddMultiItemPage(
         Footer(
             Modifier,
             addMultiDownloadComponent,
+        )
+    }
+    val currentDownloadConfigurableList by addMultiDownloadComponent.currentDownloadConfigurableList.collectAsState()
+    currentDownloadConfigurableList?.let {
+        ExtraConfig(
+            onDismiss = {
+                addMultiDownloadComponent.openConfigurableList(null)
+            },
+            configurables = it
         )
     }
     if (addMultiDownloadComponent.showAddToQueue) {

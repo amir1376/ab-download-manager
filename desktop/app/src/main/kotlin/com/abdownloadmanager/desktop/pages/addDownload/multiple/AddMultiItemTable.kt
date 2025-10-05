@@ -18,6 +18,8 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.PointerButton
+import androidx.compose.ui.input.pointer.PointerButton.Companion
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -49,6 +51,7 @@ fun AddMultiDownloadTable(
     ) {
         val itemHorizontalPadding = 16.dp
         Table(
+            key = component::getIdOf,
             tableState = component.tableState,
             list = component.list,
             modifier = modifier
@@ -117,6 +120,13 @@ fun AddMultiDownloadTable(
                                         toItem = currentId,
                                     )
                                     context.newSelection(ids, true)
+                                }
+                                .onClick(
+                                    matcher = PointerMatcher.mouse(PointerButton.Secondary)
+                                ) {
+                                    component.openConfigurableList(
+                                        component.getIdOf(item)
+                                    )
                                 }
                                 .fillMaxWidth()
                                 .padding(vertical = 1.dp)
