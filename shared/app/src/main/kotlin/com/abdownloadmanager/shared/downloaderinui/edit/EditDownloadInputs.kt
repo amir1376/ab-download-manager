@@ -5,6 +5,7 @@ import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import ir.amirab.downloader.connection.IResponseInfo
+import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.util.compose.StringSource
@@ -44,7 +45,6 @@ abstract class EditDownloadInputs<
     fun setShowMoreSettings(showMoreSettings: Boolean) {
         _showMoreSettings.value = showMoreSettings
     }
-
     val credentials: MutableStateFlow<TCredentials> = editedDownloadItem.mapTwoWayStateFlow(
         map = {
             mapper.itemToCredentials(it)
@@ -61,6 +61,7 @@ abstract class EditDownloadInputs<
             mapper.itemWithEditedName(this, it)
         }
     )
+    abstract val downloadJobConfig: StateFlow<DownloadJobExtraConfig?>
     abstract val configurableList: List<Configurable<*>>
     abstract fun applyEditedItemTo(item: TDownloadItem)
     fun setName(name: String) {

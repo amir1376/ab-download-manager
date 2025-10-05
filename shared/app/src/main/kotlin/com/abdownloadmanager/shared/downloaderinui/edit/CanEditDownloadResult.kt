@@ -1,7 +1,5 @@
 package com.abdownloadmanager.shared.downloaderinui.edit
 
-import com.abdownloadmanager.shared.downloaderinui.edit.CanEditWarnings
-
 sealed interface CanEditDownloadResult {
     data object FileNameAlreadyExists : CanEditDownloadResult
     data object InvalidURL : CanEditDownloadResult

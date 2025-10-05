@@ -18,6 +18,7 @@ import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable
 import ir.amirab.downloader.connection.HttpDownloaderClient
 import ir.amirab.downloader.connection.response.HttpResponseInfo
+import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.util.compose.StringSource
@@ -157,7 +158,7 @@ class HttpEditDownloadInputs(
         ),
     )
     val length = linkChecker.length
-
+    override val downloadJobConfig: MutableStateFlow<DownloadJobExtraConfig?> = MutableStateFlow(null)
 
     private fun HttpDownloadItem.applyOurChanges(edited: HttpDownloadItem) {
         // we don't change some of these properties, so I commented them

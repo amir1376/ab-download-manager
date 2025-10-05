@@ -45,6 +45,7 @@ import ir.amirab.downloader.utils.IDiskStat
 import ir.amirab.util.startup.Startup
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
+import com.abdownloadmanager.shared.downloaderinui.hls.HLSDownloaderInUi
 import com.abdownloadmanager.shared.downloaderinui.http.HttpDownloaderInUi
 import com.abdownloadmanager.shared.storage.IExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
@@ -87,6 +88,7 @@ import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
 import ir.amirab.downloader.connection.proxy.SystemProxySelectorProvider
 import ir.amirab.downloader.downloaditem.DownloadJob
 import ir.amirab.downloader.downloaditem.IDownloadItem
+import ir.amirab.downloader.downloaditem.hls.HLSDownloader
 import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloader
 import ir.amirab.downloader.monitor.DownloadItemStateFactory
@@ -185,6 +187,12 @@ val downloaderModule = module {
         )
     }
     single {
+        HLSDownloader(inject())
+    }
+    single {
+        HLSDownloaderInUi(get(), get())
+    }
+    single {
         HttpDownloader(inject())
     }
     single {
@@ -193,11 +201,13 @@ val downloaderModule = module {
     single {
         DownloaderInUiRegistry().apply {
             add(get<HttpDownloaderInUi>())
+            add(get<HLSDownloaderInUi>())
         }
     }.bind<DownloadItemStateFactory<IDownloadItem, DownloadJob>>()
     single {
         DownloaderRegistry().apply {
             add(get<HttpDownloader>())
+            add(get<HLSDownloader>())
         }
     }
     single {
@@ -207,6 +217,9 @@ val downloaderModule = module {
             get(),
             get(),
             get(),
+            get<DownloadFoldersRegistry>().registerAndGet(
+                AppInfo.systemDir.resolve("downloadData")
+            )
         )
     }.bind(DownloadManagerMinimalControl::class)
     single<IDownloadMonitor> {

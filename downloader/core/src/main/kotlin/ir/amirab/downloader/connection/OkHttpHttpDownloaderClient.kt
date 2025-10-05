@@ -2,6 +2,7 @@ package ir.amirab.downloader.connection
 
 import ir.amirab.downloader.connection.proxy.*
 import ir.amirab.downloader.connection.response.HttpResponseInfo
+import ir.amirab.downloader.downloaditem.http.IHttpBasedDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
 import ir.amirab.downloader.utils.await
 import okhttp3.*
@@ -17,7 +18,7 @@ class OkHttpHttpDownloaderClient(
     private val autoConfigurableProxyProvider: AutoConfigurableProxyProvider,
 ) : HttpDownloaderClient() {
     private fun newCall(
-        downloadCredentials: IHttpDownloadCredentials,
+        downloadCredentials: IHttpBasedDownloadCredentials,
         start: Long?,
         end: Long?,
         extraBuilder: Request.Builder.() -> Unit,
@@ -73,7 +74,7 @@ class OkHttpHttpDownloaderClient(
     }
 
     private fun OkHttpClient.applyProxy(
-        downloadCredentials: IHttpDownloadCredentials,
+        downloadCredentials: IHttpBasedDownloadCredentials,
     ): OkHttpClient {
         return when (
             val strategy = proxyStrategyProvider.getProxyStrategyFor(downloadCredentials.link)
@@ -164,7 +165,7 @@ class OkHttpHttpDownloaderClient(
     }
 
     override suspend fun connect(
-        credentials: IHttpDownloadCredentials,
+        credentials: IHttpBasedDownloadCredentials,
         start: Long?,
         end: Long?,
     ): Connection<HttpResponseInfo> {
@@ -186,7 +187,6 @@ class OkHttpHttpDownloaderClient(
         return Connection(
             source = body.source(),
             contentLength = body.contentLength(),
-            closeable = response,
             responseInfo = createFileInfo(response)
         )
     }

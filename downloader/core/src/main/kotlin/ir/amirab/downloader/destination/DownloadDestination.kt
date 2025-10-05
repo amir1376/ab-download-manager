@@ -1,6 +1,6 @@
 package ir.amirab.downloader.destination
 
-import ir.amirab.downloader.part.RangedPart
+import ir.amirab.downloader.part.DownloadPart
 import ir.amirab.util.tryAtomicMove
 import java.io.File
 
@@ -17,7 +17,9 @@ abstract class DownloadDestination(
         updateLastModified()
     }
 
-    open fun onAllPartsCompleted() {
+    open fun onAllPartsCompleted(
+        onProgressUpdate: (Int?) -> Unit = {}
+    ) {
         allPartsDownloaded = true
         cleanUpJunkFiles()
         updateLastModified()
@@ -25,7 +27,7 @@ abstract class DownloadDestination(
 
     open fun cleanUpJunkFiles() {}
 
-    abstract fun getWriterFor(part: RangedPart): DestWriter?
+    abstract fun getWriterFor(part: DownloadPart): DestWriter
     abstract fun canGetFileWriter(): Boolean
 
     fun returnIfAlreadyHaveWriter(partId: Long): DestWriter? {
@@ -47,10 +49,11 @@ abstract class DownloadDestination(
     abstract suspend fun prepareFile(onProgressUpdate: (Int?) -> Unit)
     abstract suspend fun isDownloadedPartsIsValid(): Boolean
     abstract fun flush()
-    open fun onPartCancelled(part: RangedPart) {
+
+    open fun onPartCancelled(part: DownloadPart) {
         synchronized(this) {
             val cleanAny = fileParts.removeAll {
-                it.id == part.from
+                it.id == part.getID()
             }
             if (cleanAny) {
                 if (fileParts.isEmpty()) {

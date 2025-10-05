@@ -34,7 +34,7 @@ class HttpPartDownloader(
     val speedLimiters: List<Throttler>,
     val strictMode: Boolean,
     partSplitLock: Any,
-) : PartDownloader<HttpResponseInfo, Connection<HttpResponseInfo>, RangedPart>(
+) : PartDownloader<RangedPart>(
     part = part,
     getDestWriter = getDestWriter
 ) {
@@ -52,7 +52,7 @@ class HttpPartDownloader(
             .onFailure {
                 // close connection before throwing exception
                 kotlin.runCatching {
-                    connect.closeable.close()
+                    connect.close()
                 }
             }
             .getOrThrow()
@@ -95,7 +95,7 @@ class HttpPartDownloader(
         val conn = establishConnection(partCopy.current, partCopy.to)
 //        thisLogger().info("connection established")
         if (stop || !currentCoroutineContext().isActive) {
-            conn.closeable.close()
+            conn.close()
             throw CancellationException()
         }
         val contentLength = conn.contentLength.let {
@@ -130,7 +130,7 @@ class HttpPartDownloader(
                 actualLength = contentLength
             )
             if (throwServerPartIsNotTheSameAsWeExpectException) {
-                conn.closeable.close()
+                conn.close()
                 throw serverPartIsNotTheSameAsWeExpectException
             } else {
                 println("WARNING: ${serverPartIsNotTheSameAsWeExpectException.message}")

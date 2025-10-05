@@ -1,7 +1,7 @@
 package ir.amirab.downloader.downloaditem
 
 import ir.amirab.downloader.DownloadManager
-import ir.amirab.downloader.destination.SimpleDownloadDestination
+import ir.amirab.downloader.destination.DownloadDestination
 import ir.amirab.downloader.utils.ExceptionUtils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -25,8 +25,7 @@ abstract class DownloadJob(
     val id get() = downloadItem.id
     val scope = CoroutineScope(SupervisorJob())
     var activeDownloadScope: CoroutineScope? = null
-    lateinit var destination: SimpleDownloadDestination
-
+    abstract fun getDestination(): DownloadDestination
     @Volatile
     private var booted = false
 
@@ -88,7 +87,9 @@ abstract class DownloadJob(
     protected fun onDownloadFinished() {
         scope.launch {
             try {
-                destination.onAllPartsCompleted()
+                getDestination().onAllPartsCompleted {
+                    _status.value = DownloadJobStatus.PreparingFile(it)
+                }
             } catch (e: Exception) {
                 pause(e)
                 return@launch
@@ -110,9 +111,9 @@ abstract class DownloadJob(
         removeOutputFile: Boolean = true,
     ) {
         ensureBooted()
-        destination.cleanUpJunkFiles()
+        getDestination().cleanUpJunkFiles()
         if (removeOutputFile) {
-            destination.deleteOutputFile()
+            getDestination().deleteOutputFile()
         }
     }
 
@@ -126,5 +127,9 @@ abstract class DownloadJob(
         scope.cancel()
     }
 
-    abstract suspend fun changeConfig(updater: (IDownloadItem) -> Unit): IDownloadItem
+    abstract suspend fun changeConfig(
+        updater: (IDownloadItem) -> Unit,
+        extraConfig: DownloadJobExtraConfig?
+    ): IDownloadItem
+    abstract suspend fun extraConfigsReceived(config: DownloadJobExtraConfig)
 }

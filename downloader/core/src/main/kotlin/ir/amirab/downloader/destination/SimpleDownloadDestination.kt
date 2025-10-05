@@ -1,7 +1,7 @@
 package ir.amirab.downloader.destination
 
 import ir.amirab.downloader.anntation.HeavyCall
-import ir.amirab.downloader.part.RangedPart
+import ir.amirab.downloader.part.DownloadPart
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.util.tryAtomicMove
 import okio.FileHandle
@@ -62,7 +62,7 @@ class SimpleDownloadDestination(
         removeFileHandle()
     }
 
-    override fun onAllPartsCompleted() {
+    override fun onAllPartsCompleted(onProgressUpdate: (Int?) -> Unit) {
         if (appendExtensionToIncompleteDownloads) {
             // this function maybe called at some point that we may not even start download yet.
             // for example when the download has already completed, the DownloadJob will call this function! so we should do nothing.
@@ -86,23 +86,22 @@ class SimpleDownloadDestination(
             }
         }
         // clean up junk files called in the super class
-        super.onAllPartsCompleted()
+        super.onAllPartsCompleted(onProgressUpdate)
     }
 
     var outputSize: Long = -1
     override fun getWriterFor(
-        part: RangedPart,
+        part: DownloadPart,
     ): DestWriter {
         if (!canGetFileWriter()) {
             throw IllegalStateException("First check then ask for...")
         }
         val outFile = fileToWrite
-        val returned = returnIfAlreadyHaveWriter(part.from)
+        val returned = returnIfAlreadyHaveWriter(part.getID())
         returned?.let { return it }
         val writer = DestWriter(
-            part.from,
+            part.getID(),
             outFile,
-            part.from,
             part.current,
             fileHandle,
         )

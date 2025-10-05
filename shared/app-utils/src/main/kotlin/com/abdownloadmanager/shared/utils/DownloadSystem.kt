@@ -8,6 +8,7 @@ import com.abdownloadmanager.shared.utils.category.CategorySelectionMode
 import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionActionRunner
 import com.abdownloadmanager.shared.utils.onqueuecompletion.OnQueueEventActionRunner
 import ir.amirab.downloader.DownloadManager
+import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.db.IDownloadListDb
 import ir.amirab.downloader.downloaditem.*
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
@@ -59,13 +60,12 @@ class DownloadSystem(
     }
 
     suspend fun addDownload(
-        newItemsToAdd: List<IDownloadItem>,
-        onDuplicateStrategy: (IDownloadItem) -> OnDuplicateStrategy,
+        newItemsToAdd: List<NewDownloadItemProps>,
         queueId: Long? = null,
         categorySelectionMode: CategorySelectionMode? = null,
     ): List<Long> {
         val createdIds = newItemsToAdd.map {
-            downloadManager.addDownload(it, onDuplicateStrategy(it))
+            downloadManager.addDownload(it)
         }
         createdIds.also { ids ->
             queueId?.let {
@@ -79,7 +79,7 @@ class DownloadSystem(
                 CategorySelectionMode.Auto -> {
                     categoryManager.autoAddItemsToCategoriesBasedOnFileNames(
                         createdIds.mapIndexed { index: Int, id: Long ->
-                            val downloadItem = newItemsToAdd[index]
+                            val downloadItem = newItemsToAdd[index].downloadItem
                             CategoryItemWithId(
                                 id = id,
                                 fileName = downloadItem.name,
@@ -101,13 +101,11 @@ class DownloadSystem(
     }
 
     suspend fun addDownload(
-        downloadItem: IDownloadItem,
-        onDuplicateStrategy: OnDuplicateStrategy,
+        newDownload: NewDownloadItemProps,
         queueId: Long?,
         categoryId: Long?,
-        context: DownloadItemContext = EmptyContext,
     ): Long {
-        val downloadId = downloadManager.addDownload(downloadItem, onDuplicateStrategy, context)
+        val downloadId = downloadManager.addDownload(newDownload)
         queueId?.let {
             queueManager.addToQueue(queueId, downloadId)
         }
@@ -211,8 +209,12 @@ class DownloadSystem(
             return id
         }
         val id = addDownload(
-            downloadItem = downloadItem,
-            onDuplicateStrategy = OnDuplicateStrategy.AddNumbered,
+            newDownload = NewDownloadItemProps(
+                downloadItem = downloadItem,
+                onDuplicateStrategy = OnDuplicateStrategy.AddNumbered,
+                extraConfig = null,
+                context = EmptyContext,
+            ),
             queueId = null,
             categoryId = null,
         )
@@ -293,12 +295,20 @@ class DownloadSystem(
         return downloadMonitor.isDownloadActiveFlow(id).value
     }
 
-    suspend fun editDownload(id: Long, applyUpdate: (IDownloadItem) -> Unit) {
+    suspend fun editDownload(
+        id: Long,
+        applyUpdate: (IDownloadItem) -> Unit,
+        downloadJobExtraConfig: DownloadJobExtraConfig?
+    ) {
         val wasActive = isDownloadActive(id)
         if (wasActive) {
             manualPause(id)
         }
-        downloadManager.updateDownloadItem(id, applyUpdate)
+        downloadManager.updateDownloadItem(
+            id = id,
+            downloadJobExtraConfig = downloadJobExtraConfig,
+            updater = applyUpdate,
+        )
         if (wasActive) {
             manualResume(id)
         }

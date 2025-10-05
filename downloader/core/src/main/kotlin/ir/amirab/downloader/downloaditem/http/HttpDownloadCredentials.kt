@@ -59,9 +59,4 @@ data class HttpDownloadCredentials(
     }
 }
 
-interface IHttpDownloadCredentials : IDownloadCredentials {
-    val headers: Map<String, String>?
-    val username: String?
-    val password: String?
-    val userAgent: String?
-}
+interface IHttpDownloadCredentials : IHttpBasedDownloadCredentials

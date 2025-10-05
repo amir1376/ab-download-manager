@@ -79,6 +79,7 @@ class DefaultCategories(
                 "m4v",
                 "3gp",
                 "mpeg",
+                "ts",
             ),
         )
 

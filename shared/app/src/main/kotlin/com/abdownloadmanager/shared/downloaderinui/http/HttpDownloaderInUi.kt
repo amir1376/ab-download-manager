@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.downloaderinui.http
 
+import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
 import com.abdownloadmanager.shared.downloaderinui.http.add.HttpDownloadUiChecker
@@ -18,7 +19,8 @@ import ir.amirab.downloader.downloaditem.http.HttpDownloadJob
 import ir.amirab.downloader.downloaditem.http.HttpDownloader
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
-import ir.amirab.downloader.monitor.UiPart
+import ir.amirab.downloader.monitor.RangeBasedProcessingDownloadItemState
+import ir.amirab.downloader.monitor.UiRangedPart
 import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
@@ -94,14 +96,6 @@ class HttpDownloaderInUi(
         )
     }
 
-    override fun acceptCredentials(credentials: IDownloadCredentials): Boolean {
-        return credentials is IHttpDownloadCredentials
-    }
-
-    override fun acceptDownloadItem(item: IDownloadItem): Boolean {
-        return item is HttpDownloadItem
-    }
-
     override fun acceptDownloadCredentials(item: IDownloadCredentials): Boolean {
         return item is IHttpDownloadCredentials
     }
@@ -121,22 +115,42 @@ class HttpDownloaderInUi(
         val downloadItem = downloadJob.downloadItem
         val downloadJobStatus = downloadJob.status.value
         val parts = downloadJob.getParts()
-        return ProcessingDownloadItemState(
+        val contentLength = downloadItem.contentLength
+        return RangeBasedProcessingDownloadItemState(
             id = downloadItem.id,
             folder = downloadItem.folder,
             name = downloadItem.name,
-            contentLength = downloadItem.contentLength ?: -1,
+            contentLength = contentLength,
             dateAdded = downloadItem.dateAdded,
             startTime = downloadItem.startTime ?: -1,
             completeTime = downloadItem.completeTime ?: -1,
             status = downloadJobStatus,
             saveLocation = downloadItem.name,
             parts = parts.map {
-                UiPart.fromPart(it)
+                UiRangedPart.fromPart(
+                    part = it,
+                    totalLength = contentLength,
+                )
             },
             speed = speed,
             supportResume = downloadJob.supportsConcurrent,
             downloadLink = downloadItem.link
+        )
+    }
+
+    override fun createBareDownloadItem(
+        credentials: HttpDownloadCredentials,
+        basicDownloadItem: BasicDownloadItem
+    ): HttpDownloadItem {
+        return HttpDownloadItem.createWithCredentials(
+            id = -1,
+            credentials = credentials,
+            folder = basicDownloadItem.folder,
+            name = basicDownloadItem.name,
+            contentLength = basicDownloadItem.contentLength,
+            preferredConnectionCount = basicDownloadItem.preferredConnectionCount,
+            speedLimit = basicDownloadItem.speedLimit,
+            fileChecksum = basicDownloadItem.fileChecksum,
         )
     }
 

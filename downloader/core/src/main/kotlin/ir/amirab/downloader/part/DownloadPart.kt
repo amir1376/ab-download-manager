@@ -9,4 +9,11 @@ interface DownloadPart {
     val statusFlow: MutableStateFlow<PartDownloadStatus>
     val status get() = statusFlow.value
     val isCompleted: Boolean
+    val percent: Int?
+    fun howMuchProceed(): Long
+    fun resetCurrent()
+
+    // an id which also is sortable among the other parts
+    // 1, 2, 3, ...
+    fun getID(): Long
 }

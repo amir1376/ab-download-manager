@@ -3,6 +3,7 @@ package com.abdownloadmanager.desktop.actions
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.SharedConstants
 import com.abdownloadmanager.desktop.di.Di
+import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.ClipboardUtil
@@ -61,7 +62,11 @@ val newDownloadFromClipboardAction = simpleAction(
     }
     val curlItems = DownloadCredentialsFromCurl.extract(contentsInClipboard)
     if (curlItems.isNotEmpty()) {
-        appComponent.openAddDownloadDialog(curlItems)
+        appComponent.openAddDownloadDialog(
+            curlItems.map {
+                AddDownloadCredentialsInUiProps(it)
+            }
+        )
         return@simpleAction
     }
     val items: List<IDownloadCredentials> = DownloadCredentialFromStringExtractor
@@ -70,7 +75,9 @@ val newDownloadFromClipboardAction = simpleAction(
     if (items.isEmpty()) {
         return@simpleAction
     }
-    appComponent.openAddDownloadDialog(items)
+    appComponent.openAddDownloadDialog(items.map {
+        AddDownloadCredentialsInUiProps(it)
+    })
 }
 val batchDownloadAction = simpleAction(
     title = Res.string.batch_download.asStringSource(),

@@ -107,6 +107,45 @@ data class HttpDownloadItem(
             this
         }
     }
+
+    companion object {
+        fun createWithCredentials(
+            credentials: HttpDownloadCredentials,
+            id: Long,
+            folder: String,
+            name: String,
+            contentLength: Long = IDownloadItem.LENGTH_UNKNOWN,
+            serverETag: String? = null,
+            dateAdded: Long = 0,
+            startTime: Long? = null,
+            completeTime: Long? = null,
+            status: DownloadStatus = DownloadStatus.Added,
+            preferredConnectionCount: Int? = null,
+            speedLimit: Long = 0,
+            fileChecksum: String? = null,
+        ): HttpDownloadItem {
+            return HttpDownloadItem(
+                link = credentials.link,
+                headers = credentials.headers,
+                username = credentials.username,
+                password = credentials.password,
+                downloadPage = credentials.downloadPage,
+                userAgent = credentials.userAgent,
+                id = id,
+                folder = folder,
+                name = name,
+                contentLength = contentLength,
+                serverETag = serverETag,
+                dateAdded = dateAdded,
+                startTime = startTime,
+                completeTime = completeTime,
+                status = status,
+                preferredConnectionCount = preferredConnectionCount,
+                speedLimit = speedLimit,
+                fileChecksum = fileChecksum,
+            )
+        }
+    }
 }
 
 

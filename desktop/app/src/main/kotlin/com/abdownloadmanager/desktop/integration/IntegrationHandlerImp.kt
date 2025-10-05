@@ -1,6 +1,7 @@
 package com.abdownloadmanager.desktop.integration
 
 import com.abdownloadmanager.desktop.AppComponent
+import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.desktop.pages.addDownload.ImportOptions
 import com.abdownloadmanager.desktop.pages.addDownload.SilentImportOptions
 import com.abdownloadmanager.desktop.repository.AppRepository
@@ -10,9 +11,14 @@ import com.abdownloadmanager.integration.HttpDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.NewDownloadTask
 import com.abdownloadmanager.integration.ApiQueueModel
 import com.abdownloadmanager.integration.AddDownloadOptionsFromIntegration
+import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
+import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
+import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
+import com.abdownloadmanager.shared.downloaderinui.hls.HLSDownloadCredentials
+import ir.amirab.downloader.NewDownloadItemProps
+import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
-import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import org.koin.core.component.KoinComponent
@@ -23,21 +29,15 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
     val downloadSystem by inject<DownloadSystem>()
     val queueManager by inject<QueueManager>()
     val appSettings by inject<AppRepository>()
+    private val downloaderInUiRegistry by inject<DownloaderInUiRegistry>()
+
     override suspend fun addDownload(
         list: List<IDownloadCredentialsFromIntegration>,
         options: AddDownloadOptionsFromIntegration,
     ) {
         appComponent.externalCredentialComingIntoApp(
             list.map {
-                when (it) {
-                    is HttpDownloadCredentialsFromIntegration -> {
-                        HttpDownloadCredentials(
-                            link = it.link,
-                            headers = it.headers,
-                            downloadPage = it.downloadPage,
-                        )
-                    }
-                }
+                convertToDownloadSystemCredentials(it)
             },
             options = ImportOptions(
                 silentImport = if (options.silentAdd) {
@@ -55,21 +55,27 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
             ApiQueueModel(id = queueModel.id, name = queueModel.name)
         }
     }
-
     override suspend fun addDownloadTask(task: NewDownloadTask) {
-        val downloadItem =
-            HttpDownloadItem(
-                link = task.downloadSource.link,
-                headers = task.downloadSource.headers,
-                downloadPage = task.downloadSource.downloadPage,
+        val addDownloaderInUiProps = convertToDownloadSystemCredentials(task.downloadSource)
+        val downloaderInUi = downloaderInUiRegistry.getDownloaderOf(
+            addDownloaderInUiProps.credentials
+        ) ?: error("Downloader for ${addDownloaderInUiProps.credentials::class.qualifiedName} not found")
+        val downloadItem = downloaderInUi.createBareDownloadItem(
+            addDownloaderInUiProps.credentials,
+            basicDownloadItem = BasicDownloadItem(
                 folder = task.folder ?: appSettings.saveLocation.value,
-                id = -1,
-                name = task.name ?: task.downloadSource.link.substringAfterLast("/"),
-            )
+                name = task.name ?: addDownloaderInUiProps.extraConfig.suggestedName
+                ?: task.downloadSource.link.substringAfterLast("/"),
+            ),
+        )
         val id =
             downloadSystem.addDownload(
-                downloadItem = downloadItem,
-                onDuplicateStrategy = OnDuplicateStrategy.default(),
+                newDownload = NewDownloadItemProps(
+                    downloadItem = downloadItem,
+                    onDuplicateStrategy = OnDuplicateStrategy.default(),
+                    extraConfig = null,
+                    context = EmptyContext,
+                ),
                 queueId = task.queueId,
                 categoryId = null
             )
@@ -78,6 +84,34 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
             queue.start()
         } else {
             downloadSystem.manualResume(id)
+        }
+    }
+
+    companion object {
+        private fun convertToDownloadSystemCredentials(it: IDownloadCredentialsFromIntegration): AddDownloadCredentialsInUiProps {
+            val credentials = when (it) {
+                is HttpDownloadCredentialsFromIntegration -> {
+                    HttpDownloadCredentials(
+                        link = it.link,
+                        headers = it.headers,
+                        downloadPage = it.downloadPage,
+                    )
+                }
+
+                is HLSDownloadCredentialsFromIntegration -> {
+                    HLSDownloadCredentials(
+                        link = it.link,
+                        headers = it.headers,
+                        downloadPage = it.downloadPage,
+                    )
+                }
+            }
+            return AddDownloadCredentialsInUiProps(
+                credentials = credentials,
+                extraConfig = AddDownloadCredentialsInUiProps.Configs(
+                    suggestedName = it.suggestedName,
+                )
+            )
         }
     }
 }
