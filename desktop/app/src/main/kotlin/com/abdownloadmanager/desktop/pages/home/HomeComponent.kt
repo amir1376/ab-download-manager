@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.UpdateManager
+import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.desktop.pages.category.CategoryDialogManager
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.resources.Res
@@ -733,7 +734,7 @@ class HomeComponent(
 
 
     fun requestAddNewDownload(
-        link: List<IDownloadCredentials>,
+        link: List<AddDownloadCredentialsInUiProps>,
     ) {
         addDownloadDialogManager.openAddDownloadDialog(link)
     }
@@ -920,7 +921,7 @@ class HomeComponent(
         this.filterState.queueFilter = queueModel
     }
 
-    fun importLinks(links: List<IDownloadCredentials>) {
+    fun importLinks(links: List<AddDownloadCredentialsInUiProps>) {
         val size = links.size
         when {
             size <= 0 -> {
@@ -958,18 +959,15 @@ class HomeComponent(
         }
     }
 
-    fun onLinkPasted(txt: String) {
-        importLinks(parseLinks(txt))
-    }
-
-
     fun onDragExit() {
         currentActiveDrops.update { null }
     }
 
     fun onDropped() {
         currentActiveDrops.value?.let {
-            importLinks(it)
+            importLinks(it.map {
+                AddDownloadCredentialsInUiProps(credentials = it)
+            })
         }
     }
 

@@ -4,8 +4,10 @@ import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.connection.HttpDownloaderClient
 import ir.amirab.downloader.connection.response.expectSuccess
 import ir.amirab.downloader.connection.response.isWebPage
+import ir.amirab.downloader.destination.DownloadDestination
 import ir.amirab.downloader.destination.SimpleDownloadDestination
 import ir.amirab.downloader.downloaditem.DownloadJob
+import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.downloaditem.IDownloadItem
@@ -40,6 +42,10 @@ class HttpDownloadJob(
     val listDb by downloadManager::dlListDb
     val partListDb by downloadManager::partListDb
     private val parts: MutableList<RangedPart> = mutableListOf()
+    private lateinit var destination: SimpleDownloadDestination
+    override fun getDestination(): DownloadDestination {
+        return destination
+    }
 
     var supportsConcurrent: Boolean? = null
         private set
@@ -243,7 +249,10 @@ class HttpDownloadJob(
         }
     }
 
-    override suspend fun changeConfig(updater: (IDownloadItem) -> Unit): IDownloadItem {
+    override suspend fun changeConfig(
+        updater: (IDownloadItem) -> Unit,
+        extraConfig: DownloadJobExtraConfig?
+    ): IDownloadItem {
         boot()
         val previousItem = downloadItem.copy()
         val newItem = previousItem.copy().apply(updater)
@@ -269,6 +278,9 @@ class HttpDownloadJob(
             onLinkChanged()
         }
         applySpeedLimit()
+        extraConfig?.let {
+            extraConfigsReceived(it)
+        }
         saveDownloadItem()
         return downloadItem
     }
@@ -732,5 +744,9 @@ class HttpDownloadJob(
 
     override fun reloadSettings() {
         onPreferredConnectionCountChanged()
+    }
+
+    override suspend fun extraConfigsReceived(config: DownloadJobExtraConfig) {
+        // we don't have extra configs
     }
 }

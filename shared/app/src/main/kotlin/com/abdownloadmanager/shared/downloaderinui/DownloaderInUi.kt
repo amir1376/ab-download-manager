@@ -16,6 +16,10 @@ import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.CoroutineScope
 
+/**
+ * This is a class that represent a downloader implementation details tight to the Application not just the downloader logic
+ * including ui, component factories and every thing that app need work with
+ */
 abstract class DownloaderInUi<
         TCredentials : IDownloadCredentials,
         TResponseInfo : IResponseInfo,
@@ -42,11 +46,13 @@ abstract class DownloaderInUi<
     ): DownloadUiChecker<TCredentials, TResponseInfo, TLinkChecker>
 
 
-    abstract fun acceptCredentials(credentials: IDownloadCredentials): Boolean
-    abstract fun acceptDownloadItem(item: IDownloadItem): Boolean
     abstract fun acceptDownloadCredentials(item: IDownloadCredentials): Boolean
     abstract fun supportsThisLink(link: String): Boolean
     abstract fun createMinimumCredentials(link: String): TCredentials
+    abstract fun createBareDownloadItem(
+        credentials: TCredentials,
+        basicDownloadItem: BasicDownloadItem
+    ): TDownloadItem
 
     abstract fun createProcessingDownloadItemState(
         downloadJob: TDownloadJob,

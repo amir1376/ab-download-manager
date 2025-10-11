@@ -32,8 +32,6 @@ const val PART_MAX_TRIES = 10
 const val RetryDelay = 1_000L
 
 abstract class PartDownloader<
-        TResponseInfo : IResponseInfo,
-        TConnection : Connection<TResponseInfo>,
         TPart : DownloadPart
         >(
     val part: TPart,
@@ -199,36 +197,35 @@ abstract class PartDownloader<
         return haveToManyErrors() || haveCriticalError()
     }
 
-    abstract suspend fun connectAndVerify(): TConnection
+    abstract suspend fun connectAndVerify(): Connection<*>
 
     private suspend fun download() {
         onNewStatus(PartDownloadStatus.Connecting)
         val conn = connectAndVerify()
         thread = thread {
             if (stop || Thread.currentThread().isInterrupted) {
-                conn.closeable.close()
+                conn.close()
                 onCanceled(kotlinx.coroutines.CancellationException())
                 return@thread
             }
 //            thisLogger().info("going to copy data to destination $conn")
             try {
-                conn.closeable.use {
-                    conn.source.use { connectionStream ->
-                        getDestWriter().use { writer ->
-                            copyDataSync(connectionStream, writer)
-                        }
+                conn.use {
+                    // connection automatically closes the source
+                    val connectionStream = it.source
+                    getDestWriter().use { writer ->
+                        copyDataSync(connectionStream, writer)
                     }
                 }
             } catch (e: Exception) {
                 onCanceled(e)
             } finally {
-                conn.closeable.close()
                 thread = null
             }
         }
     }
 
-    private fun onCanceled(e: Throwable) {
+    protected open fun onCanceled(e: Throwable) {
         lastException = e
         val canceled = PartDownloadStatus.Canceled(e)
         onNewStatus(canceled)
@@ -241,7 +238,7 @@ abstract class PartDownloader<
 //        }
     }
 
-    open fun onFinish() {
+    protected open fun onFinish() {
         onNewStatus(PartDownloadStatus.Completed)
     }
 

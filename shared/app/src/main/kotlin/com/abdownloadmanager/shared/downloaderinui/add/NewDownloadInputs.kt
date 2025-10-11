@@ -5,6 +5,7 @@ import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsItem
 import ir.amirab.downloader.connection.IResponseInfo
+import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.util.compose.StringSource
@@ -22,10 +23,11 @@ abstract class NewDownloadInputs<
     val openedTime = System.currentTimeMillis()
 
     val name = downloadUiChecker.name
-    val folder = downloadUiChecker.name
+    val folder = downloadUiChecker.folder
     val credentials = downloadUiChecker.credentials
 
     abstract val downloadItem: StateFlow<TDownloadItem>
+    abstract val downloadJobConfig: StateFlow<DownloadJobExtraConfig?>
     abstract val configurableList: List<Configurable<*>>
 
     abstract fun applyHostSettingsToExtraConfig(extraConfig: PerHostSettingsItem)

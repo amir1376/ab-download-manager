@@ -11,7 +11,6 @@ import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.utils.DuplicateFilterByPath
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.downloader.utils.FileNameUtil
-import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.downloader.utils.OnDuplicateStrategy.*
 import ir.amirab.util.FileNameValidator
 import ir.amirab.util.PathValidator
@@ -34,6 +33,7 @@ class DownloadManager(
     val settings: DownloadSettings,
     val emptyFileCreator: EmptyFileCreator,
     private val downloaderRegistry: DownloaderRegistry,
+    val downloadDataFolder: File
 ) : DownloadManagerMinimalControl {
 
     val scope = CoroutineScope(SupervisorJob())
@@ -68,11 +68,12 @@ class DownloadManager(
     private val dbAddSync = Mutex()
 
     suspend fun addDownload(
-        newItem: IDownloadItem,
-        onDuplicateStrategy: OnDuplicateStrategy,
-        context: DownloadItemContext = EmptyContext,
+        props: NewDownloadItemProps
     ): Long {
-
+        val newItem = props.downloadItem
+        val onDuplicateStrategy = props.onDuplicateStrategy
+        val context = props.context
+        val extraConfig = props.extraConfig
         newItem.validateItem()
         require(PathValidator.isValidPath(newItem.folder)) { "folder of new download is not valid: ${newItem.folder}" }
         require(PathValidator.canWriteToThisPath(newItem.folder)) { "can't write to this new download's folder: ${newItem.folder}" }
@@ -127,7 +128,13 @@ class DownloadManager(
                 status = Some(DownloadStatus.Added)
             )
             dlListDb.add(downloadItem)
-            createJob(downloadItem).apply { boot() }
+            createJob(downloadItem)
+                .apply { boot() }
+                .apply {
+                    extraConfig?.let {
+                        extraConfigsReceived(it)
+                    }
+                }
         }
         contextContainer.setContext(job.id, context)
         onDownloadAdded(job.downloadItem)
@@ -354,7 +361,11 @@ class DownloadManager(
         }
     }
 
-    suspend fun updateDownloadItem(id: Long, updater: (IDownloadItem) -> Unit) {
+    suspend fun updateDownloadItem(
+        id: Long,
+        downloadJobExtraConfig: DownloadJobExtraConfig?,
+        updater: (IDownloadItem) -> Unit,
+    ) {
         var wasCreated = false
         val job = getDownloadJob(id) ?: run {
             dlListDb.getById(id)?.let {
@@ -362,7 +373,7 @@ class DownloadManager(
                 createJob(it)
             }
         } ?: return
-        val updated = job.changeConfig(updater)
+        val updated = job.changeConfig(updater, downloadJobExtraConfig)
         if (wasCreated && updated.status == DownloadStatus.Completed) {
             deleteJob(job.id)
         }

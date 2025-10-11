@@ -369,7 +369,7 @@ private fun RenderPartInfo(
                 Table(
                     list = listToShow,
                     key = {
-                        it.value.from
+                        it.value.id
                     },
                     modifier = Modifier
                         .fillMaxSize(),
@@ -758,21 +758,20 @@ private fun RenderParts(parts: List<UiPart>, modifier: Modifier) {
         if (parts.isNotEmpty()) {
             val sortedParts = remember(parts) {
                 parts.sortedBy {
-                    it.from
+                    it.id
                 }
             }
-            val total = sortedParts.last().to?.let {
-                it + 1 // parts are end inclusive
-            } ?: return
             for (p in sortedParts) {
-                val partSpace = (p.length!!.toDouble() / total).toFloat()
+                val partSpace = p.partSpace
                 if (partSpace <= 0f) continue
-                RenderPart(
-                    p,
-                    Modifier
-                        .fillMaxHeight()
-                        .weight(partSpace)
-                )
+                key(p.id) {
+                    RenderPart(
+                        p,
+                        Modifier
+                            .fillMaxHeight()
+                            .weight(partSpace)
+                    )
+                }
             }
         }
     }
@@ -780,7 +779,9 @@ private fun RenderParts(parts: List<UiPart>, modifier: Modifier) {
 
 @Composable
 private fun RenderPart(part: UiPart, modifier: Modifier) {
-    val partProgress = part.percent!! / 100f
+    val partProgress = part.percent?.let {
+        it / 100f
+    } ?: 0f
 
     val foregroundColor = when (part.status) {
         is PartDownloadStatus.Canceled -> myColors.error

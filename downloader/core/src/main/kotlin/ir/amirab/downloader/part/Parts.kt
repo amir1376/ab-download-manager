@@ -16,10 +16,23 @@ sealed interface Parts {
  * this type is used for downloaders that split download into multiple byte ranges,
  * like http
  */
-@SerialName("ranged")
+@SerialName("ranges")
 @Serializable
 data class RangedParts(
     val list: List<RangedPart>
+) : Parts {
+    override fun clone(): Parts {
+        return copy()
+    }
+}
+
+/**
+ * this type is used for downloaders that contains multiple links to download like hls
+ */
+@SerialName("mediaSegments")
+@Serializable
+data class MediaSegments(
+    val list: List<MediaSegment>
 ) : Parts {
     override fun clone(): Parts {
         return copy()

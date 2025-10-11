@@ -9,6 +9,7 @@ import com.abdownloadmanager.shared.utils.BaseComponent
 import com.abdownloadmanager.shared.utils.DownloadSystem
 import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
+import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import kotlinx.coroutines.flow.*
@@ -25,7 +26,7 @@ class EditDownloadComponent(
     val onRequestClose: () -> Unit,
     val downloadId: Long,
     val acceptEdit: StateFlow<Boolean>,
-    private val onEdited: ((IDownloadItem) -> Unit) -> Unit,
+    private val onEdited: ((IDownloadItem) -> Unit, DownloadJobExtraConfig?) -> Unit,
 ) : BaseComponent(ctx),
     ContainsEffects<EditDownloadPageEffects> by supportEffects(),
     KoinComponent {
@@ -85,7 +86,7 @@ class EditDownloadComponent(
             return
         }
         editDownloadUiChecker.value?.let { editDownloadUiChecker ->
-            onEdited(editDownloadUiChecker::applyEditedItemTo)
+            onEdited(editDownloadUiChecker::applyEditedItemTo, editDownloadUiChecker.downloadJobConfig.value)
         }
     }
 

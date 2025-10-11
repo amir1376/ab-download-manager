@@ -51,15 +51,24 @@ interface AddDownloadConfig {
     val importOptions: ImportOptions
 
     data class SingleAddConfig(
-        val credentials: IDownloadCredentials,
+        val credentials: AddDownloadCredentialsInUiProps,
         override val importOptions: ImportOptions = ImportOptions(),
         override val id: String = UUID.randomUUID().toString(),
     ) : AddDownloadConfig
 
     data class MultipleAddConfig(
-        val links: List<IDownloadCredentials> = emptyList(),
+        val links: List<AddDownloadCredentialsInUiProps> = emptyList(),
         override val importOptions: ImportOptions = ImportOptions(),
         override val id: String = UUID.randomUUID().toString(),
     ) : AddDownloadConfig
 
+}
+
+data class AddDownloadCredentialsInUiProps(
+    val credentials: IDownloadCredentials,
+    val extraConfig: Configs = Configs(),
+) {
+    data class Configs(
+        val suggestedName: String? = null,
+    )
 }

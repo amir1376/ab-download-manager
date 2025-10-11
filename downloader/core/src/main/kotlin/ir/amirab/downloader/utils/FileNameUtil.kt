@@ -4,27 +4,29 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import java.io.File
-import java.security.cert.Extension
 
 object FileNameUtil {
-    private fun getExtensionOrNull(name: String): String? {
-        return name
+    /**
+     * make sure to validate name before using this function
+     */
+    fun getExtensionOrNull(filename: String): String? {
+        return filename
             .substringAfterLast('.', "")
             .takeIf { it.isNotEmpty() }
     }
 
-    fun numberedIfExists(file: File): Flow<File> {
+    fun numberedIfExists(filename: File): Flow<File> {
         return flow {
-            if (!file.exists()) {
-                emit(file)
+            if (!filename.exists()) {
+                emit(filename)
             }
-            val ext = file.extension
+            val ext = filename.extension
                 .takeIf { it.isNotEmpty() }
                 ?.let { ".$it" }.orEmpty()
-            val name = file.nameWithoutExtension
+            val name = filename.nameWithoutExtension
             var counter = 1
             while (currentCoroutineContext().isActive) {
-                val newFile = file.parentFile.resolve(
+                val newFile = filename.parentFile.resolve(
                     "${name}_${counter}${ext}"
                 )
                 if (!newFile.exists()) {
@@ -35,13 +37,13 @@ object FileNameUtil {
         }
     }
 
-    fun replaceExtension(filename: String, newExtension: String, appendIfNotExists: Boolean=true): String {
+    fun replaceExtension(filename: String, newExtension: String, appendIfNotExists: Boolean = true): String {
         val ext = getExtensionOrNull(filename) ?: if (appendIfNotExists) {
             return "$filename.$newExtension"
         } else {
             return filename
         }
-        val filenameWithoutExtension = filename.substring(0, filename.length - ext.length)
+        val filenameWithoutExtension = filename.dropLast(ext.length)
         return "$filenameWithoutExtension$newExtension"
     }
 }

@@ -14,6 +14,7 @@ import com.abdownloadmanager.shared.utils.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsItem
 import com.abdownloadmanager.shared.downloaderinui.http.applyToHttpDownload
 import ir.amirab.downloader.connection.response.HttpResponseInfo
+import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
@@ -79,6 +80,8 @@ class HttpNewDownloadInputs(
             fileChecksum = fileChecksum?.toString()
         ).withCredentials(credentials)
     }
+
+    override val downloadJobConfig: StateFlow<DownloadJobExtraConfig?> = MutableStateFlow(null)
 
     override fun applyHostSettingsToExtraConfig(extraConfig: PerHostSettingsItem) {
         extraConfig.applyToHttpDownload(

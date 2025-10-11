@@ -13,6 +13,7 @@ import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.util.convertDurationToHumanReadable
 import com.abdownloadmanager.shared.utils.*
 import com.abdownloadmanager.shared.utils.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
@@ -150,12 +151,23 @@ class SingleDownloadComponent(
             buildList {
                 add(SingleDownloadPagePropertyItem(Res.string.name.asStringSource(), it.name.asStringSource()))
                 add(SingleDownloadPagePropertyItem(Res.string.status.asStringSource(), createStatusString(it)))
-                add(
-                    SingleDownloadPagePropertyItem(
-                        Res.string.size.asStringSource(),
-                        convertPositiveSizeToHumanReadable(it.contentLength, appRepository.sizeUnit.value)
+                if (it is DurationBasedProcessingDownloadItemState) {
+                    add(
+                        SingleDownloadPagePropertyItem(
+                            Res.string.size.asStringSource(),
+                            it.duration
+                                ?.let(::convertDurationToHumanReadable)
+                                ?: Res.string.unknown.asStringSource()
+                        )
                     )
-                )
+                } else {
+                    add(
+                        SingleDownloadPagePropertyItem(
+                            Res.string.size.asStringSource(),
+                            convertPositiveSizeToHumanReadable(it.contentLength, appRepository.sizeUnit.value)
+                        )
+                    )
+                }
                 add(
                     SingleDownloadPagePropertyItem(
                         Res.string.download_page_downloaded_size.asStringSource(),
@@ -331,7 +343,10 @@ class SingleDownloadComponent(
             .drop(1)
             .debounce(500)
             .onEach { count ->
-                downloadManager.updateDownloadItem(downloadId) {
+                downloadManager.updateDownloadItem(
+                    id = downloadId,
+                    downloadJobExtraConfig = null
+                ) {
                     it.preferredConnectionCount = count.takeIf { it > 0 }
                 }
             }.launchIn(scope)
@@ -339,7 +354,10 @@ class SingleDownloadComponent(
             .drop(1)
             .debounce(500)
             .onEach { limit ->
-                downloadManager.updateDownloadItem(downloadId) {
+                downloadManager.updateDownloadItem(
+                    id = downloadId,
+                    downloadJobExtraConfig = null
+                ) {
                     it.speedLimit = limit
                 }
             }.launchIn(scope)

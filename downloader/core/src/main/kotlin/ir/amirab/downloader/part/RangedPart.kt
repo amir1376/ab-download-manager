@@ -13,11 +13,11 @@ data class RangedPart(
     override var current: Long = from,
 ) : DownloadPart {
 
-    fun howMuchProceed(): Long {
+    override fun howMuchProceed(): Long {
         return current - from
     }
 
-    fun resetCurrent() {
+    override fun resetCurrent() {
         current = from
     }
 
@@ -33,7 +33,7 @@ data class RangedPart(
             (it - from) + 1
         }
 
-    val percent
+    override val percent
         get() = run {
             val partLength = partLength ?: return@run null
             (howMuchProceed().toDouble() / partLength.toDouble()) * 100
@@ -55,7 +55,9 @@ data class RangedPart(
         }
 
     val isBlind get() = to == null
-
+    override fun getID(): Long {
+        return from
+    }
     companion object {
     }
 }

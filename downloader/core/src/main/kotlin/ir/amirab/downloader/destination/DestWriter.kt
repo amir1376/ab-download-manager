@@ -3,6 +3,7 @@ package ir.amirab.downloader.destination
 import ir.amirab.downloader.anntation.HeavyCall
 import okio.Buffer
 import okio.FileHandle
+import okio.FileSystem
 import okio.Sink
 import java.io.File
 
@@ -12,7 +13,6 @@ import java.io.File
 class DestWriter(
     val id: Long,
     val file: File,
-    val startPos: Long,
     var seekPos: Long,
     val writer: FileHandle,
 ) {
@@ -21,7 +21,7 @@ class DestWriter(
 
 
     @Transient
-    private var sink:Sink?=null
+    private var sink: Sink? = null
 
     @HeavyCall
     @Synchronized
@@ -34,7 +34,7 @@ class DestWriter(
         }
 
         status = Status.Preparing
-        sink=writer.sink(seekPos)
+        sink = writer.sink(seekPos)
         status = Status.Prepared
 //        println("part #$id started to write from $seekPos")
     }
@@ -46,7 +46,7 @@ class DestWriter(
 //        println("part #$id stopped to write to $seekPos")
     }
 
-    fun write(buffer: Buffer,  length: Long = buffer.size) {
+    fun write(buffer: Buffer, length: Long = buffer.size) {
         val currentStatus = status
         if (currentStatus == Status.NotPrepared) {
             throw Exception("first prepare")
@@ -57,7 +57,7 @@ class DestWriter(
         if (currentStatus == Status.Prepared) {
             status = Status.Writing
         }
-        sink!!.write(buffer,length)
+        sink!!.write(buffer, length)
         seekPos += length
 //    println("seek :$seekPos")
     }

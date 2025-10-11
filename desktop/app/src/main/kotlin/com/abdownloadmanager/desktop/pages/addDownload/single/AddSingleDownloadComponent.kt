@@ -3,6 +3,7 @@ package com.abdownloadmanager.desktop.pages.addDownload.single
 import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadComponent
 import com.abdownloadmanager.desktop.repository.AppRepository
 import androidx.compose.runtime.*
+import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.desktop.pages.addDownload.ImportOptions
 import com.abdownloadmanager.desktop.pages.addDownload.SilentImportOptions
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
@@ -26,8 +27,10 @@ import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.utils.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.utils.perhostsettings.getSettingsForURL
+import ir.amirab.downloader.NewDownloadItemProps
+import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
+import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.*
@@ -44,12 +47,12 @@ class AddSingleDownloadComponent(
     val onRequestAddToQueue: OnRequestAddSingleItem,
     val onRequestAddCategory: () -> Unit,
     val openExistingDownload: (Long) -> Unit,
-    val updateExistingDownloadCredentials: (Long, IDownloadCredentials) -> Unit,
+    val updateExistingDownloadCredentials: (Long, IDownloadCredentials, DownloadJobExtraConfig?) -> Unit,
     private val downloadItemOpener: DownloadItemOpener,
     importOptions: ImportOptions,
     id: String,
     downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *>,
-    initialCredentials: IDownloadCredentials,
+    initialCredentials: AddDownloadCredentialsInUiProps,
 ) : AddDownloadComponent(ctx, id),
     KoinComponent,
     ContainsEffects<AddSingleDownloadPageEffects> by supportEffects() {
@@ -63,10 +66,10 @@ class AddSingleDownloadComponent(
     override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
     val downloadInputsComponent = downloaderInUi.createNewDownloadInputs(
         initialFolder = appRepository.saveLocation.value,
-        initialName = "",
+        initialName = initialCredentials.extraConfig.suggestedName.orEmpty(),
         downloadSystem = downloadSystem,
         scope = scope,
-        initialCredentials = initialCredentials,
+        initialCredentials = initialCredentials.credentials,
     )
     val downloadChecker = downloadInputsComponent.downloadUiChecker
     private val categoryManager: CategoryManager by inject()
@@ -213,6 +216,7 @@ class AddSingleDownloadComponent(
     }
 
     val downloadItem = downloadInputsComponent.downloadItem
+    val downloadJobConfig = downloadInputsComponent.downloadJobConfig
 
 
     var showMoreSettings by mutableStateOf(false)
@@ -232,13 +236,18 @@ class AddSingleDownloadComponent(
     }
 
     fun onRequestDownload() {
-        val item = downloadItem.value
+        val downloadItem = this@AddSingleDownloadComponent.downloadItem.value
+        val downloadJobExtraConfig = downloadJobConfig.value
         consumeDialog {
-            saveLocationIfNecessary(item.folder)
+            saveLocationIfNecessary(downloadItem.folder)
             onRequestDownload(
-                item,
-                onDuplicateStrategy.value.orDefault(),
-                getCategoryIfUseCategoryIsOn()?.id
+                item = NewDownloadItemProps(
+                    downloadItem = downloadItem,
+                    extraConfig = downloadJobExtraConfig,
+                    onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
+                    context = EmptyContext
+                ),
+                categoryId = getCategoryIfUseCategoryIsOn()?.id
             )
         }
     }
@@ -270,12 +279,17 @@ class AddSingleDownloadComponent(
         startQueue: Boolean,
     ) {
         val downloadItem = downloadItem.value
+        val downloadJobConfig = downloadJobConfig.value
         consumeDialog {
             saveLocationIfNecessary(downloadItem.folder)
             onRequestAddToQueue(
-                item = downloadItem,
+                item = NewDownloadItemProps(
+                    downloadItem = downloadItem,
+                    extraConfig = downloadJobConfig,
+                    onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
+                    context = EmptyContext,
+                ),
                 queueId = queueId,
-                onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
                 categoryId = getCategoryIfUseCategoryIsOn()?.id,
             ).invokeOnCompletion {
                 if (queueId != null && startQueue) {
@@ -300,7 +314,7 @@ class AddSingleDownloadComponent(
         (canAddResult.value as? CanAddResult.DownloadAlreadyExists)
             ?.itemId
             ?.let {
-                updateExistingDownloadCredentials(it, downloadItem.value)
+                updateExistingDownloadCredentials(it, downloadItem.value, downloadJobConfig.value)
             }
     }
 
@@ -433,17 +447,15 @@ class AddSingleDownloadComponent(
 
 fun interface OnRequestAddSingleItem {
     operator fun invoke(
-        item: IDownloadItem,
+        item: NewDownloadItemProps,
         queueId: Long?,
-        onDuplicateStrategy: OnDuplicateStrategy,
         categoryId: Long?,
     ): Deferred<Long>
 }
 
 fun interface OnRequestDownloadSingleItem {
     operator fun invoke(
-        item: IDownloadItem,
-        onDuplicateStrategy: OnDuplicateStrategy,
+        item: NewDownloadItemProps,
         categoryId: Long?,
     )
 }

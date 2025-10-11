@@ -119,7 +119,8 @@ class FileChecksumComponent(
                 id = downloadId,
                 updater = {
                     it.fileChecksum = newChecksumString
-                }
+                },
+                downloadJobExtraConfig = null,
             )
             // update this class internal download items
             downloadItems = downloadItems.map {

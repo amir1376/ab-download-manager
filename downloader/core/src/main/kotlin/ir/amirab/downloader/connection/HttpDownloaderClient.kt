@@ -1,6 +1,7 @@
 package ir.amirab.downloader.connection
 
 import ir.amirab.downloader.connection.response.HttpResponseInfo
+import ir.amirab.downloader.downloaditem.http.IHttpBasedDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.downloader.utils.throwIf
@@ -28,7 +29,7 @@ abstract class HttpDownloaderClient {
     ): HttpResponseInfo
 
     abstract suspend fun connect(
-        credentials: IHttpDownloadCredentials,
+        credentials: IHttpBasedDownloadCredentials,
         start: Long?,
         end: Long?,
     ): Connection<HttpResponseInfo>
