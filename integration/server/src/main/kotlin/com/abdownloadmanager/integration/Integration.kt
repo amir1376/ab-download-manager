@@ -6,27 +6,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.builtins.ListSerializer
 
-//val scope = CoroutineScope(SupervisorJob())
-
-/*
-fun main() {
-    runBlocking {
-        val integration = Integration(
-            object : ir.amirab.abdownloadmanager.integration.IntegrationHandler {
-                override suspend fun addDownload(list: List<NewDownloadInfo>){
-                    return
-                }
-            },
-            this,
-        )
-//    integration.createServer(8000)
-//        .start(true)
-        integration.boot()
-        integration.enable(8000)
-        delay(100)
-    }
-}
-*/
 sealed interface IntegrationResult {
     data object Inactive : IntegrationResult
     data class Fail(val throwable: Throwable) : IntegrationResult
@@ -36,6 +15,7 @@ sealed interface IntegrationResult {
 class Integration(
     val integrationHandler: IntegrationHandler,
     val scope: CoroutineScope,
+    private val json: Json,
     val debugMode: Boolean,
 ) {
 
@@ -97,10 +77,6 @@ class Integration(
         server = null
     }
 
-    private val customJson = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-    }
 
     private fun createServer(port: Int): MyServer {
         val handlers = HandlerMap().apply {
@@ -109,7 +85,7 @@ class Integration(
                     val itemsToAdd = kotlin.runCatching {
                         val message = it.getBody().orEmpty()
                         AddDownloadsFromIntegration.createFromRequest(
-                            json = customJson,
+                            json = json,
                             jsonData = message
                         )
                     }
@@ -126,7 +102,7 @@ class Integration(
             get("/queues") {
                 runBlocking {
                     val queues = integrationHandler.listQueues()
-                    val jsonResponse = customJson.encodeToString(ListSerializer(ApiQueueModel.serializer()), queues)
+                    val jsonResponse = json.encodeToString(ListSerializer(ApiQueueModel.serializer()), queues)
                     MyResponse.Text(jsonResponse)
                 }
             }
@@ -134,7 +110,7 @@ class Integration(
                 runBlocking {
                     val itemsToAdd = kotlin.runCatching {
                         val message = it.getBody().orEmpty()
-                        customJson.decodeFromString<NewDownloadTask>(message)
+                        json.decodeFromString<NewDownloadTask>(message)
                     }
                     itemsToAdd.onFailure { it.printStackTrace() }
                     integrationHandler.addDownloadTask(itemsToAdd.getOrThrow())

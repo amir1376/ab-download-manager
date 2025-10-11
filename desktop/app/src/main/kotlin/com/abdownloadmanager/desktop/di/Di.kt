@@ -33,6 +33,9 @@ import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManif
 import com.abdownloadmanager.desktop.utils.proxy.AutoConfigurableProxyProviderForDesktop
 import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvider
 import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
+import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
+import com.abdownloadmanager.integration.HttpDownloadCredentialsFromIntegration
+import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import ir.amirab.downloader.DownloadManagerMinimalControl
@@ -334,6 +337,20 @@ val jsonModule = module {
                         HttpDownloadItem.serializer()
                     }
                 }
+                // TODO remove this later
+                polymorphic(IDownloadCredentialsFromIntegration::class) {
+                    subclass(
+                        HttpDownloadCredentialsFromIntegration::class,
+                        HttpDownloadCredentialsFromIntegration.serializer()
+                    )
+                    subclass(
+                        HLSDownloadCredentialsFromIntegration::class,
+                        HLSDownloadCredentialsFromIntegration.serializer()
+                    )
+                    defaultDeserializer {
+                        HttpDownloadCredentialsFromIntegration.serializer()
+                    }
+                }
             }
         }
     }
@@ -343,7 +360,7 @@ val integrationModule = module {
         IntegrationHandlerImp()
     }
     single {
-        Integration(get(), get(), AppInfo.isInDebugMode())
+        Integration(get(), get(), get(), AppInfo.isInDebugMode())
     }
 }
 val updaterModule = module {
