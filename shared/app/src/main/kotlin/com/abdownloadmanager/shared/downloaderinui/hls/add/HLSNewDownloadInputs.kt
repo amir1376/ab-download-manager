@@ -167,6 +167,36 @@ class HLSNewDownloadInputs(
                 "".asStringSource()
             }
         ),
+        StringConfigurable(
+            Res.string.download_item_settings_user_agent.asStringSource(),
+            Res.string.download_item_settings_user_agent_description.asStringSource(),
+            backedBy = credentials.mapTwoWayStateFlow(
+                map = {
+                    it.userAgent.orEmpty()
+                },
+                unMap = {
+                    copy(userAgent = it.takeIf { it.isNotEmpty() })
+                }
+            ),
+            describe = {
+                "".asStringSource()
+            }
+        ),
+        StringConfigurable(
+            Res.string.download_item_settings_download_page.asStringSource(),
+            Res.string.download_item_settings_download_page_description.asStringSource(),
+            backedBy = credentials.mapTwoWayStateFlow(
+                map = {
+                    it.downloadPage.orEmpty()
+                },
+                unMap = {
+                    copy(downloadPage = it.takeIf { it.isNotEmpty() })
+                }
+            ),
+            describe = {
+                "".asStringSource()
+            }
+        )
     )
 
     override val lengthStringFlow: StateFlow<StringSource> = downloadUiChecker.responseInfo.mapStateFlow {
