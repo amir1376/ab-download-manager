@@ -125,7 +125,8 @@ fun AddDownloadPage(
                         CanAddResult.CantWriteInThisFolder -> myStringResource(Res.string.cant_write_to_this_folder)
                         else -> null
                     },
-                    lastUsedLocations = component.lastUsedLocations.collectAsState().value
+                    lastUsedLocations = component.lastUsedLocations.collectAsState().value,
+                    onRequestRemoveSaveLocation = component::removeFromLastDownloadLocation,
                 )
                 val name by component.name.collectAsState()
                 Spacer(Modifier.size(8.dp))

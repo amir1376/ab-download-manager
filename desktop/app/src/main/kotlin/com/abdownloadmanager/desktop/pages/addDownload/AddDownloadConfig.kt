@@ -42,6 +42,11 @@ abstract class AddDownloadComponent(
                 .take(lastLocationsCacheSize)
         }
     }
+    fun removeFromLastDownloadLocation(saveLocation: String) {
+        _lastUsedLocations.update {
+            it.filter { it != saveLocation }
+        }
+    }
 
     abstract val shouldShowWindow: StateFlow<Boolean>
 }

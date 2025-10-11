@@ -162,7 +162,8 @@ private fun RowScope.LocationSaveOption(
                     component.setFolder(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                lastUsedLocations = component.lastUsedLocations.collectAsState().value
+                lastUsedLocations = component.lastUsedLocations.collectAsState().value,
+                onRequestRemoveSaveLocation = component::removeFromLastDownloadLocation
             )
         }
     )

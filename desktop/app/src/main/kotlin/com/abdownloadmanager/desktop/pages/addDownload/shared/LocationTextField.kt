@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.utils.ui.theme.myShapes
+import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
@@ -34,6 +36,7 @@ fun LocationTextField(
     setText: (String) -> Unit,
     errorText: String? = null,
     lastUsedLocations: List<String> = emptyList(),
+    onRequestRemoveSaveLocation: (String) -> Unit,
 ) {
     var showLastUsedLocations by remember { mutableStateOf(false) }
 
@@ -89,7 +92,8 @@ fun LocationTextField(
                 },
                 onDismiss = {
                     showLastUsedLocations = false
-                }
+                },
+                onRequestRemove = onRequestRemoveSaveLocation
             )
         }
     }
@@ -99,6 +103,7 @@ fun LocationTextField(
 private fun ShowSuggestions(
     width: () -> Dp,
     suggestions: List<String>,
+    onRequestRemove: (String) -> Unit,
     onSuggestionSelected: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -111,16 +116,33 @@ private fun ShowSuggestions(
                 .verticalScroll(rememberScrollState())
         ) {
             for (l in suggestions) {
-                Text(
-                    text = l,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onSuggestionSelected(l)
-                        }
-                        .padding(vertical = 4.dp, horizontal = 4.dp),
-                    fontSize = myTextSizes.sm
-                )
+                Row(
+                    Modifier.height(IntrinsicSize.Max)
+                ) {
+                    Text(
+                        text = l,
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                onSuggestionSelected(l)
+                            }
+                            .padding(vertical = 4.dp, horizontal = 4.dp),
+                        fontSize = myTextSizes.sm
+                    )
+                    MyIcon(
+                        MyIcons.clear,
+                        null,
+                        Modifier
+                            .fillMaxHeight()
+                            .clickable {
+                                onRequestRemove(l)
+                            }
+                            .wrapContentHeight()
+                            .padding(horizontal = 2.dp)
+                            .size(12.dp)
+                            .alpha(0.25f)
+                    )
+                }
             }
         }
     }
