@@ -45,8 +45,7 @@ abstract class ShortcutManager {
 
     fun handle(event: KeyEvent): Boolean {
         val keyStroke = getKeyStrokeFromEvent(event) ?: return false
-        executeShortcut(keyStroke)
-        return true
+        return executeShortcut(keyStroke)
     }
 }
 
