@@ -37,7 +37,7 @@ data class UiRangedPart(
                 percent = part.percent,
                 length = length,
                 partSpace = when {
-                    totalLength >= 0 || length == null || length == 0L -> 0f
+                    totalLength <= 0 || length == null || length <= 0L -> 0f
                     else -> (length.toDouble() / totalLength.toDouble()).toFloat()
                 },
             )
