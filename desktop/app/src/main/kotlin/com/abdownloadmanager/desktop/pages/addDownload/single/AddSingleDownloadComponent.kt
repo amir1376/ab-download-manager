@@ -66,7 +66,7 @@ class AddSingleDownloadComponent(
     override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
     val downloadInputsComponent = downloaderInUi.createNewDownloadInputs(
         initialFolder = appRepository.saveLocation.value,
-        initialName = initialCredentials.extraConfig.suggestedName.orEmpty(),
+        initialName = initialCredentials.extraConfig.getAndFixSuggestedName().orEmpty(),
         downloadSystem = downloadSystem,
         scope = scope,
         initialCredentials = initialCredentials.credentials,

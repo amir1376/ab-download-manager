@@ -102,7 +102,7 @@ class AddMultiDownloadComponent(
             .getDownloaderOf(iDownloadCredentials)
             ?.createNewDownloadInputs(
                 initialCredentials = iDownloadCredentials,
-                initialName = addDownloadCredentialsInUiProps.extraConfig.suggestedName.orEmpty(),
+                initialName = addDownloadCredentialsInUiProps.extraConfig.getAndFixSuggestedName().orEmpty(),
                 initialFolder = folder.value,
                 downloadSystem = downloadSystem,
                 scope = scope,
