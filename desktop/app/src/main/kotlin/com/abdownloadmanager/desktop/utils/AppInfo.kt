@@ -56,7 +56,7 @@ object AppInfo {
     }
 
     val dataDir by lazy {
-        getPortableDataDir() ?: getUserDataDir()
+        PortableUtil.getPortableDataDir(installationFolder) ?: getUserDataDir()
     }
 }
 
