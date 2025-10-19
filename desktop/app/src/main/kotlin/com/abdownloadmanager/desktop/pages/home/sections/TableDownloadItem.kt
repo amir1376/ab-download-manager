@@ -9,6 +9,7 @@ import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
@@ -17,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
@@ -258,12 +261,18 @@ fun StatusCell(
                 }
 
                 DownloadJobStatus.Finished,
-                    -> SimpleStatus(myStringResource(itemState.status.toStringResource()))
+                    -> SimpleStatus(
+                    myStringResource(itemState.status.toStringResource()),
+                    myColors.success,
+                )
             }
         }
 
         is CompletedDownloadItemState -> {
-            SimpleStatus(myStringResource(Res.string.finished))
+            SimpleStatus(
+                myStringResource(Res.string.finished),
+                myColors.success,
+            )
         }
     }
 
@@ -335,12 +344,16 @@ private fun DownloadProgressStatus.toStringResource(): MyStringResource {
 }
 
 @Composable
-private fun SimpleStatus(string: String) {
+private fun SimpleStatus(
+    string: String,
+    color: Color = LocalContentColor.current
+) {
     Text(
         text = string,
         maxLines = 1,
         fontSize = myTextSizes.base,
         overflow = TextOverflow.Ellipsis,
+        color = color,
     )
 }
 
@@ -369,7 +382,7 @@ private fun ProgressAndPercent(
         } else {
             statusString
         }
-        SimpleStatus(statusText)
+        SimpleStatus(statusText, LocalContentColor.current)
         if (status != DownloadProgressStatus.Added) {
             Spacer(Modifier.height(2.5.dp))
             ProgressStatus(
@@ -388,6 +401,7 @@ private fun ProgressStatus(
         Modifier
             .fillMaxWidth()
             .clip(CircleShape)
+            .border(Dp.Hairline, myColors.onSurface / 0.1f, CircleShape)
             .background(myColors.surface)
     ) {
         if (percent != null) {
