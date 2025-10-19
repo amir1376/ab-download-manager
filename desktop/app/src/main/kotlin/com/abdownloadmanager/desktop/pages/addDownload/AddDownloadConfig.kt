@@ -2,6 +2,7 @@ package com.abdownloadmanager.desktop.pages.addDownload
 
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.shared.utils.BaseComponent
+import com.abdownloadmanager.shared.utils.FilenameFixer
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import kotlinx.coroutines.flow.StateFlow
@@ -42,6 +43,7 @@ abstract class AddDownloadComponent(
                 .take(lastLocationsCacheSize)
         }
     }
+
     fun removeFromLastDownloadLocation(saveLocation: String) {
         _lastUsedLocations.update {
             it.filter { it != saveLocation }
@@ -74,6 +76,11 @@ data class AddDownloadCredentialsInUiProps(
     val extraConfig: Configs = Configs(),
 ) {
     data class Configs(
+        // don't consume it directly as it might not be a valid file name on user's current OS
         val suggestedName: String? = null,
-    )
+    ) {
+        fun getAndFixSuggestedName(): String? {
+            return suggestedName?.let(FilenameFixer::fix)
+        }
+    }
 }
