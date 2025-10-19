@@ -14,6 +14,24 @@
 
 ### Security
 
+## 1.7.1
+
+### Added
+
+- Support for custom data directory (#895)
+
+### Fixed
+
+- System shortcuts not working on the main page (#885)
+- Segment info display issues
+- Suggested file names from browsers are now automatically corrected before use (#896)
+
+### Improved
+
+- Translations updated
+- Download list UI improvements (#897)
+- Extra icon sizes added to the Windows `.ico` file
+
 ## 1.7.0
 
 ### Added
