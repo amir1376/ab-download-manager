@@ -5,3 +5,7 @@
 # Ignore Gradle build output directory
 build
 .idea
+local.properties
+
+# Ignore android keystores
+*.jks

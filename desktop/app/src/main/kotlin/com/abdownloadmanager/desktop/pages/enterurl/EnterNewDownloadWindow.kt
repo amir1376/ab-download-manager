@@ -10,9 +10,9 @@ import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
-import com.abdownloadmanager.shared.utils.rememberChild
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.rememberChild
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.screen.applyUiScale
 
@@ -28,7 +28,7 @@ fun EnterNewDownloadWindow(
 
 @Composable
 private fun EnterNewDownloadWindow(
-    component: EnterNewURLComponent,
+    component: DesktopEnterNewURLComponent,
 ) {
     val windowState = rememberWindowState(
         size = DpSize(400.dp, 150.dp)
@@ -44,7 +44,7 @@ private fun EnterNewDownloadWindow(
         )
         HandleEffects(component) {
             when (it) {
-                EnterNewURLComponent.Effects.BringToFront -> {
+                DesktopEnterNewURLComponent.Effects.BringToFront -> {
                     windowState.isMinimized = false
                     window.toFront()
                 }

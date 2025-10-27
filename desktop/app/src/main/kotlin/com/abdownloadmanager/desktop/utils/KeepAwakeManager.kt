@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.utils
 
-import com.abdownloadmanager.shared.utils.DownloadSystem
+import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.util.desktop.keepawake.KeepAwake
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

@@ -5,8 +5,10 @@ import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import arrow.optics.optics
 import com.abdownloadmanager.desktop.pages.settings.SettingPageStateToPersist
+import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageStateStorage
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageStateToPersist
-import com.abdownloadmanager.shared.utils.ConfigBaseSettingsByMapConfig
+import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.util.ConfigBaseSettingsByMapConfig
 import ir.amirab.util.config.getDecoded
 import ir.amirab.util.config.keyOfEncoded
 import ir.amirab.util.config.putEncoded
@@ -89,9 +91,11 @@ data class PageStatesModel(
 
 class PageStatesStorage(
     settings: DataStore<MapConfig>,
-) : ConfigBaseSettingsByMapConfig<PageStatesModel>(settings, PageStatesModel.ConfigLens) {
-    val lastUsedSaveLocations = from(PageStatesModel.global.lastSavedLocations)
-    val downloadPage = from(PageStatesModel.downloadPage)
+) : ConfigBaseSettingsByMapConfig<PageStatesModel>(settings, PageStatesModel.ConfigLens),
+    ILastSavedLocationsStorage,
+    SingleDownloadPageStateStorage {
+    override val lastUsedSaveLocations = from(PageStatesModel.global.lastSavedLocations)
+    override val singleDownloadPageState = from(PageStatesModel.downloadPage)
     val homePageStorage = from(PageStatesModel.home)
     val settingsPageStorage = from(PageStatesModel.settings)
 }

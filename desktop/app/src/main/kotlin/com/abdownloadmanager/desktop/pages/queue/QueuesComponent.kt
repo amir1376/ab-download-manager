@@ -1,13 +1,13 @@
 package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.desktop.actions.newQueueAction
-import com.abdownloadmanager.shared.utils.mvi.ContainsEffects
-import com.abdownloadmanager.shared.utils.mvi.supportEffects
+import com.abdownloadmanager.shared.util.mvi.ContainsEffects
+import com.abdownloadmanager.shared.util.mvi.supportEffects
 import androidx.compose.runtime.*
-import com.abdownloadmanager.shared.utils.BaseComponent
-import com.abdownloadmanager.shared.utils.DownloadSystem
-import com.abdownloadmanager.shared.utils.asState
-import com.abdownloadmanager.shared.utils.subscribeAsStateFlow
+import com.abdownloadmanager.shared.util.BaseComponent
+import com.abdownloadmanager.shared.util.DownloadSystem
+import com.abdownloadmanager.shared.util.asState
+import com.abdownloadmanager.shared.util.subscribeAsStateFlow
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.childSlot

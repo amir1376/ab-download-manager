@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.poweractionalert
 
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.BaseComponent
+import com.abdownloadmanager.shared.util.BaseComponent
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource

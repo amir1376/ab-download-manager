@@ -1,9 +1,9 @@
 package com.abdownloadmanager.desktop.pages.addDownload.multiple
 
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
-import com.abdownloadmanager.shared.ui.widget.customtable.styled.MyStyledTableHeader
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.ui.widget.table.customtable.styled.MyStyledTableHeader
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -19,27 +19,26 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.PointerButton
-import androidx.compose.ui.input.pointer.PointerButton.Companion
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.ui.widget.customtable.CellSize
-import com.abdownloadmanager.shared.ui.widget.customtable.CustomCellRenderer
-import com.abdownloadmanager.shared.ui.widget.customtable.Table
-import com.abdownloadmanager.shared.ui.widget.customtable.TableCell
+import com.abdownloadmanager.shared.ui.widget.table.customtable.CellSize
+import com.abdownloadmanager.shared.ui.widget.table.customtable.CustomCellRenderer
+import com.abdownloadmanager.shared.ui.widget.table.customtable.Table
+import com.abdownloadmanager.shared.ui.widget.table.customtable.TableCell
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.add.TANewDownloadInputs
-import com.abdownloadmanager.shared.utils.FileIconProvider
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.FileIconProvider
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 
 @Composable
 fun AddMultiDownloadTable(
     modifier: Modifier,
-    component: AddMultiDownloadComponent,
+    component: DesktopAddMultiDownloadComponent,
 ) {
     var isCtrlPressed by remember { mutableStateOf(false) }
 
@@ -196,7 +195,7 @@ private val LocalAddMultiItemListContext = compositionLocalOf<AddMultiItemListCo
 }
 
 class AddMultiItemListContext(
-    val component: AddMultiDownloadComponent,
+    val component: DesktopAddMultiDownloadComponent,
     val isAllSelected: Boolean,
 ) {
     fun changeAllSelection(boolean: Boolean) {

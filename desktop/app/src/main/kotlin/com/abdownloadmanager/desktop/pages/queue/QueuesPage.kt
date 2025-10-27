@@ -2,14 +2,14 @@ package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
-import com.abdownloadmanager.shared.utils.ui.LocalContentAlpha
-import com.abdownloadmanager.shared.utils.ui.LocalContentColor
+import com.abdownloadmanager.shared.util.ui.LocalContentAlpha
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,8 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.IDownloadItemState

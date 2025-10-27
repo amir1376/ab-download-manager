@@ -14,8 +14,8 @@ import com.abdownloadmanager.desktop.window.custom.titlebar.CommonTitleBarConten
 import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
 import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonsPosition
 import com.abdownloadmanager.desktop.window.custom.titlebar.TitleBar
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.myColors
 
 object LinuxTitleBar : TitleBar {
     override val titleBarHeight: Dp = TitleBar.Companion.DefaultTitleBarHeigh

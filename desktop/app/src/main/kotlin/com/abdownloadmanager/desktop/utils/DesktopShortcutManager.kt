@@ -2,8 +2,8 @@ package com.abdownloadmanager.desktop.utils
 
 import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.input.key.KeyEvent
-import com.abdownloadmanager.shared.utils.PlatformKeyStroke
-import com.abdownloadmanager.shared.utils.ShortcutManager
+import com.abdownloadmanager.shared.util.PlatformKeyStroke
+import com.abdownloadmanager.shared.util.ShortcutManager
 import java.awt.Toolkit
 import java.awt.event.InputEvent
 import javax.swing.KeyStroke

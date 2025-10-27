@@ -1,6 +1,7 @@
 package myPlugins
 
 plugins {
+    id("myPlugins.kotlin")
     id("myPlugins.composeBase")
 }
 

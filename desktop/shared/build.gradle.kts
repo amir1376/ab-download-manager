@@ -9,6 +9,5 @@ dependencies {
     implementation(libs.jna.platform)
 
     implementation(project(":shared:app"))
-    implementation(project(":shared:app-utils"))
     implementation(project(":shared:utils"))
 }

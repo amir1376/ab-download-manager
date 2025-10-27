@@ -10,8 +10,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.UpdateCheckStatus
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.pages.updater.UpdateComponent
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.desktop.screen.applyUiScale

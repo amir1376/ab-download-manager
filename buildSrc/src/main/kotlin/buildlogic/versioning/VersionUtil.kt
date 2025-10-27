@@ -12,6 +12,15 @@ fun Project.getAppVersion(): Version {
 fun Project.getAppVersionString(): String {
     return rootProject.version.toString()
 }
+fun Version.convertToVersionCode(): Int {
+    require(major in 0..1023) { "Major must be 0..1023" }
+    require(minor in 0..1023) { "Minor must be 0..1023" }
+    require(patch in 0..511) { "Patch must be 0..511" }
+
+    return (major shl 19) or
+            (minor shl 9)  or
+            patch
+}
 
 fun Project.getAppName(): String {
     return rootProject.name

@@ -1,19 +1,15 @@
 package com.abdownloadmanager.desktop.pages.addDownload.single
 
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import com.abdownloadmanager.shared.utils.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.desktop.window.moveSafe
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.*
@@ -21,26 +17,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 import arrow.core.Some
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.*
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
+import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
+import com.abdownloadmanager.shared.pages.adddownload.single.AddSingleDownloadPageEffects
+import com.abdownloadmanager.shared.util.ClipboardUtil
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import java.awt.MouseInfo
 
 @Composable
 fun AddDownloadPage(
-    component: AddSingleDownloadComponent,
+    component: BaseAddSingleDownloadComponent,
 ) {
     val onDuplicateStrategy by component.onDuplicateStrategy.collectAsState()
     Column(
@@ -185,7 +182,7 @@ fun AddDownloadPage(
 }
 
 @Composable
-private fun ShowSolutionsOnDuplicateDownload(component: AddSingleDownloadComponent) {
+private fun ShowSolutionsOnDuplicateDownload(component: BaseAddSingleDownloadComponent) {
     val h = 250
     val w = 300
     val state = rememberDialogState(
@@ -350,7 +347,7 @@ private fun Divider() {
 
 
 @Composable
-fun RenderResumeSupport(component: AddSingleDownloadComponent) {
+fun RenderResumeSupport(component: BaseAddSingleDownloadComponent) {
     val fileInfo by component.linkResponseInfo.collectAsState()
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -406,39 +403,7 @@ private fun MainConfigActionButton(
 
 
 @Composable
-private fun PrimaryMainConfigActionButton(
-    text: String,
-    modifier: Modifier,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val backgroundColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors.map {
-            it / 30
-        }
-    )
-    val borderColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors
-    )
-    val disabledBorderColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors.map {
-            it / 50
-        }
-    )
-    ActionButton(
-        text = text,
-        modifier = modifier,
-        enabled = enabled,
-        onClick = onClick,
-        backgroundColor = backgroundColor,
-        disabledBackgroundColor = backgroundColor,
-        borderColor = borderColor,
-        disabledBorderColor = disabledBorderColor,
-    )
-}
-
-@Composable
-fun ConfigActionsButtons(component: AddSingleDownloadComponent) {
+fun ConfigActionsButtons(component: BaseAddSingleDownloadComponent) {
     val responseInfo by component.linkResponseInfo.collectAsState()
     Row {
         IconActionButton(MyIcons.refresh, myStringResource(Res.string.refresh)) {
@@ -457,7 +422,7 @@ fun ConfigActionsButtons(component: AddSingleDownloadComponent) {
 }
 
 @Composable
-private fun MainActionButtons(component: AddSingleDownloadComponent) {
+private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
     Row {
         val onDuplicateStrategy by component.onDuplicateStrategy.collectAsState()
         val canAddResult by component.canAddResult.collectAsState()
@@ -486,7 +451,7 @@ private fun MainActionButtons(component: AddSingleDownloadComponent) {
                 },
             )
             Spacer(Modifier.width(8.dp))
-            PrimaryMainConfigActionButton(
+            PrimaryMainActionButton(
                 text = myStringResource(Res.string.download),
                 modifier = Modifier,
                 enabled = canAddToDownloads,
@@ -519,7 +484,7 @@ private fun MainActionButtons(component: AddSingleDownloadComponent) {
 
 @Composable
 fun RenderFileTypeAndSize(
-    component: AddSingleDownloadComponent,
+    component: BaseAddSingleDownloadComponent,
 ) {
     val isLinkLoading by component.isLinkLoading.collectAsState()
     val fileInfo by component.linkResponseInfo.collectAsState()
@@ -589,22 +554,6 @@ fun getExtension(s: String): String? {
         .takeIf { it.isNotBlank() }
 }
 
-@Composable
-fun MyTextFieldIcon(
-    icon: IconSource,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-) {
-    MyIcon(
-        icon, null, Modifier
-            .pointerHoverIcon(PointerIcon.Default)
-            .fillMaxHeight()
-            .clickable(enabled = enabled, onClick = onClick)
-            .wrapContentHeight()
-            .padding(horizontal = 8.dp)
-            .size(16.dp)
-    )
-}
 
 @Composable
 private fun UrlTextField(
@@ -613,7 +562,7 @@ private fun UrlTextField(
     errorText: String? = null,
     modifier: Modifier = Modifier,
 ) {
-    AddDownloadPageTextField(
+    MyTextFieldWithIcons(
         text,
         setText,
         myStringResource(Res.string.download_link),
@@ -636,67 +585,12 @@ private fun NameTextField(
     setText: (String) -> Unit,
     errorText: String? = null,
 ) {
-    AddDownloadPageTextField(
+    MyTextFieldWithIcons(
         text,
         setText,
         myStringResource(Res.string.name),
         modifier = Modifier.fillMaxWidth(),
         errorText = errorText,
     )
-}
-
-@Composable
-fun AddDownloadPageTextField(
-    text: String,
-    setText: (String) -> Unit,
-    placeHolder: String,
-    modifier: Modifier,
-    errorText: String? = null,
-    start: @Composable() (() -> Unit)? = null,
-    end: @Composable() (() -> Unit)? = null,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-    val dividerModifier = Modifier
-        .fillMaxHeight()
-        .padding(vertical = 1.dp)
-        //to not conflict with text-field border
-        .width(1.dp)
-        .background(if (isFocused) myColors.onBackground / 10 else Color.Transparent)
-    Column(modifier) {
-        MyTextField(
-            text,
-            setText,
-            placeHolder,
-            modifier = Modifier.fillMaxWidth(),
-            background = myColors.surface / 50,
-            interactionSource = interactionSource,
-            shape = myShapes.defaultRounded,
-            start = start?.let {
-                {
-                    WithContentAlpha(0.5f) {
-                        it()
-                    }
-                    Spacer(dividerModifier)
-                }
-            },
-            end = end?.let {
-                {
-                    Spacer(dividerModifier)
-                    it()
-                }
-            }
-        )
-        AnimatedVisibility(errorText != null) {
-            if (errorText != null) {
-                Text(
-                    errorText,
-                    Modifier.padding(bottom = 4.dp, start = 4.dp),
-                    fontSize = myTextSizes.sm,
-                    color = myColors.error,
-                )
-            }
-        }
-    }
 }
 

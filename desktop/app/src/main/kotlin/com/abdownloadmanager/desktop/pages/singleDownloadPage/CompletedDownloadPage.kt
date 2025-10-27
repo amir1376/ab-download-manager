@@ -16,19 +16,19 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.home.DownloadItemTransferable
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.utils.LocalSizeUnit
-import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.LocalSizeUnit
+import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.Tooltip
-import com.abdownloadmanager.shared.utils.ui.WithContentColor
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
@@ -36,7 +36,7 @@ import ir.amirab.util.desktop.isShiftPressed
 
 @Composable
 fun CompletedDownloadPage(
-    component: SingleDownloadComponent,
+    component: DesktopSingleDownloadComponent,
     completedDownloadItemState: CompletedDownloadItemState,
 ) {
     Column {
@@ -66,7 +66,7 @@ fun CompletedDownloadPage(
 @Composable
 private fun Actions(
     modifier: Modifier,
-    component: SingleDownloadComponent,
+    component: DesktopSingleDownloadComponent,
 ) {
     val iDownloadItemState by component.itemStateFlow.collectAsState()
     Column(modifier) {
@@ -186,7 +186,7 @@ private fun RenderName(
 @Composable
 private fun RenderFileIconAndSize(
     modifier: Modifier,
-    component: SingleDownloadComponent,
+    component: DesktopSingleDownloadComponent,
     itemState: CompletedDownloadItemState,
 ) {
     Column(

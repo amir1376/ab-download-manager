@@ -2,13 +2,12 @@ package com.abdownloadmanager.desktop.pages.editdownload
 
 import androidx.compose.runtime.Composable
 
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
@@ -32,18 +31,19 @@ import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.ifThen
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditDownloadResult
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditWarnings
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadInputs
 import com.abdownloadmanager.shared.downloaderinui.edit.TAEditDownloadInputs
-import com.abdownloadmanager.shared.utils.FileIconProvider
-import com.abdownloadmanager.shared.utils.ui.WithContentColor
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ClipboardUtil
+import com.abdownloadmanager.shared.util.FileIconProvider
+import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.asStringSource
@@ -51,7 +51,7 @@ import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
 fun EditDownloadWindow(
-    component: EditDownloadComponent,
+    component: DesktopEditDownloadComponent,
 ) {
     CustomWindow(
         state = rememberWindowState(
@@ -77,7 +77,7 @@ fun EditDownloadWindow(
 
 @Composable
 fun EditDownloadPage(
-    component: EditDownloadComponent,
+    component: DesktopEditDownloadComponent,
 ) {
     WindowTitle(myStringResource(Res.string.edit_download_title))
     component.editDownloadUiChecker.collectAsState().value?.let { editDownloadUiChecker ->
@@ -158,7 +158,7 @@ fun EditDownloadPage(
 
 @Composable
 fun BrowserImportButton(
-    component: EditDownloadComponent,
+    component: DesktopEditDownloadComponent,
     downloadUiState: EditDownloadInputs<*, *, *, *, *>,
 ) {
     val credentialsImportedFromExternal by component.credentialsImportedFromExternal.collectAsState()
@@ -260,39 +260,6 @@ private fun MainConfigActionButton(
     ActionButton(text, modifier, enabled, onClick)
 }
 
-
-@Composable
-private fun PrimaryMainConfigActionButton(
-    text: String,
-    modifier: Modifier,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val backgroundColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors.map {
-            it / 30
-        }
-    )
-    val borderColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors
-    )
-    val disabledBorderColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors.map {
-            it / 50
-        }
-    )
-    ActionButton(
-        text = text,
-        modifier = modifier,
-        enabled = enabled,
-        onClick = onClick,
-        backgroundColor = backgroundColor,
-        disabledBackgroundColor = backgroundColor,
-        borderColor = borderColor,
-        disabledBorderColor = disabledBorderColor,
-    )
-}
-
 @Composable
 fun ConfigActionsButtons(
     editDownloadUiChecker: TAEditDownloadInputs,
@@ -317,7 +284,7 @@ fun ConfigActionsButtons(
 
 @Composable
 private fun MainActionButtons(
-    component: EditDownloadComponent,
+    component: DesktopEditDownloadComponent,
     editDownloadUiChecker: TAEditDownloadInputs,
 ) {
     Row {
@@ -347,7 +314,7 @@ private fun MainActionButtons(
                     }
                 )
             }
-            PrimaryMainConfigActionButton(
+            PrimaryMainActionButton(
                 text = myStringResource(Res.string.change),
                 modifier = Modifier,
                 enabled = canEdit,
@@ -380,7 +347,7 @@ fun WarningPrompt(
     onConfirm: () -> Unit,
 ) {
     Popup(
-        popupPositionProvider = rememberComponentRectPositionProvider(
+        popupPositionProvider = rememberMyComponentRectPositionProvider(
             anchor = Alignment.TopStart,
             alignment = Alignment.TopEnd,
         ),

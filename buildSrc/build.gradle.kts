@@ -4,9 +4,11 @@ plugins{
 repositories {
     gradlePluginPortal()
     mavenCentral()
+    google()
 }
 dependencies{
     implementation(libs.pluginKotlin)
+    implementation(libs.pluginAndroidGradle)
     implementation(libs.pluginComposeCompiler)
     implementation(libs.pluginKsp)
     implementation(libs.pluginSerialization)
@@ -19,4 +21,5 @@ dependencies{
     implementation("ir.amirab.util:platform:1")
     implementation("ir.amirab.plugin:git-version-plugin:1")
     implementation("ir.amirab.plugin:installer-plugin:1")
+    implementation("ir.amirab.plugin:common-android:1")
 }

@@ -1,12 +1,13 @@
 package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
-import com.abdownloadmanager.shared.utils.BaseComponent
+import com.abdownloadmanager.shared.util.BaseComponent
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.flow.mapStateFlow
-import com.abdownloadmanager.desktop.utils.newScopeBasedOn
+import com.abdownloadmanager.shared.util.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
-import com.abdownloadmanager.desktop.storage.ExtraQueueSettingsStorage
+import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
+import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.DayOfWeekConfigurable
@@ -46,7 +47,7 @@ class QueueInfoComponent(
     val selectedListItems = MutableStateFlow(emptyList<Long>())
     private val lastSelectedItem = MutableStateFlow(null as Long?)
 
-    val extraQueueSettingsStorage by inject<ExtraQueueSettingsStorage>()
+    val extraQueueSettingsStorage by inject<ExtraQueueSettingsStorage<DesktopExtraQueueSettings>>()
     val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
         flow = extraQueueSettingsStorage.getExternalQueueSettingsAsFlow(
             id = id,

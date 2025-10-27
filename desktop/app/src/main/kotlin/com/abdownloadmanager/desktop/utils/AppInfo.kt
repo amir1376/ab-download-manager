@@ -1,8 +1,11 @@
 package com.abdownloadmanager.desktop.utils
 
 import com.abdownloadmanager.desktop.AppArguments
-import com.abdownloadmanager.desktop.SharedConstants
+import com.abdownloadmanager.shared.util.SharedConstants
+import com.abdownloadmanager.desktop.storage.DesktopDefinedPaths
+import com.abdownloadmanager.shared.util.AppVersion
 import ir.amirab.util.platform.Platform
+import okio.Path.Companion.toOkioPath
 import java.io.File
 
 object AppInfo {
@@ -39,17 +42,6 @@ object AppInfo {
             }
     }
 
-    private fun getPortableDataDir(): File? {
-        val dataDirName = SharedConstants.dataDirName
-        if (installationFolder != null) {
-            val portableDataDir = File(installationFolder, dataDirName)
-            if (portableDataDir.exists() && portableDataDir.canWrite()) {
-                return portableDataDir
-            }
-        }
-        return null
-    }
-
     private fun getUserDataDir(): File {
         val dataDirName = SharedConstants.dataDirName
         return File(System.getProperty("user.home"), dataDirName)
@@ -58,6 +50,7 @@ object AppInfo {
     val dataDir by lazy {
         PortableUtil.getPortableDataDir(installationFolder) ?: getUserDataDir()
     }
+    val definedPaths = DesktopDefinedPaths(dataDir.toOkioPath())
 }
 
 fun AppInfo.isAppInstalled(): Boolean {
@@ -71,10 +64,3 @@ fun AppInfo.isInIDE(): Boolean {
 fun AppInfo.isInDebugMode(): Boolean {
     return AppArguments.get().debug || AppProperties.isDebugMode() || isInIDE()
 }
-
-val AppInfo.configDir: File get() = dataDir.resolve("config")
-val AppInfo.systemDir: File get() = dataDir.resolve("system")
-val AppInfo.updateDir: File get() = AppInfo.systemDir.resolve("update")
-val AppInfo.logDir: File get() = AppInfo.systemDir.resolve("log")
-val AppInfo.optionsDir: File get() = AppInfo.configDir.resolve("options")
-val AppInfo.downloadDbDir: File get() = AppInfo.configDir.resolve("download_db")

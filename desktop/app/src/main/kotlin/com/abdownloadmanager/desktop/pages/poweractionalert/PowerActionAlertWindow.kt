@@ -30,11 +30,11 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.LoadingIndicatorWithBrush
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.rememberChild
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.rememberChild
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.screen.applyUiScale

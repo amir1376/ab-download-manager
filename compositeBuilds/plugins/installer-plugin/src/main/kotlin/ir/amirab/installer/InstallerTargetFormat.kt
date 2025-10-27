@@ -12,7 +12,8 @@ enum class InstallerTargetFormat(
     Dmg("dmg", Platform.Desktop.MacOS),
     Pkg("pkg", Platform.Desktop.MacOS),
     Exe("exe", Platform.Desktop.Windows),
-    Msi("msi", Platform.Desktop.Windows);
+    Msi("msi", Platform.Desktop.Windows),
+    Apk("apk", Platform.Android);
 
     val isCompatibleWithCurrentOS: Boolean by lazy { isCompatibleWith(Platform.getCurrentPlatform()) }
 

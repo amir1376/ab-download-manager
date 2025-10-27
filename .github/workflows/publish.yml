@@ -37,6 +37,11 @@ jobs:
           key: ${{ matrix.os }}-gradle
           enableCrossOsArchive: true
 
+      - name: build Android on Ubuntu only
+        if: matrix.os != 'ubuntu-latest'
+        run: |
+          echo "SKIP_ANDROID_BUILD=true" >> $GITHUB_ENV
+
       # Steps specific to macOS (to create DMG for macOS)
       - name: Install create-dmg (for macOS)
         if: startsWith(matrix.os, 'macos-')

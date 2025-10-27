@@ -14,6 +14,7 @@ import ir.amirab.util.compose.contants.RESOURCE_PROTOCOL
 import ir.amirab.util.compose.contants.SYSTEM_PROTOCOL
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
+import ir.amirab.util.guardedEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -88,41 +89,39 @@ class FontManager(
         }
     }
 
-    @Volatile
-    private var booted = false
+    private val booted = guardedEntry()
 
     fun boot() {
-        if (booted) return
+        booted.action {
+            val systemFontFamilies = getUsableFontFamilyNamesOfSystem()
+                .mapNotNull { fontFamilyName ->
+                    val uri = runCatching {
+                        URI(SYSTEM_PROTOCOL, fontFamilyName, null).toString()
+                    }.onFailure { throwable ->
+                        // it seems that some fonts has empty name, which causes URI creation to fail
+                        // in order to not break the app, we will just ignore those fonts
+                        println("system font family with name:\"$fontFamilyName\" can't be used: $throwable")
+                    }.getOrNull()
+                    if (uri == null) {
+                        return@mapNotNull null
+                    }
+                    val fontFamily = getFontByUri(uri)
+                    if (fontFamily == null) {
+                        return@mapNotNull null
+                    }
+                    FontInfo(
+                        id = uri,
+                        uri = uri,
+                        name = fontFamilyName.asStringSource(),
+                        fontFamily = fontFamily,
+                    )
+                }
 
-        val systemFontFamilies = getUsableFontFamilyNamesOfSystem()
-            .mapNotNull { fontFamilyName ->
-                val uri = runCatching {
-                    URI(SYSTEM_PROTOCOL, fontFamilyName, null).toString()
-                }.onFailure { throwable ->
-                    // it seems that some fonts has empty name, which causes URI creation to fail
-                    // in order to not break the app, we will just ignore those fonts
-                    println("system font family with name:\"$fontFamilyName\" can't be used: $throwable")
-                }.getOrNull()
-                if (uri == null) {
-                    return@mapNotNull null
-                }
-                val fontFamily = getFontByUri(uri)
-                if (fontFamily == null) {
-                    return@mapNotNull null
-                }
-                FontInfo(
-                    id = uri,
-                    uri = uri,
-                    name = fontFamilyName.asStringSource(),
-                    fontFamily = fontFamily,
-                )
+            _availableFonts.update {
+                it.plus(systemFontFamilies)
             }
-
-        _availableFonts.update {
-            it.plus(systemFontFamilies)
+            setFont(appSettings.font.value)
         }
-        setFont(appSettings.font.value)
-        booted = true
     }
 
 }

@@ -8,12 +8,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import java.awt.ComponentOrientation
 import java.awt.GraphicsConfiguration
 import java.awt.GraphicsEnvironment
-import java.awt.Window
 import java.util.*
-
-val LocalWindow = compositionLocalOf<Window> {
-    error("LocalWindow not provided yet")
-}
 
 val LocalFrameWindowScope = compositionLocalOf<FrameWindowScope> {
     error("LocalFrameWindowScope not provided yet")

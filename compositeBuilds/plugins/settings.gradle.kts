@@ -7,3 +7,4 @@ dependencyResolutionManagement{
 }
 include("git-version-plugin")
 include("installer-plugin")
+include("common-android")

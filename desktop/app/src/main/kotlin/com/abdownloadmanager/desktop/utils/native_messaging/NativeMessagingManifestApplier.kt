@@ -2,11 +2,12 @@ package com.abdownloadmanager.desktop.utils.native_messaging
 
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.AppProperties
-import com.abdownloadmanager.desktop.utils.configDir
 import com.abdownloadmanager.desktop.utils.isAppInstalled
+import ir.amirab.util.createParentDirectories
+import ir.amirab.util.deleteIfExists
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.desktop.WindowsRegistry
-import kotlinx.serialization.encodeToString
+import ir.amirab.util.writeText
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -41,7 +42,7 @@ abstract class NativeMessagingManifestApplier : KoinComponent {
 }
 
 class WindowsNativeMessagingManifestApplier : NativeMessagingManifestApplier() {
-    private val baseNativeMessagingDir get() =  AppInfo.configDir.toPath() / "native-messaging"
+    private val baseNativeMessagingDir get() = AppInfo.definedPaths.configDir / "native-messaging"
     private val firefoxManifestFile get() = baseNativeMessagingDir / "firefox-native-messaging-manifest.json"
     private val chromeManifestFile get() = baseNativeMessagingDir / "chrome-native-messaging-manifest.json"
     private val firefoxRegistryPath get() = "HKCU\\SOFTWARE\\Mozilla\\NativeMessagingHosts\\${AppInfo.packageName}"

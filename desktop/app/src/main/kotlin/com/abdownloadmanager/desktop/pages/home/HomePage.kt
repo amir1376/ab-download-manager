@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.abdownloadmanager.desktop.pages.home.sections.DownloadList
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
-import com.abdownloadmanager.desktop.pages.home.sections.category.DefinedStatusCategories
-import com.abdownloadmanager.desktop.pages.home.sections.category.DownloadStatusCategoryFilter
+import com.abdownloadmanager.shared.pages.home.category.DefinedStatusCategories
+import com.abdownloadmanager.shared.pages.home.category.DownloadStatusCategoryFilter
 import com.abdownloadmanager.desktop.pages.home.sections.category.StatusFilterItem
 import com.abdownloadmanager.desktop.pages.home.sections.queue.QueuesSection
 import com.abdownloadmanager.desktop.window.custom.TitlePosition
@@ -41,25 +41,29 @@ import com.abdownloadmanager.desktop.window.custom.WindowEnd
 import com.abdownloadmanager.desktop.window.custom.WindowStart
 import com.abdownloadmanager.desktop.window.custom.WindowTitlePosition
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.pages.home.BaseHomeComponent
+import com.abdownloadmanager.shared.pages.home.CategoryActions
+import com.abdownloadmanager.shared.pages.home.CategoryDeletePromptState
+import com.abdownloadmanager.shared.pages.home.ConfirmPromptState
+import com.abdownloadmanager.shared.pages.home.DeletePromptState
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuBar
-import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInPopup
 import com.abdownloadmanager.shared.ui.widget.menu.native.NativeMenuBar
-import com.abdownloadmanager.shared.utils.LocalSpeedUnit
-import com.abdownloadmanager.shared.utils.category.Category
-import com.abdownloadmanager.shared.utils.category.rememberIconPainter
-import com.abdownloadmanager.shared.utils.convertPositiveBytesToSizeUnit
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import com.abdownloadmanager.shared.utils.ui.WithTitleBarDirection
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.LocalSpeedUnit
+import com.abdownloadmanager.shared.util.category.Category
+import com.abdownloadmanager.shared.util.category.rememberIconPainter
+import com.abdownloadmanager.shared.util.convertPositiveBytesToSizeUnit
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithTitleBarDirection
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
@@ -96,48 +100,59 @@ fun HomePage(component: HomeComponent) {
 
     HandleEffects(component) { effect ->
         when (effect) {
-            is HomeEffects.DeleteItems -> {
-                if (effect.list.isNotEmpty()) {
-                    showDeletePromptState = DeletePromptState(
-                        downloadList = effect.list,
-                        finishedCount = effect.finishedCount,
-                        unfinishedCount = effect.unfinishedCount,
-                    )
-                }
-            }
+            is BaseHomeComponent.Effects.Common -> {
+                when (effect) {
+                    is BaseHomeComponent.Effects.Common.DeleteItems -> {
+                        if (effect.list.isNotEmpty()) {
+                            showDeletePromptState = DeletePromptState(
+                                downloadList = effect.list,
+                                finishedCount = effect.finishedCount,
+                                unfinishedCount = effect.unfinishedCount,
+                            )
+                        }
+                    }
 
-            is HomeEffects.DeleteCategory -> {
-                showDeleteCategoryPromptState = CategoryDeletePromptState(effect.category)
-            }
+                    is BaseHomeComponent.Effects.Common.DeleteCategory -> {
+                        showDeleteCategoryPromptState = CategoryDeletePromptState(effect.category)
+                    }
 
-            is HomeEffects.AutoCategorize -> {
-                showConfirmPrompt = ConfirmPromptState(
-                    title = Res.string.confirm_auto_categorize_downloads_title.asStringSource(),
-                    description = Res.string.confirm_auto_categorize_downloads_description.asStringSource(),
-                    onConfirm = component::onConfirmAutoCategorize
-                )
-            }
+                    is BaseHomeComponent.Effects.Common.AutoCategorize -> {
+                        showConfirmPrompt = ConfirmPromptState(
+                            title = Res.string.confirm_auto_categorize_downloads_title.asStringSource(),
+                            description = Res.string.confirm_auto_categorize_downloads_description.asStringSource(),
+                            onConfirm = component::onConfirmAutoCategorize
+                        )
+                    }
 
-            is HomeEffects.ResetCategoriesToDefault -> {
-                showConfirmPrompt = ConfirmPromptState(
-                    title = Res.string.confirm_reset_to_default_categories_title.asStringSource(),
-                    description = Res.string.confirm_reset_to_default_categories_description.asStringSource(),
-                    onConfirm = component::onConfirmResetCategories
-                )
-            }
+                    is BaseHomeComponent.Effects.Common.ResetCategoriesToDefault -> {
+                        showConfirmPrompt = ConfirmPromptState(
+                            title = Res.string.confirm_reset_to_default_categories_title.asStringSource(),
+                            description = Res.string.confirm_reset_to_default_categories_description.asStringSource(),
+                            onConfirm = component::onConfirmResetCategories
+                        )
+                    }
 
-            is HomeEffects.ScrollToDownloadItem -> {
-                val id = effect.downloadId
-                val positionOrNull = tableState
-                    .getItemPosition(listState) { it.id == id }
-                    .takeIf { it != -1 }
-                positionOrNull?.let {
-                    coroutineScope.launch {
-                        lazyListState.scrollToItem(it)
+                    is BaseHomeComponent.Effects.Common.ScrollToDownloadItem -> {
+                        val id = effect.downloadId
+                        val positionOrNull = tableState
+                            .getItemPosition(listState) { it.id == id }
+                            .takeIf { it != -1 }
+                        positionOrNull?.let {
+                            coroutineScope.launch {
+                                lazyListState.scrollToItem(it)
+                            }
+                        }
                     }
                 }
             }
 
+            is HomeComponent.Effects -> {
+                when (effect) {
+                    HomeComponent.Effects.BringToFront -> {
+                        // handled else where
+                    }
+                }
+            }
             else -> {}
         }
     }
@@ -355,7 +370,7 @@ fun HomePage(component: HomeComponent) {
         }
         NotificationArea(
             Modifier
-                .width(300.dp)
+                .width(310.dp)
                 .padding(24.dp)
                 .align(Alignment.BottomEnd)
         )
@@ -638,33 +653,6 @@ private fun ShowDeleteCategoryPrompt(
     }
 }
 
-@Stable
-class DeletePromptState(
-    val downloadList: List<Long>,
-    val finishedCount: Int,
-    val unfinishedCount: Int,
-) {
-    val hasFinishedDownloads = finishedCount > 0
-    var hasUnfinishedDownloads = unfinishedCount > 0
-    var alsoDeleteFile by mutableStateOf(false)
-
-    fun hasBothFinishedAndUnfinished(): Boolean {
-        return hasFinishedDownloads && hasUnfinishedDownloads
-    }
-}
-
-@Immutable
-data class CategoryDeletePromptState(
-    val category: Category,
-)
-
-@Immutable
-data class ConfirmPromptState(
-    val title: StringSource,
-    val description: StringSource,
-    val onConfirm: () -> Unit,
-)
-
 @Composable
 fun DragWidget(
     modifier: Modifier,
@@ -788,7 +776,7 @@ fun CategoryOption(
     categoryOptionMenuState: CategoryActions,
     onDismiss: () -> Unit,
 ) {
-    ShowOptionsInDropDown(
+    ShowOptionsInPopup(
         MenuItem.SubMenu(
             icon = categoryOptionMenuState.categoryItem?.rememberIconPainter(),
             title = categoryOptionMenuState.categoryItem?.name?.asStringSource()

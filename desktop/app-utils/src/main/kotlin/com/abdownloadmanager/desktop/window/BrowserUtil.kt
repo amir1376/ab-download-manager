@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.window
 
-import com.abdownloadmanager.shared.utils.BrowserType
+import com.abdownloadmanager.shared.util.BrowserType
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
 import ir.amirab.util.toUpUntil
