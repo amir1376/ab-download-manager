@@ -1,0 +1,39 @@
+name: Auto bump ab-download-manager homebrew cask
+
+on:
+  release:
+    types: [published]    
+  workflow_dispatch: {}     
+  
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: macos-latest
+    env:
+      HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
+
+    steps:
+      - name: Prepare Homebrew environment
+        run: |
+          if ! command -v brew >/dev/null 2>&1; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            echo "/opt/homebrew/bin" >> "$GITHUB_PATH"
+          fi
+          brew update
+
+      - name: Extract version
+        id: ver
+        run: |
+          RAW="${{ github.event.release.tag_name }}"   
+          V="${RAW#v}"                                  
+          echo "raw=$RAW"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Bump cask
+        run: |
+          V="${{ steps.ver.outputs.version }}"
+          echo "Bumping ab-download-manager to $V ..."
+          brew bump-cask-pr --no-browse --version "$V" ab-download-manager
