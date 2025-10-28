@@ -27,13 +27,36 @@ jobs:
       - name: Extract version
         id: ver
         run: |
-          RAW="${{ github.event.release.tag_name }}"   
-          V="${RAW#v}"                                  
-          echo "raw=$RAW"
+          TAG_RAW="${{ github.event.release.tag_name }}"
+          TAG_VER="${TAG_RAW#v}"
+
+          if [ -n "$TAG_VER" ]; then
+            SRC="release tag"
+            V="$TAG_VER"
+          else
+            SRC="livecheck"
+            OUT="$(brew livecheck --cask --json ab-download-manager || true)"
+            V="$(ruby -rjson -e '
+              j = JSON.parse(STDIN.read) rescue []
+              if j.is_a?(Array) && j[0] && j[0]["version"]
+                v = j[0]["version"]
+                if v["latest"] && v["current"] && v["latest"] != v["current"]
+                  puts v["latest"]
+                end
+              end
+            ' <<< "$OUT" | tr -d "[:space:]")"
+          fi                               
+          echo "Source: $SRC"
+          echo "Version: ${V:-<none>}"
           echo "version=$V" >> "$GITHUB_OUTPUT"
 
       - name: Bump cask
+        if: ${{ steps.ver.outputs.version != '' }}
         run: |
           V="${{ steps.ver.outputs.version }}"
           echo "Bumping ab-download-manager to $V ..."
           brew bump-cask-pr --no-browse --version "$V" ab-download-manager
+
+      - name: Skip (No new version)
+        if: ${{ steps.ver.outputs.version == '' }}
+        run: echo "No newer version detected; nothing to bump."
