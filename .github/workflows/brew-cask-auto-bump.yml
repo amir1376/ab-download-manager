@@ -23,6 +23,7 @@ jobs:
             echo "/opt/homebrew/bin" >> "$GITHUB_PATH"
           fi
           brew update
+          brew tap amir1376/tap
 
       - name: Extract version
         id: ver
@@ -35,7 +36,7 @@ jobs:
             V="$TAG_VER"
           else
             SRC="livecheck"
-            OUT="$(brew livecheck --cask --json ab-download-manager || true)"
+            OUT="$(brew livecheck --cask --json amir1376/tap/ab-download-manager || true)"
             V="$(ruby -rjson -e '
               j = JSON.parse(STDIN.read) rescue []
               if j.is_a?(Array) && j[0] && j[0]["version"]
@@ -55,7 +56,7 @@ jobs:
         run: |
           V="${{ steps.ver.outputs.version }}"
           echo "Bumping ab-download-manager to $V ..."
-          brew bump-cask-pr --no-browse --version "$V" ab-download-manager
+          brew bump-cask-pr --no-browse --version "$V" amir1376/tap/ab-download-manager
 
       - name: Skip (No new version)
         if: ${{ steps.ver.outputs.version == '' }}
