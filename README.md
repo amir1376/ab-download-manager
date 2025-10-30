@@ -59,6 +59,12 @@ winget install amir1376.ABDownloadManager
 scoop install extras/abdownloadmanager
 ```
 
+#### Homebrew (for macOS)
+
+```bash
+brew tap amir1376/tap && brew install --cask ab-download-manager
+```
+
 ### Browser Extensions
 
 You can download the browser extension to integrate the app with your browser.
