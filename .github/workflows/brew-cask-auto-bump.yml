@@ -2,7 +2,7 @@ name: Auto bump ab-download-manager homebrew cask
 
 on:
   release:
-    types: [published]    
+    types: [released]    
   workflow_dispatch: {}     
   
 permissions:
@@ -16,13 +16,8 @@ jobs:
       HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
 
     steps:
-      - name: Prepare Homebrew environment
+      - name: Tap homebrew cask repo
         run: |
-          if ! command -v brew >/dev/null 2>&1; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            echo "/opt/homebrew/bin" >> "$GITHUB_PATH"
-          fi
-          brew update
           brew tap amir1376/tap
 
       - name: Extract version
