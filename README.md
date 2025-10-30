@@ -164,6 +164,10 @@ so on Crowdin. Here’s how:
 
 ## Contribution
 
+> ❌ **Important Notice:** The entire codebase is being completely rewritten. Pull requests are **not accepted** at this
+> time, as incoming changes may be lost or conflict heavily with ongoing refactoring. Please wait until the refactor is
+> complete before submitting any PRs.
+
 Contributions to this project are very welcome!
 
 If you want to contribute to this project, please read [Contributing Guide](CONTRIBUTING.md) first.

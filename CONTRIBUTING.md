@@ -1,5 +1,9 @@
 # Contributing to AB Download Manager
 
+> ❌ **Important Notice:** The entire codebase is being completely rewritten. Pull requests are **not accepted** at this
+> time, as incoming changes may be lost or conflict heavily with ongoing refactoring. Please wait until the refactor is
+> complete before submitting any PRs.
+
 Thank you for your interest in contributing to AB Download Manager! I appreciate any help you can offer.
 
 ## What Contributions Are Accepted?
