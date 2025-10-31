@@ -24,6 +24,9 @@ abstract class DownloadUiChecker<
     val credentials = MutableStateFlow(initialCredentials)
     val name = MutableStateFlow(initialName)
     val folder = MutableStateFlow(initialFolder)
+    
+    // Track if an initial name was provided to prevent overwriting it
+    private val hasInitialName = initialName.isNotEmpty()
 
 
     protected val linkChecker = linkCheckerFactory.createLinkChecker(credentials.value)
@@ -85,8 +88,11 @@ abstract class DownloadUiChecker<
 
         linkChecker.suggestedName
             .onEach {
-                it?.let { name ->
-                    this.name.update { name }
+                // Only update the name from link checker if no initial name was provided
+                if (!hasInitialName) {
+                    it?.let { name ->
+                        this.name.update { name }
+                    }
                 }
             }.launchIn(scope)
 
