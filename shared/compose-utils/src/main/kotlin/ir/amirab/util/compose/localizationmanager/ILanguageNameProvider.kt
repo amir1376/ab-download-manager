@@ -30,7 +30,7 @@ object LanguageNameProvider : ILanguageNameProvider {
         "br" to LanguageName("Brezhoneg", "Breton"),
         "bs" to LanguageName("Bosanski", "Bosnian"),
         "ca" to LanguageName("Català", "Catalan"),
-        "ckb" to LanguageName("کوردیی سۆرانی", "Kurdish (Sorani)"),
+        "ckb" to LanguageName("کوردیی ناوەندی", "Central Kurdish"),
         "cs" to LanguageName("Čeština", "Czech"),
         "cy" to LanguageName("Cymraeg", "Welsh"),
         "da" to LanguageName("Dansk", "Danish"),
