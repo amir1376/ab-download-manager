@@ -61,6 +61,7 @@ import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -174,11 +175,11 @@ class DownloadActions(
         },
         onActionPerformed = {
             scope.launch {
-                resumableSelections.value.forEach {
-                    runCatching {
+                resumableSelections.value.map {
+                    launch {
                         downloadSystem.manualResume(it.id)
                     }
-                }
+                }.joinAll()
             }
         }
     )
@@ -188,14 +189,12 @@ class DownloadActions(
         MyIcons.refresh
     ) {
         scope.launch {
-            selections.value.forEach {
-                scope.launch {
-                    runCatching {
-                        downloadSystem.reset(it.id)
-                        downloadSystem.manualResume(it.id)
-                    }
+            selections.value.map {
+                launch {
+                    downloadSystem.reset(it.id)
+                    downloadSystem.manualResume(it.id)
                 }
-            }
+            }.joinAll()
         }
     }
 
@@ -207,11 +206,11 @@ class DownloadActions(
         },
         onActionPerformed = {
             scope.launch {
-                pausableSelections.value.forEach {
-                    runCatching {
+                pausableSelections.value.map {
+                    launch {
                         downloadSystem.manualPause(it.id)
                     }
-                }
+                }.joinAll()
             }
         }
     )
@@ -684,14 +683,15 @@ class HomeComponent(
 
     fun confirmDelete(promptState: DeletePromptState) {
         scope.launch {
-            val selectionList = promptState.downloadList
-            for (id in selectionList) {
-                downloadSystem.removeDownload(
-                    id = id,
-                    alsoRemoveFile = promptState.alsoDeleteFile,
-                    context = RemovedBy(User),
-                )
-            }
+            promptState.downloadList.map { id ->
+                launch {
+                    downloadSystem.removeDownload(
+                        id = id,
+                        alsoRemoveFile = promptState.alsoDeleteFile,
+                        context = RemovedBy(User),
+                    )
+                }
+            }.joinAll()
         }
     }
 
