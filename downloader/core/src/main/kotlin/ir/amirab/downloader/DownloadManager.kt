@@ -16,11 +16,10 @@ import ir.amirab.util.FileNameValidator
 import ir.amirab.util.PathValidator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -324,10 +323,10 @@ class DownloadManager(
         downloadJobs.filter {
             it.status.value == DownloadJobStatus.Downloading
         }.map {
-            scope.async {
+            scope.launch {
                 pause(it.id, context)
             }
-        }.awaitAll()
+        }.joinAll()
     }
 
     fun getActiveCount(): Int {
