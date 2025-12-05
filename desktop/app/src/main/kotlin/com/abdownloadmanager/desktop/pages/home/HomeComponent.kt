@@ -177,7 +177,9 @@ class DownloadActions(
             scope.launch {
                 resumableSelections.value.map {
                     launch {
-                        downloadSystem.manualResume(it.id)
+                        runCatching {
+                            downloadSystem.manualResume(it.id)
+                        }
                     }
                 }.joinAll()
             }
