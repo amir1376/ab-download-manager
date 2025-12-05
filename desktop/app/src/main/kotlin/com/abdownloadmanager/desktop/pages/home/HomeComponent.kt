@@ -193,8 +193,10 @@ class DownloadActions(
         scope.launch {
             selections.value.map {
                 launch {
-                    downloadSystem.reset(it.id)
-                    downloadSystem.manualResume(it.id)
+                    runCatching {
+                        downloadSystem.reset(it.id)
+                        downloadSystem.manualResume(it.id)
+                    }
                 }
             }.joinAll()
         }
