@@ -14,10 +14,11 @@ class DownloadConflictDetector(
     private val downloadSystem: DownloadSystem
 ) : IDownloadConflictDetector<IDownloadItem> {
     override fun checkAlreadyExists(current: IDownloadItem, edited: IDownloadItem): Boolean {
+        val currentDownloadFile = downloadSystem.getDownloadFile(current)
         val editedDownloadFile = downloadSystem.getDownloadFile(edited)
         val alreadyExists = editedDownloadFile.exists()
         if (alreadyExists) {
-            return true
+            return !(currentDownloadFile.parentFile == editedDownloadFile.parentFile && currentDownloadFile.name.equals(editedDownloadFile.name, true))
         }
         return downloadSystem
             .getAllRegisteredDownloadFiles()
