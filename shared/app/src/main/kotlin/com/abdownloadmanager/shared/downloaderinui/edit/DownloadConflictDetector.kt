@@ -18,7 +18,10 @@ class DownloadConflictDetector(
         val editedDownloadFile = downloadSystem.getDownloadFile(edited)
         val alreadyExists = editedDownloadFile.exists()
         if (alreadyExists) {
-            return !(currentDownloadFile.parentFile == editedDownloadFile.parentFile && currentDownloadFile.name.equals(editedDownloadFile.name, true))
+            return !(
+                currentDownloadFile.parentFile?.canonicalPath == editedDownloadFile.parentFile?.canonicalPath &&
+                currentDownloadFile.name.equals(editedDownloadFile.name, true)
+            )
         }
         return downloadSystem
             .getAllRegisteredDownloadFiles()
