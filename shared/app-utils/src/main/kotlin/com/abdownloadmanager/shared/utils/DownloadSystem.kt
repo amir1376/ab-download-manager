@@ -24,6 +24,7 @@ import ir.amirab.downloader.utils.OnDuplicateStrategy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -169,9 +170,11 @@ class DownloadSystem(
     }
 
     suspend fun stopAnything() {
-        queueManager.getAll().forEach {
-            it.stop()
-        }
+        queueManager.getAll().map {
+            scope.launch {
+                it.stop()
+            }
+        }.joinAll()
         downloadManager.stopAll()
     }
 
