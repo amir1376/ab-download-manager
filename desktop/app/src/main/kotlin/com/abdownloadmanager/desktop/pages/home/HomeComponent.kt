@@ -212,7 +212,9 @@ class DownloadActions(
             scope.launch {
                 pausableSelections.value.map {
                     launch {
-                        downloadSystem.manualPause(it.id)
+                        runCatching {
+                            downloadSystem.manualPause(it.id)
+                        }
                     }
                 }.joinAll()
             }
