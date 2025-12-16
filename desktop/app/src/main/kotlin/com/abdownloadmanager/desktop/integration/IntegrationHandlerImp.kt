@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.integration
 
 import com.abdownloadmanager.desktop.AppComponent
-import com.abdownloadmanager.desktop.pages.addDownload.AddDownloadCredentialsInUiProps
-import com.abdownloadmanager.desktop.pages.addDownload.ImportOptions
-import com.abdownloadmanager.desktop.pages.addDownload.SilentImportOptions
+import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
+import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
+import com.abdownloadmanager.shared.pages.adddownload.SilentImportOptions
 import com.abdownloadmanager.desktop.repository.AppRepository
-import com.abdownloadmanager.shared.utils.DownloadSystem
+import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.integration.HttpDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.NewDownloadTask
@@ -15,7 +15,7 @@ import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
 import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
-import com.abdownloadmanager.shared.downloaderinui.hls.HLSDownloadCredentials
+import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials

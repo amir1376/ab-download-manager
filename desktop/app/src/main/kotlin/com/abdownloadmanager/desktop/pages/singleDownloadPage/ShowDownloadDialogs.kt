@@ -1,11 +1,11 @@
 package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
-import com.abdownloadmanager.desktop.DownloadDialogManager
+import com.abdownloadmanager.desktop.DesktopDownloadDialogManager
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
@@ -14,7 +14,8 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.singledownloadpage.BaseSingleDownloadComponent
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
@@ -47,7 +48,7 @@ class SingleProgressDownloadPageSizing {
 }
 
 @Composable
-fun ShowDownloadDialogs(component: DownloadDialogManager) {
+fun ShowDownloadDialogs(component: DesktopDownloadDialogManager) {
     val openedDownloadDialogs = component.openedDownloadDialogs.collectAsState().value
     for (singleDownloadComponent in openedDownloadDialogs) {
         key(singleDownloadComponent.downloadId) {
@@ -57,7 +58,7 @@ fun ShowDownloadDialogs(component: DownloadDialogManager) {
 }
 
 @Composable
-private fun ShowDownloadDialog(singleDownloadComponent: SingleDownloadComponent) {
+private fun ShowDownloadDialog(singleDownloadComponent: DesktopSingleDownloadComponent) {
     val itemState by singleDownloadComponent.itemStateFlow.collectAsState()
     itemState?.let {
         when (it) {
@@ -81,15 +82,20 @@ private fun ShowDownloadDialog(singleDownloadComponent: SingleDownloadComponent)
 
 @Composable
 private fun FrameWindowScope.CommonContent(
-    singleDownloadComponent: SingleDownloadComponent,
+    singleDownloadComponent: DesktopSingleDownloadComponent,
     state: WindowState,
     itemState: IDownloadItemState,
 ) {
     HandleEffects(singleDownloadComponent) {
         when (it) {
-            SingleDownloadEffects.BringToFront -> {
-                state.isMinimized = false
-                window.toFront()
+            is BaseSingleDownloadComponent.Effects.Platform -> {
+                it as DesktopSingleDownloadComponent.Effects
+                when (it) {
+                    DesktopSingleDownloadComponent.Effects.BringToFront -> {
+                        state.isMinimized = false
+                        window.toFront()
+                    }
+                }
             }
         }
     }
@@ -100,7 +106,7 @@ private fun FrameWindowScope.CommonContent(
 
 @Composable
 private fun CompletedWindow(
-    singleDownloadComponent: SingleDownloadComponent,
+    singleDownloadComponent: DesktopSingleDownloadComponent,
     itemState: CompletedDownloadItemState,
 ) {
     val onRequestClose = {
@@ -148,7 +154,7 @@ private fun CompletedWindow(
 
 @Composable
 private fun ProgressWindow(
-    singleDownloadComponent: SingleDownloadComponent,
+    singleDownloadComponent: DesktopSingleDownloadComponent,
     itemState: ProcessingDownloadItemState,
 ) {
     val onRequestClose = {

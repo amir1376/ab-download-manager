@@ -2,10 +2,10 @@ package com.abdownloadmanager.desktop.pages.addDownload.shared
 
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurable
 import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
-import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.utils.ui.WithContentColor
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.desktop.window.moveSafe
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -21,8 +21,10 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
 import com.abdownloadmanager.shared.ui.configurable.Configurable
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
+import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 import java.awt.MouseInfo
@@ -90,14 +92,16 @@ fun ExtraConfig(
                             for ((index, cfg) in configurables.withIndex()) {
                                 RenderConfigurable(
                                     cfg,
-                                    Modifier.padding(vertical = 8.dp, horizontal = 32.dp)
+                                    ConfigurableUiProps(
+                                        itemPaddingValues = PaddingValues(vertical = 8.dp, horizontal = 32.dp)
+                                    )
                                 )
                                 if (index != configurables.lastIndex) {
                                     Divider()
                                 }
                             }
                         }
-                        VerticalScrollbar(
+                        MultiplatformVerticalScrollbar(
                             rememberScrollbarAdapter(scrollState),
                             Modifier.fillMaxHeight()
                                 .align(Alignment.CenterEnd)

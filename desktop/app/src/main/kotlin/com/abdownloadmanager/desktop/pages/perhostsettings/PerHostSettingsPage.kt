@@ -6,8 +6,8 @@ import androidx.compose.animation.scaleOut
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -30,16 +30,17 @@ import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.pages.perhostsettings.PerHostSettingsItemWithId
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.*
 
 @Composable
-fun PerHostSettingsPage(component: PerHostSettingsComponent) {
+fun PerHostSettingsPage(component: DesktopPerHostSettingsComponent) {
     val perHostSettings by component.editedPerHostSettings.collectAsState()
     val selectedItemId by component.selectedId.collectAsState()
     WindowTitle(myStringResource(Res.string.settings_per_host_settings))
@@ -81,7 +82,7 @@ fun PerHostSettingsPage(component: PerHostSettingsComponent) {
 
 @Composable
 private fun Actions(
-    component: PerHostSettingsComponent,
+    component: DesktopPerHostSettingsComponent,
 ) {
     val canSave by component.canSave.collectAsState()
     val scope = rememberCoroutineScope()
@@ -162,7 +163,7 @@ private fun HostList(
     hosts: List<PerHostSettingsItemWithId>,
     selectedId: String?,
     setSelected: (String) -> Unit,
-    component: PerHostSettingsComponent,
+    component: DesktopPerHostSettingsComponent,
 ) {
     val shape = myShapes.defaultRounded
     val borderColor = myColors.surface / 0.5f

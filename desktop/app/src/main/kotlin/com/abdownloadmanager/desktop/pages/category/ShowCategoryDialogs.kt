@@ -9,11 +9,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.pages.category.CategoryComponent
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
-fun ShowCategoryDialogs(dialogManager: CategoryDialogManager) {
+fun ShowCategoryDialogs(dialogManager: DesktopCategoryDialogManager) {
     val dialogs by dialogManager.openedCategoryDialogs.collectAsState()
     for (d in dialogs) {
         CategoryDialog(d)

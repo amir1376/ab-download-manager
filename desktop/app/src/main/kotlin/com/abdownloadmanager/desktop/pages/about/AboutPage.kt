@@ -1,15 +1,12 @@
 package com.abdownloadmanager.desktop.pages.about
 
 import androidx.compose.foundation.*
-import com.abdownloadmanager.shared.utils.ui.LocalTextStyle
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.desktop.utils.AppInfo
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,25 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.SharedConstants
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import ir.amirab.util.ifThen
+import com.abdownloadmanager.shared.util.SharedConstants
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.Tooltip
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.ActionButton
-import com.abdownloadmanager.shared.utils.ui.LocalContentColor
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
+import com.abdownloadmanager.shared.ui.widget.LinkText
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.URLOpener
 import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.compose.IconSource
@@ -383,80 +374,6 @@ private fun BoxScope.BackgroundEffects() {
     )
 }
 
-
-@Composable
-fun LinkText(
-    text: String,
-    link: String,
-    modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE,
-    showExternalIndicator: Boolean = true,
-    overflow: TextOverflow = TextOverflow.Clip,
-) {
-    val handler = LocalUriHandler.current
-    val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
-    Row(
-        modifier
-            .pointerHoverIcon(PointerIcon.Hand)
-            .hoverable(interactionSource)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) {
-                handler.openUri(link)
-            }
-    ) {
-        Text(
-            text = text,
-            style = LocalTextStyle.current
-                .merge(LinkStyle).ifThen(isHovered) {
-                    copy(
-                        textDecoration = TextDecoration.Underline
-                    )
-                },
-            overflow = overflow,
-            maxLines = maxLines,
-        )
-        if (showExternalIndicator) {
-            MyIcon(
-                MyIcons.externalLink,
-                null,
-                Modifier.size(10.dp).alpha(
-                    if (isHovered) 0.75f
-                    else 0.5f
-                )
-            )
-        }
-    }
-}
-
-@Composable
-fun MaybeLinkText(
-    text: String,
-    link: String?,
-    modifier: Modifier = Modifier,
-    overflow: TextOverflow = TextOverflow.Clip,
-    maxLines: Int = Int.MAX_VALUE,
-) {
-    if (link == null) {
-        Text(
-            modifier = modifier,
-            text = text,
-            maxLines = maxLines,
-            overflow = overflow,
-        )
-    } else {
-        LinkText(
-            modifier = modifier,
-            text = text,
-            link = link,
-            maxLines = maxLines,
-            overflow = overflow
-        )
-    }
-}
-
 @Composable
 private fun DonateButton() {
     ActionButton(
@@ -476,9 +393,3 @@ private fun DonateButton() {
         }
     )
 }
-
-private val LinkStyle: TextStyle
-    @Composable
-    get() = TextStyle(
-        color = myColors.info,
-    )

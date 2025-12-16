@@ -1,8 +1,8 @@
 package com.abdownloadmanager.desktop.window.custom.titlebar.windows
 
-import com.abdownloadmanager.shared.utils.ui.LocalContentColor
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,8 +23,8 @@ import com.abdownloadmanager.desktop.window.custom.WindowToggleMaximizeTooltip
 import com.abdownloadmanager.desktop.window.custom.isWindowFocused
 import com.abdownloadmanager.desktop.window.custom.isWindowMaximized
 import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
 
 @Composable
 private fun SystemButton(

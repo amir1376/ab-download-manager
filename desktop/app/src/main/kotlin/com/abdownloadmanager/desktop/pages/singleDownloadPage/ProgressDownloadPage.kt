@@ -2,13 +2,13 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurable
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageSections.*
-import com.abdownloadmanager.shared.utils.ui.LocalContentColor
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -32,18 +31,21 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.rememberComponentRectPositionProvider
+import com.abdownloadmanager.shared.ui.widget.rememberMyComponentRectPositionProvider
 import com.abdownloadmanager.shared.ui.widget.*
-import com.abdownloadmanager.shared.ui.widget.customtable.CellSize
-import com.abdownloadmanager.shared.ui.widget.customtable.Table
-import com.abdownloadmanager.shared.ui.widget.customtable.TableCell
-import com.abdownloadmanager.shared.ui.widget.customtable.TableState
+import com.abdownloadmanager.shared.ui.widget.table.customtable.CellSize
+import com.abdownloadmanager.shared.ui.widget.table.customtable.Table
+import com.abdownloadmanager.shared.ui.widget.table.customtable.TableCell
+import com.abdownloadmanager.shared.ui.widget.table.customtable.TableState
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.LocalSizeUnit
-import com.abdownloadmanager.shared.utils.convertPositiveSizeToHumanReadable
-import com.abdownloadmanager.shared.utils.ui.useIsInDebugMode
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
+import com.abdownloadmanager.shared.singledownloadpage.SingleDownloadPagePropertyItem
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
+import com.abdownloadmanager.shared.util.LocalSizeUnit
+import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
+import com.abdownloadmanager.shared.util.ui.useIsInDebugMode
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.part.PartDownloadStatus
@@ -73,7 +75,10 @@ enum class SingleDownloadPageSections(
 private val tabs = entries.toList()
 
 @Composable
-fun ProgressDownloadPage(singleDownloadComponent: SingleDownloadComponent, itemState: ProcessingDownloadItemState) {
+fun ProgressDownloadPage(
+    singleDownloadComponent: DesktopSingleDownloadComponent,
+    itemState: ProcessingDownloadItemState
+) {
     var selectedTab by remember { mutableStateOf(Info) }
     val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
     val setShowPartInfo = singleDownloadComponent::setShowPartInfo
@@ -136,12 +141,9 @@ fun ProgressDownloadPage(singleDownloadComponent: SingleDownloadComponent, itemS
                         singleDownloadComponent = singleDownloadComponent,
                     )
                 }
-                VerticalScrollbar(
+                MultiplatformVerticalScrollbar(
                     adapter = rememberScrollbarAdapter(scrollState),
                     modifier = Modifier.matchParentSize().wrapContentWidth(Alignment.End),
-                    style = LocalScrollbarStyle.current.copy(
-                        shape = RectangleShape
-                    )
                 )
             }
         }
@@ -182,15 +184,18 @@ fun ProgressDownloadPage(singleDownloadComponent: SingleDownloadComponent, itemS
 private fun RenderSettings(
     modifier: Modifier,
     horizontalPadding: Dp,
-    singleDownloadComponent: SingleDownloadComponent,
+    singleDownloadComponent: DesktopSingleDownloadComponent,
 ) {
     Column(modifier) {
         for (configurable in singleDownloadComponent.settings) {
             RenderConfigurable(
-                configurable, Modifier
-                    // I'm using Configurable object which their renderer by default uses 8.dp, we want 16.dp, so I only add 8.dp here 16-8 == 8
-                    // I may improve this later
-                    .padding(horizontal = (horizontalPadding - 8.dp).coerceAtLeast(0.dp))
+                configurable,
+                ConfigurableUiProps(
+                    modifier = Modifier
+                        // I'm using Configurable object which their renderer by default uses 8.dp, we want 16.dp, so I only add 8.dp here 16-8 == 8
+                        // I may improve this later
+                        .padding(horizontal = (horizontalPadding - 8.dp).coerceAtLeast(0.dp))
+                )
             )
         }
     }
@@ -200,15 +205,17 @@ private fun RenderSettings(
 private fun RenderOnCompletion(
     modifier: Modifier,
     horizontalPadding: Dp,
-    singleDownloadComponent: SingleDownloadComponent,
+    singleDownloadComponent: DesktopSingleDownloadComponent,
 ) {
     Column(modifier) {
         for (configurable in singleDownloadComponent.onCompletion) {
             RenderConfigurable(
-                configurable, Modifier
-                    // I'm using Configurable object which their renderer by default uses 8.dp, we want 16.dp, so I only add 8.dp here 16-8 == 8
-                    // I may improve this later
-                    .padding(horizontal = (horizontalPadding - 8.dp).coerceAtLeast(0.dp))
+                configurable, ConfigurableUiProps(
+                    modifier = Modifier
+                        // I'm using Configurable object which their renderer by default uses 8.dp, we want 16.dp, so I only add 8.dp here 16-8 == 8
+                        // I may improve this later
+                        .padding(horizontal = (horizontalPadding - 8.dp).coerceAtLeast(0.dp))
+                )
             )
         }
     }
@@ -553,7 +560,7 @@ private fun RenderPropertyItem(propertyItem: SingleDownloadPagePropertyItem) {
 private fun RenderInfo(
     modifier: Modifier,
     horizontalPadding: Dp,
-    singleDownloadComponent: SingleDownloadComponent,
+    singleDownloadComponent: DesktopSingleDownloadComponent,
 ) {
     Column(
         modifier
@@ -570,7 +577,7 @@ private fun RenderInfo(
 @Composable
 private fun RenderActions(
     itemState: ProcessingDownloadItemState,
-    singleDownloadComponent: SingleDownloadComponent,
+    singleDownloadComponent: DesktopSingleDownloadComponent,
     showingPartInfo: Boolean,
     onRequestShowPartInfo: (show: Boolean) -> Unit,
 ) {
@@ -706,7 +713,7 @@ private fun ToggleButton(
                 showPromptOnNonePresumablePause = false
             }
             Popup(
-                popupPositionProvider = rememberComponentRectPositionProvider(
+                popupPositionProvider = rememberMyComponentRectPositionProvider(
                     offset = DpOffset.Zero,
                     anchor = Alignment.TopEnd,
                     alignment = Alignment.TopStart,

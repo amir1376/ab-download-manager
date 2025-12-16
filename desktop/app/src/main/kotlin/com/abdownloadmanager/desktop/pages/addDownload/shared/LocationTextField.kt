@@ -1,10 +1,10 @@
 package com.abdownloadmanager.desktop.pages.addDownload.shared
 
-import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPageTextField
-import com.abdownloadmanager.desktop.pages.addDownload.single.MyTextFieldIcon
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.ui.widget.MyTextFieldWithIcons
+import com.abdownloadmanager.shared.ui.widget.MyTextFieldIcon
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MyDropDown
 import androidx.compose.foundation.background
@@ -21,12 +21,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
-import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
-import io.github.vinceglb.filekit.core.FileKitPlatformSettings
-import ir.amirab.util.desktop.LocalWindow
+import com.abdownloadmanager.shared.ui.util.rememberMyDirectoryPickerLauncher
 import java.io.File
 
 @Composable
@@ -40,18 +38,16 @@ fun LocationTextField(
 ) {
     var showLastUsedLocations by remember { mutableStateOf(false) }
 
-    val downloadLauncherFolderPickerLauncher = rememberDirectoryPickerLauncher(
+    val downloadLauncherFolderPickerLauncher = rememberMyDirectoryPickerLauncher(
         title = myStringResource(Res.string.download_location),
         initialDirectory = remember(text) {
             runCatching {
                 File(text).canonicalPath
             }.getOrNull()
         },
-        platformSettings = FileKitPlatformSettings(
-            parentWindow = LocalWindow.current
-        )
+        attachToWindow = true
     ) { directory ->
-        directory?.path?.let(setText)
+        directory?.let(setText)
     }
 
     var widthForDropDown by remember {
@@ -59,7 +55,7 @@ fun LocationTextField(
     }
     val density = LocalDensity.current
     Box(modifier) {
-        AddDownloadPageTextField(
+        MyTextFieldWithIcons(
             text,
             setText,
             myStringResource(Res.string.location),

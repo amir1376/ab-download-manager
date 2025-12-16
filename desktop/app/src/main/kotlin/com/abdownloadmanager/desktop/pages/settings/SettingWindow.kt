@@ -1,19 +1,18 @@
 package com.abdownloadmanager.desktop.pages.settings
 
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.shared.settings.BaseSettingsComponent
 
 @Composable
 fun SettingWindow(
-    settingsComponent: SettingsComponent,
+    settingsComponent: DesktopSettingsComponent,
     onRequestCloseWindow: () -> Unit,
 ) {
     val windowState = rememberWindowState(
@@ -30,9 +29,13 @@ fun SettingWindow(
     }) {
         HandleEffects(settingsComponent) {
             when (it) {
-                SettingPageEffects.BringToFront -> {
-                    windowState.isMinimized = false
-                    window.toFront()
+                is BaseSettingsComponent.Effects.Platform -> {
+                    when (it as DesktopSettingsComponent.Effects) {
+                        DesktopSettingsComponent.Effects.BringToFront -> {
+                            windowState.isMinimized = false
+                            window.toFront()
+                        }
+                    }
                 }
             }
         }

@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.screen.applyUiScale
@@ -25,7 +25,7 @@ fun ShowAboutDialog(appComponent: AppComponent) {
                 appComponent.closeAbout()
             },
             onRequestShowOpenSourceLibraries = {
-                appComponent.openOpenSourceLibraries()
+                appComponent.openOpenSourceLibrariesPage()
             },
             onRequestShowTranslators = {
                 appComponent.openTranslatorsPage()

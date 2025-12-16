@@ -4,9 +4,13 @@ import arrow.optics.Lens
 import arrow.optics.optics
 import ir.amirab.util.config.MapConfig
 import ir.amirab.util.config.booleanKeyOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 
+interface SingleDownloadPageStateStorage {
+    val singleDownloadPageState: MutableStateFlow<SingleDownloadPageStateToPersist>
+}
 @optics
 @Serializable
 data class SingleDownloadPageStateToPersist(

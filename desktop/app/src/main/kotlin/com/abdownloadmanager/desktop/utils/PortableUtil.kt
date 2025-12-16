@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.utils
 
-import com.abdownloadmanager.desktop.SharedConstants
+import com.abdownloadmanager.shared.util.SharedConstants
 import java.io.File
 
 object PortableUtil {

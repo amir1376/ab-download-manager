@@ -1,12 +1,12 @@
 package com.abdownloadmanager.desktop.pages.settings
 
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.ui.widget.Handle
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.animation.AnimatedContent
@@ -29,16 +29,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.needScroll
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
+import com.abdownloadmanager.shared.util.ui.needScroll
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 
 @Composable
 private fun SideBar(
-    settingsComponent: SettingsComponent,
+    settingsComponent: DesktopSettingsComponent,
     modifier: Modifier = Modifier,
 ) {
     val shape = myShapes.defaultRounded
@@ -54,13 +56,14 @@ private fun SideBar(
 //            onTextChange = { searchText = it },
 //            modifier = Modifier.height(38.dp),
 //        )
+        val collectAsState by settingsComponent.currentPage.collectAsState()
         for (i in settingsComponent.pages) {
             SideBarItem(
                 icon = i.icon,
                 name = i.name.rememberString(),
-                isSelected = settingsComponent.currentPage == i,
+                isSelected = collectAsState == i,
                 onClick = {
-                    settingsComponent.currentPage = i
+                    settingsComponent.setCurrentPage(i)
                 }
             )
         }
@@ -154,7 +157,7 @@ private fun SideBarItem(icon: IconSource, name: String, isSelected: Boolean, onC
 
 @Composable
 fun SettingsPage(
-    settingsComponent: SettingsComponent,
+    settingsComponent: DesktopSettingsComponent,
     onDismissRequest: () -> Unit,
 ) {
     WindowTitle(myStringResource(Res.string.settings))
@@ -176,7 +179,7 @@ fun SettingsPage(
                     .width(sideBarWidth)
                     .padding(8.dp)
             )
-            val currentConfigurables = settingsComponent.configurables
+            val currentConfigurables by settingsComponent.configurables.collectAsState()
             Handle(
                 Modifier.width(5.dp).fillMaxHeight(),
                 orientation = Orientation.Horizontal
@@ -209,7 +212,7 @@ fun SettingsPage(
                         }
                     }
                     if (scrollbarAdapter.needScroll()) {
-                        VerticalScrollbar(
+                        MultiplatformVerticalScrollbar(
                             adapter = scrollbarAdapter,
                             modifier = Modifier
                                 .padding(vertical = 8.dp)

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,27 +30,27 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberDialogState
-import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPageTextField
-import com.abdownloadmanager.desktop.pages.addDownload.single.MyTextFieldIcon
-import com.abdownloadmanager.desktop.utils.ClipboardUtil
+import com.abdownloadmanager.shared.ui.widget.MyTextFieldWithIcons
+import com.abdownloadmanager.shared.ui.widget.MyTextFieldIcon
+import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
 import com.abdownloadmanager.desktop.window.moveSafe
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.TADownloaderInUI
+import com.abdownloadmanager.shared.pages.enterurl.DownloaderSelection
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
-import com.abdownloadmanager.shared.utils.ui.WithContentColor
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
 import java.awt.MouseInfo
 
 @Composable
-fun EnterNewURLPage(component: EnterNewURLComponent) {
+fun EnterNewURLPage(component: DesktopEnterNewURLComponent) {
     val linkFocus = remember { FocusRequester() }
     LaunchedEffect(Unit) {
         linkFocus.requestFocus()
@@ -100,7 +99,7 @@ fun EnterNewURLPage(component: EnterNewURLComponent) {
 
 @Composable
 private fun DownloaderSelectionSection(
-    component: EnterNewURLComponent,
+    component: DesktopEnterNewURLComponent,
 ) {
     val downloaderSelection = component.downloaderSelection.collectAsState().value
     val bestDownloader = component.bestDownloader.collectAsState().value
@@ -214,7 +213,7 @@ private fun rememberDownloaderSelectionItemString(
 
 @Composable
 private fun Actions(
-    component: EnterNewURLComponent,
+    component: DesktopEnterNewURLComponent,
 ) {
     ActionButton(
         myStringResource(Res.string.ok),
@@ -237,7 +236,7 @@ private fun UrlTextField(
     errorText: String? = null,
     modifier: Modifier = Modifier,
 ) {
-    AddDownloadPageTextField(
+    MyTextFieldWithIcons(
         text,
         setText,
         myStringResource(Res.string.download_link),

@@ -12,23 +12,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.pages.addDownload.single.MyTextFieldIcon
+import com.abdownloadmanager.shared.ui.widget.MyTextFieldIcon
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.*
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import ir.amirab.util.ifThen
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
-import io.github.vinceglb.filekit.core.FileKitPlatformSettings
+import com.abdownloadmanager.shared.pages.category.CategoryComponent
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.LocalWindow
+import com.abdownloadmanager.shared.ui.util.rememberMyDirectoryPickerLauncher
 import java.io.File
 
 @Composable
@@ -131,14 +130,12 @@ fun CategoryDefaultPath(
                 }.getOrNull()
             } ?: defaultDownloadLocation
     }
-    val downloadFolderPickerLauncher = rememberDirectoryPickerLauncher(
+    val downloadFolderPickerLauncher = rememberMyDirectoryPickerLauncher(
         title = myStringResource(Res.string.category_download_location),
         initialDirectory = initialDirectory,
-        platformSettings = FileKitPlatformSettings(
-            parentWindow = LocalWindow.current
-        )
+        attachToWindow = true
     ) { directory ->
-        directory?.path?.let(onPathChanged)
+        directory?.let(onPathChanged)
     }
 
     OptionalWithLabel(

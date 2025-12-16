@@ -3,16 +3,17 @@ package com.abdownloadmanager.desktop.actions.onevennts
 import com.abdownloadmanager.desktop.PowerActionManager
 import ir.amirab.util.desktop.poweraction.PowerActionConfig
 import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
-import com.abdownloadmanager.desktop.storage.ExtraDownloadSettingsStorage
-import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionAction
-import com.abdownloadmanager.shared.utils.ondownloadcompletion.OnDownloadCompletionActionProvider
+import com.abdownloadmanager.desktop.storage.DesktopExtraDownloadItemSettings
+import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
+import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionAction
+import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionProvider
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.getValue
 
 class DesktopOnDownloadCompletionActionProvider(
-    private val extraDownloadSettingsStorage: ExtraDownloadSettingsStorage,
+    private val extraDownloadSettingsStorage: ExtraDownloadSettingsStorage<DesktopExtraDownloadItemSettings>,
 ) : OnDownloadCompletionActionProvider, KoinComponent {
     // TODO: BUG
     // at the moment if I move this to constructor the DI halts
@@ -46,10 +47,3 @@ class PowerActionOnDownloadFinish(
     }
 }
 
-class CleanExtraSettingsOnDownloadFinish(
-    private val storage: ExtraDownloadSettingsStorage
-) : OnDownloadCompletionAction {
-    override suspend fun onDownloadCompleted(downloadItem: IDownloadItem) {
-        storage.deleteExtraDownloadItemSettings(downloadItem.id)
-    }
-}

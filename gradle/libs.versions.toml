@@ -1,7 +1,8 @@
 [versions]
-kotlin = "2.2.20"
-ksp = "2.2.20-2.0.4"
-compose = "1.9.1"
+fastscrollerCore = "0.3.2"
+kotlin = "2.2.21"
+ksp = "2.3.3"
+compose = "1.9.3"
 ktorVersion = "2.3.7"
 kotlin-serialization = "1.9.0"
 okhttp = "5.2.1"
@@ -32,6 +33,11 @@ autoService = "1.1.1"
 proxyVole = "1.1.7"
 jbrApi = "1.9.0"
 gradleVersions = "0.53.0"
+handlebars = "4.5.0"
+
+agp = "8.12.3"
+androidx-core = "1.17.0"
+androidx-activity-compose = "1.11.0"
 
 [libraries]
 
@@ -74,6 +80,8 @@ kotlin-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-s
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 composeFileKit = { module = "io.github.vinceglb:filekit-compose", version.ref = "fileKit" }
 
+fastscroller-core = { module = "io.github.oikvpqya.compose.fastscroller:fastscroller-core", version.ref = "fastscrollerCore" }
+
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktorVersion" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktorVersion" }
@@ -108,7 +116,7 @@ aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", versi
 
 jna-core = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
-
+pluginAndroidGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 pluginComposeMultiplatform = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
 pluginComposeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 pluginKotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -123,10 +131,13 @@ arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
 arrow-opticKsp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref = "arrow" }
 
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+
 osThemeDetector = { module = "com.github.Dansoftowner:jSystemThemeDetector", version.ref = "osThemeDetector" }
 markdownRenderer-core = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdownRenderer" }
-handlebarsJava = "com.github.jknack:handlebars:4.4.0"
+handlebarsJava = { module = "com.github.jknack:handlebars", version.ref = "handlebars" }
 
 kotlinFileWatcher = { module = "io.github.irgaly.kfswatch:kfswatch", version.ref = "kotlinFileWatcher" }
 

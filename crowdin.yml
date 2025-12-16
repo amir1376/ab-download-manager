@@ -5,7 +5,7 @@
 "preserve_hierarchy": true
 files: [
   {
-    "source": "/shared/resources/src/main/resources/com/abdownloadmanager/resources/locales/en_US.properties",
-    "translation": "/shared/resources/src/main/resources/com/abdownloadmanager/resources/locales/%locale_with_underscore%.properties",
+      "source": "/shared/resources/src/commonMain/resources/com/abdownloadmanager/resources/locales/en_US.properties",
+      "translation": "/shared/resources/src/commonMain/resources/com/abdownloadmanager/resources/locales/%locale_with_underscore%.properties",
   }
 ]

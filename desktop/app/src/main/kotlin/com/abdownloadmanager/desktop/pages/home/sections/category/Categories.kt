@@ -9,12 +9,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.ExpandableItem
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.onClick
@@ -38,65 +37,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.home.dropDownloadItemsHere
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.pages.home.category.DownloadStatusCategoryFilter
 import com.abdownloadmanager.shared.ui.widget.DelayedTooltipPopup
-import com.abdownloadmanager.shared.utils.category.Category
-import com.abdownloadmanager.shared.utils.category.rememberIconPainter
-import ir.amirab.downloader.downloaditem.DownloadStatus
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.statusOrFinished
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.abdownloadmanager.shared.util.category.Category
+import com.abdownloadmanager.shared.util.category.rememberIconPainter
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
-
-class DownloadStatusCategoryFilterByList(
-    name: StringSource,
-    icon: IconSource,
-    val acceptedStatus: List<DownloadStatus>,
-) : DownloadStatusCategoryFilter(name, icon) {
-    override fun accept(iDownloadStatus: IDownloadItemState): Boolean {
-        return iDownloadStatus
-            .statusOrFinished()
-            .asDownloadStatus() in acceptedStatus
-    }
-}
-
-abstract class DownloadStatusCategoryFilter(
-    val name: StringSource,
-    val icon: IconSource,
-) {
-    abstract fun accept(iDownloadStatus: IDownloadItemState): Boolean
-}
-
-object DefinedStatusCategories {
-    fun values() = listOf(All, Finished, Unfinished)
-
-
-    val All = object : DownloadStatusCategoryFilter(
-        Res.string.all.asStringSource(),
-        MyIcons.folder,
-    ) {
-        override fun accept(iDownloadStatus: IDownloadItemState): Boolean = true
-    }
-    val Finished = DownloadStatusCategoryFilterByList(
-        Res.string.finished.asStringSource(),
-        MyIcons.folder,
-        listOf(DownloadStatus.Completed)
-    )
-    val Unfinished = DownloadStatusCategoryFilterByList(
-        Res.string.Unfinished.asStringSource(),
-        MyIcons.folder,
-        listOf(
-            DownloadStatus.Error,
-            DownloadStatus.Added,
-            DownloadStatus.Paused,
-            DownloadStatus.Downloading,
-        )
-    )
-}
 
 
 @Composable

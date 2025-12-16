@@ -1,15 +1,15 @@
 package com.abdownloadmanager.desktop.pages.home
 
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import ir.amirab.util.ifThen
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MyDropDown
 import com.abdownloadmanager.shared.ui.widget.menu.custom.SubMenu
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import com.abdownloadmanager.shared.utils.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentColor
 import ir.amirab.util.compose.action.MenuItem
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.div
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import com.abdownloadmanager.shared.ui.widget.Text
@@ -19,6 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.widget.Tooltip
+import com.abdownloadmanager.shared.util.ui.LocalMultiplatformScrollbarStyle
+import com.abdownloadmanager.shared.util.ui.MultiplatformHorizontalScrollbar
+import com.abdownloadmanager.shared.util.ui.needScroll
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 
@@ -59,21 +62,14 @@ fun Actions(
         }
         val adapter = rememberScrollbarAdapter(scrollState)
         if (adapter.needScroll()) {
-            HorizontalScrollbar(
+            MultiplatformHorizontalScrollbar(
                 adapter = adapter,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 2.dp),
-                style = LocalScrollbarStyle.current.copy(
-                    thickness = 6.dp
-                ),
             )
         }
     }
-}
-
-private fun androidx.compose.foundation.v2.ScrollbarAdapter.needScroll(): Boolean {
-    return contentSize > viewportSize
 }
 
 @Composable

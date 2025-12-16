@@ -11,24 +11,25 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.desktop.AddDownloadDialogManager
-import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiDownloadComponent
+import com.abdownloadmanager.desktop.DesktopAddDownloadDialogManager
+import com.abdownloadmanager.desktop.pages.addDownload.multiple.DesktopAddMultiDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemPage
 import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPage
-import com.abdownloadmanager.desktop.pages.addDownload.single.AddSingleDownloadComponent
+import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.PlatformAppActivator
 import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 
 @Composable
-fun ShowAddDownloadDialogs(component: AddDownloadDialogManager) {
+fun ShowAddDownloadDialogs(component: DesktopAddDownloadDialogManager) {
     val openedAddDownloadDialogs = component.openedAddDownloadDialogs.collectAsState().value
     for (addDownloadComponent in openedAddDownloadDialogs) {
         key(addDownloadComponent.id) {
@@ -51,7 +52,7 @@ private fun AddDownloadWindow(
     if (!shouldShowWindow) return
     val uiScale = LocalUiScale.current
     when (addDownloadComponent) {
-        is AddSingleDownloadComponent -> {
+        is BaseAddSingleDownloadComponent -> {
             val h = 265.applyUiScale(uiScale)
             val w = 500.applyUiScale(uiScale)
             val size = remember {
@@ -81,7 +82,7 @@ private fun AddDownloadWindow(
             }
         }
 
-        is AddMultiDownloadComponent -> {
+        is DesktopAddMultiDownloadComponent -> {
             val h = 450
             val w = 800
             val state = rememberWindowState(

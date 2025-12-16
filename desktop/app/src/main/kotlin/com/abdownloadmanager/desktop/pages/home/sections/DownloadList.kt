@@ -1,15 +1,15 @@
 package com.abdownloadmanager.desktop.pages.home.sections
 
-import com.abdownloadmanager.shared.utils.DOUBLE_CLICK_DELAY
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.util.DOUBLE_CLICK_DELAY
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.ui.widget.customtable.Table
-import com.abdownloadmanager.shared.ui.widget.customtable.styled.MyStyledTableHeader
+import com.abdownloadmanager.shared.ui.widget.table.customtable.Table
+import com.abdownloadmanager.shared.ui.widget.table.customtable.styled.MyStyledTableHeader
 import com.abdownloadmanager.shared.ui.widget.menu.custom.LocalMenuDisabledItemBehavior
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuDisabledItemBehavior
-import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInDropDown
+import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInPopup
 import ir.amirab.util.compose.action.MenuItem
 import androidx.compose.foundation.*
 import androidx.compose.foundation.draganddrop.dragAndDropSource
@@ -29,12 +29,16 @@ import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.home.DownloadItemTransferable
-import com.abdownloadmanager.shared.ui.widget.customtable.*
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.FileIconProvider
-import com.abdownloadmanager.shared.utils.category.CategoryManager
-import com.abdownloadmanager.shared.utils.category.rememberCategoryOf
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
+import com.abdownloadmanager.shared.ui.widget.table.customtable.CellSize
+import com.abdownloadmanager.shared.ui.widget.table.customtable.CustomCellRenderer
+import com.abdownloadmanager.shared.ui.widget.table.customtable.SortableCell
+import com.abdownloadmanager.shared.ui.widget.table.customtable.TableCell
+import com.abdownloadmanager.shared.ui.widget.table.customtable.TableState
+import com.abdownloadmanager.shared.util.FileIconProvider
+import com.abdownloadmanager.shared.util.category.CategoryManager
+import com.abdownloadmanager.shared.util.category.rememberCategoryOf
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.StringSource
@@ -413,7 +417,7 @@ fun ShowDownloadOptions(
         CompositionLocalProvider(
             LocalMenuDisabledItemBehavior provides MenuDisabledItemBehavior.LowerOpacity
         ) {
-            ShowOptionsInDropDown(options, onDismiss)
+            ShowOptionsInPopup(options, onDismiss)
         }
     }
 }

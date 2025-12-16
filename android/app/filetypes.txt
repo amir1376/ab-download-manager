@@ -1,0 +1,108 @@
+# music / audio
+mp3
+aac
+m4a
+wav
+flac
+ogg
+wma
+amr
+opus
+mid
+
+# video
+mp4
+mkv
+avi
+mov
+3gp
+webm
+wmv
+flv
+mpeg
+mpg
+m4v
+ts
+
+# image
+jpg
+jpeg
+png
+gif
+bmp
+webp
+svg
+tiff
+ico
+heic
+raw
+
+# documents / text formats
+pdf
+txt
+doc
+docx
+xls
+xlsx
+ppt
+pptx
+rtf
+odt
+ods
+odp
+csv
+json
+xml
+yaml
+yml
+ini
+cfg
+md
+log
+
+# compressed
+zip
+rar
+7z
+tar
+gz
+bz2
+xz
+iso
+
+# executables
+exe
+msi
+apk
+jar
+bat
+cmd
+sh
+deb
+rpm
+
+# fonts
+ttf
+otf
+woff
+woff2
+
+# ebooks
+epub
+mobi
+azw3
+djvu
+
+# subtitles
+srt
+ass
+vtt
+
+# design / creative
+psd
+ai
+eps
+
+# miscellaneous
+dat
+bin

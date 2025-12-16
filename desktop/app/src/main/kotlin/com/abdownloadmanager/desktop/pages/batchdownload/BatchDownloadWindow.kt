@@ -7,25 +7,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.shared.utils.ui.theme.LocalUiScale
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
+import com.abdownloadmanager.shared.pages.batchdownload.BaseBatchDownloadComponent
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
-fun BatchDownloadWindow(batchDownloadComponent: BatchDownloadComponent) {
+fun BatchDownloadWindow(desktopBatchDownloadComponent: DesktopBatchDownloadComponent) {
     CustomWindow(
         state = rememberWindowState(
             size = DpSize(500.dp, 420.dp)
                 .applyUiScale(LocalUiScale.current),
             position = WindowPosition(Alignment.Center)
         ),
-        onCloseRequest = batchDownloadComponent.onClose
+        onCloseRequest = desktopBatchDownloadComponent.onClose
     ) {
-        HandleEffects(batchDownloadComponent) {
+        HandleEffects(desktopBatchDownloadComponent) {
             when (it) {
-                BatchDownloadEffects.BringToFront -> window.toFront()
+                DesktopBatchDownloadComponent.Effects.BringToFront -> window.toFront()
+                is BaseBatchDownloadComponent.Effects.PlatformEffects -> {
+                    //
+                }
             }
         }
-        BatchDownload(batchDownloadComponent)
+        BatchDownload(desktopBatchDownloadComponent)
     }
 }

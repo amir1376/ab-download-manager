@@ -1,7 +1,6 @@
 package com.abdownloadmanager.desktop.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,7 +23,7 @@ import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.enterurl.EnterNewDownloadWindow
 import com.abdownloadmanager.desktop.pages.extenallibs.ShowOpenSourceLibraries
-import com.abdownloadmanager.desktop.pages.filehash.FileChecksumWindow
+import com.abdownloadmanager.desktop.pages.checksum.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
 import com.abdownloadmanager.desktop.pages.perhostsettings.PerHostSettingsWindow
@@ -35,20 +34,24 @@ import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionAlert
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialogs
 import com.abdownloadmanager.desktop.pages.updater.ShowUpdaterDialog
+import com.abdownloadmanager.desktop.ui.configurable.comon.CommonConfigurableRenderersForDesktop
+import com.abdownloadmanager.desktop.ui.configurable.platform.PlatformConfigurableRenderersForDesktop
 import com.abdownloadmanager.desktop.ui.widget.ShowMessageDialogs
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
 import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
 import com.abdownloadmanager.desktop.utils.isInDebugMode
+import com.abdownloadmanager.shared.ui.ProvideCommonSettings
+import com.abdownloadmanager.shared.ui.ProvideSizeUnits
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableRendererRegistry
 import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
+import com.abdownloadmanager.shared.ui.widget.NotificationManager
 import com.abdownloadmanager.shared.ui.widget.ProvideLanguageManager
 import com.abdownloadmanager.shared.ui.widget.ProvideNotificationManager
 import com.abdownloadmanager.shared.ui.widget.useNotification
-import com.abdownloadmanager.shared.utils.LocalUseRelativeDateTime
-import com.abdownloadmanager.shared.utils.ProvideSizeAndSpeedUnit
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
-import com.abdownloadmanager.shared.utils.ui.ProvideDebugInfo
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.ProvideDebugInfo
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
@@ -74,6 +77,7 @@ object Ui : KoinComponent {
         val themeManager: ThemeManager = get()
         val fontManager: FontManager = get()
         val languageManager: LanguageManager = get()
+        val notificationManager: NotificationManager = get()
         themeManager.boot()
         fontManager.boot()
         languageManager.boot()
@@ -99,6 +103,7 @@ object Ui : KoinComponent {
                 themeManager = themeManager,
                 fontManager = fontManager,
                 globalAppExceptionHandler = globalAppExceptionHandler,
+                notificationManager = notificationManager,
             ) {
                 HandleEffectsForApp(appComponent)
                 SystemTray(appComponent)
@@ -152,22 +157,39 @@ private fun ProvideLocalProviders(
     themeManager: ThemeManager,
     fontManager: FontManager,
     appComponent: AppComponent,
+    notificationManager: NotificationManager,
     globalAppExceptionHandler: GlobalAppExceptionHandler,
     content: @Composable () -> Unit
 ) {
     val theme by themeManager.currentThemeColor.collectAsState()
     val fontFamily by fontManager.currentFontFamily.collectAsState()
+    val configurableRendererRegistry = remember {
+        ConfigurableRendererRegistry {
+            listOf(
+                PlatformConfigurableRenderersForDesktop,
+                CommonConfigurableRenderersForDesktop,
+            ).forEach {
+                it.getAllRenderers().forEach { (key, renderer) ->
+                    this.register(key, renderer)
+                }
+            }
+        }
+    }
     ProvideDebugInfo(AppInfo.isInDebugMode()) {
         ProvideLanguageManager(languageManager) {
-            ProvideCommonSettings(appComponent) {
-                ProvideNotificationManager {
+            ProvideCommonSettings(
+                appSettings = appComponent.appSettings,
+                configurableRendererRegistry = configurableRendererRegistry,
+                iconProvider = appComponent.iconFromUriResolver
+            ) {
+                ProvideNotificationManager(notificationManager) {
                     ABDownloaderTheme(
                         myColors = theme,
                         fontFamily = fontFamily,
                         uiScale = appComponent.uiScale.collectAsState().value
                     ) {
                         ProvideGlobalExceptionHandler(globalAppExceptionHandler) {
-                            ProvideSizeUnits(appComponent) {
+                            ProvideSizeUnits(appComponent.appRepository) {
                                 content()
                             }
                         }
@@ -176,31 +198,6 @@ private fun ProvideLocalProviders(
             }
         }
     }
-}
-
-@Composable
-private fun ProvideCommonSettings(
-    appComponent: AppComponent,
-    content: @Composable () -> Unit,
-) {
-    val useNativeDateTime by appComponent.appSettings.useRelativeDateTime.collectAsState()
-    CompositionLocalProvider(
-        LocalUseRelativeDateTime provides useNativeDateTime
-    ) {
-        content()
-    }
-}
-
-@Composable
-private fun ProvideSizeUnits(
-    component: AppComponent,
-    content: @Composable () -> Unit,
-) {
-    ProvideSizeAndSpeedUnit(
-        sizeUnitConfig = component.appRepository.sizeUnit.collectAsState().value,
-        speedUnitConfig = component.appRepository.speedUnit.collectAsState().value,
-        content = content
-    )
 }
 
 @Composable

@@ -12,8 +12,9 @@ import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunni
 import com.abdownloadmanager.desktop.utils.singleInstance.MutableSingleInstanceServerHandler
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
 import com.abdownloadmanager.integration.Integration
-import com.abdownloadmanager.shared.utils.DownloadSystem
-import com.abdownloadmanager.shared.utils.appinfo.PreviousVersion
+import com.abdownloadmanager.shared.util.AppVersion
+import com.abdownloadmanager.shared.util.DownloadSystem
+import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.runBlocking
@@ -78,7 +79,7 @@ fun main(args: Array<String>) {
         if (appArguments.version) {
             dispatchVersionAndExit()
         }
-        val singleInstance = SingleInstanceUtil(AppInfo.configDir.toOkioPath())
+        val singleInstance = SingleInstanceUtil(AppInfo.definedPaths.configDir)
         if (appArguments.exit) {
             exitExistingProcessAndExit(singleInstance)
         }

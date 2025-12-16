@@ -1,11 +1,33 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    id(MyPlugins.kotlin)
+    id(MyPlugins.kotlinMultiplatform)
     id(Plugins.Kotlin.serialization)
-    id(MyPlugins.composeDesktop)
+    id(MyPlugins.composeBase)
+    id(Plugins.Android.library)
 }
-dependencies {
-    implementation(project(":downloader:core"))
-    implementation(project(":shared:utils"))
-    implementation(libs.kotlin.coroutines.core)
-    implementation(compose.runtime)
+kotlin {
+    jvm("desktop")
+    androidTarget("android") {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(project(":downloader:core"))
+                implementation(project(":shared:utils"))
+                implementation(libs.kotlin.coroutines.core)
+                implementation(compose.runtime)
+            }
+        }
+    }
+}
+android {
+    compileSdk = 36
+    namespace = "ir.amirab.downloader.monitor"
+    defaultConfig {
+        minSdk = 26
+    }
 }

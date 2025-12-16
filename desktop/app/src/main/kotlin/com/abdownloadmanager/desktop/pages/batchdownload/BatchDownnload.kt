@@ -18,18 +18,21 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.batchdownload.WildcardSelect.*
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.*
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import ir.amirab.util.ifThen
-import com.abdownloadmanager.desktop.utils.ClipboardUtil
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.ClipboardUtil
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.ui.LocalContentColor
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
-import com.abdownloadmanager.shared.utils.ui.theme.myShapes
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.pages.batchdownload.BatchDownloadValidationResult
+import com.abdownloadmanager.shared.pages.batchdownload.WildcardLength
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
+import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
@@ -37,7 +40,7 @@ import ir.amirab.util.compose.asStringSource
 
 @Composable
 fun BatchDownload(
-    component: BatchDownloadComponent,
+    component: DesktopBatchDownloadComponent,
 ) {
     WindowTitle(myStringResource(Res.string.batch_download))
     val link by component.link.collectAsState()
@@ -182,7 +185,7 @@ fun BatchDownload(
                     }
                 )
             }
-            VerticalScrollbar(scrollAdapter, Modifier.fillMaxHeight())
+            MultiplatformVerticalScrollbar(scrollAdapter, Modifier.fillMaxHeight())
         }
         Spacer(Modifier.height(8.dp))
         Row(

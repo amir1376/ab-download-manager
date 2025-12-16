@@ -20,7 +20,7 @@ import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
 import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonsPosition
 import com.abdownloadmanager.desktop.window.custom.titlebar.Title
 import com.abdownloadmanager.desktop.window.custom.titlebar.TitleBar
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import ir.amirab.util.compose.layout.RelativeAlignment
 import ir.amirab.util.ifThen
 import kotlin.math.roundToInt

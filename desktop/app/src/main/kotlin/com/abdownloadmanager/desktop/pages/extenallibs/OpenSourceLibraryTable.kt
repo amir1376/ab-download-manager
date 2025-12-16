@@ -1,8 +1,8 @@
 package com.abdownloadmanager.desktop.pages.extenallibs
 
-import com.abdownloadmanager.shared.ui.widget.customtable.CellSize
-import com.abdownloadmanager.shared.ui.widget.customtable.SortableCell
-import com.abdownloadmanager.shared.ui.widget.customtable.TableCell
+import com.abdownloadmanager.shared.ui.widget.table.customtable.CellSize
+import com.abdownloadmanager.shared.ui.widget.table.customtable.SortableCell
+import com.abdownloadmanager.shared.ui.widget.table.customtable.TableCell
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
 import com.mikepenz.aboutlibraries.entity.Library

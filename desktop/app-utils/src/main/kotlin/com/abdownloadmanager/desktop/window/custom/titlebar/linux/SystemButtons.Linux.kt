@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.window.custom.titlebar.linux
 
 import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.utils.ui.widget.MyIcon
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.hoverable
@@ -24,9 +24,9 @@ import com.abdownloadmanager.desktop.window.custom.isWindowFocused
 import com.abdownloadmanager.desktop.window.custom.isWindowMaximized
 import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType
 import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonType.*
-import com.abdownloadmanager.shared.utils.div
-import com.abdownloadmanager.shared.utils.ui.icon.MyIcons
-import com.abdownloadmanager.shared.utils.ui.myColors
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
 
 @Composable
 private fun SystemButton(

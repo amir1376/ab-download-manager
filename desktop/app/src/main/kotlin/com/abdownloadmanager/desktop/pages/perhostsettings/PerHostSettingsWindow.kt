@@ -8,8 +8,9 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.shared.utils.mvi.HandleEffects
-import com.abdownloadmanager.shared.utils.rememberChild
+import com.abdownloadmanager.shared.pages.perhostsettings.BasePerHostSettingsComponent
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.rememberChild
 
 @Composable
 fun PerHostSettingsWindow(
@@ -30,9 +31,13 @@ fun PerHostSettingsWindow(
         ) {
             HandleEffects(component) {
                 when (it) {
-                    PerHostSettingsComponentEffects.BringToFront -> {
-                        windowState.isMinimized = false
-                        window.toFront()
+                    is BasePerHostSettingsComponent.Effects.Platform -> {
+                        when (it as DesktopPerHostSettingsComponent.Effects) {
+                            DesktopPerHostSettingsComponent.Effects.BringToFront -> {
+                                windowState.isMinimized = false
+                                window.toFront()
+                            }
+                        }
                     }
                 }
             }

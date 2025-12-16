@@ -8,25 +8,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.di.Di
-import com.abdownloadmanager.desktop.pages.about.MaybeLinkText
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
-import com.abdownloadmanager.shared.ui.widget.ActionButton
+import com.abdownloadmanager.shared.ui.widget.MaybeLinkText
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.ui.widget.customtable.Table
-import com.abdownloadmanager.shared.ui.widget.customtable.TableState
-import com.abdownloadmanager.shared.ui.widget.customtable.styled.MyStyledTableHeader
+import com.abdownloadmanager.shared.ui.widget.table.customtable.Table
+import com.abdownloadmanager.shared.ui.widget.table.customtable.TableState
+import com.abdownloadmanager.shared.ui.widget.table.customtable.styled.MyStyledTableHeader
 import com.abdownloadmanager.desktop.utils.AppInfo
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.ui.LocalContentColor
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.pages.credits.translators.LanguageTranslationInfo
+import com.abdownloadmanager.shared.pages.credits.translators.TranslatorData
+import com.abdownloadmanager.shared.ui.widget.PrimaryMainActionButton
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.localizationmanager.LanguageNameProvider
 import ir.amirab.util.compose.localizationmanager.MyLocale
@@ -34,7 +35,6 @@ import ir.amirab.util.compose.resources.myStringResource
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import okio.Path.Companion.toPath
-import okio.buffer
 import org.koin.core.component.get
 
 @Composable
@@ -108,7 +108,7 @@ private fun ContributionNotice(
                     )
                 }
                 Spacer(Modifier.width(32.dp))
-                PrimaryMainConfigActionButton(
+                PrimaryMainActionButton(
                     text = myStringResource(Res.string.contribute),
                     onClick = onUserWantsToContribute,
                     modifier = Modifier,
@@ -119,37 +119,6 @@ private fun ContributionNotice(
     }
 }
 
-@Composable
-private fun PrimaryMainConfigActionButton(
-    text: String,
-    modifier: Modifier,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val backgroundColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors.map {
-            it / 30
-        }
-    )
-    val borderColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors
-    )
-    val disabledBorderColor = Brush.horizontalGradient(
-        myColors.primaryGradientColors.map {
-            it / 50
-        }
-    )
-    ActionButton(
-        text = text,
-        modifier = modifier,
-        enabled = enabled,
-        onClick = onClick,
-        backgroundColor = backgroundColor,
-        disabledBackgroundColor = backgroundColor,
-        borderColor = borderColor,
-        disabledBorderColor = disabledBorderColor,
-    )
-}
 
 @Composable
 private fun TranslatorsTable(

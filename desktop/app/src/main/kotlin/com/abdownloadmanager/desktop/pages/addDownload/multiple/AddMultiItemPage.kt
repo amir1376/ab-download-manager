@@ -13,17 +13,17 @@ import com.abdownloadmanager.desktop.pages.addDownload.shared.CategorySelect
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.pages.addDownload.shared.LocationTextField
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ShowAddToQueueDialog
-import com.abdownloadmanager.shared.utils.ui.myColors
-import com.abdownloadmanager.shared.utils.ui.theme.myTextSizes
-import com.abdownloadmanager.shared.utils.div
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.utils.category.Category
-import com.abdownloadmanager.shared.utils.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.category.Category
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun AddMultiItemPage(
-    addMultiDownloadComponent: AddMultiDownloadComponent,
+    addMultiDownloadComponent: DesktopAddMultiDownloadComponent,
 ) {
     Column(Modifier) {
         Column(
@@ -76,7 +76,7 @@ fun AddMultiItemPage(
 @Composable
 fun Footer(
     modifier: Modifier = Modifier,
-    component: AddMultiDownloadComponent,
+    component: DesktopAddMultiDownloadComponent,
 ) {
     Column(modifier) {
         Spacer(
@@ -123,7 +123,7 @@ fun Footer(
 @Composable
 private fun SaveSettings(
     modifier: Modifier,
-    component: AddMultiDownloadComponent,
+    component: DesktopAddMultiDownloadComponent,
 ) {
     val selectedCategory by component.selectedCategory.collectAsState()
 
@@ -143,7 +143,7 @@ private fun SaveSettings(
 
 @Composable
 private fun RowScope.LocationSaveOption(
-    component: AddMultiDownloadComponent,
+    component: DesktopAddMultiDownloadComponent,
     folder: String
 ) {
     val allItemsInSameLocation by component.allInSameLocation.collectAsState()
@@ -172,7 +172,7 @@ private fun RowScope.LocationSaveOption(
 @Composable
 private fun RowScope.CategorySaveOption(
     selectedCategory: Category?,
-    component: AddMultiDownloadComponent
+    component: DesktopAddMultiDownloadComponent
 ) {
 
     SaveOption(
@@ -206,7 +206,7 @@ private fun RowScope.CategorySaveOption(
                     Modifier.fillMaxHeight(),
                     enabled = true,
                     onClick = {
-                        component.requestAddCategory()
+                        component.onRequestAddCategory()
                     },
                 )
             }
