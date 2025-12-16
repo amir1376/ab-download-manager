@@ -3,6 +3,7 @@ package ir.amirab.downloader.downloaditem.hls
 import io.lindstrom.m3u8.model.KeyMethod
 import io.lindstrom.m3u8.model.MediaPlaylist
 import io.lindstrom.m3u8.parser.MediaPlaylistParser
+import io.lindstrom.m3u8.parser.ParsingMode
 import ir.amirab.downloader.connection.Connection
 import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.connection.response.HttpResponseInfo
@@ -68,7 +69,7 @@ data class HLSResponseInfo(
         }
 
         private fun parseHLSAsMediaPlaylist(data: String): MediaPlaylist {
-            val playlistParser = MediaPlaylistParser()
+            val playlistParser = MediaPlaylistParser(ParsingMode.LENIENT)
             return playlistParser.readPlaylist(data)
         }
 
