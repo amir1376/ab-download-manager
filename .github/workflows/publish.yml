@@ -39,8 +39,17 @@ jobs:
 
       - name: Skip Android build (build android only on Ubuntu)
         if: matrix.os != 'ubuntu-latest'
+        shell: "bash"
         run: |
           echo "SKIP_ANDROID_BUILD=true" >> $GITHUB_ENV
+
+      - name: Use Android Secrets
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "ABDM_KEYSTORE_FILE=${{ secrets.ABDM_KEYSTORE_FILE }}" >> $GITHUB_ENV
+          echo "ABDM_KEYSTORE_FILE_PASSWORD=${{ secrets.ABDM_KEYSTORE_FILE_PASSWORD }}" >> $GITHUB_ENV
+          echo "ABDM_KEYSTORE_KEY_ALIAS=${{ secrets.ABDM_KEYSTORE_KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "ABDM_KEYSTORE_KEY_PASSWORD=${{ secrets.ABDM_KEYSTORE_KEY_PASSWORD }}" >> $GITHUB_ENV
 
       # Steps specific to macOS (to create DMG for macOS)
       - name: Install create-dmg (for macOS)

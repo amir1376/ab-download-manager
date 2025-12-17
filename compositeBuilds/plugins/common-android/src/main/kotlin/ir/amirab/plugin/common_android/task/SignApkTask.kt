@@ -3,7 +3,6 @@ package ir.amirab.plugin.common_android.task
 import okio.Path.Companion.toPath
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -14,7 +13,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.gradle.process.ExecOperations
 import java.io.File
 import java.io.FileOutputStream
-import java.net.URI
 import java.util.Base64
 import javax.inject.Inject
 
@@ -23,7 +21,12 @@ sealed interface KeystoreContent {
         fun fromUri(
             uriString: String,
         ): KeystoreContent {
-            val (type, data) = uriString.split(":")
+            val splitIndex = uriString.indexOf(':')
+            if (splitIndex == -1) {
+                throw GradleException("Invalid KeystoreContent it should be <type>:<data>")
+            }
+            val type = uriString.substring(0, splitIndex)
+            val data = uriString.substring(splitIndex + 1)
             return when (type) {
                 "file" -> {
                     FromFile(File(data))

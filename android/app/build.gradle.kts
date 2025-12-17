@@ -77,16 +77,16 @@ androidComponents.onVariants { variant ->
         outputDIr.set(project.layout.buildDirectory.dir("generatedSignedApks"))
         platformToolsVersion.set("36.1.0")
         keystoreUri.set(provider {
-            getFromEnvOrProperties("KEYSTORE_FILE")
+            getFromEnvOrProperties("ABDM_KEYSTORE_FILE")
         })
         keystorePassword.set(provider {
-            getFromEnvOrProperties("KEYSTORE_FILE_PASSWORD")
+            getFromEnvOrProperties("ABDM_KEYSTORE_FILE_PASSWORD")
         })
         keyPassword.set(provider {
-            getFromEnvOrProperties("KEYSTORE_KEY_PASSWORD")
+            getFromEnvOrProperties("ABDM_KEYSTORE_KEY_PASSWORD")
         })
         keyAlias.set(provider {
-            getFromEnvOrProperties("KEYSTORE_KEY_ALIAS")
+            getFromEnvOrProperties("ABDM_KEYSTORE_KEY_ALIAS")
         })
     }
 }
