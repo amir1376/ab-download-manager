@@ -12,6 +12,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.content.ContextCompat
 import com.abdownloadmanager.android.pages.onboarding.permissions.PermissionManager
 import com.abdownloadmanager.android.service.DownloadSystemService
+import com.abdownloadmanager.android.storage.AppSettingsStorage
+import com.abdownloadmanager.android.util.notification.playNotificationSoundIfAllowed
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pagemanager.NotificationSender
 import com.abdownloadmanager.shared.ui.widget.MessageDialogType
@@ -35,9 +37,11 @@ import ir.amirab.util.suspendGuardedEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -51,9 +55,14 @@ class ABDMAppManager(
     val permissionManager: PermissionManager,
     val notificationManager: NotificationManager,
     val serviceNotificationManager: ABDMServiceNotificationManager,
+    private val appSettingsStorage: AppSettingsStorage,
 ) : KoinComponent, NotificationSender {
     private var booted = guardedEntry()
     private var downloadSystemBooted = suspendGuardedEntry()
+    fun isSoundAllowed(): Boolean {
+        return appSettingsStorage.notificationSound.value
+    }
+
     fun boot() {
         booted.action {
             registerAsFallbackNotification()
@@ -71,6 +80,7 @@ class ABDMAppManager(
             registerDownloadEventNotifications()
         }
     }
+
     private var shouldShowToastsNotifications = MutableStateFlow(true)
     fun setNotificationsHandledInUi(shownInUi: Boolean) {
         shouldShowToastsNotifications.value = !shownInUi
@@ -78,6 +88,7 @@ class ABDMAppManager(
 
     private fun registerAsFallbackNotification(): () -> Unit {
         val context = context
+        var lastNotificationSound = 0L
         val job = scope.headlessComposeRuntime {
             val scope = rememberCoroutineScope()
             val notifications by notificationManager.activeNotificationList.collectAsState()
@@ -87,31 +98,50 @@ class ABDMAppManager(
             }
             notifications
                 .firstOrNull()?.let { notification ->
-                DisposableEffect(notification) {
-                    val title = notification.title.getString()
-                    val description = notification.description.getString()
-                    val iconText = when (notification.notificationType) {
-                        NotificationType.Error -> "❌"
-                        NotificationType.Info -> "ℹ\uFE0F"
-                        is NotificationType.Loading -> "⏳"
-                        NotificationType.Success -> "✔\uFE0F"
-                        NotificationType.Warning -> "⚠\uFE0F"
-                    }
-                    val fullTitle = "$iconText $title - $description"
-                    val toast = scope.launch(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            fullTitle,
-                            Toast.LENGTH_LONG,
-                        ).apply { show() }
-                    }
-                    onDispose {
-                        scope.launch(Dispatchers.Main) {
-                            toast.cancel()
+                    DisposableEffect(notification) {
+                        val title = notification.title.getString()
+                        val description = notification.description.getString()
+                        val iconText = when (notification.notificationType) {
+                            NotificationType.Error -> "❌"
+                            NotificationType.Info -> "ℹ\uFE0F"
+                            is NotificationType.Loading -> "⏳"
+                            NotificationType.Success -> "✔\uFE0F"
+                            NotificationType.Warning -> "⚠\uFE0F"
+                        }
+                        val fullTitle = "$iconText $title - $description"
+                        val toastJob = scope.launch(Dispatchers.Main) {
+                            val toast = Toast.makeText(
+                                context,
+                                fullTitle,
+                                Toast.LENGTH_LONG,
+                            )
+                            if (isSoundAllowed()) {
+                                val now = System.currentTimeMillis()
+                                val sinceLastSoundMillis = now - lastNotificationSound
+                                // don't repeatedly play notification!
+                                if (sinceLastSoundMillis > 5_000) {
+                                    runCatching {
+                                        playNotificationSoundIfAllowed(context)
+                                        lastNotificationSound = now
+                                    }.onFailure {
+                                        it.printStackTrace()
+                                    }
+                                }
+                            }
+                            toast.show()
+                            currentCoroutineContext().job.invokeOnCompletion {
+                                it?.let {
+                                    toast.cancel()
+                                }
+                            }
+                        }
+                        onDispose {
+                            scope.launch(Dispatchers.Main) {
+                                toastJob.cancel()
+                            }
                         }
                     }
                 }
-            }
         }
         return { job.cancel() }
     }

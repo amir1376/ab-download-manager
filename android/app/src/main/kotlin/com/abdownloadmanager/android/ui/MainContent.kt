@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import com.abdownloadmanager.android.pages.onboarding.permissions.PermissionsPag
 import com.abdownloadmanager.android.pages.perhostsettings.PerHostSettingsPage
 import com.abdownloadmanager.android.pages.queue.QueueConfigSheet
 import com.abdownloadmanager.android.pages.updater.UpdaterSheet
+import com.abdownloadmanager.android.util.compose.rememberIsUiVisible
 import com.abdownloadmanager.shared.ui.widget.NotificationArea
 import com.abdownloadmanager.shared.ui.widget.useNotification
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
@@ -148,19 +150,25 @@ fun MainContent(
         UpdaterSheet(
             updaterComponent = mainComponent.updaterComponent,
         )
+        val isUiVisible = rememberIsUiVisible()
+        LaunchedEffect(isUiVisible) {
+            mainComponent.abdmAppManager.setNotificationsHandledInUi(isUiVisible)
+        }
+        // is this really necessary?
         DisposableEffect(Unit) {
-            mainComponent.abdmAppManager.setNotificationsHandledInUi(true)
             onDispose {
                 mainComponent.abdmAppManager.setNotificationsHandledInUi(false)
             }
         }
-        NotificationArea(
-            Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 96.dp)
-                .padding(horizontal = 24.dp)
-                .navigationBarsPadding()
-        )
+        if (isUiVisible) {
+            NotificationArea(
+                Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 96.dp)
+                    .padding(horizontal = 24.dp)
+                    .navigationBarsPadding()
+            )
+        }
     }
 }

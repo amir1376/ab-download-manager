@@ -576,7 +576,7 @@ fun getAppModule(context: ABDMApp) = module {
         bind<Context>()
     }
     single {
-        ABDMAppManager(get(), get(), get(), get(), get(), get())
+        ABDMAppManager(get(), get(), get(), get(), get(), get(), get())
     }
     single {
         ABDMServiceNotificationManager(get(), get(), get(), get(), get())
