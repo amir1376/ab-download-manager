@@ -67,7 +67,7 @@ androidEnableFileTypesGeneratorForManifest(
 
 
 // ======= begin of GitHub action stuff
-val ciDir = CiDirs(rootProject.layout.buildDirectory)
+val ciDir = CiUtils.getCiDir(project)
 androidComponents.onVariants { variant ->
     tasks.register(
         "createReleaseSignedBinary${variant.name.uppercaseFirstChar()}",
@@ -118,12 +118,7 @@ val androidBinaries by tasks.registering {
     }
 }
 
-tasks.register("createBinariesForCi") {
-    onlyIf {
-        System.getenv("SKIP_ANDROID_BUILD")
-            ?.toBoolean()
-            ?: false
-    }
+tasks.register(CiUtils.getCreateBinaryFolderForCiTaskName()) {
     dependsOn(androidBinaries)
 }
 

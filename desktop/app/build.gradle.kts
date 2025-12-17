@@ -13,7 +13,6 @@ plugins {
     id(MyPlugins.kotlin)
     id(MyPlugins.composeDesktop)
     id(Plugins.Kotlin.serialization)
-    id(Plugins.changeLog)
     id(Plugins.ksp)
     id(Plugins.aboutLibraries)
     id("ir.amirab.installer-plugin")
@@ -211,13 +210,8 @@ installerPlugin {
 }
 
 
-changelog {
-    path.set(rootProject.layout.projectDirectory.dir("CHANGELOG.md").asFile.path)
-    version.set(getAppVersionString())
-}
-
 // ======= begin of GitHub action stuff
-val ciDir = CiDirs(rootProject.layout.buildDirectory)
+val ciDir = CiUtils.getCiDir(project)
 
 val appPackageNameByComposePlugin
     get() = requireNotNull(compose.desktop.application.nativeDistributions.packageName) {
@@ -265,7 +259,7 @@ val createDistributableAppArchive by tasks.registering {
     }
 }
 
-val createBinariesForCi by tasks.registering {
+tasks.register(CiUtils.getCreateBinaryFolderForCiTaskName()) {
     if (installerPlugin.isThisPlatformSupported()) {
         dependsOn(installerPlugin.createInstallerTask)
         inputs.dir(installerPlugin.outputFolder)
@@ -308,26 +302,6 @@ val createBinariesForCi by tasks.registering {
         )
         logger.lifecycle("distributable app archive written in ${output}")
     }
-}
-
-val createChangeNoteForCi by tasks.registering {
-    inputs.property("appVersion", getAppVersionString())
-    inputs.file(changelog.path)
-    outputs.file(ciDir.changeNotesFile)
-    doLast {
-        val output = ciDir.changeNotesFile.get().asFile
-        val bodyText = with(changelog) {
-            getOrNull(getAppVersionString())?.let { item ->
-                renderItem(item, Changelog.OutputType.MARKDOWN)
-            }
-        }.orEmpty()
-        logger.lifecycle("changeNotes written in $output")
-        output.writeText(bodyText)
-    }
-}
-
-val createReleaseFolderForCi by tasks.registering {
-    dependsOn(createBinariesForCi, createChangeNoteForCi)
 }
 // ======= end of GitHub action stuff
 

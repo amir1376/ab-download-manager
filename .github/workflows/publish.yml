@@ -12,7 +12,7 @@ jobs:
   create-packages:
     strategy:
       matrix:
-        os: [ "ubuntu-latest" , "windows-2022", "macos-13", "macos-15" ]
+        os: [ "ubuntu-latest" , "windows-2022", "macos-15-intel", "macos-15" ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -37,7 +37,7 @@ jobs:
           key: ${{ matrix.os }}-gradle
           enableCrossOsArchive: true
 
-      - name: build Android on Ubuntu only
+      - name: Skip Android build (build android only on Ubuntu)
         if: matrix.os != 'ubuntu-latest'
         run: |
           echo "SKIP_ANDROID_BUILD=true" >> $GITHUB_ENV
@@ -56,7 +56,7 @@ jobs:
       - name: Build package for current OS using gradle
         shell: bash
         run: |
-          ./gradlew desktop:app:createReleaseFolderForCi
+          ./gradlew createReleaseFolderForCi
 
       - name: Release Gradle to unlock cache files
         shell: bash

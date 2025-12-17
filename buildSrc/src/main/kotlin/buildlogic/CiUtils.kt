@@ -4,6 +4,7 @@ import io.github.z4kn4fein.semver.Version
 import ir.amirab.installer.InstallerTargetFormat
 import ir.amirab.util.platform.Arch
 import ir.amirab.util.platform.Platform
+import org.gradle.api.Project
 import java.io.File
 
 object CiUtils {
@@ -124,6 +125,13 @@ object CiUtils {
             destinationFolder = outputDir,
             name = newName,
         )
+    }
+
+    fun getCiDir(project: Project): CiDirs {
+        return CiDirs(project.rootProject.layout.buildDirectory)
+    }
+    fun getCreateBinaryFolderForCiTaskName(): String {
+        return "createBinariesForCi"
     }
     /*
         fun moveAndCreateSignature(
