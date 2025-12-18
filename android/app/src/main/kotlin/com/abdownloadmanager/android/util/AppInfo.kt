@@ -1,17 +1,16 @@
 package com.abdownloadmanager.android.util
 
-import android.content.Context
+import android.app.Application
 import com.abdownloadmanager.android.BuildConfig
 import com.abdownloadmanager.shared.util.AppVersion
-import com.abdownloadmanager.shared.util.DefinedPaths
 import com.abdownloadmanager.shared.util.SharedConstants
 import ir.amirab.util.platform.Platform
 import okio.Path.Companion.toOkioPath
 
 object AppInfo {
     val isInDebugMode: Boolean = BuildConfig.DEBUG
-    lateinit var context: Context
-    fun init(context: Context) {
+    lateinit var context: Application
+    fun init(context: Application) {
         this.context = context
     }
 
@@ -20,7 +19,7 @@ object AppInfo {
 
     val definedPaths by lazy {
         AndroidDefinedPaths(
-            dataDir = context.dataDir.resolve(
+            dataDir = context.filesDir.resolve(
                 SharedConstants.dataDirName
             ).toOkioPath()
         )
