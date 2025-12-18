@@ -15,30 +15,32 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
@@ -50,6 +52,9 @@ import androidx.compose.ui.window.PopupProperties
 import com.abdownloadmanager.android.pages.enterurl.EnterNewURLPage
 import com.abdownloadmanager.android.pages.home.sections.sort.RenderSortMenu
 import com.abdownloadmanager.android.ui.menu.RenderMenuInSinglePage
+import com.abdownloadmanager.android.ui.page.PageUi
+import com.abdownloadmanager.android.ui.page.PageHeader
+import com.abdownloadmanager.android.ui.page.PageTitle
 import com.abdownloadmanager.android.util.AndroidIntentUtils
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.home.BaseHomeComponent
@@ -62,26 +67,25 @@ import com.abdownloadmanager.shared.util.ResponsiveDialog
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.modifiers.silentClickable
+import ir.amirab.util.compose.resources.myStringResource
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun HomePage(component: HomeComponent) {
     val selectionList by component.selectionList.collectAsState()
-    var footerHeight by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
-    val systemBars = WindowInsets.systemBars
-    val bottomPadding = systemBars.getBottom(density)
-    val topPadding = systemBars.getTop(density)
-    val topPaddingInDp = density.run {
-        (topPadding).toDp()
+    var contentPaddingValues by remember {
+        mutableStateOf(PaddingValues.Zero)
     }
-    val bottomPaddingInDp = density.run {
-        (bottomPadding + footerHeight).toDp()
-    }
+    val topPaddingInDp = contentPaddingValues.calculateTopPadding()
+    val bottomPaddingInDp = contentPaddingValues.calculateBottomPadding()
     var showDeletePromptState by remember {
         mutableStateOf(null as DeletePromptState?)
     }
@@ -154,87 +158,115 @@ fun HomePage(component: HomeComponent) {
         }
     }
     val isOverlayVisible by component.isOverlayVisible.collectAsState()
-    Box {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .background(myColors.background),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            DownloadList(
-                downloadList = downloadList,
-                selectionList = selectionList,
-                onItemSelectionChange = { id, checked ->
-                    component.onItemSelectionChange(id, checked)
+    PageUi(
+        header = {
+            val headerAlpha = rememberHeaderAlpha(
+                lazyListState,
+                density.run {
+                    topPaddingInDp.toPx()
                 },
-                onItemClicked = {
-                    component.onItemClicked(it)
-                },
-                fileIconProvider = component.fileIconProvider,
-                onNewSelection = {
-                    component.newSelection(ids = it)
-                },
-                lazyListState = lazyListState,
+            ).value * 0.75f
+            val colors = myColors
+            PageHeader(
                 modifier = Modifier
-                    .weight(1f),
-                contentPadding = PaddingValues(
-                    bottom = bottomPaddingInDp,
-                    top = topPaddingInDp,
-                ),
+                    .background(
+                        myColors.background.copy(
+                            alpha = headerAlpha
+                        )
+                    )
+                    .statusBarsPadding()
+                    .padding(horizontal = mySpacings.largeSpace),
+                leadingIcon = {
+                    MyIcon(
+                        MyIcons.appIcon,
+                        null,
+                        Modifier.size(mySpacings.iconSize),
+                    )
+                },
+                headerTitle = {
+                    PageTitle(
+                        myStringResource(Res.string.app_title)
+                    )
+                }
+            )
+        },
+        footer = {
+            Footer(
+                Modifier,
+                component,
             )
         }
-        Box(
-            Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth()
-                .height(topPaddingInDp)
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            myColors.background,
-                            Color.Transparent,
-                        )
-                    )
+    ) {
+        contentPaddingValues = it.paddingValues
+        Box {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(myColors.background),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                DownloadList(
+                    downloadList = downloadList,
+                    selectionList = selectionList,
+                    onItemSelectionChange = { id, checked ->
+                        component.onItemSelectionChange(id, checked)
+                    },
+                    onItemClicked = {
+                        component.onItemClicked(it)
+                    },
+                    fileIconProvider = component.fileIconProvider,
+                    onNewSelection = {
+                        component.newSelection(ids = it)
+                    },
+                    lazyListState = lazyListState,
+                    modifier = Modifier
+                        .weight(1f),
+                    contentPadding = PaddingValues(
+                        bottom = bottomPaddingInDp,
+                        top = topPaddingInDp,
+                    ),
                 )
-        )
-        Box(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(bottomPaddingInDp)
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color.Transparent,
-                            myColors.background,
+            }
+            AnimatedVisibility(
+                isOverlayVisible,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                Box(
+                    Modifier
+                        .align(Alignment.Center)
+                        .fillMaxSize()
+                        .background(
+                            Color.Black.copy(alpha = 0.5f),
                         )
-                    )
+                        .silentClickable {
+                            component.onOverlayClicked()
+                        }
                 )
-        )
-        AnimatedVisibility(
-            isOverlayVisible,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
+            }
             Box(
                 Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize()
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(bottomPaddingInDp)
                     .background(
-                        Color.Black.copy(alpha = 0.5f),
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Transparent,
+                                myColors.background,
+                            )
+                        )
                     )
-                    .silentClickable {
-                        component.onOverlayClicked()
-                    }
+            )
+            RenderAboveBottonNavigation(
+                component, Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = bottomPaddingInDp)
             )
         }
-        Footer(
-            Modifier
-                .align(Alignment.BottomCenter),
-            component,
-            onFooterSizeChange = { footerHeight = it.height }
-        )
     }
+
     val enterNewURLComponent = component.enterNewLinkSlot.rememberChild()
     val state = rememberResponsiveDialogState(false)
     LaunchedEffect(enterNewURLComponent) {
@@ -279,13 +311,11 @@ fun HomePage(component: HomeComponent) {
 fun Footer(
     modifier: Modifier,
     component: HomeComponent,
-    onFooterSizeChange: (IntSize) -> Unit,
 ) {
     Column(
         modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        RenderAboveBottonNavigation(component, Modifier.padding(horizontal = 16.dp))
         val selectionList by component.selectionList.collectAsState()
         AnimatedContent(
             selectionList.isNotEmpty(),
@@ -299,7 +329,6 @@ fun Footer(
             val commonModifier = Modifier
                 .navigationBarsPadding()
                 .padding(bottom = 8.dp)
-                .onSizeChanged(onFooterSizeChange)
             if (hasSelection) {
                 RenderDownloadOptions(
                     modifier = commonModifier,
@@ -377,4 +406,32 @@ private fun RenderDownloadOptions(
         selectionCount = selection.size,
         total = downloadList.size,
     )
+}
+
+private fun createAlphaForHeader(
+    scrollOffset: Float,
+    headerHeight: Float,
+): Float {
+    if (headerHeight == 0f) return 0f
+    return (scrollOffset / headerHeight).coerceIn(0f..1f)
+}
+
+@Composable
+fun rememberHeaderAlpha(
+    listState: LazyListState,
+    headerHeightPx: Float,
+): State<Float> {
+    val headerHeightPx by rememberUpdatedState(headerHeightPx)
+    return remember {
+        derivedStateOf {
+            when {
+                listState.firstVisibleItemIndex > 0 -> 1f
+                headerHeightPx == 0f -> 1f
+                else -> {
+                    val scrolled = listState.firstVisibleItemScrollOffset.toFloat()
+                    (scrolled / headerHeightPx).coerceIn(0f, 1f)
+                }
+            }
+        }
+    }
 }
