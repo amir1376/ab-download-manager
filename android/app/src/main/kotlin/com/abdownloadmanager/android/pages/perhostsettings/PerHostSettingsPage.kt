@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.android.ui.page.PageHeader
 import com.abdownloadmanager.android.ui.page.PageTitle
+import com.abdownloadmanager.android.ui.page.PageUi
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.perhostsettings.PerHostSettingsItemWithId
@@ -40,6 +41,7 @@ import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import ir.amirab.util.compose.modifiers.autoMirror
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.*
@@ -58,15 +60,8 @@ fun PerHostSettingsPage(component: AndroidPerHostSettingsComponent) {
     ) {
         component.reset()
     }
-    Column(
-        modifier = Modifier
-            .background(myColors.background)
-            .navigationBarsPadding()
-            .statusBarsPadding()
-    ) {
-        Column(
-            Modifier.weight(1f)
-        ) {
+    PageUi(
+        header = {
             PageHeader(
                 leadingIcon = {
                     TransparentIconActionButton(
@@ -110,31 +105,40 @@ fun PerHostSettingsPage(component: AndroidPerHostSettingsComponent) {
                     }
                 }
             )
-            // TODO improvement make it tablet friendly
-            AnimatedContent(configurableList) { configurableList ->
-                if (configurableList != null) {
-                    RenderPerHostSettingsItem(
+        },
+        footer = {
+
+        },
+        modifier = Modifier
+            .systemBarsPadding()
+            .navigationBarsPadding()
+    ) {
+        // TODO improvement make it tablet friendly
+        AnimatedContent(
+            configurableList,
+            modifier = Modifier.padding(it.paddingValues)
+        ) { configurableList ->
+            if (configurableList != null) {
+                RenderPerHostSettingsItem(
+                    modifier = Modifier
+                        .padding(8.dp),
+                    itemId = configurableList.id,
+                    configurableList = configurableList.configurableGroups,
+                )
+            } else {
+                Column {
+                    HostList(
                         modifier = Modifier
                             .padding(8.dp)
+                            .fillMaxWidth()
                             .weight(1f),
-                        itemId = configurableList.id,
-                        configurableList = configurableList.configurableGroups,
+                        hosts = perHostSettings,
+                        selectedId = selectedItemId,
+                        setSelected = { id ->
+                            component.onIdSelected(id)
+                        },
+                        component = component
                     )
-                } else {
-                    Column {
-                        HostList(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxWidth()
-                                .weight(1f),
-                            hosts = perHostSettings,
-                            selectedId = selectedItemId,
-                            setSelected = { id ->
-                                component.onIdSelected(id)
-                            },
-                            component = component
-                        )
-                    }
                 }
             }
         }
@@ -273,7 +277,8 @@ private fun SideBarItem(
             .selectable(
                 selected = isSelected,
                 onClick = onClick
-            )
+            ),
+        contentAlignment = Alignment.Center,
     ) {
         Row(
             Modifier

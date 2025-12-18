@@ -1,6 +1,7 @@
 package com.abdownloadmanager.android.pages.add.multiple
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,14 +17,14 @@ import com.abdownloadmanager.android.pages.add.shared.LocationTextField
 import com.abdownloadmanager.android.pages.add.shared.ShowAddToQueueDialog
 import com.abdownloadmanager.android.ui.RenderControlSelections
 import com.abdownloadmanager.android.ui.SelectionControlButton
-import com.abdownloadmanager.android.ui.page.PageTitle
+import com.abdownloadmanager.android.ui.page.PageHeader
+import com.abdownloadmanager.android.ui.page.PageTitleWithDescription
+import com.abdownloadmanager.android.ui.page.PageUi
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.category.Category
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.util.compose.asStringSource
@@ -38,19 +39,46 @@ fun AddMultiItemPage(
         addMultiDownloadComponent.selectAll(false)
     }
     val pageHorizontalPadding = 16.dp
-    Column(
-        Modifier
+    PageUi(
+        modifier = Modifier
+            .background(myColors.background)
+            .statusBarsPadding(),
+        header = {
+            val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+            PageHeader(
+                leadingIcon = {
+                    TransparentIconActionButton(
+                        MyIcons.back,
+                        contentDescription = myStringResource(Res.string.back)
+                    ) {
+                        backDispatcher?.onBackPressed()
+                    }
+                },
+                headerTitle = {
+                    PageTitleWithDescription(
+                        title = myStringResource(
+                            Res.string.add_download
+                        ),
+                        description = myStringResource(
+                            Res.string.add_multi_download_page_header
+                        )
+                    )
+                }
+            )
+        },
+        footer = {
+            Footer(
+                Modifier,
+                addMultiDownloadComponent,
+            )
+        },
     ) {
         Column(
             Modifier
                 .fillMaxWidth()
                 .background(myColors.background)
-                .statusBarsPadding()
-                .padding(top = 8.dp)
-                .weight(1f)
+                .padding(it.paddingValues)
         ) {
-            PageTitle(myStringResource(Res.string.new_download))
-            Spacer(Modifier.height(8.dp))
             AddMultiDownloadList(
                 Modifier.weight(1f),
                 addMultiDownloadComponent,
@@ -60,10 +88,6 @@ fun AddMultiItemPage(
                 )
             )
         }
-        Footer(
-            Modifier,
-            addMultiDownloadComponent,
-        )
     }
     val currentDownloadConfigurableList by addMultiDownloadComponent.currentDownloadConfigurableList.collectAsState()
     currentDownloadConfigurableList?.let {

@@ -26,11 +26,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import ir.amirab.util.compose.modifiers.autoMirror
 
 @Composable
 fun alphaFlicker(): Float {
@@ -51,6 +54,8 @@ fun IconActionButton(
     contentColor: Color = LocalContentColor.current,
     borderColor: Color = myColors.onBackground / 10,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    automaticMirrorIcon: Boolean = true,
+    iconSize: Dp = mySpacings.iconSize,
     onClick: () -> Unit,
 ) {
     WithContentColor(contentColor) {
@@ -90,7 +95,10 @@ fun IconActionButton(
                 icon,
                 contentDescription,
                 Modifier
-                    .size(mySpacings.iconSize),
+                    .ifThen(automaticMirrorIcon) {
+                        autoMirror()
+                    }
+                    .size(iconSize),
             )
         }
     }
@@ -107,6 +115,8 @@ fun TransparentIconActionButton(
     shape: Shape = myShapes.defaultRounded,
     contentColor: Color = LocalContentColor.current,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    automaticMirrorIcon: Boolean = true,
+    iconSize: Dp = mySpacings.iconSize,
     onClick: () -> Unit,
 ) {
     IconActionButton(
@@ -121,6 +131,8 @@ fun TransparentIconActionButton(
         contentColor = contentColor,
         borderColor = Color.Transparent,
         interactionSource = interactionSource,
+        automaticMirrorIcon = automaticMirrorIcon,
+        iconSize = iconSize,
         onClick = onClick,
     )
 }
