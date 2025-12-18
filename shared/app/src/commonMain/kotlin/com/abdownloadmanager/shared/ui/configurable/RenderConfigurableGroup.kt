@@ -31,7 +31,7 @@ fun RenderConfigurableGroup(
     Column(
         modifier
             .clip(myShapes.defaultRounded)
-            .background(myColors.surface)
+            .background(myColors.surface / 0.5f)
     ) {
         title?.rememberString()?.let {
             Text(

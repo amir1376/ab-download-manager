@@ -303,9 +303,7 @@ fun StatusFilterItem(
                     }
                     .myCombinedClickable(
                         onClick = {
-                            if (!isExpanded) {
-                                onRequestExpand(true)
-                            }
+                            onRequestExpand(!isExpanded)
                             onFilterChange(null)
                         },
                         onLongClick = {

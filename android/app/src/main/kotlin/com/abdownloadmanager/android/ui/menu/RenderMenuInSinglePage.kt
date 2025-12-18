@@ -3,7 +3,6 @@ package com.abdownloadmanager.android.ui.menu
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +46,7 @@ import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuDisabledItemBehavi
 import com.abdownloadmanager.shared.util.LocalShortCutManager
 import com.abdownloadmanager.shared.util.PlatformKeyStroke
 import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.ProvideTextStyle
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
@@ -86,7 +86,7 @@ private fun RenderMenuInSinglePage(
                 .shadow(4.dp, shape)
 //                .verticalScroll(rememberScrollState())
                 .clip(shape)
-                .widthIn(150.dp)
+                .widthIn(200.dp)
                 .border(1.dp, myColors.onSurface / 0.1f, shape)
                 .background(myColors.surface)
                 .padding(horizontal = 0.dp, vertical = 0.dp)
@@ -122,18 +122,19 @@ private fun RenderMenuInSinglePage(
                         .padding(horizontal = 16.dp)
                 ) {
                     val iconModifier = Modifier
-                        .size(16.dp)
+                        .size(menuIconSize)
                     if (menuStack.size > 1) {
                         MyIcon(
                             MyIcons.back,
                             null,
-                            iconModifier,
+                            iconModifier.autoMirror(),
                         )
                         Spacer(Modifier.width(16.dp))
                     }
                     Text(
                         currentTitle,
                         Modifier.weight(1f),
+                        color = LocalContentColor.current / 0.75f,
                     )
                 }
             }
@@ -225,10 +226,10 @@ private fun ReactableItem(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     extraContent: @Composable () -> Unit = {},
 ) {
-    val iconModifier = Modifier.size(16.dp)
+    val iconModifier = Modifier.size(menuIconSize)
     val title by item.title.collectAsState()
     val icon by item.icon.collectAsState()
-    val itemPadding = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+    val itemPadding = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isEnabled = (item as? MenuItem.HasEnable)
         ?.isEnabled
@@ -237,6 +238,7 @@ private fun ReactableItem(
     Row(
         modifier
             .ifThen(!isEnabled) { alpha(0.5f) }
+            .heightIn(mySpacings.thumbSize)
             .hoverable(interactionSource)
             .background(
                 when {
@@ -424,3 +426,4 @@ private fun RenderShortcutStroke(shortcutStroke: PlatformKeyStroke) {
         }
     }
 }
+private val menuIconSize = 20.dp

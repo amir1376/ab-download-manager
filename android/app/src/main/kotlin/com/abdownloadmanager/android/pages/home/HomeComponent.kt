@@ -339,7 +339,10 @@ class HomeComponent(
         +createPerHostSettingsPage(perHostSettingsPageManager = perHostSettingsPageManager)
         +createOpenSettingsAction(settingsPageManager = settingsPageManager)
         separator()
-        subMenu(Res.string.help.asStringSource()) {
+        subMenu(
+            Res.string.help.asStringSource(),
+            MyIcons.question,
+        ) {
             +supportActionGroup
             separator()
             +createOpenOpenSourceThirdPartyLibrariesPage(openSourceLibrariesPageManager = openSourceLibrariesPageManager)

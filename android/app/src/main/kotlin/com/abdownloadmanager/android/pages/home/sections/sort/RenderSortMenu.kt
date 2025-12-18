@@ -154,6 +154,12 @@ fun RenderSortIndicatorMode(sortIndicatorMode: SortIndicatorMode) {
         SortIndicatorMode.Descending -> MyIcons.sortDown
     }
     icon?.let {
-        MyIcon(it, null, Modifier.size(16.dp))
+        MyIcon(
+            it,
+            null,
+            Modifier
+                .size(16.dp)
+                .alpha(0.75f)
+        )
     }
 }

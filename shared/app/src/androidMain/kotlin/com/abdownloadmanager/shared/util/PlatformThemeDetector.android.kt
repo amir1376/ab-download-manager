@@ -1,11 +1,10 @@
 package com.abdownloadmanager.shared.util
 
-import android.content.BroadcastReceiver
+import android.app.Activity
+import android.app.Application
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.res.Configuration
-import androidx.core.content.ContextCompat
+import android.os.Bundle
 import com.abdownloadmanager.shared.util.ui.theme.ISystemThemeDetector
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -23,15 +22,39 @@ class AndroidSystemThemeDetector(
 
     override val systemThemeFlow: Flow<Boolean> = callbackFlow {
         trySend(isDark())
-        val intentFilter = IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED)
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                trySend(isDark())
-            }
+        val callback = GlobalActivityLifecycleCallbacks {
+            trySend(isDark())
         }
-        ContextCompat.registerReceiver(context, receiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
+        val application = context.applicationContext as? Application
+        application?.registerActivityLifecycleCallbacks(callback)
         awaitClose {
-            context.unregisterReceiver(receiver)
+            application?.unregisterActivityLifecycleCallbacks(callback)
         }
     }
 }
+
+private class GlobalActivityLifecycleCallbacks(
+    private val recheck: () -> Unit,
+) : Application.ActivityLifecycleCallbacks {
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        recheck()
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+    }
+
+    override fun onActivityStarted(activity: Activity) {}
+
+    override fun onActivityStopped(activity: Activity) {}
+
+}
+

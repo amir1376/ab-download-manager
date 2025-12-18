@@ -64,7 +64,10 @@ enum class ResponsiveTarget {
 
 @Composable
 fun rememberResponsiveWidth(): ResponsiveTarget {
-    return when (LocalContainerSize.current.maxWidth) {
+    val width = LocalContainerSize.current.run {
+        minOf(maxWidth, maxHeight)
+    }
+    return when (width) {
         in 0.dp..599.dp -> ResponsiveTarget.Phone
         in 600.dp..1199.dp -> ResponsiveTarget.Tablet
         else -> ResponsiveTarget.Desktop
