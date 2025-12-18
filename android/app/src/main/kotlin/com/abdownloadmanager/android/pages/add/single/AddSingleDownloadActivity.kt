@@ -47,8 +47,9 @@ class AddSingleDownloadActivity : ABDMActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val myRetainedComponent = myRetainedComponent {
+            // TODO consider use a factory to create AndroidAddSingleDownloadComponent
+            // we may create memory leaks if we accidentally pass Activity::this into the component lambdas
             val config = getComponentConfig(intent)
-            // make sure to not pass these to lambdas as it causes memory leak
             val appManager = appManager
             val appContext = this@AddSingleDownloadActivity.appContext
             val scope = applicationScope

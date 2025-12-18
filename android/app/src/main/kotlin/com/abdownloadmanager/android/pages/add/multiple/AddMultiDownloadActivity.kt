@@ -40,6 +40,7 @@ class AddMultiDownloadActivity : ABDMActivity() {
         super.onCreate(savedInstanceState)
         val myRetainedComponent = myRetainedComponent {
             val config = getComponentConfig(intent)
+            val appManager = appManager
             val closeAddDownloadDialog = {
                 this@myRetainedComponent.finishActivityAction()
             }
