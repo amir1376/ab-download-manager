@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import com.abdownloadmanager.android.pages.category.CategorySheet
 import com.abdownloadmanager.android.pages.newqueue.NewQueueSheet
+import com.abdownloadmanager.android.pages.singledownload.SingleDownloadPageActivity
 import com.abdownloadmanager.android.util.ABDMAppManager
 import com.abdownloadmanager.android.util.AndroidDownloadItemOpener
 import com.abdownloadmanager.android.util.activity.ABDMActivity
@@ -41,10 +42,19 @@ class AddSingleDownloadActivity : ABDMActivity() {
     private val queueManager: QueueManager by inject()
     private val categoryManager: CategoryManager by inject()
     private val iconProvider: FileIconProvider by inject()
+    private val appContext: Context by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val myRetainedComponent = myRetainedComponent {
             val config = getComponentConfig(intent)
+            // make sure to not pass these to lambdas as it causes memory leak
+            val appManager = appManager
+            val appContext = this@AddSingleDownloadActivity.appContext
+            val scope = applicationScope
+            val downloadItemOpener = downloadItemOpener
+            val appSettingsStorage = appSettingsStorage
+            val downloadSystem = downloadSystem
             val closeAddDownloadDialog = {
                 this@myRetainedComponent.finishActivityAction()
             }
@@ -52,7 +62,21 @@ class AddSingleDownloadActivity : ABDMActivity() {
                 ctx = it,
                 onRequestClose = closeAddDownloadDialog,
                 onRequestDownload = { item, categoryId ->
-                    appManager.startNewDownload(item, categoryId)
+                    scope.launch {
+                        val id = appManager.startNewDownload(item, categoryId).await()
+                        if (appSettingsStorage.showDownloadProgressDialog.value) {
+                            runCatching {
+                                appContext.startActivity(
+                                    SingleDownloadPageActivity.createIntent(
+                                        appContext,
+                                        id
+                                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                )
+                            }.onFailure {
+                                it.printStackTrace()
+                            }
+                        }
+                    }
                 },
                 onRequestAddToQueue = { item, queue, category ->
                     appManager.addDownload(item, queue, category)
