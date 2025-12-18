@@ -64,6 +64,7 @@ import com.arkivanov.decompose.router.slot.dismiss
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.navigate
+import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushToFront
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
 import ir.amirab.downloader.queue.DefaultQueueInfo
@@ -690,8 +691,11 @@ class MainComponent(
     override fun closePermissionsPage() {
         scope.launch {
             stackNavigation.navigate {
-                it.filterNot { config ->
+                val newList = it.filterNot { config ->
                     config is ScreenConfig.Permissions
+                }
+                newList.ifEmpty {
+                    listOf(ScreenConfig.InitialSetup)
                 }
             }
         }

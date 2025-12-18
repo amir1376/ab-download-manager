@@ -44,7 +44,7 @@ fun InitialSetupPage(
     StartUpPageTemplate(
         header = {
             StartUpPageHeader(
-                title = Res.string.welcome.asStringSource(),
+                title = Res.string.app_title.asStringSource(),
                 onBackPressed = null
             )
         },
@@ -61,7 +61,7 @@ fun InitialSetupPage(
                     Row {
                         PrimaryMainActionButton(
                             onClick = component::onUserPressFinish,
-                            text = myStringResource(Res.string.lets_go),
+                            text = myStringResource(Res.string.next),
                             modifier = Modifier
                                 .fillMaxWidth(),
                         )
@@ -80,13 +80,22 @@ fun InitialSetupPage(
                         Modifier
                             .fillMaxWidth()
                             .wrapContentWidth(),
-                        size = 64.dp,
+                        size = 72.dp,
                     )
                     Spacer(Modifier.height(mySpacings.largeSpace))
+                    Spacer(Modifier.height(mySpacings.largeSpace))
                     Text(
-                        text = myStringResource(Res.string.app_title),
+                        text = myStringResource(Res.string.welcome),
                         fontWeight = FontWeight.Bold,
                         fontSize = myTextSizes.x2l,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(),
+                    )
+                    Spacer(Modifier.height(mySpacings.mediumSpace))
+                    Text(
+                        text = myStringResource(Res.string.initial_setup_description),
+                        fontSize = myTextSizes.lg,
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentWidth(),
