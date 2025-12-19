@@ -14,6 +14,22 @@
 
 ### Security
 
+## 1.8.0
+
+### Added
+
+- Android Support
+- macOS users can now use homebrew to install/update the application
+
+### Fixed
+
+- Some HLS streams are not recognized properly
+
+### Improved
+
+- Updated translations
+- UI improvements
+
 ## 1.7.1
 
 ### Added
