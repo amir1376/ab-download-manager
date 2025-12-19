@@ -1,6 +1,5 @@
 package com.abdownloadmanager
 
-import com.abdownloadmanager.InstallableArch.SomeArch
 import io.github.z4kn4fein.semver.Version
 import ir.amirab.util.platform.Arch
 import ir.amirab.util.platform.Platform
@@ -14,7 +13,11 @@ data class AppArtifactInfo(
 )
 
 sealed interface InstallableArch {
+    fun isCompatible(arch: Arch): Boolean
     data object Universal : InstallableArch {
+        override fun isCompatible(arch: Arch): Boolean {
+            return true
+        }
         private val possibleNames = listOf(
             "universal",
             null,
@@ -30,6 +33,10 @@ sealed interface InstallableArch {
     }
 
     data class SomeArch(val arch: Arch) : InstallableArch {
+        override fun isCompatible(arch: Arch): Boolean {
+            return this.arch == arch
+        }
+
         companion object {
             fun fromString(arch: String?): InstallableArch? {
                 return arch

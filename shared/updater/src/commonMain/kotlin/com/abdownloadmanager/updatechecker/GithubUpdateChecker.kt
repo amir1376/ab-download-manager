@@ -2,7 +2,6 @@ package com.abdownloadmanager.updatechecker
 
 import com.abdownloadmanager.github.GithubApi
 import com.abdownloadmanager.ArtifactUtil
-import com.abdownloadmanager.isUniversal
 import io.github.z4kn4fein.semver.Version
 import ir.amirab.util.platform.Arch
 import ir.amirab.util.platform.Platform
@@ -26,7 +25,7 @@ class GithubUpdateChecker(
             val v = ArtifactUtil.getArtifactInfo(asset.name) ?: continue
             if (v.platform != currentPlatform) continue
             // universal builds should be installed on any arch
-            if (v.arch != currentArch && !v.arch.isUniversal()) continue
+            if (!v.arch.isCompatible(currentArch)) continue
             if (!initializedVersionFromAssetNames) {
                 foundVersion = v.version
                 initializedVersionFromAssetNames = true
