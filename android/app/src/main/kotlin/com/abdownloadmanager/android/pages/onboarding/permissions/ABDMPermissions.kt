@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.os.Build
 import android.os.Environment
+import android.os.PowerManager
 import androidx.annotation.RequiresApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
@@ -66,10 +67,30 @@ object ABDMPermissions {
         )
     }
 
-    val all = buildList {
+    val importantPermissions = buildList {
         add(StoragePermission)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             add(createPostNotificationPermission())
         }
     }
+
+    // these are not introduced in the main screen.
+    val BatteryOptimizationPermission = AppPermission(
+        title = Res.string.permissions_ignore_battery_optimization_title.asStringSource(),
+        description = Res.string.permissions_ignore_battery_optimization_reason.asStringSource(),
+        icon = MyIcons.settings,
+        isOptional = true,
+        permissions = listOf(),
+        permissionRequestFactory = CustomPermissionActivityLauncher(::requestIgnoreBatteryOptimizationPermission),
+        permissionChecker = object : PermissionRequestChecker {
+            override fun isGranted(
+                context: Context,
+                appPermission: AppPermission
+            ): Boolean {
+                val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+                return pm.isIgnoringBatteryOptimizations(context.packageName)
+            }
+        }
+    )
 }
+

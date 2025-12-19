@@ -1,5 +1,11 @@
 package com.abdownloadmanager.android.pages.credits.translators
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import com.abdownloadmanager.android.di.Di
 import com.abdownloadmanager.resources.ABDMResources
 import com.abdownloadmanager.shared.ui.widget.MaybeLinkText
@@ -9,15 +15,27 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.android.ui.page.FooterFade
+import com.abdownloadmanager.android.ui.page.PageHeader
+import com.abdownloadmanager.android.ui.page.PageTitle
+import com.abdownloadmanager.android.ui.page.PageUi
+import com.abdownloadmanager.android.ui.page.rememberHeaderAlpha
+import com.abdownloadmanager.android.util.compose.useBack
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.Text
@@ -26,11 +44,14 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.credits.translators.LanguageTranslationInfo
 import com.abdownloadmanager.shared.pages.credits.translators.TranslatorData
 import com.abdownloadmanager.shared.ui.widget.PrimaryMainActionButton
+import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.SharedConstants
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.util.URLOpener
+import ir.amirab.util.compose.dpToPx
 import ir.amirab.util.compose.localizationmanager.LanguageNameProvider
 import ir.amirab.util.compose.localizationmanager.MyLocale
 import ir.amirab.util.compose.resources.myStringResource
@@ -49,21 +70,83 @@ fun TranslatorsPage(onBack: () -> Unit) {
 
 @Composable
 internal fun Translators(modifier: Modifier) {
-    Column(
-        modifier
-    ) {
-        DearTranslators(
-            Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .weight(1f)
-        )
-        ContributionNotice(
-            modifier = Modifier,
-            onUserWantsToContribute = {
-                URLOpener.openUrl(SharedConstants.projectTranslations)
+    val listState = rememberLazyListState()
+    var contentPadding by remember {
+        mutableStateOf(PaddingValues.Zero)
+    }
+    val topPadding = contentPadding.calculateTopPadding()
+    val bottomPadding = contentPadding.calculateBottomPadding()
+    val density = LocalDensity.current
+    val headerAlpha by rememberHeaderAlpha(listState, topPadding.dpToPx(density))
+    PageUi(
+        modifier = modifier,
+        header = {
+            val onBack = useBack()
+            PageHeader(
+                leadingIcon = {
+                    TransparentIconActionButton(
+                        MyIcons.back,
+                        myStringResource(Res.string.back),
+                    ) {
+                        onBack?.onBackPressed()
+                    }
+                },
+                headerTitle = {
+                    PageTitle(
+                        myStringResource(Res.string.meet_the_translators)
+                    )
+                },
+                modifier = Modifier
+                    .background(
+                        myColors.background.copy(
+                            alpha = headerAlpha * 0.75f
+                        )
+                    )
+                    .statusBarsPadding()
+            )
+        },
+        footer = {
+            AnimatedContent(
+                headerAlpha == 0f,
+                transitionSpec = {
+                    fadeIn() + expandVertically() togetherWith fadeOut() + shrinkVertically()
+                },
+                contentAlignment = Alignment.BottomCenter,
+            ) {
+                if (it) {
+                    ContributionNotice(
+                        modifier = Modifier,
+                        onUserWantsToContribute = {
+                            URLOpener.openUrl(SharedConstants.projectTranslations)
+                        }
+                    )
+                } else {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .navigationBarsPadding()
+                    )
+                }
             }
-        )
+//            AnimatedVisibility(
+//                headerAlpha == 0f,
+//                enter = expandVertically() + fadeIn(),
+//                exit = shrinkVertically() + fadeOut(),
+//            ) {
+//
+//            }
+        },
+    ) {
+        contentPadding = it.paddingValues
+        Box {
+            DearTranslators(
+                Modifier
+                    .fillMaxWidth(),
+                state = listState,
+                contentPadding = it.paddingValues,
+            )
+            FooterFade(bottomPadding)
+        }
     }
 }
 
@@ -134,15 +217,16 @@ private fun ContributionNotice(
 @Composable
 private fun DearTranslators(
     modifier: Modifier,
+    state: LazyListState,
+    contentPadding: PaddingValues,
 ) {
     val itemHorizontalPadding = 16.dp
     val list = rememberLanguageTranslationInfo()
 
-    val state = rememberLazyListState()
-
     LazyColumn(
         modifier,
-        state = state
+        state = state,
+        contentPadding = contentPadding,
     ) {
         itemsIndexed(list) { index, item ->
             TranslatedLanguageItem(

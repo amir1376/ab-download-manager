@@ -1,6 +1,5 @@
 package com.abdownloadmanager.android.pages.about
 
-import android.webkit.URLUtil
 import androidx.compose.runtime.Composable
 
 
@@ -11,19 +10,20 @@ import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.android.ui.page.PageHeader
+import com.abdownloadmanager.android.ui.page.PageTitle
+import com.abdownloadmanager.android.ui.page.PageUi
+import com.abdownloadmanager.android.util.compose.useBack
 import com.abdownloadmanager.shared.util.SharedConstants
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.ui.widget.IconActionButton
@@ -31,9 +31,8 @@ import com.abdownloadmanager.shared.ui.widget.Tooltip
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.ActionButton
-import com.abdownloadmanager.shared.ui.widget.LinkText
+import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.AppVersion
-import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.util.URLOpener
@@ -48,9 +47,28 @@ fun AboutPage(
     onRequestShowOpenSourceLibraries: () -> Unit,
     onRequestShowTranslators: () -> Unit,
 ) {
-    Box(Modifier.background(myColors.background)) {
+    PageUi(
+        header = {
+            val onBack = useBack()
+            PageHeader(
+                leadingIcon = {
+                    TransparentIconActionButton(
+                        icon = MyIcons.back,
+                        contentDescription = myStringResource(Res.string.back)
+                    ) {
+                        onBack?.onBackPressed()
+                    }
+                },
+                headerTitle = {
+                    PageTitle(myStringResource(Res.string.about))
+                },
+                modifier = Modifier.statusBarsPadding(),
+            )
+        },
+        footer = {}
+    ) {
         RenderAppInfo(
-            modifier = Modifier,
+            modifier = Modifier.padding(it.paddingValues),
             onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
             onRequestShowTranslators = onRequestShowTranslators,
         )
@@ -117,6 +135,7 @@ private fun RenderAppInfo(
     onRequestShowOpenSourceLibraries: () -> Unit,
     onRequestShowTranslators: () -> Unit,
 ) {
+    val shape = myShapes.defaultRounded
     Column(
         modifier.fillMaxSize(),
     ) {
@@ -124,8 +143,7 @@ private fun RenderAppInfo(
             Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = mySpacings.largeSpace)
-                .statusBarsPadding(),
+                .padding(horizontal = mySpacings.largeSpace),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             AppIconAndVersion(
@@ -142,17 +160,15 @@ private fun RenderAppInfo(
                 onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
                 onRequestShowTranslators = onRequestShowTranslators,
             )
-            Spacer(
-                Modifier
-                    .height(1.dp)
-                    .fillMaxWidth()
-                    .background(myColors.onBackground / 0.15f)
-            )
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .background(myColors.surface)
                     .navigationBarsPadding()
+                    .padding(horizontal = mySpacings.largeSpace)
+                    .padding(bottom = mySpacings.largeSpace)
+                    .border(1.dp, myColors.onBackground / 0.15f, shape)
+                    .clip(shape)
+                    .background(myColors.surface)
             ) {
                 Spacer(Modifier.height(mySpacings.largeSpace))
                 DevelopedWithLove(

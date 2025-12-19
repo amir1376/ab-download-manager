@@ -55,6 +55,7 @@ import com.abdownloadmanager.android.ui.menu.RenderMenuInSinglePage
 import com.abdownloadmanager.android.ui.page.PageUi
 import com.abdownloadmanager.android.ui.page.PageHeader
 import com.abdownloadmanager.android.ui.page.PageTitle
+import com.abdownloadmanager.android.ui.page.rememberHeaderAlpha
 import com.abdownloadmanager.android.util.AndroidIntentUtils
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.home.BaseHomeComponent
@@ -166,7 +167,6 @@ fun HomePage(component: HomeComponent) {
                     topPaddingInDp.toPx()
                 },
             ).value * 0.75f
-            val colors = myColors
             PageHeader(
                 modifier = Modifier
                     .background(
@@ -406,32 +406,4 @@ private fun RenderDownloadOptions(
         selectionCount = selection.size,
         total = downloadList.size,
     )
-}
-
-private fun createAlphaForHeader(
-    scrollOffset: Float,
-    headerHeight: Float,
-): Float {
-    if (headerHeight == 0f) return 0f
-    return (scrollOffset / headerHeight).coerceIn(0f..1f)
-}
-
-@Composable
-fun rememberHeaderAlpha(
-    listState: LazyListState,
-    headerHeightPx: Float,
-): State<Float> {
-    val headerHeightPx by rememberUpdatedState(headerHeightPx)
-    return remember {
-        derivedStateOf {
-            when {
-                listState.firstVisibleItemIndex > 0 -> 1f
-                headerHeightPx == 0f -> 1f
-                else -> {
-                    val scrolled = listState.firstVisibleItemScrollOffset.toFloat()
-                    (scrolled / headerHeightPx).coerceIn(0f, 1f)
-                }
-            }
-        }
-    }
 }

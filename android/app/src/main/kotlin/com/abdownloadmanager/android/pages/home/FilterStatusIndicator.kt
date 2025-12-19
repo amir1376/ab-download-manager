@@ -24,6 +24,7 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
+import ir.amirab.util.compose.modifiers.autoMirror
 
 
 @Composable
@@ -45,6 +46,7 @@ fun FilterStatusIndicator(
             modifier = Modifier
                 .padding(start = 3.dp)
                 .align(Alignment.CenterStart)
+                .autoMirror()
         )
         SimplePager(
             modifier = Modifier
@@ -87,6 +89,7 @@ fun FilterStatusIndicator(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 3.dp)
+                .autoMirror()
         )
         BottomNavigationSelectedIndicator(isSelected)
     }

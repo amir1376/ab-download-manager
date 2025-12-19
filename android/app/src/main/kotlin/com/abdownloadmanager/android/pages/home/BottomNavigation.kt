@@ -282,11 +282,11 @@ fun ToggleQueueStatus(
     if (isQueueActive) {
         icon = MyIcons.queueStop
         contentDescription = Res.string.stop_queue.asStringSource()
-        onClick = { homeComponent.startQueue(queue.id) }
+        onClick = { homeComponent.stopQueue(queue.id) }
     } else {
         icon = MyIcons.queueStart
         contentDescription = Res.string.start_queue.asStringSource()
-        onClick = { homeComponent.stopQueue(queue.id) }
+        onClick = { homeComponent.startQueue(queue.id) }
     }
     BottonNavigationItem(
         icon = icon,

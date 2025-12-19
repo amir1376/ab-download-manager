@@ -27,9 +27,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.android.ui.page.FooterFade
 import com.abdownloadmanager.android.ui.page.PageUi
 import com.abdownloadmanager.android.ui.page.PageHeader
 import com.abdownloadmanager.android.ui.page.PageTitle
+import com.abdownloadmanager.android.ui.page.createAlphaForHeader
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
 import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
@@ -116,28 +118,8 @@ fun SettingsPage(
                     }
                 }
             }
-            Box(
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(bottomPadding)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                Color.Transparent,
-                                myColors.background,
-                            )
-                        )
-                    )
-            )
+            FooterFade(bottomPadding)
         }
     }
 }
 
-private fun createAlphaForHeader(
-    scrollOffset: Float,
-    headerHeight: Float,
-): Float {
-    if (headerHeight == 0f) return 0f
-    return (scrollOffset / headerHeight).coerceIn(0f..1f)
-}

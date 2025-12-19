@@ -337,7 +337,7 @@ val downloadSystemModule = module {
     }
     single {
         PermissionManager(
-            ABDMPermissions.all,
+            ABDMPermissions.importantPermissions,
             get(),
         )
     }

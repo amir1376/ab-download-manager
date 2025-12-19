@@ -1,5 +1,6 @@
 package com.abdownloadmanager.android.ui.page
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -110,15 +111,17 @@ fun PageHeader(
 
 @Composable
 fun PageTitle(
-    title: String
+    title: String,
 ) {
     Text(
         text = title,
         fontWeight = FontWeight.Bold,
         fontSize = myTextSizes.xl,
+        maxLines = 1,
         modifier = Modifier
             .padding(start = mySpacings.largeSpace)
             .padding(vertical = mySpacings.largeSpace)
+            .basicMarquee()
     )
 }
 
