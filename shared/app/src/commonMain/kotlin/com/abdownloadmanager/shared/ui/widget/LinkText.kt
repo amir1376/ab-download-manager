@@ -22,6 +22,7 @@ import com.abdownloadmanager.shared.util.ui.LocalTextStyle
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.ifThen
 
 
@@ -80,6 +81,9 @@ fun MaybeLinkText(
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
 ) {
+    val link = remember(link) {
+        link?.takeIf(HttpUrlUtils::isValidUrl)
+    }
     if (link == null) {
         Text(
             modifier = modifier,
