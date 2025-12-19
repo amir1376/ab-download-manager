@@ -42,6 +42,7 @@ import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialog
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
@@ -88,9 +89,10 @@ fun DirectoryPicker(
     state.OnFullyDismissed {
         onDirectorySelected(null)
     }
+    val onDismiss = state::hide
     ResponsiveDialog(
         state,
-        state::hide
+        onDismiss
     ) {
         var currentDirectory by remember(initialDirectory) {
             mutableStateOf(initialDirectory)
@@ -101,6 +103,7 @@ fun DirectoryPicker(
         fun refreshDirectories() {
             updateDirectories++
         }
+
         val storagePermissionState = rememberAppPermissionState(ABDMPermissions.StoragePermission)
         val directoryList = remember(
             currentDirectory,
@@ -152,6 +155,13 @@ fun DirectoryPicker(
                             description = currentDirectory.toString()
                         )
                     },
+                    headerActions = {
+                        TransparentIconActionButton(
+                            MyIcons.close,
+                            contentDescription = myStringResource(Res.string.close),
+                            onClick = onDismiss
+                        )
+                    }
                 )
             }
         ) {

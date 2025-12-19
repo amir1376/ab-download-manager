@@ -22,6 +22,8 @@ import androidx.compose.ui.focus.focusRequester
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.ui.widget.ActionButton
+import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.resources.myStringResource
@@ -67,6 +69,13 @@ fun <T> SheetInput(
         title = title,
         onDismiss = onDismiss,
         isOpened = isOpened,
+        headerActions = {
+            TransparentIconActionButton(
+                MyIcons.close,
+                contentDescription = myStringResource(Res.string.close),
+                onClick = onDismiss
+            )
+        }
     ) {
         Column(
             Modifier.padding(horizontal = mySpacings.mediumSpace)

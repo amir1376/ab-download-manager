@@ -5,13 +5,17 @@ import androidx.compose.runtime.*
 import com.abdownloadmanager.android.ui.SheetHeader
 import com.abdownloadmanager.android.ui.SheetTitle
 import com.abdownloadmanager.android.ui.SheetUI
+import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.singledownloadpage.createStatusString
+import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialog
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
+import ir.amirab.util.compose.resources.myStringResource
 import kotlinx.coroutines.delay
 
 @Composable
@@ -39,21 +43,29 @@ fun ShowDownloadDialog(singleDownloadComponent: AndroidSingleDownloadComponent) 
         delay(10)
         dialogState.show()
     }
+    val closeDialog = dialogState::hide
     ResponsiveDialog(
-        dialogState, dialogState::hide
+        dialogState, closeDialog
     ) {
         itemState?.let { downloadItemState ->
             SheetUI(header = {
                 SheetHeader(
                     headerTitle = {
                         SheetTitle(getDownloadTitle(downloadItemState))
+                    },
+                    headerActions = {
+                        TransparentIconActionButton(
+                            MyIcons.close,
+                            contentDescription = myStringResource(Res.string.close),
+                            onClick = closeDialog
+                        )
                     }
                 )
             }) {
                 AnimatedContent(
                     targetState = downloadItemState,
                     contentKey = {
-                        when (downloadItemState) {
+                        when (it) {
                             is CompletedDownloadItemState -> 0
                             is ProcessingDownloadItemState -> 1
                         }

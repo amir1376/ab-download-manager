@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +26,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.abdownloadmanager.android.ui.SheetHeader
@@ -37,11 +38,10 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.TADownloaderInUI
 import com.abdownloadmanager.shared.pages.enterurl.DownloaderSelection
 import com.abdownloadmanager.shared.ui.widget.ActionButton
-import com.abdownloadmanager.shared.ui.widget.IconActionButton
-import com.abdownloadmanager.shared.ui.widget.MyTextField
 import com.abdownloadmanager.shared.ui.widget.MyTextFieldIcon
 import com.abdownloadmanager.shared.ui.widget.MyTextFieldWithIcons
 import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.ResponsiveDialogScope
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.WithContentColor
@@ -71,6 +71,11 @@ fun ResponsiveDialogScope.EnterNewURLPage(
                 },
                 headerActions = {
                     DownloaderSelectionSection(component)
+                    TransparentIconActionButton(
+                        MyIcons.close,
+                        contentDescription = myStringResource(Res.string.close),
+                        onClick = onCloseRequest,
+                    )
                 }
             )
         },
@@ -114,6 +119,7 @@ private fun DownloaderSelectionSection(
                 MyIcon(MyIcons.down, null, Modifier.size(12.dp))
             }
         },
+        borderColor = SolidColor(Color.Transparent),
         onClick = {
             isSelecting = !isSelecting
         }
@@ -218,8 +224,8 @@ private fun Actions(
 private fun UrlTextField(
     text: String,
     setText: (String) -> Unit,
-    errorText: String? = null,
     modifier: Modifier = Modifier,
+    errorText: String? = null,
 ) {
     MyTextFieldWithIcons(
         text,

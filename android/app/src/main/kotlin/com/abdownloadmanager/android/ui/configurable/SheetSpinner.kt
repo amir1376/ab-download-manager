@@ -34,7 +34,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.defaultValueToString
+import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
 import com.abdownloadmanager.shared.util.ui.VerticalScrollableContent
@@ -47,6 +49,7 @@ import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
 import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 import kotlin.collections.set
 
@@ -72,6 +75,13 @@ fun <T> RenderSpinnerInSheet(
         title = title,
         isOpened = isOpened,
         onDismiss = onDismiss,
+        headerActions = {
+            TransparentIconActionButton(
+                MyIcons.close,
+                contentDescription = myStringResource(Res.string.close),
+                onClick = onDismiss
+            )
+        }
     ) {
         val focusRequester = remember { FocusRequester() }
         LaunchedEffect(Unit) {

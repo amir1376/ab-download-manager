@@ -82,7 +82,14 @@ fun ResponsiveDialogScope.EditDownloadPage(
             SheetHeader(
                 headerTitle = {
                     SheetTitle(myStringResource(Res.string.edit_download_title))
-                }
+                },
+                headerActions = {
+                    TransparentIconActionButton(
+                        MyIcons.close,
+                        contentDescription = myStringResource(Res.string.close),
+                        onClick = onDismiss
+                    )
+                },
             )
         }
     ) {
