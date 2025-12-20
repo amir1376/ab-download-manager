@@ -21,11 +21,11 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:usesCleartextTraffic="true"
             android:requestLegacyExternalStorage="true"
-            android:label="@string/app_short_name"
+            android:label="@string/app_name"
     >
         <activity
-                android:label="@string/app_short_name"
                 android:name=".ui.MainActivity"
+                android:label="@string/app_short_name"
                 android:exported="true"
                 android:launchMode="singleInstance"
                 android:windowSoftInputMode="adjustResize"
@@ -37,6 +37,7 @@
         </activity>
         <activity
                 android:name=".pages.singledownload.SingleDownloadPageActivity"
+                android:label="@string/app_short_name"
                 android:exported="true"
                 android:theme="@style/Theme.ABDownloadManager.Transparent"
                 android:windowSoftInputMode="adjustResize"
@@ -45,12 +46,14 @@
         <!--        Accept external download from browsers/send intents etc...-->
         <activity
                 android:name=".pages.add.AddDownloadActivity"
+                android:label="@string/app_short_name"
                 android:exported="true"
                 android:theme="@style/Theme.ABDownloadManager.Transparent"
         />
 
         <activity
                 android:name=".pages.add.single.AddSingleDownloadActivity"
+                android:label="@string/app_short_name"
                 android:exported="false"
                 android:theme="@style/Theme.ABDownloadManager.Transparent"
                 android:windowSoftInputMode="adjustResize"
@@ -58,6 +61,7 @@
 
         <activity
                 android:name=".pages.add.multiple.AddMultiDownloadActivity"
+                android:label="@string/app_short_name"
                 android:exported="false"
                 android:theme="@style/Theme.ABDownloadManager"
                 android:windowSoftInputMode="adjustResize"
@@ -65,6 +69,7 @@
 
         <activity
                 android:name=".pages.directorypicker.DirectoryPickerActivity"
+                android:label="@string/app_short_name"
                 android:exported="false"
                 android:theme="@style/Theme.ABDownloadManager.Transparent"
                 android:windowSoftInputMode="adjustResize"
@@ -72,6 +77,7 @@
 
         <activity
                 android:name=".pages.crashreport.CrashReportActivity"
+                android:label="@string/app_short_name"
                 android:exported="true"
                 android:theme="@style/Theme.ABDownloadManager.Transparent"
                 android:windowSoftInputMode="adjustResize"
