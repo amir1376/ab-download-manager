@@ -1,4 +1,3 @@
-import buildlogic.CiDirs
 import buildlogic.CiUtils
 import buildlogic.versioning.convertToVersionCode
 import buildlogic.versioning.getAppName
@@ -11,12 +10,11 @@ import ir.amirab.plugin.common_android.task.SignApkTask
 import ir.amirab.plugin.common_android.task.androidEnableFileTypesGeneratorForManifest
 import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 plugins {
     id(Plugins.Android.application)
-    id(MyPlugins.kotlinAndroid)
+    id(MyPlugins.androidBase)
     id(MyPlugins.composeAndroid)
     id(Plugins.ksp)
     id(Plugins.Kotlin.serialization)
@@ -42,6 +40,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 }
 

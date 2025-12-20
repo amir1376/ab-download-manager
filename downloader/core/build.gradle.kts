@@ -1,13 +1,15 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id(MyPlugins.kotlinMultiplatform)
     id(Plugins.Kotlin.serialization)
-    id(Plugins.Android.library)
+    id(Plugins.Android.multiplatformLibrary)
 }
 kotlin {
     jvm("desktop")
-    androidTarget("android") {
+    android {
+        compileSdk = 36
+        namespace = "ir.amirab.downloader.core"
+        minSdk = 26
     }
     sourceSets {
         commonMain {
@@ -23,12 +25,5 @@ kotlin {
                 api("io.lindstrom:m3u8-parser:0.29")
             }
         }
-    }
-}
-android {
-    compileSdk = 36
-    namespace = "ir.amirab.downloader.core"
-    defaultConfig {
-        minSdk = 26
     }
 }

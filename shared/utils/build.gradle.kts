@@ -1,13 +1,14 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     id(MyPlugins.kotlinMultiplatform)
     id(Plugins.Kotlin.serialization)
-    id(Plugins.Android.library)
+    id(Plugins.Android.multiplatformLibrary)
 }
 kotlin {
     jvm("desktop")
-    androidTarget("android") {
+    android {
+        compileSdk = 36
+        namespace = "ir.amirab.util"
+        minSdk = 26
     }
     sourceSets {
         commonMain.dependencies {
@@ -29,12 +30,5 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.androidx.core.ktx)
         }
-    }
-}
-android {
-    compileSdk = 36
-    namespace = "ir.amirab.util"
-    defaultConfig {
-        minSdk = 26
     }
 }

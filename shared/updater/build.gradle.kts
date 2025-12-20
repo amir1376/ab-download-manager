@@ -1,14 +1,14 @@
-import org.gradle.kotlin.dsl.implementation
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     id(MyPlugins.kotlinMultiplatform)
-    id(Plugins.Android.library)
+    id(Plugins.Android.multiplatformLibrary)
     id(Plugins.Kotlin.serialization)
 }
 kotlin {
     jvm("desktop")
-    androidTarget("android") {
+    android {
+        namespace = "com.abdownloadmanager.updater"
+        compileSdk = 36
+        minSdk = 26
     }
     sourceSets {
         commonMain.dependencies {
@@ -23,12 +23,5 @@ kotlin {
         desktopMain.dependencies {
             implementation(libs.jna.platform)
         }
-    }
-}
-android {
-    namespace = "com.abdownloadmanager.updater"
-    compileSdk = 36
-    defaultConfig {
-        minSdk = 26
     }
 }
