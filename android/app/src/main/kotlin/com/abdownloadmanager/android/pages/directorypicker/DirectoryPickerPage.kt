@@ -57,6 +57,7 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.createDirectories
 import ir.amirab.util.exists
+import ir.amirab.util.isDirectory
 import ir.amirab.util.listFiles
 import ir.amirab.util.listFilesOrNull
 import ir.amirab.util.startsWith
@@ -113,7 +114,11 @@ fun DirectoryPicker(
             val weHaveFullAccess = storagePermissionState.isGranted
             DirectoryList(
                 currentDirectory = currentDirectory,
-                directories = runCatching { currentDirectory.listFiles() }
+                directories = runCatching {
+                    currentDirectory
+                        .listFiles()
+                        .filter { it.isDirectory() }
+                }
                     .getOrNull()
                     .orEmpty()
                     .map {

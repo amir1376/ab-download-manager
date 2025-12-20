@@ -1,6 +1,7 @@
-package com.abdownloadmanager.shared.ui.util
+package com.abdownloadmanager.desktop.ui.util
 
 import androidx.compose.runtime.Composable
+import com.abdownloadmanager.shared.ui.util.LocalWindow
 import io.github.vinceglb.filekit.compose.PickerResultLauncher
 import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.core.FileKitPlatformSettings
@@ -25,6 +26,8 @@ fun rememberMyDirectoryPickerLauncher(
 }
 
 @Composable
-expect fun createPlatformSettings(
-    attachToWindow: Boolean
-): FileKitPlatformSettings
+fun createPlatformSettings(attachToWindow: Boolean): FileKitPlatformSettings {
+    return FileKitPlatformSettings(
+        parentWindow = LocalWindow.current.takeIf { attachToWindow }
+    )
+}
