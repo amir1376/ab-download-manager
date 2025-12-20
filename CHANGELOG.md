@@ -14,6 +14,19 @@
 
 ### Security
 
+## 1.8.1
+
+### Fixed
+
+- Android 10 storage access issue that caused download errors (#977)
+
+### Improved
+
+- Updated translations
+- Better support for adaptive icons on Android (#978)
+- Improved directory picker on Android (#979)
+- Slightly reduced application size
+
 ## 1.8.0
 
 ### Added
