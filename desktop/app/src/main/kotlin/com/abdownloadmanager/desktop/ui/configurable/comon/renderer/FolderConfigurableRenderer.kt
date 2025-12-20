@@ -20,7 +20,7 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.ui.configurable.item.FolderConfigurable
-import com.abdownloadmanager.shared.ui.util.rememberMyDirectoryPickerLauncher
+import com.abdownloadmanager.desktop.ui.util.rememberMyDirectoryPickerLauncher
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.myShapes

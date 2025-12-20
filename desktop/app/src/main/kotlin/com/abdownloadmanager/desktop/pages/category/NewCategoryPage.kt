@@ -27,7 +27,7 @@ import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.resources.myStringResource
-import com.abdownloadmanager.shared.ui.util.rememberMyDirectoryPickerLauncher
+import com.abdownloadmanager.desktop.ui.util.rememberMyDirectoryPickerLauncher
 import java.io.File
 
 @Composable

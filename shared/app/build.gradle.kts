@@ -52,7 +52,6 @@ kotlin {
             api(libs.fastscroller.core)
             api(libs.markdownRenderer.core)
             api(libs.compose.reorderable)
-            api(libs.composeFileKit)
         }
         androidMain.dependencies {
             api(libs.androidx.core.ktx)
