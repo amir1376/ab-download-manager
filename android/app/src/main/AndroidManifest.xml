@@ -19,6 +19,7 @@
             android:theme="@style/Theme.ABDownloadManager"
             android:icon="@mipmap/ic_launcher"
             android:usesCleartextTraffic="true"
+            android:requestLegacyExternalStorage="true"
             android:label="@string/app_short_name"
     >
         <activity
