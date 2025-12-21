@@ -91,7 +91,7 @@ class ABDMServiceNotificationManager(
             AndroidConstants.NOTIFICATION_DOWNLOAD_CHANEL_NAME,
             NotificationManager.IMPORTANCE_LOW,
         )
-        notificationChanel.setShowBadge(true)
+        notificationChanel.setShowBadge(false)
         notificationManagerCompat.createNotificationChannel(notificationChanel)
     }
 

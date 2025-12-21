@@ -61,6 +61,7 @@ class AndroidGlobalExceptionHandler(
                     AndroidConstants.NOTIFICATION_CRASH_REPORT_CHANEL_NAME,
                     NotificationManager.IMPORTANCE_LOW,
                 )
+                notificationChanel.setShowBadge(false)
                 notificationManagerCompat.createNotificationChannel(notificationChanel)
             }
             initialized = true
