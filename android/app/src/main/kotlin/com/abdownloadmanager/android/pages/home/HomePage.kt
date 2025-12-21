@@ -38,11 +38,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -52,6 +54,7 @@ import androidx.compose.ui.window.PopupProperties
 import com.abdownloadmanager.android.pages.enterurl.EnterNewURLPage
 import com.abdownloadmanager.android.pages.home.sections.sort.RenderSortMenu
 import com.abdownloadmanager.android.ui.menu.RenderMenuInSinglePage
+import com.abdownloadmanager.android.ui.page.PageFooter
 import com.abdownloadmanager.android.ui.page.PageUi
 import com.abdownloadmanager.android.ui.page.PageHeader
 import com.abdownloadmanager.android.ui.page.PageTitle
@@ -75,6 +78,7 @@ import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.modifiers.silentClickable
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.ifThen
 import kotlinx.coroutines.launch
 
 
@@ -100,6 +104,7 @@ fun HomePage(component: HomeComponent) {
     val downloadList by component.sortedDownloadList.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val direction = LocalLayoutDirection.current
     HandleEffects(component) { effect ->
         when (effect) {
             is BaseHomeComponent.Effects.Common -> {
@@ -159,112 +164,120 @@ fun HomePage(component: HomeComponent) {
         }
     }
     val isOverlayVisible by component.isOverlayVisible.collectAsState()
-    PageUi(
-        header = {
-            val headerAlpha = rememberHeaderAlpha(
-                lazyListState,
-                density.run {
-                    topPaddingInDp.toPx()
-                },
-            ).value * 0.75f
-            PageHeader(
-                modifier = Modifier
-                    .background(
-                        myColors.background.copy(
-                            alpha = headerAlpha
-                        )
-                    )
-                    .statusBarsPadding()
-                    .padding(horizontal = mySpacings.largeSpace),
-                leadingIcon = {
-                    MyIcon(
-                        MyIcons.appIcon,
-                        null,
-                        Modifier.size(mySpacings.iconSize),
-                    )
-                },
-                headerTitle = {
-                    PageTitle(
-                        myStringResource(Res.string.app_title)
-                    )
-                }
-            )
-        },
-        footer = {
-            Footer(
-                Modifier,
-                component,
-            )
-        }
+    Box(
+        Modifier.fillMaxSize()
     ) {
-        contentPaddingValues = it.paddingValues
-        Box {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(myColors.background),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                DownloadList(
-                    downloadList = downloadList,
-                    selectionList = selectionList,
-                    onItemSelectionChange = { id, checked ->
-                        component.onItemSelectionChange(id, checked)
+        PageUi(
+            header = {
+                val headerAlpha = rememberHeaderAlpha(
+                    lazyListState,
+                    density.run {
+                        topPaddingInDp.toPx()
                     },
-                    onItemClicked = {
-                        component.onItemClicked(it)
-                    },
-                    fileIconProvider = component.fileIconProvider,
-                    onNewSelection = {
-                        component.newSelection(ids = it)
-                    },
-                    lazyListState = lazyListState,
+                ).value * 0.75f
+                PageHeader(
                     modifier = Modifier
-                        .weight(1f),
-                    contentPadding = PaddingValues(
-                        bottom = bottomPaddingInDp,
-                        top = topPaddingInDp,
-                    ),
-                )
-            }
-            AnimatedVisibility(
-                isOverlayVisible,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                Box(
-                    Modifier
-                        .align(Alignment.Center)
-                        .fillMaxSize()
                         .background(
-                            Color.Black.copy(alpha = 0.5f),
-                        )
-                        .silentClickable {
-                            component.onOverlayClicked()
-                        }
-                )
-            }
-            Box(
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(bottomPaddingInDp)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                Color.Transparent,
-                                myColors.background,
+                            myColors.background.copy(
+                                alpha = headerAlpha
                             )
                         )
+                        .statusBarsPadding()
+                        .padding(horizontal = mySpacings.largeSpace),
+                    leadingIcon = {
+                        MyIcon(
+                            MyIcons.appIcon,
+                            null,
+                            Modifier.size(mySpacings.iconSize),
+                        )
+                    },
+                    headerTitle = {
+                        PageTitle(
+                            myStringResource(Res.string.app_title)
+                        )
+                    }
+                )
+            },
+            footer = {
+                PageFooter {
+                    Footer(
+                        Modifier,
+                        component,
                     )
-            )
-            RenderAboveBottonNavigation(
-                component, Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = bottomPaddingInDp)
-            )
+                }
+            },
+        ) { params ->
+            contentPaddingValues = params.paddingValues
+            Box {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .background(myColors.background),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    DownloadList(
+                        downloadList = downloadList,
+                        selectionList = selectionList,
+                        onItemSelectionChange = { id, checked ->
+                            component.onItemSelectionChange(id, checked)
+                        },
+                        onItemClicked = {
+                            component.onItemClicked(it)
+                        },
+                        fileIconProvider = component.fileIconProvider,
+                        onNewSelection = {
+                            component.newSelection(ids = it)
+                        },
+                        lazyListState = lazyListState,
+                        modifier = Modifier
+                            .weight(1f),
+                        contentPadding = params.paddingValues,
+                    )
+                }
+                AnimatedVisibility(
+                    isOverlayVisible,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    Box(
+                        Modifier
+                            .align(Alignment.Center)
+                            .fillMaxSize()
+                            .background(
+                                Color.Black.copy(alpha = 0.5f),
+                            )
+                            .silentClickable {
+                                component.onOverlayClicked()
+                            }
+                    )
+                }
+                Box(
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(bottomPaddingInDp)
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    Color.Transparent,
+                                    myColors.background,
+                                )
+                            )
+                        )
+                )
+            }
         }
+        RenderAboveBottonNavigation(
+            component, Modifier
+                .align(Alignment.BottomCenter)
+                .padding(
+                    start = contentPaddingValues.calculateLeftPadding(direction),
+                    end = contentPaddingValues.calculateRightPadding(direction),
+                )
+                .padding(horizontal = 16.dp)
+                .statusBarsPadding()
+                .padding(bottom = bottomPaddingInDp)
+        )
     }
 
     val enterNewURLComponent = component.enterNewLinkSlot.rememberChild()

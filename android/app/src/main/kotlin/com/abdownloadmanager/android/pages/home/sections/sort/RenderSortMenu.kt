@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -79,26 +81,32 @@ fun RenderSortMenu(
                     mySpacings.largeSpace
                 )
             )
-            for (downloadSortBy in component.possibleSorts) {
-                val isSelected = downloadSortBy == selectedSort.cell
-                key(downloadSortBy) {
-                    SortItem(
-                        downloadSortBy,
-                        sortIndicatorMode = if (isSelected) {
-                            selectedSort.toSortIndicatorMode()
-                        } else {
-                            SortIndicatorMode.None
-                        },
-                        onSortChange = {
-                            component.setSelectedSort(
-                                Sort(
-                                    cell = downloadSortBy,
-                                    isDescending = it.isDescending()
+            Column(
+                Modifier
+                    .weight(1f, false)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                for (downloadSortBy in component.possibleSorts) {
+                    val isSelected = downloadSortBy == selectedSort.cell
+                    key(downloadSortBy) {
+                        SortItem(
+                            downloadSortBy,
+                            sortIndicatorMode = if (isSelected) {
+                                selectedSort.toSortIndicatorMode()
+                            } else {
+                                SortIndicatorMode.None
+                            },
+                            onSortChange = {
+                                component.setSelectedSort(
+                                    Sort(
+                                        cell = downloadSortBy,
+                                        isDescending = it.isDescending()
+                                    )
                                 )
-                            )
-                        },
-                        Modifier.fillMaxWidth(),
-                    )
+                            },
+                            Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
             ActionButton(
