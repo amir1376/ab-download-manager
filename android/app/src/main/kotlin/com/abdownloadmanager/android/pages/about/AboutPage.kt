@@ -10,19 +10,24 @@ import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.android.ui.page.PageFooter
 import com.abdownloadmanager.android.ui.page.PageHeader
 import com.abdownloadmanager.android.ui.page.PageTitle
 import com.abdownloadmanager.android.ui.page.PageUi
+import com.abdownloadmanager.android.ui.page.createAlphaForHeader
+import com.abdownloadmanager.android.ui.page.rememberHeaderAlpha
 import com.abdownloadmanager.android.util.compose.useBack
 import com.abdownloadmanager.shared.util.SharedConstants
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
@@ -40,6 +45,7 @@ import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.dpToPx
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -47,6 +53,11 @@ fun AboutPage(
     onRequestShowOpenSourceLibraries: () -> Unit,
     onRequestShowTranslators: () -> Unit,
 ) {
+    val state = rememberScrollState()
+    var paddings by remember { mutableStateOf(PaddingValues.Zero) }
+    val headerAlpha =
+        createAlphaForHeader(state.value.toFloat(), paddings.calculateTopPadding().dpToPx(LocalDensity.current))
+    val shape = myShapes.defaultRounded
     PageUi(
         header = {
             val onBack = useBack()
@@ -62,16 +73,79 @@ fun AboutPage(
                 headerTitle = {
                     PageTitle(myStringResource(Res.string.about))
                 },
-                modifier = Modifier.statusBarsPadding(),
+                modifier = Modifier
+                    .background(
+                        myColors.background.copy(
+                            alpha = headerAlpha * 0.75f
+                        )
+                    )
+                    .statusBarsPadding(),
+
             )
         },
-        footer = {}
+        footer = {
+            PageFooter {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(horizontal = mySpacings.largeSpace)
+                        .padding(bottom = mySpacings.largeSpace)
+                        .border(1.dp, myColors.onBackground / 0.15f, shape)
+                        .clip(shape)
+                        .background(myColors.surface)
+                ) {
+                    Spacer(Modifier.height(mySpacings.largeSpace))
+                    DevelopedWithLove(
+                        Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth()
+                    )
+                    Spacer(Modifier.height(mySpacings.mediumSpace))
+                    SocialAndLinks(
+                        Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(),
+                        horizontalPadding = 8.dp,
+                    )
+                    Spacer(Modifier.height(mySpacings.mediumSpace))
+                    Spacer(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(myColors.onBackground / 0.05f)
+                            .height(1.dp)
+                    )
+                    MainWebsite(Modifier)
+                }
+            }
+        }
     ) {
-        RenderAppInfo(
-            modifier = Modifier.padding(it.paddingValues),
-            onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
-            onRequestShowTranslators = onRequestShowTranslators,
-        )
+        paddings = it.paddingValues
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(state)
+                .padding(it.paddingValues),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = mySpacings.largeSpace),
+            ) {
+                AppIconAndVersion(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp)
+                )
+            }
+            CreditsSection(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
+                onRequestShowTranslators = onRequestShowTranslators,
+            )
+        }
     }
 }
 
@@ -129,72 +203,6 @@ private fun AppIconAndVersion(
     }
 }
 
-@Composable
-private fun RenderAppInfo(
-    modifier: Modifier,
-    onRequestShowOpenSourceLibraries: () -> Unit,
-    onRequestShowTranslators: () -> Unit,
-) {
-    val shape = myShapes.defaultRounded
-    Column(
-        modifier.fillMaxSize(),
-    ) {
-        Column(
-            Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = mySpacings.largeSpace),
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
-            AppIconAndVersion(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .wrapContentHeight()
-            )
-        }
-        Column {
-            CreditsSection(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,
-                onRequestShowTranslators = onRequestShowTranslators,
-            )
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(horizontal = mySpacings.largeSpace)
-                    .padding(bottom = mySpacings.largeSpace)
-                    .border(1.dp, myColors.onBackground / 0.15f, shape)
-                    .clip(shape)
-                    .background(myColors.surface)
-            ) {
-                Spacer(Modifier.height(mySpacings.largeSpace))
-                DevelopedWithLove(
-                    Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth()
-                )
-                Spacer(Modifier.height(mySpacings.mediumSpace))
-                SocialAndLinks(
-                    Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(),
-                    horizontalPadding = 8.dp,
-                )
-                Spacer(Modifier.height(mySpacings.mediumSpace))
-                Spacer(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(myColors.onBackground / 0.05f)
-                        .height(1.dp)
-                )
-                MainWebsite(Modifier)
-            }
-        }
-    }
-}
 
 @Composable
 fun MainWebsite(
@@ -298,7 +306,6 @@ private fun CreditsSection(
 ) {
     Column(
         modifier
-            .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
