@@ -4,6 +4,7 @@ sealed class Arch(val name: String) {
     data object X64 : Arch("x64")
     data object Arm64 : Arch("arm64")
     data object X32 : Arch("x32")
+    data object Arm32 : Arch("arm32")
 
     override fun toString(): String {
         return name
@@ -18,7 +19,10 @@ sealed class Arch(val name: String) {
                 "arm64", "aarch64"
             ),
             X32 to listOf(
-                "x86",
+                "x86", "i686"
+            ),
+            Arm32 to listOf(
+                "armv7l", "arm"
             ),
         )
 
