@@ -19,6 +19,8 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -85,35 +87,54 @@ fun Footer(
                 .height(1.dp)
                 .background(myColors.onBackground / 0.15f)
         )
-        Row(
+        Column(
             Modifier
                 .fillMaxWidth()
                 .background(myColors.surface / 0.5f)
-                .padding(horizontal = 16.dp)
-                .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
         ) {
-            SaveSettings(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                component = component,
-            )
-            Spacer(Modifier.width(8.dp))
-            Row(Modifier.align(Alignment.Bottom)) {
-                ActionButton(
-                    text = myStringResource(Res.string.add),
-                    onClick = {
-                        component.openAddToQueueDialog()
-                    },
-                    enabled = component.canClickAdd,
-                    modifier = Modifier,
+            Row(
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SaveSettings(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    component = component,
                 )
                 Spacer(Modifier.width(8.dp))
-                ActionButton(
-                    text = myStringResource(Res.string.cancel),
-                    onClick = {
-                        component.requestClose()
-                    },
-                    modifier = Modifier,
+                Row(Modifier.align(Alignment.Bottom)) {
+                    ActionButton(
+                        text = myStringResource(Res.string.add),
+                        onClick = {
+                            component.openAddToQueueDialog()
+                        },
+                        enabled = component.canClickAdd,
+                        modifier = Modifier,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    ActionButton(
+                        text = myStringResource(Res.string.cancel),
+                        onClick = {
+                            component.requestClose()
+                        },
+                        modifier = Modifier,
+                    )
+                }
+            }
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(
+                        myColors.surface
+                    )
+            )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                SelectionDetail(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    totalDownloadItems = component.list.count(),
+                    selectedDownloadItems = component.selectionList.count()
                 )
             }
         }
@@ -138,6 +159,29 @@ private fun SaveSettings(
             LocationSaveOption(component, folder)
             Spacer(Modifier)
         }
+    }
+}
+
+@Composable
+private fun SelectionDetail(
+    modifier: Modifier,
+    totalDownloadItems: Int,
+    selectedDownloadItems: Int
+) {
+    val selectionCount = "$selectedDownloadItems / $totalDownloadItems"
+    Row(
+        modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        WithContentAlpha(.25f) {
+            MyIcon(
+                icon = MyIcons.activeCount,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        Text(selectionCount, fontSize = myTextSizes.base)
     }
 }
 
@@ -217,18 +261,18 @@ private fun RowScope.CategorySaveOption(
 @Composable
 private fun RowScope.SaveOption(
     title: String,
-    selectedHelp:String,
-    unselectedHelp:String,
+    selectedHelp: String,
+    unselectedHelp: String,
     selected: Boolean,
     onSelectedChange: (Boolean) -> Unit,
     selectedContent: @Composable () -> Unit
 ) {
     ExpandableItem(
-        modifier=Modifier.fillMaxWidth().weight(1f),
+        modifier = Modifier.fillMaxWidth().weight(1f),
         isExpanded = selected,
         header = {
             Row(
-                modifier=Modifier.onClick { onSelectedChange(!selected) },
+                modifier = Modifier.onClick { onSelectedChange(!selected) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
