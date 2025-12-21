@@ -51,6 +51,7 @@ import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.util.URLOpener
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.dpToPx
 import ir.amirab.util.compose.localizationmanager.LanguageNameProvider
 import ir.amirab.util.compose.localizationmanager.MyLocale
@@ -86,7 +87,7 @@ internal fun Translators(modifier: Modifier) {
                 leadingIcon = {
                     TransparentIconActionButton(
                         MyIcons.back,
-                        myStringResource(Res.string.back),
+                        Res.string.back.asStringSource(),
                     ) {
                         onBack?.onBackPressed()
                     }

@@ -86,7 +86,7 @@ fun ResponsiveDialogScope.EditDownloadPage(
                 headerActions = {
                     TransparentIconActionButton(
                         MyIcons.close,
-                        contentDescription = myStringResource(Res.string.close),
+                        contentDescription = Res.string.close.asStringSource(),
                         onClick = onDismiss
                     )
                 },
@@ -168,7 +168,7 @@ fun BrowserImportButton(
     val downloadPage = downloadUiState.currentDownloadItem.collectAsState().value.downloadPage
     IconActionButton(
         MyIcons.earth,
-        myStringResource(Res.string.edit_download_update_from_download_page),
+        Res.string.edit_download_update_from_download_page.asStringSource(),
         enabled = downloadPage != null,
         onClick = {
             downloadPage?.let {
@@ -242,7 +242,7 @@ fun ConfigActionsButtons(
     val showMoreSettings by downloadInputs.showMoreSettings.collectAsState()
     val requiresAuth = downloadInputs.responseInfo.collectAsState().value?.requireBasicAuth ?: false
     Row {
-        IconActionButton(MyIcons.refresh, myStringResource(Res.string.refresh)) {
+        IconActionButton(MyIcons.refresh, Res.string.refresh.asStringSource()) {
             downloadInputs.refresh()
         }
         Spacer(Modifier.width(6.dp))
@@ -250,7 +250,7 @@ fun ConfigActionsButtons(
         Spacer(Modifier.width(6.dp))
         IconActionButton(
             MyIcons.settings,
-            myStringResource(Res.string.settings),
+            Res.string.settings.asStringSource(),
             indicateActive = showMoreSettings,
             requiresAttention = requiresAuth
         ) {

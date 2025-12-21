@@ -281,7 +281,7 @@ private fun SocialSmallButton(
     Tooltip(title) {
         IconActionButton(
             icon,
-            contentDescription = title.rememberString(),
+            contentDescription = title,
             onClick = onClick,
         )
     }

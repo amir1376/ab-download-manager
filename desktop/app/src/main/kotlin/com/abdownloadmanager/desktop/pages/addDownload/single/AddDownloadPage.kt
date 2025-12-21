@@ -33,6 +33,7 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.utils.OnDuplicateStrategy
+import ir.amirab.util.compose.asStringSource
 import java.awt.MouseInfo
 
 @Composable
@@ -406,13 +407,13 @@ private fun MainConfigActionButton(
 fun ConfigActionsButtons(component: BaseAddSingleDownloadComponent) {
     val responseInfo by component.linkResponseInfo.collectAsState()
     Row {
-        IconActionButton(MyIcons.refresh, myStringResource(Res.string.refresh)) {
+        IconActionButton(MyIcons.refresh, Res.string.refresh.asStringSource()) {
             component.refresh()
         }
         Spacer(Modifier.width(6.dp))
         IconActionButton(
             MyIcons.settings,
-            myStringResource(Res.string.settings),
+            Res.string.settings.asStringSource(),
             indicateActive = component.showMoreSettings,
             requiresAttention = responseInfo?.requireBasicAuth ?: false
         ) {

@@ -38,6 +38,7 @@ import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.ui.VerticalScrollableContent
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 
 
@@ -72,7 +73,7 @@ fun SettingsPage(
                 leadingIcon = {
                     TransparentIconActionButton(
                         icon = MyIcons.back,
-                        contentDescription = myStringResource(Res.string.back),
+                        contentDescription = Res.string.back.asStringSource(),
                         onClick = {
                             backDispatcher?.onBackPressedDispatcher?.onBackPressed()
                         }

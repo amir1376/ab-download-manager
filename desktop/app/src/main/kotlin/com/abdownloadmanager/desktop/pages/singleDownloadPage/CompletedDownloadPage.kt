@@ -105,7 +105,7 @@ private fun Actions(
             Tooltip(dragTheFileDescription) {
                 IconActionButton(
                     icon = MyIcons.dragAndDrop,
-                    contentDescription = dragTheFileDescription.rememberString(),
+                    contentDescription = dragTheFileDescription,
                     modifier = Modifier
                         .dragAndDropSource(
                             drawDragDecoration = {},

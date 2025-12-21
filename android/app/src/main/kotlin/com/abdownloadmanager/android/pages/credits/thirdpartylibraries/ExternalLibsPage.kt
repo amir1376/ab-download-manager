@@ -40,6 +40,7 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.dpToPx
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
@@ -62,7 +63,7 @@ fun ThirdPartyLibrariesPage() {
                 leadingIcon = {
                     TransparentIconActionButton(
                         MyIcons.back,
-                        myStringResource(Res.string.back)
+                        Res.string.back.asStringSource()
                     ) {
                         onBack?.onBackPressed()
                     }

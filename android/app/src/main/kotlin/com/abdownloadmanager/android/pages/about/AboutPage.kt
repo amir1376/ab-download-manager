@@ -65,7 +65,7 @@ fun AboutPage(
                 leadingIcon = {
                     TransparentIconActionButton(
                         icon = MyIcons.back,
-                        contentDescription = myStringResource(Res.string.back)
+                        contentDescription = Res.string.back.asStringSource()
                     ) {
                         onBack?.onBackPressed()
                     }
@@ -350,7 +350,7 @@ private fun SocialSmallButton(
     Tooltip(title) {
         IconActionButton(
             icon,
-            contentDescription = title.rememberString(),
+            contentDescription = title,
             onClick = onClick,
         )
     }

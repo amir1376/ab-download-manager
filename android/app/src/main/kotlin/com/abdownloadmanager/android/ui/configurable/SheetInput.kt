@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +24,7 @@ import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 
 @Immutable
@@ -72,7 +71,7 @@ fun <T> SheetInput(
         headerActions = {
             TransparentIconActionButton(
                 MyIcons.close,
-                contentDescription = myStringResource(Res.string.close),
+                contentDescription = Res.string.close.asStringSource(),
                 onClick = onDismiss
             )
         }

@@ -49,7 +49,7 @@ fun AddMultiItemPage(
                 leadingIcon = {
                     TransparentIconActionButton(
                         MyIcons.back,
-                        contentDescription = myStringResource(Res.string.back)
+                        contentDescription = Res.string.back.asStringSource()
                     ) {
                         backDispatcher?.onBackPressed()
                     }

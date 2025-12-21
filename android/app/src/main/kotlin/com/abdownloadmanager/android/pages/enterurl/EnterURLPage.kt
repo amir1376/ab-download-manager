@@ -50,6 +50,7 @@ import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
@@ -73,7 +74,7 @@ fun ResponsiveDialogScope.EnterNewURLPage(
                     DownloaderSelectionSection(component)
                     TransparentIconActionButton(
                         MyIcons.close,
-                        contentDescription = myStringResource(Res.string.close),
+                        contentDescription = Res.string.close.asStringSource(),
                         onClick = onCloseRequest,
                     )
                 }

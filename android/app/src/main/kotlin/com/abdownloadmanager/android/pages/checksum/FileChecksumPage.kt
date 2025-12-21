@@ -28,7 +28,6 @@ import com.abdownloadmanager.shared.pages.checksum.DownloadItemWithChecksum
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.Help
-import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.FileChecksum
@@ -261,7 +260,7 @@ private data object FileChecksumTableCellRenderers {
                 TransparentIconActionButton(
                     enabled = calculatedChecksum != null,
                     icon = MyIcons.copy,
-                    contentDescription = myStringResource(Res.string.copy),
+                    contentDescription = Res.string.copy.asStringSource(),
                     onClick = {
                         item.calculatedChecksum
                             ?.let { savedChecksum -> ClipboardUtil.copy(savedChecksum) }
@@ -289,12 +288,12 @@ private data object FileChecksumTableCellRenderers {
             actions = {
                 TransparentIconActionButton(
                     icon = MyIcons.edit,
-                    contentDescription = myStringResource(Res.string.edit),
+                    contentDescription = Res.string.edit.asStringSource(),
                     onClick = onRequestUpdateChecksum,
                 )
                 TransparentIconActionButton(
                     icon = MyIcons.copy,
-                    contentDescription = myStringResource(Res.string.copy),
+                    contentDescription = Res.string.copy.asStringSource(),
                     enabled = item.savedChecksum != null,
                     onClick = {
                         item.savedChecksum

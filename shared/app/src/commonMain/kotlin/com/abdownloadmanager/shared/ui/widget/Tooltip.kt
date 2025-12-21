@@ -1,10 +1,12 @@
 package com.abdownloadmanager.shared.ui.widget
 
+import androidx.compose.foundation.BasicTooltipState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -14,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.abdownloadmanager.shared.util.div
@@ -35,20 +36,15 @@ fun Tooltip(
     alignment: Alignment = Alignment.TopCenter,
     content: @Composable () -> Unit,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
-    var showHint by remember { mutableStateOf(false) }
-    LaunchedEffect(isHovered) {
-        showHint = isHovered
-    }
+    val showHint = remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
-            .hoverable(interactionSource)
+            .detectTooltip(showHint)
     ) {
-        if (showHint) {
+        if (showHint.value) {
             DelayedTooltipPopup(
                 onRequestCloseShowHelpContent = {
-                    showHint = false
+                    showHint.value = false
                 },
                 content = tooltip.rememberString(),
                 delay = delayUntilShow,
@@ -117,3 +113,7 @@ fun DelayedTooltipPopup(
         )
     }
 }
+
+expect fun Modifier.detectTooltip(
+    state: MutableState<Boolean>
+): Modifier

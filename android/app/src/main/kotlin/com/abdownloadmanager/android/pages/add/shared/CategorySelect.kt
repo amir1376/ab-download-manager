@@ -4,13 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import com.abdownloadmanager.android.ui.configurable.RenderSpinnerInSheet
 import com.abdownloadmanager.resources.Res
@@ -24,7 +22,6 @@ import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.rememberIconPainter
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
@@ -130,7 +127,7 @@ fun CategoryAddButton(
     IconActionButton(
         modifier = modifier,
         icon = MyIcons.add,
-        contentDescription = "Add Category",
+        contentDescription = Res.string.add_category.asStringSource(),
         enabled = enabled,
         onClick = onClick,
     )

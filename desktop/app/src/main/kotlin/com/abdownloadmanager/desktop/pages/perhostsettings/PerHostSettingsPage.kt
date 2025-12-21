@@ -35,6 +35,7 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.*
@@ -234,7 +235,7 @@ private fun HostList(
             spacer()
             IconActionButton(
                 icon = MyIcons.add,
-                contentDescription = myStringResource(Res.string.add),
+                contentDescription = Res.string.add.asStringSource(),
                 onClick = {
                     component.onRequestAddNewHostSettingsItem()
                 }
@@ -242,7 +243,7 @@ private fun HostList(
             spacer()
             IconActionButton(
                 icon = MyIcons.remove,
-                contentDescription = myStringResource(Res.string.remove),
+                contentDescription = Res.string.remove.asStringSource(),
                 enabled = selectedId != null,
                 onClick = {
                     selectedId?.let {

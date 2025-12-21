@@ -13,7 +13,6 @@ import com.abdownloadmanager.shared.util.ui.myColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -41,7 +40,7 @@ import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.compose.modifiers.autoMirror
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.*
@@ -66,7 +65,7 @@ fun PerHostSettingsPage(component: AndroidPerHostSettingsComponent) {
                 leadingIcon = {
                     TransparentIconActionButton(
                         icon = MyIcons.back,
-                        contentDescription = myStringResource(Res.string.back),
+                        contentDescription = Res.string.back.asStringSource(),
                         onClick = {
                             backDispatcher?.onBackPressedDispatcher?.onBackPressed()
                         }
@@ -79,7 +78,7 @@ fun PerHostSettingsPage(component: AndroidPerHostSettingsComponent) {
                     if (configurableList == null) {
                         TransparentIconActionButton(
                             icon = MyIcons.add,
-                            contentDescription = myStringResource(Res.string.add),
+                            contentDescription = Res.string.add.asStringSource(),
                             onClick = {
                                 component.onRequestAddNewHostSettingsItem()
                             }
@@ -87,7 +86,7 @@ fun PerHostSettingsPage(component: AndroidPerHostSettingsComponent) {
                     } else {
                         TransparentIconActionButton(
                             icon = MyIcons.remove,
-                            contentDescription = myStringResource(Res.string.remove),
+                            contentDescription = Res.string.remove.asStringSource(),
                             onClick = {
                                 component.onRequestDeleteConfig(configurableList.id)
                             }
@@ -100,7 +99,7 @@ fun PerHostSettingsPage(component: AndroidPerHostSettingsComponent) {
                                     component.saveAndReturn()
                                 }
                             },
-                            contentDescription = myStringResource(Res.string.update)
+                            contentDescription = Res.string.update.asStringSource()
                         )
                     }
                 }

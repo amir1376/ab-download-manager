@@ -38,7 +38,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import com.abdownloadmanager.shared.ui.widget.*
@@ -50,6 +49,7 @@ import com.abdownloadmanager.shared.util.ResponsiveDialogScope
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.downloader.utils.OnDuplicateStrategy
+import ir.amirab.util.compose.asStringSource
 
 @Composable
 fun ResponsiveDialogScope.AddSingleDownloadPage(
@@ -67,7 +67,7 @@ fun ResponsiveDialogScope.AddSingleDownloadPage(
                 headerActions = {
                     TransparentIconActionButton(
                         MyIcons.close,
-                        contentDescription = myStringResource(Res.string.close),
+                        contentDescription = Res.string.close.asStringSource(),
                         onClick = onDismiss,
                     )
                 }
@@ -424,7 +424,7 @@ private fun MainConfigActionButton(
 fun ConfigActionsButtons(component: AndroidAddSingleDownloadComponent) {
     val responseInfo by component.linkResponseInfo.collectAsState()
     Row {
-        IconActionButton(MyIcons.refresh, myStringResource(Res.string.refresh)) {
+        IconActionButton(MyIcons.refresh, Res.string.refresh.asStringSource()) {
             component.refresh()
         }
         Spacer(Modifier.width(6.dp))
@@ -435,14 +435,14 @@ fun ConfigActionsButtons(component: AndroidAddSingleDownloadComponent) {
             } else {
                 MyIcons.down
             },
-            myStringResource(Res.string.more_options),
+            Res.string.more_options.asStringSource(),
         ) {
             component.setShowMoreInputs(!showMoreInputs)
         }
         Spacer(Modifier.width(6.dp))
         IconActionButton(
             MyIcons.settings,
-            myStringResource(Res.string.settings),
+            Res.string.settings.asStringSource(),
             indicateActive = component.showMoreSettings,
             requiresAttention = responseInfo?.requireBasicAuth ?: false
         ) {

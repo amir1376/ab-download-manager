@@ -66,7 +66,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.Path
 import okio.Path.Companion.toOkioPath
-import kotlin.system.exitProcess
 
 val alwaysAllowedPaths = listOf(
     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toOkioPath(),
@@ -163,7 +162,7 @@ fun DirectoryPicker(
                     headerActions = {
                         TransparentIconActionButton(
                             MyIcons.close,
-                            contentDescription = myStringResource(Res.string.close),
+                            contentDescription = Res.string.close.asStringSource(),
                             onClick = onDismiss
                         )
                     }
@@ -274,7 +273,7 @@ fun DirectoryPicker(
                         Spacer(Modifier.width(mySpacings.mediumSpace))
                         IconActionButton(
                             MyIcons.add,
-                            contentDescription = myStringResource(Res.string.new_folder),
+                            contentDescription = Res.string.new_folder.asStringSource(),
                             enabled = directoryList.currentDirectoryCanWrite,
                         ) {
                             creatingNewFolder = true

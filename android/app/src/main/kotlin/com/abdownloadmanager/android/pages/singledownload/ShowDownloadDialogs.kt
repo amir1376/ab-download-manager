@@ -15,7 +15,7 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
-import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.delay
 
 @Composable
@@ -56,7 +56,7 @@ fun ShowDownloadDialog(singleDownloadComponent: AndroidSingleDownloadComponent) 
                     headerActions = {
                         TransparentIconActionButton(
                             MyIcons.close,
-                            contentDescription = myStringResource(Res.string.close),
+                            contentDescription = Res.string.close.asStringSource(),
                             onClick = closeDialog
                         )
                     }

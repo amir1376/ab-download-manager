@@ -286,7 +286,7 @@ fun RenderQueueItems(
             val space = 4.dp
             IconActionButton(
                 icon = MyIcons.remove,
-                contentDescription = myStringResource(Res.string.remove),
+                contentDescription = Res.string.remove.asStringSource(),
                 onClick = {
                     component.deleteItems()
                 },
@@ -295,7 +295,7 @@ fun RenderQueueItems(
             Spacer(Modifier.weight(1f))
             IconActionButton(
                 icon = MyIcons.down,
-                contentDescription = myStringResource(Res.string.move_down),
+                contentDescription = Res.string.move_down.asStringSource(),
                 onClick = {
                     component.moveDownItems()
                 },
@@ -304,7 +304,7 @@ fun RenderQueueItems(
             Spacer(Modifier.width(space))
             IconActionButton(
                 icon = MyIcons.up,
-                contentDescription = myStringResource(Res.string.move_up),
+                contentDescription = Res.string.move_up.asStringSource(),
                 onClick = {
                     component.moveUpItems()
                 },
@@ -458,7 +458,7 @@ private fun QueueListSection(
         ) {
             IconActionButton(
                 icon = MyIcons.add,
-                contentDescription = myStringResource(Res.string.add_new_queue),
+                contentDescription = Res.string.add_new_queue.asStringSource(),
                 onClick = {
                     component.addQueue()
                 }
@@ -466,7 +466,7 @@ private fun QueueListSection(
             spacer()
             IconActionButton(
                 icon = MyIcons.remove,
-                contentDescription = myStringResource(Res.string.remove_queue),
+                contentDescription = Res.string.remove_queue.asStringSource(),
                 enabled = component.canDeleteThisQueue(selectedItem),
                 onClick = {
                     component.requestDeleteQueue(selectedItem)

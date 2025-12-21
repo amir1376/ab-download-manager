@@ -267,13 +267,13 @@ fun ConfigActionsButtons(
     val showMoreSettings by editDownloadUiChecker.showMoreSettings.collectAsState()
     val requiresAuth = editDownloadUiChecker.responseInfo.collectAsState().value?.requireBasicAuth ?: false
     Row {
-        IconActionButton(MyIcons.refresh, myStringResource(Res.string.refresh)) {
+        IconActionButton(MyIcons.refresh, Res.string.refresh.asStringSource()) {
             editDownloadUiChecker.refresh()
         }
         Spacer(Modifier.width(6.dp))
         IconActionButton(
             MyIcons.settings,
-            myStringResource(Res.string.settings),
+            Res.string.settings.asStringSource(),
             indicateActive = showMoreSettings,
             requiresAttention = requiresAuth
         ) {

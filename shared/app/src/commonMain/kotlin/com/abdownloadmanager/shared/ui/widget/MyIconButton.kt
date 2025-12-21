@@ -27,12 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.modifiers.autoMirror
 
 @Composable
@@ -44,7 +44,7 @@ fun alphaFlicker(): Float {
 @Composable
 fun IconActionButton(
     icon: IconSource,
-    contentDescription: String,
+    contentDescription: StringSource,
     modifier: Modifier = Modifier,
     indicateActive: Boolean = false,
     requiresAttention: Boolean = false,
@@ -58,48 +58,50 @@ fun IconActionButton(
     iconSize: Dp = mySpacings.iconSize,
     onClick: () -> Unit,
 ) {
-    WithContentColor(contentColor) {
-        val isFocused by interactionSource.collectIsFocusedAsState()
-        val isActiveOrFocused = indicateActive || isFocused
-        Box(
-            modifier
-                .sizeIn(mySpacings.thumbSize, mySpacings.thumbSize)
-                .ifThen(!enabled) {
-                    alpha(0.5f)
-                }
-                .border(
-                    1.dp,
-                    borderColor,
-                    shape
-                )
-                .ifThen(isActiveOrFocused || requiresAttention) {
-                    border(
+    Tooltip(contentDescription) {
+        WithContentColor(contentColor) {
+            val isFocused by interactionSource.collectIsFocusedAsState()
+            val isActiveOrFocused = indicateActive || isFocused
+            Box(
+                modifier
+                    .sizeIn(mySpacings.thumbSize, mySpacings.thumbSize)
+                    .ifThen(!enabled) {
+                        alpha(0.5f)
+                    }
+                    .border(
                         1.dp,
-                        myColors.focusedBorderColor / if (isActiveOrFocused) 1f else alphaFlicker(),
+                        borderColor,
                         shape
                     )
-                }
-                .clip(shape)
-                .background(backgroundColor)
-                .clickable(
-                    enabled = enabled,
-                    indication = LocalIndication.current,
-                    interactionSource = interactionSource,
-                    role = Role.Button,
-                    onClick = onClick,
-                )
-                .padding(6.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            MyIcon(
-                icon,
-                contentDescription,
-                Modifier
-                    .ifThen(automaticMirrorIcon) {
-                        autoMirror()
+                    .ifThen(isActiveOrFocused || requiresAttention) {
+                        border(
+                            1.dp,
+                            myColors.focusedBorderColor / if (isActiveOrFocused) 1f else alphaFlicker(),
+                            shape
+                        )
                     }
-                    .size(iconSize),
-            )
+                    .clip(shape)
+                    .background(backgroundColor)
+                    .clickable(
+                        enabled = enabled,
+                        indication = LocalIndication.current,
+                        interactionSource = interactionSource,
+                        role = Role.Button,
+                        onClick = onClick,
+                    )
+                    .padding(6.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                MyIcon(
+                    icon,
+                    contentDescription.rememberString(),
+                    Modifier
+                        .ifThen(automaticMirrorIcon) {
+                            autoMirror()
+                        }
+                        .size(iconSize),
+                )
+            }
         }
     }
 }
@@ -107,7 +109,7 @@ fun IconActionButton(
 @Composable
 fun TransparentIconActionButton(
     icon: IconSource,
-    contentDescription: String,
+    contentDescription: StringSource,
     modifier: Modifier = Modifier,
     indicateActive: Boolean = false,
     requiresAttention: Boolean = false,

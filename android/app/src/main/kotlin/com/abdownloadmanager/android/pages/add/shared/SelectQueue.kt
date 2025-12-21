@@ -36,6 +36,7 @@ import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.util.compose.action.AnAction
+import ir.amirab.util.compose.asStringSource
 
 @Composable
 fun ShowAddToQueueDialog(
@@ -137,7 +138,7 @@ fun ShowAddToQueueDialog(
                         ) {
                             IconActionButton(
                                 MyIcons.add,
-                                contentDescription = myStringResource(Res.string.add_new_queue),
+                                contentDescription = Res.string.add_new_queue.asStringSource(),
                                 onClick = newQueueAction
                             )
                             Spacer(Modifier.width(mySpacings.mediumSpace))

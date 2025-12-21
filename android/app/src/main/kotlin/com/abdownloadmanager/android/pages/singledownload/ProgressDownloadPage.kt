@@ -532,7 +532,7 @@ private fun PartInfoButton(
             onClick = {
                 onClick(!showing)
             },
-            contentDescription = partsInfoTitle.rememberString(),
+            contentDescription = partsInfoTitle,
             icon = if (showing) {
                 MyIcons.up
             } else {

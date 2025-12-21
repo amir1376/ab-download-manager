@@ -31,6 +31,7 @@ import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.downloader.queue.DownloadQueue
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.desktop.screen.applyUiScale
 import java.awt.MouseInfo
 
@@ -165,7 +166,7 @@ fun ShowAddToQueueDialog(
                         ) {
                             IconActionButton(
                                 MyIcons.add,
-                                contentDescription = myStringResource(Res.string.add_new_queue),
+                                contentDescription = Res.string.add_new_queue.asStringSource(),
                                 onClick = newQueueAction
                             )
                             ActionButton(
