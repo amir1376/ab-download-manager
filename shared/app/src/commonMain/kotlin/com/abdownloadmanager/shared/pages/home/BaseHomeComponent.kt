@@ -35,6 +35,7 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.queue.queueModelsFlow
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.coroutines.combine
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +45,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -219,17 +219,7 @@ abstract class BaseHomeComponent(
 
 
     val activeDownloadList = downloadSystem.downloadMonitor.activeDownloadListFlow
-        .stateIn(
-            scope,
-            SharingStarted.Companion.Eagerly,
-            emptyList()
-        )
     val completedList = downloadSystem.downloadMonitor.completedDownloadListFlow
-        .stateIn(
-            scope,
-            SharingStarted.Companion.Eagerly,
-            emptyList()
-        )
 
     init {
         categoryManager.categoriesFlow.onEach { categories ->
@@ -246,29 +236,31 @@ abstract class BaseHomeComponent(
         }.launchIn(scope)
     }
 
-    val downloadList = merge(
+    val downloadList = combine(
         snapshotFlow { filterState.textToSearch },
         activeDownloadList,
         completedList,
         snapshotFlow { filterState.typeCategoryFilter },
         snapshotFlow { filterState.statusFilter },
         snapshotFlow { filterState.queueFilter },
-    )
-        .map {
-            (activeDownloadList.value + completedList.value)
-                .filter {
-                    val statusAccepted = filterState.statusFilter.accept(it)
-                    val categoryFilter = filterState.typeCategoryFilter
-                    val queueFilter = filterState.queueFilter
-                    val allowedList = categoryFilter?.items ?: queueFilter?.queueItems
-                    val itemIsInAllowedList = allowedList?.contains(it.id) ?: true
-                    val searchAccepted = it.name.contains(filterState.textToSearch, ignoreCase = true)
-                    itemIsInAllowedList && statusAccepted && searchAccepted
-                }
-                // when restart a completed download item there is a duplication in list
-                // so make sure to not pass bad data to download list table as it has item.id as key
-                .distinctBy { it.id }
-        }.stateIn(scope, SharingStarted.Companion.Eagerly, emptyList())
+    ) { textToSearch, activeDownloads, completeDownloads, categoryFilter, statusFilter, queueFilter ->
+        val isSearching = textToSearch.isNotBlank()
+        val allowedList = categoryFilter?.items ?: queueFilter?.queueItems
+        (activeDownloads + completeDownloads)
+            .filter {
+                val statusAccepted = filterState.statusFilter.accept(it)
+                val itemIsInAllowedList = allowedList?.contains(it.id) ?: true
+                val searchAccepted = if (isSearching) {
+                    it.name.contains(filterState.textToSearch, ignoreCase = true)
+                } else true
+                itemIsInAllowedList && statusAccepted && searchAccepted
+            }
+            // when restart a completed download item there is a duplication in list
+            // so make sure to not pass bad data to download list table as it has item.id as key
+            .distinctBy { it.id }
+    }
+        .withResumedLifecycle()
+        .stateIn(scope, SharingStarted.Companion.Eagerly, emptyList())
 
 
     init {

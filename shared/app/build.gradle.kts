@@ -39,6 +39,7 @@ kotlin {
             api(libs.kotlin.serialization.json)
 
             api(libs.decompose)
+            api(libs.essenty.lifecycleCoroutines)
             api(libs.koin.core)
 
             api(libs.androidx.datastore)
