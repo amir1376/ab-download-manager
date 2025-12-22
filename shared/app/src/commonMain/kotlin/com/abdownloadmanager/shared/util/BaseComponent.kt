@@ -1,22 +1,24 @@
 package com.abdownloadmanager.shared.util
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.essenty.lifecycle.doOnDestroy
-import kotlinx.coroutines.CoroutineScope
+import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
+import com.arkivanov.essenty.lifecycle.coroutines.withLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 
 abstract class BaseComponent(
     componentContext: ComponentContext
 ) : ComponentContext by componentContext {
-    val scope = CoroutineScope(
+    val scope = coroutineScope(
         SupervisorJob() + Dispatchers.Main
     )
 
-    init {
-        componentContext.lifecycle.doOnDestroy {
-            scope.cancel()
-        }
+    fun <T> Flow<T>.withResumedLifecycle(): Flow<T> {
+        return withLifecycle(
+            lifecycle = lifecycle,
+            minActiveState = Lifecycle.State.STARTED,
+        )
     }
 }

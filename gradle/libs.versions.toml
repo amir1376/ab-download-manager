@@ -10,6 +10,7 @@ coroutines = "1.10.2"
 koin = "4.1.1"
 koinAnnotation = "2.3.1"
 decompose = "3.4.0"
+essenty = "2.5.0"
 logback = "1.5.22"
 buildConfig = "6.0.6"
 changelog = "2.5.0"
@@ -58,6 +59,8 @@ koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-jbCompose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
+
+essenty-lifecycleCoroutines = { module = "com.arkivanov.essenty:lifecycle-coroutines", version.ref = "essenty" }
 
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-debug = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-debug", version.ref = "coroutines" }
