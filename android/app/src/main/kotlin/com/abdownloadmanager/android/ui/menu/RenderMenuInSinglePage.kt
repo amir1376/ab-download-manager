@@ -1,6 +1,5 @@
 package com.abdownloadmanager.android.ui.menu
 
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
@@ -63,19 +62,11 @@ import ir.amirab.util.compose.modifiers.autoMirror
 import ir.amirab.util.ifThen
 
 @Composable
-private fun RenderMenuInSinglePage(
+fun RenderMenuInSinglePage(
     menuStack: SnapshotStateList<MenuItem.SubMenu>,
     onDismissRequest: () -> Unit,
     modifier: Modifier,
 ) {
-    BackHandler {
-        val menuStack = menuStack
-        if (menuStack.size == 1) {
-            onDismissRequest()
-        } else {
-            menuStack.removeAt(menuStack.lastIndex)
-        }
-    }
     val shape = LocalMenuBoxClip.current
     val currentMenu = menuStack.last()
     val alpha = remember { Animatable(0f) }
@@ -107,7 +98,8 @@ private fun RenderMenuInSinglePage(
                         .verticalScroll(rememberScrollState()),
                 )
             }
-            val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+            val onBackPressedDispatcher =
+                LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
             val currentTitle = currentMenu.title.collectAsState().value.rememberString()
             if (currentTitle.isNotEmpty()) {
                 RenderSeparator()
@@ -207,7 +199,7 @@ private fun Menu(
                 RenderMenuItem(
                     menuItem = menuItem,
 //                    openedItem = openedItem,
-                    onRequestCLose = onRequestClose,
+                    onRequestClose = onRequestClose,
                     isSelected = openedItem == menuItem,
                     onRequestOpenItem = {
                         onNewMenuSelected(it)
@@ -284,7 +276,7 @@ private fun ReactableItem(
 @Composable
 private fun RenderMenuItem(
     menuItem: MenuItem,
-    onRequestCLose: () -> Unit,
+    onRequestClose: () -> Unit,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
     onRequestOpenItem: (MenuItem.SubMenu) -> Unit,
@@ -303,7 +295,7 @@ private fun RenderMenuItem(
                 RenderSingleItem(
                     item = menuItem,
                     isSelected = isSelected,
-                    onRequestClose = onRequestCLose,
+                    onRequestClose = onRequestClose,
                 )
             }
 
@@ -428,4 +420,5 @@ private fun RenderShortcutStroke(shortcutStroke: PlatformKeyStroke) {
         }
     }
 }
+
 private val menuIconSize = 20.dp
