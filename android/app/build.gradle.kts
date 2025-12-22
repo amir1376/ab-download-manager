@@ -34,9 +34,6 @@ android {
     compileSdk = 36
     namespace = "com.abdownloadmanager.android"
     buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("debug")
-        }
         debug {
             applicationIdSuffix = ".debug"
         }
