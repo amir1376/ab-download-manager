@@ -47,24 +47,10 @@ jobs:
 
       - name: Bump cask
         if: ${{ steps.ver.outputs.version != '' }}
-        env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
         run: |
-          gh label create "pr-pull" --repo "${{ env.GH_REPO }}" --color "EDEDED" --description "Automatically created for PR labeling" --force || true
           V="${{ steps.ver.outputs.version }}"
           echo "Bumping ${{ env.CASK_NAME }} to $V ..."
           brew bump-cask-pr --no-browse --version "$V" "${{ env.TAP_NAME }}/${{ env.CASK_NAME }}"
-          sleep 5
-          BRANCH_NAME="bump-${{ env.CASK_NAME }}-$V"
-          echo "Looking for PR from branch: $BRANCH_NAME in repo ${{ env.GH_REPO }}"
-          PR_URL=$(gh pr list --repo "${{ env.GH_REPO }}" --head "$BRANCH_NAME" --state open --json url --jq '.[0].url')
-          if [ -n "$PR_URL" ]; then
-            echo "✅ Found PR: $PR_URL"
-            echo "Adding label 'pr-pull'..."
-            gh pr edit "$PR_URL" --add-label "pr-pull"
-          else
-            echo "⚠️ Could not find the PR for branch $BRANCH_NAME."
-          fi
 
       - name: Skip (No new version)
         if: ${{ steps.ver.outputs.version == '' }}
