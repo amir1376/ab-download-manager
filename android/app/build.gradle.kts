@@ -36,6 +36,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
+            resValue("string", "app_short_name", "AB DM - Debug")
         }
     }
     buildFeatures {
