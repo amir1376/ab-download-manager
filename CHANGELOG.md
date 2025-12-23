@@ -14,6 +14,22 @@
 
 ### Security
 
+## 1.8.2
+
+### Fixed
+
+- Resolved issues with the In-App update feature on some android devices
+- Disabled notification badges on the launcher icon on android
+- The application crashes on some devices (desktops) because of an issue in system theme detection logic
+
+### Improved
+
+- Updated translations
+- Added tooltips for action buttons
+- Display selected count in the "Add Multi Download" page on desktop (#970)
+- Reduced battery consumption
+- Various UI/UX enhancements
+
 ## 1.8.1
 
 ### Fixed
