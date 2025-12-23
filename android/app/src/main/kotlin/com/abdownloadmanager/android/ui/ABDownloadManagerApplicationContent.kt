@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import com.abdownloadmanager.android.storage.AppSettingsModel.ConfigLens.Keys.uiScale
 import com.abdownloadmanager.android.ui.configurable.comon.CommonConfigurableRenderersForAndroid
+import com.abdownloadmanager.android.ui.configurable.comon.ConfigurableRenderersForAndroid
 import com.abdownloadmanager.android.util.AppInfo
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
@@ -39,6 +39,7 @@ fun ABDownloadManagerApplicationContent(
         ConfigurableRendererRegistry {
             listOf(
                 CommonConfigurableRenderersForAndroid,
+                ConfigurableRenderersForAndroid
             ).forEach {
                 it.getAllRenderers().forEach { (key, renderer) ->
                     this.register(key, renderer)
