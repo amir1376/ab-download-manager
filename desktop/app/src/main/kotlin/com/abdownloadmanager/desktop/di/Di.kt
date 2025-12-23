@@ -97,6 +97,7 @@ import com.abdownloadmanager.shared.util.ui.IMyIcons
 import com.abdownloadmanager.shared.util.proxy.IProxyStorage
 import com.abdownloadmanager.shared.util.proxy.ProxyData
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
+import com.arkivanov.essenty.lifecycle.Lifecycle
 import ir.amirab.downloader.DownloaderRegistry
 import ir.amirab.downloader.connection.UserAgentProvider
 import ir.amirab.downloader.connection.proxy.AutoConfigurableProxyProvider
@@ -546,7 +547,9 @@ val appModule = module {
         )
     }
     single {
-        val lifecycle = LifecycleRegistry()
+        val lifecycle = LifecycleRegistry(
+            Lifecycle.State.RESUMED
+        )
         val context = DefaultComponentContext(lifecycle)
         runBlocking {
             withContext(Dispatchers.Main) {
