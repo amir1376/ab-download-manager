@@ -11,7 +11,9 @@ actual typealias PlatformThemeDetector = DesktopSystemThemeDetector
 
 class DesktopSystemThemeDetector : ISystemThemeDetector {
     override val isSupported by lazy {
-        OsThemeDetector.isSupported()
+        runCatching {
+            OsThemeDetector.isSupported()
+        }.getOrElse { false }
     }
     private val detector by lazy { OsThemeDetector.getDetector() }
 
