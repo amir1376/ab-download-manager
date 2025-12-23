@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -55,7 +55,7 @@ fun PageUi(
     }
     val density = LocalDensity.current
     val direction = LocalLayoutDirection.current
-    val horizontalInsets = WindowInsets.safeContent.only(WindowInsetsSides.Horizontal)
+    val horizontalInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
     val contentPadding = PaddingValues(
         top = density.run { headerHeight.toDp() },
         bottom = density.run { footerHeight.toDp() },
@@ -105,7 +105,7 @@ fun PageHeader(
             .fillMaxWidth()
 //            .padding(vertical = mySpacings.mediumSpace)
             .padding(horizontal = mySpacings.mediumSpace)
-            .safeContentHorizontalPaddings(),
+            .systemHorizontalPaddings(),
     ) {
         leadingIcon?.let {
             it()
@@ -172,16 +172,16 @@ fun PageFooter(
     content: @Composable () -> Unit,
 ) {
     Box(
-        Modifier.safeContentHorizontalPaddings()
+        Modifier.systemHorizontalPaddings()
     ) {
         content()
     }
 }
 
 @Composable
-fun Modifier.safeContentHorizontalPaddings(): Modifier {
+fun Modifier.systemHorizontalPaddings(): Modifier {
     return composed {
-        val horizontalInsets = WindowInsets.safeContent.only(WindowInsetsSides.Horizontal)
+        val horizontalInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
         val direction = LocalLayoutDirection.current
         val density = LocalDensity.current
         val horizontalPaddings = PaddingValues(
