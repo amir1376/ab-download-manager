@@ -344,7 +344,7 @@ class MainComponent(
                 ScreenConfig.Settings -> {
                     Settings(
                         AndroidSettingsComponent(
-                            ctx,
+                            ctx = ctx,
                             perHostSettingsPageManager = this,
                             permissionsPageManager = this,
                         )

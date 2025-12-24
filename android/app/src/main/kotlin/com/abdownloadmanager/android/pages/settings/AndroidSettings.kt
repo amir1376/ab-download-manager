@@ -1,12 +1,19 @@
 package com.abdownloadmanager.android.pages.settings
 
 import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import com.abdownloadmanager.android.pages.onboarding.permissions.ABDMPermissions
+import com.abdownloadmanager.android.pages.onboarding.permissions.isBatteryOptimizationDisabled
 import com.abdownloadmanager.android.pages.onboarding.permissions.requestIgnoreBatteryOptimizationPermission
+import com.abdownloadmanager.android.ui.configurable.comon.item.PermissionConfigurable
 import com.abdownloadmanager.android.util.pagemanager.PermissionsPageManager
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
 import ir.amirab.util.compose.asStringSource
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 object AndroidSettings {
@@ -21,15 +28,12 @@ object AndroidSettings {
             },
         )
     }
-    fun ignoreBatteryOptimizations(
-        context: Context
-    ): NavigatableConfigurable {
-        return NavigatableConfigurable(
-            title = Res.string.permissions_ignore_battery_optimization_title.asStringSource(),
-            description = Res.string.permissions_ignore_battery_optimization_reason.asStringSource(),
-            onRequestNavigate = {
-                requestIgnoreBatteryOptimizationPermission(context, true)
-            },
+    fun ignoreBatteryOptimizations(): PermissionConfigurable {
+        val permission = ABDMPermissions.BatteryOptimizationPermission
+        return PermissionConfigurable(
+            title = permission.title,
+            description = permission.description,
+            backedBy = MutableStateFlow(permission),
         )
     }
 }

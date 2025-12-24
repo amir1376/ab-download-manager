@@ -1,5 +1,11 @@
 package com.abdownloadmanager.android.ui.configurable
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -77,6 +83,29 @@ fun <T> TitleAndDescription(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(8.dp),
 ) {
+    val value = cfg.backedBy.collectAsState().value
+    val describedStringSource = remember(value) {
+        cfg.describe(value)
+    }
+    val describeContent = describedStringSource.rememberString()
+    TitleAndDescription(
+        cfg = cfg,
+        describe = describe,
+        modifier = modifier,
+        describeContent = describeContent,
+        contentPadding = contentPadding,
+    )
+}
+
+@Composable
+fun <T> TitleAndDescription(
+    cfg: Configurable<T>,
+    describe: Boolean = true,
+    describeContent: String,
+    describeWrapper: @Composable (@Composable () -> Unit) -> Unit = { it() },
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(8.dp),
+) {
     val enabled = isConfigEnabled()
     Column(
         modifier
@@ -101,18 +130,22 @@ fun <T> TitleAndDescription(
             }
         }
         if (describe) {
-            val value = cfg.backedBy.collectAsState().value
-            val describedStringSource = remember(value) {
-                cfg.describe(value)
-            }
-            val describeContent = describedStringSource.rememberString()
             if (describeContent.isNotBlank()) {
                 Spacer(Modifier.size(4.dp))
-                WithContentAlpha(0.75f) {
-                    Text(
-                        describeContent,
-                        fontSize = myTextSizes.base,
-                    )
+                describeWrapper {
+                    WithContentAlpha(0.75f) {
+                        AnimatedContent(
+                            targetState = describeContent,
+                            transitionSpec = {
+                                scaleIn() + fadeIn() togetherWith scaleOut() + fadeOut()
+                            }
+                        ) { content ->
+                            Text(
+                                content,
+                                fontSize = myTextSizes.base,
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -120,7 +120,7 @@ class AndroidSettingsComponent(
             ConfigurableGroup(
                 nestedConfigurable = listOf(
                     AndroidSettings.permissionSettings(permissionsPageManager),
-                    AndroidSettings.ignoreBatteryOptimizations(context),
+                    AndroidSettings.ignoreBatteryOptimizations(),
                 )
             ),
 
