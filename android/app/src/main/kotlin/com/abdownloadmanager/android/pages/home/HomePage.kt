@@ -23,22 +23,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
@@ -78,7 +73,6 @@ import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.modifiers.silentClickable
 import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.ifThen
 import kotlinx.coroutines.launch
 
 
@@ -144,9 +138,18 @@ fun HomePage(component: HomeComponent) {
                         val positionOrNull = downloadList
                             .indexOfFirst { it.id == id }
                             .takeIf { it != -1 }
-                        positionOrNull?.let {
+
+                        positionOrNull?.let { index ->
+                            if (effect.skipIfVisible) {
+                                val isVisible = lazyListState.layoutInfo.visibleItemsInfo.any {
+                                    it.index == index
+                                }
+                                if (isVisible) {
+                                    return@let
+                                }
+                            }
                             coroutineScope.launch {
-                                lazyListState.scrollToItem(it)
+                                lazyListState.scrollToItem(index)
                             }
                         }
                     }
@@ -215,6 +218,7 @@ fun HomePage(component: HomeComponent) {
                         .background(myColors.background),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    val filterMode by component.filterMode
                     DownloadList(
                         downloadList = downloadList,
                         selectionList = selectionList,
@@ -372,7 +376,9 @@ private fun RenderDownloadOptions(
 ) {
     val selection by component.selectionList.collectAsState()
     val downloadList by component.sortedDownloadList.collectAsState()
-    SelectionPopup(
+    val filterMode by component.filterMode
+    val selectedQueue = (filterMode as? HomeComponent.FilterMode.Queue)?.queue
+    SelectionMenuBox(
         modifier = modifier,
         options = component.downloadActions.androidMenu,
         onRequestClose = component::clearSelection,
@@ -418,5 +424,13 @@ private fun RenderDownloadOptions(
         onRequestInvertSelection = component::onRequestInvertSelection,
         selectionCount = selection.size,
         total = downloadList.size,
+        queueItemsMenu = selectedQueue?.let {
+            QueueSelectedItemsMenuProps(
+                queueName = it.name,
+                onRequestQueueItemsUp = component::reorderQueueItemsUp,
+                onRequestQueueItemsDown = component::reorderQueueItemsDown,
+                onRequestRemoveItemsFromQueue = component::removeQueueItems,
+            )
+        }
     )
 }

@@ -50,6 +50,7 @@ interface IMyIcons {
     val remove: IconSource
     val clear: IconSource
     val add: IconSource
+    val minus: IconSource
     val paste: IconSource
     val copy: IconSource
     val refresh: IconSource

@@ -415,7 +415,10 @@ abstract class BaseHomeComponent(
 
             data object ResetCategoriesToDefault : Common
             data object AutoCategorize : Common
-            data class ScrollToDownloadItem(val downloadId: Long) : Common
+            data class ScrollToDownloadItem(
+                val downloadId: Long,
+                val skipIfVisible: Boolean = false,
+            ) : Common
         }
     }
 }

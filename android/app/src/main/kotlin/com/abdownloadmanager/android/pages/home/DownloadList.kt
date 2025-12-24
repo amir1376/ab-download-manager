@@ -1,7 +1,6 @@
 package com.abdownloadmanager.android.pages.home
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -67,7 +66,9 @@ fun DownloadList(
                 key = { _, item -> item.id }
             ) { index, item ->
                 val isFirstItem = index == 0
-                Column {
+                Column(
+                    modifier = Modifier.animateItem()
+                ) {
                     RenderDownloadItem(
                         downloadItem = item,
                         checked = if (isInSelectMode) {
