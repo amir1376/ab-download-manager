@@ -137,9 +137,16 @@ fun HomePage(component: HomeComponent) {
                         val positionOrNull = tableState
                             .getItemPosition(listState) { it.id == id }
                             .takeIf { it != -1 }
-                        positionOrNull?.let {
+                        positionOrNull?.let { index ->
+                            if (effect.skipIfVisible) {
+                                val isVisible = lazyListState.layoutInfo.visibleItemsInfo
+                                    .any { it.index == index }
+                                if (isVisible) {
+                                    return@let
+                                }
+                            }
                             coroutineScope.launch {
-                                lazyListState.scrollToItem(it)
+                                lazyListState.scrollToItem(index)
                             }
                         }
                     }

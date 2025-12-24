@@ -62,9 +62,10 @@ data class OpenOptionMenuProps(
 )
 
 @Composable
-fun SelectionPopup(
+fun SelectionMenuBox(
     modifier: Modifier,
     options: List<MenuItem>,
+    queueItemsMenu: QueueSelectedItemsMenuProps?,
     onRequestSelectAll: () -> Unit,
     onRequestSelectInside: () -> Unit,
     onRequestInvertSelection: () -> Unit,
@@ -109,6 +110,15 @@ fun SelectionPopup(
         RenderSelectionMenuActions(options, {
             submenuToOpen = it
         })
+        if (queueItemsMenu != null) {
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(myColors.onBackground / 0.1f)
+            )
+            RenderSelectedQueueItemsOption(queueItemsMenu)
+        }
     }
     renderSubMenu(submenuToOpen, dismissExtraMenu)
 }

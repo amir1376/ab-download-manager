@@ -56,6 +56,7 @@ object MyIcons : BaseMyColors() {
     override val remove = ABDMIcons.Delete.asIconSource("remove")
     override val clear = ABDMIcons.Clear.asIconSource("clear")
     override val add = ABDMIcons.Plus.asIconSource("add")
+    override val minus = ABDMIcons.Minus.asIconSource("add")
     override val paste = ABDMIcons.Clipboard.asIconSource("paste")
 
     override val copy = ABDMIcons.Copy.asIconSource("copy")
