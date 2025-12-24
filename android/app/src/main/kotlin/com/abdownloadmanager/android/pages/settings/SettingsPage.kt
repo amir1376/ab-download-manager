@@ -21,16 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
-import com.abdownloadmanager.android.pages.onboarding.permissions.isBatteryOptimizationDisabled
 import com.abdownloadmanager.android.ui.page.FooterFade
 import com.abdownloadmanager.android.ui.page.PageUi
 import com.abdownloadmanager.android.ui.page.PageHeader

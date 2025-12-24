@@ -1,6 +1,6 @@
-package com.abdownloadmanager.android.ui.configurable
+package com.abdownloadmanager.android.ui.configurable.android
 
-import com.abdownloadmanager.android.ui.configurable.comon.item.PermissionConfigurable
+import com.abdownloadmanager.android.ui.configurable.android.item.PermissionConfigurable
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRenderer
 import com.abdownloadmanager.shared.ui.configurable.ContainsConfigurableRenderers

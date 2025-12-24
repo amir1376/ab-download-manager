@@ -8,7 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import com.abdownloadmanager.android.pages.onboarding.permissions.ABDMPermissions
 import com.abdownloadmanager.android.pages.onboarding.permissions.isBatteryOptimizationDisabled
 import com.abdownloadmanager.android.pages.onboarding.permissions.requestIgnoreBatteryOptimizationPermission
-import com.abdownloadmanager.android.ui.configurable.comon.item.PermissionConfigurable
+import com.abdownloadmanager.android.ui.configurable.android.item.PermissionConfigurable
 import com.abdownloadmanager.android.util.pagemanager.PermissionsPageManager
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable

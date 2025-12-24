@@ -1,6 +1,5 @@
 package com.abdownloadmanager.android.pages.settings
 
-import android.content.Context
 import com.abdownloadmanager.android.storage.AppSettingsStorage
 import com.abdownloadmanager.android.util.pagemanager.PermissionsPageManager
 import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
@@ -26,7 +25,6 @@ class AndroidSettingsComponent(
 ) : BaseSettingsComponent(
     ctx
 ), KoinComponent {
-    private val context by inject<Context>()
     private val appSettings by inject<AppSettingsStorage>()
     //    private val pageStorage by inject<PageStatesStorage>()
     private val appRepository by inject<BaseAppRepository>()

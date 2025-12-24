@@ -1,6 +1,5 @@
-package com.abdownloadmanager.android.ui.configurable.comon.item
+package com.abdownloadmanager.android.ui.configurable.android.item
 
-import android.content.Context
 import com.abdownloadmanager.android.pages.onboarding.permissions.AppPermission
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import ir.amirab.util.compose.StringSource
