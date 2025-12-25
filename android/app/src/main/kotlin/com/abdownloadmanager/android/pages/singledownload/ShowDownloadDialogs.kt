@@ -31,7 +31,10 @@ private fun getDownloadTitle(itemState: IDownloadItemState): String {
 
 
 @Composable
-fun ShowDownloadDialog(singleDownloadComponent: AndroidSingleDownloadComponent) {
+fun ShowDownloadDialog(
+    singleDownloadComponent: AndroidSingleDownloadComponent,
+    onRequestShowInDownloads: () -> Unit,
+) {
     val itemState by singleDownloadComponent.itemStateFlow.collectAsState()
     val dialogState = rememberResponsiveDialogState(false)
     dialogState.OnFullyDismissed {
@@ -54,6 +57,13 @@ fun ShowDownloadDialog(singleDownloadComponent: AndroidSingleDownloadComponent) 
                         SheetTitle(getDownloadTitle(downloadItemState))
                     },
                     headerActions = {
+                        if (singleDownloadComponent.comesFromExternalApplication) {
+                            TransparentIconActionButton(
+                                MyIcons.externalLink,
+                                contentDescription = Res.string.show_downloads.asStringSource(),
+                                onClick = onRequestShowInDownloads,
+                            )
+                        }
                         TransparentIconActionButton(
                             MyIcons.close,
                             contentDescription = Res.string.close.asStringSource(),

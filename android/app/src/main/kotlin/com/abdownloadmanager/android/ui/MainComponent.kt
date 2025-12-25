@@ -463,7 +463,11 @@ class MainComponent(
     override fun openDownloadDialog(id: Long) {
         sendEffect(
             MainAppEffects.StartActivity(
-                SingleDownloadPageActivity.createIntent(context, id)
+                SingleDownloadPageActivity.createIntent(
+                    context = context,
+                    downloadId = id,
+                    comingFromOutside = false
+                )
             )
         )
     }
@@ -719,6 +723,21 @@ class MainComponent(
 
     override fun openNewQueueDialog() {
         setShowAddQueue(true)
+    }
+
+    fun revealDownload(downloadId: Long) {
+        stackNavigation.pushToFront(
+            ScreenConfig.Home,
+        ) {
+            if (downloadId < 0) {
+                return@pushToFront
+            }
+            stack.value.items
+                .lastOrNull()
+                ?.let {
+                    (it.instance as? Screen.Home)?.component?.revealItem(downloadId)
+                }
+        }
     }
 
     sealed interface MainAppEffects {

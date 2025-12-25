@@ -70,7 +70,8 @@ class AddSingleDownloadActivity : ABDMActivity() {
                                 appContext.startActivity(
                                     SingleDownloadPageActivity.createIntent(
                                         appContext,
-                                        id
+                                        id,
+                                        true,
                                     ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 )
                             }.onFailure {
