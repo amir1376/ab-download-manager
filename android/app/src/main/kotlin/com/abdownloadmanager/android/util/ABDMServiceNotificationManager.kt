@@ -216,7 +216,7 @@ class ABDMServiceNotificationManager(
             context,
             AndroidConstants.SERVICE_NOTIFICATION_ID,
             SingleDownloadPageActivity.createIntent(
-                context, downloadItemState.id
+                context, downloadItemState.id, true
             ),
             flagOfPendingIntent
         )

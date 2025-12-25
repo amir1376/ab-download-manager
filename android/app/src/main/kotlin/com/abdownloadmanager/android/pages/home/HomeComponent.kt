@@ -406,6 +406,7 @@ class HomeComponent(
             queueManager.getQueue(id).stop()
         }
     }
+
     private fun getCurrentDownloadQueue(): DownloadQueue? {
         val queueId = (filterMode.value as? FilterMode.Queue)?.queue?.id ?: return null
         return runCatching { queueManager.getQueue(queueId) }.getOrNull()
@@ -468,6 +469,12 @@ class HomeComponent(
         val downloadQueue = getCurrentDownloadQueue() ?: return
         val itemsToRemove = selectionList.value
         downloadQueue.removeFromQueue(itemsToRemove)
+    }
+
+    fun revealItem(downloadId: Long) {
+        scope.launch {
+            sendEffect(BaseHomeComponent.Effects.Common.ScrollToDownloadItem(downloadId))
+        }
     }
 
     override val enterNewURLDialogManager: EnterNewURLDialogManager

@@ -1,24 +1,17 @@
 package com.abdownloadmanager.android.ui
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
-import androidx.core.app.ActivityCompat
 import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.android.pages.onboarding.permissions.PermissionManager
-import com.abdownloadmanager.android.util.ABDMServiceNotificationManager
-import com.abdownloadmanager.android.util.AndroidUi
 import com.abdownloadmanager.android.util.activity.ABDMActivity
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
-import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.DefaultCategories
-import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.arkivanov.decompose.retainedComponent
 import ir.amirab.downloader.queue.QueueManager
 import kotlinx.serialization.json.Json
@@ -36,10 +29,8 @@ class MainActivity : ABDMActivity() {
     private val json: Json by inject()
     private val updateManager: UpdateManager by inject()
     private val permissionManager: PermissionManager by inject()
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        requestNotificationPermissionIfNeeded()
-        val mainComponent = retainedComponent {
+    val mainComponent by lazy {
+        retainedComponent {
             // make sure to not pass any activity to retained component
             MainComponent(
                 ctx = it,
@@ -64,6 +55,10 @@ class MainActivity : ABDMActivity() {
                 homePageStorage = homePageStorage,
             )
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setABDMContent {
             MainContent(
                 mainComponent = mainComponent,
@@ -71,18 +66,25 @@ class MainActivity : ABDMActivity() {
         }
     }
 
-    private fun requestNotificationPermissionIfNeeded() {
-        if (ActivityCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    override fun handleIntent(intent: Intent) {
+        if (intent.action == ACTION_REVEAL_DOWNLOAD_IN_LIST) {
+            val downloadId = intent.getLongExtra(DOWNLOAD_ID_KEY, -1)
+                .takeIf { it >= 0 } ?: return
+            mainComponent.revealDownload(downloadId)
         }
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
+    companion object {
+        private const val DOWNLOAD_ID_KEY = "downloadId"
+        private const val ACTION_REVEAL_DOWNLOAD_IN_LIST = "revealDownloadList"
+        fun createRevelDownloadIntent(
+            context: Context,
+            downloadId: Long,
+        ): Intent {
+            return Intent(context, MainActivity::class.java).apply {
+                action = ACTION_REVEAL_DOWNLOAD_IN_LIST
+                putExtra(DOWNLOAD_ID_KEY, downloadId)
+            }
+        }
     }
 }

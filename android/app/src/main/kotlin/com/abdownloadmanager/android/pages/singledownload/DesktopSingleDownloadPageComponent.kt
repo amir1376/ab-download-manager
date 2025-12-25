@@ -25,6 +25,7 @@ class AndroidSingleDownloadComponent(
     appRepository: BaseAppRepository,
     applicationScope: CoroutineScope,
     fileIconProvider: FileIconProvider,
+    val comesFromExternalApplication: Boolean,
 ) : BaseSingleDownloadComponent<AndroidExtraDownloadItemSettings>(
     ctx = ctx,
     downloadItemOpener = downloadItemOpener,
