@@ -14,6 +14,23 @@
 
 ### Security
 
+## 1.8.3
+
+### Added
+
+- Ability to sort and remove queue items on Android (#996)
+- A new shortcut to open the download list from the download progress dialog (#1001)
+
+### Fixed
+
+- Download table state not saved properly on desktop (#999)
+- Update related notifications appearing repeatedly on android (#998)
+
+### Improved
+
+- Updated translations
+- Settings Page UI improvements on android (#990)
+
 ## 1.8.2
 
 ### Fixed
