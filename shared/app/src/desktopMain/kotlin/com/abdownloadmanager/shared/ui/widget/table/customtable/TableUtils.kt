@@ -321,7 +321,7 @@ class TableState<Item, Cell : TableCell<Item>>(
         return SerializableTableState(
             sizes = sizes,
             sortBy = sortBy?.let {
-                SortBy(sortBy.cell.id, sortBy.isAscending())
+                SortBy(name = sortBy.cell.id, descending = sortBy.isDescending())
             },
             order = order.value.map { it.id },
             visibleCells = visibleCells.value.map { it.id }
