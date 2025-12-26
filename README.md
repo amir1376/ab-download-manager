@@ -45,6 +45,11 @@ Please visit [Project Website](https://abdownloadmanager.com) for more info.
 bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh)
 ```
 
+#### Arch Linux (AUR)
+
+```bash
+yay -S ab-download-manager-bin
+
 #### Winget or Scoop (for Windows)
 
 **winget**:
