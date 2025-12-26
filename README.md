@@ -27,7 +27,7 @@
 - ⏰ Queues and Schedulers
 - 🌐 Browser Extensions
 - 💻 Multiplatform (Android / Windows / Linux / Mac)
-- 🌙 Multiple Themes (Dark/Light) with modern UI
+- 🌙 Multiple Themes (Dark/Light/Black and more) with modern UI
 - ❤️ Free and Open Source
 
 Please visit [Project Website](https://abdownloadmanager.com) for more info.
@@ -65,6 +65,10 @@ scoop install extras/abdownloadmanager
 brew tap amir1376/tap && brew install --cask ab-download-manager
 ```
 
+> ⚠️ **Warning:** This software is NOT on Google Play or other app stores unless listed here. Any version **claiming to be or related to this project** outside of these links is a SCAM and UNSAFE.
+
+For alternative installation methods, uninstallation instructions, and more details, please refer to the [wiki](https://github.com/amir1376/ab-download-manager/wiki/) page.
+
 ### Browser Extensions
 
 You can download the browser extension to integrate the app with your browser.
@@ -83,10 +87,6 @@ You can download the browser extension to integrate the app with your browser.
     </picture>
 </a>
 </p>
-
-## Uninstallation
-
-[Uninstall Wiki](https://github.com/amir1376/ab-download-manager/wiki/Uninstall)
 
 ## Screenshots
 
@@ -174,15 +174,7 @@ so on Crowdin. Here’s how:
 
 ## Contribution
 
-> ❌ **Important Notice:** The entire codebase is being completely rewritten. Pull requests are **not accepted** at this
-> time, as incoming changes may be lost or conflict heavily with ongoing refactoring. Please wait until the refactor is
-> complete before submitting any PRs.
-
-Contributions to this project are very welcome!
-
 If you want to contribute to this project, please read [Contributing Guide](CONTRIBUTING.md) first.
-
-Let's make a better Download Manager together! ❤️
 
 ## Support the Project
 
