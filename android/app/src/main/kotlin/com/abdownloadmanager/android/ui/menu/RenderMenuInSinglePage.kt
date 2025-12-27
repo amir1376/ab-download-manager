@@ -11,6 +11,7 @@ import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -63,84 +64,84 @@ import ir.amirab.util.compose.modifiers.autoMirror
 import ir.amirab.util.ifThen
 
 @Composable
-private fun RenderMenuInSinglePage(
+fun RenderMenuInSinglePage(
     menuStack: SnapshotStateList<MenuItem.SubMenu>,
     onDismissRequest: () -> Unit,
     modifier: Modifier,
 ) {
-    BackHandler {
-        val menuStack = menuStack
-        if (menuStack.size == 1) {
-            onDismissRequest()
-        } else {
-            menuStack.removeAt(menuStack.lastIndex)
-        }
-    }
     val shape = LocalMenuBoxClip.current
     val currentMenu = menuStack.last()
     val alpha = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
         alpha.animateTo(1f)
     }
+    BackHandler {
+        if (menuStack.size == 1) {
+            onDismissRequest()
+        } else {
+            menuStack.removeAt(menuStack.lastIndex)
+        }
+    }
     WithLanguageDirection {
-        Column(
+        Box(
             modifier
                 .shadow(4.dp, shape)
                 .clip(shape)
                 .widthIn(200.dp)
                 .border(1.dp, myColors.onSurface / 0.1f, shape)
                 .background(myColors.surface)
-                .padding(horizontal = 0.dp, vertical = 0.dp)
         ) {
             AnimatedContent(
                 currentMenu
             ) { currentMenu ->
-                Menu(
-                    menu = currentMenu,
-                    onNewMenuSelected = { newMenu ->
-                        menuStack.add(newMenu)
-                    },
-                    onRequestClose = {
-                        onDismissRequest()
-                    },
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState()),
-                )
-            }
-            val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-            val currentTitle = currentMenu.title.collectAsState().value.rememberString()
-            if (currentTitle.isNotEmpty()) {
-                RenderSeparator()
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clickable(
-                            enabled = menuStack.size > 1
-                        ) {
-                            onBackPressedDispatcher?.onBackPressed()
-                        }
-                        .fillMaxWidth()
-                        .heightIn(mySpacings.thumbSize)
-                        .padding(horizontal = 16.dp)
-                ) {
-                    val iconModifier = Modifier
-                        .size(menuIconSize)
-                    if (menuStack.size > 1) {
-                        MyIcon(
-                            MyIcons.back,
-                            null,
-                            iconModifier.autoMirror(),
-                        )
-                        Spacer(Modifier.width(16.dp))
-                    }
-                    Text(
-                        currentTitle,
-                        Modifier.weight(1f),
-                        color = LocalContentColor.current / 0.75f,
+                Column {
+                    Menu(
+                        menu = currentMenu,
+                        onNewMenuSelected = { newMenu ->
+                            menuStack.add(newMenu)
+                        },
+                        onRequestClose = {
+                            onDismissRequest()
+                        },
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState()),
                     )
+                    val currentTitle = currentMenu.title.collectAsState().value.rememberString()
+                    if (currentTitle.isNotEmpty()) {
+                        val onBackPressedDispatcher =
+                            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+                        RenderSeparator()
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .clickable(
+                                    enabled = menuStack.size > 1
+                                ) {
+                                    onBackPressedDispatcher?.onBackPressed()
+                                }
+                                .fillMaxWidth()
+                                .heightIn(mySpacings.thumbSize)
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            val iconModifier = Modifier
+                                .size(menuIconSize)
+                            if (menuStack.size > 1) {
+                                MyIcon(
+                                    MyIcons.back,
+                                    null,
+                                    iconModifier.autoMirror(),
+                                )
+                                Spacer(Modifier.width(16.dp))
+                            }
+                            Text(
+                                currentTitle,
+                                Modifier.weight(1f),
+                                color = LocalContentColor.current / 0.75f,
+                            )
+                        }
+                    }
                 }
             }
-
         }
     }
 }
@@ -207,7 +208,7 @@ private fun Menu(
                 RenderMenuItem(
                     menuItem = menuItem,
 //                    openedItem = openedItem,
-                    onRequestCLose = onRequestClose,
+                    onRequestClose = onRequestClose,
                     isSelected = openedItem == menuItem,
                     onRequestOpenItem = {
                         onNewMenuSelected(it)
@@ -284,7 +285,7 @@ private fun ReactableItem(
 @Composable
 private fun RenderMenuItem(
     menuItem: MenuItem,
-    onRequestCLose: () -> Unit,
+    onRequestClose: () -> Unit,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
     onRequestOpenItem: (MenuItem.SubMenu) -> Unit,
@@ -303,7 +304,7 @@ private fun RenderMenuItem(
                 RenderSingleItem(
                     item = menuItem,
                     isSelected = isSelected,
-                    onRequestClose = onRequestCLose,
+                    onRequestClose = onRequestClose,
                 )
             }
 
@@ -428,4 +429,5 @@ private fun RenderShortcutStroke(shortcutStroke: PlatformKeyStroke) {
         }
     }
 }
+
 private val menuIconSize = 20.dp

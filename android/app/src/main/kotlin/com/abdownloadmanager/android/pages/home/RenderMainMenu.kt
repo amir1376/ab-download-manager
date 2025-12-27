@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.abdownloadmanager.android.ui.menu.RenderMenuInSinglePage
+import com.abdownloadmanager.android.ui.menu.StackedMenuPopup
 import com.abdownloadmanager.shared.ui.widget.rememberMyComponentRectPositionProvider
 
 @Composable
@@ -21,22 +22,15 @@ fun RenderMainMenu(component: HomeComponent) {
         val onDismissRequest = {
             component.setIsMainMenuShowing(false)
         }
-        Popup(
+        StackedMenuPopup(
             popupPositionProvider = rememberMyComponentRectPositionProvider(
                 anchor = Alignment.TopStart,
                 alignment = Alignment.TopEnd,
                 offset = DpOffset(x = 0.dp, y = (-8).dp)
             ),
             onDismissRequest = onDismissRequest,
-            properties = PopupProperties(
-                focusable = true,
-            )
-        ) {
-            RenderMenuInSinglePage(
-                menu = component.mainMenu,
-                onDismissRequest = onDismissRequest,
-                modifier = Modifier.width(IntrinsicSize.Max),
-            )
-        }
+            menu = component.mainMenu,
+            modifier = Modifier.width(IntrinsicSize.Max)
+        )
     }
 }

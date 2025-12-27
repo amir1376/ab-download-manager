@@ -30,7 +30,7 @@ fun RenderAddMenu(component: HomeComponent) {
             onDismissRequest = onDismissRequest,
             properties = PopupProperties(
                 focusable = true,
-            )
+            ),
         ) {
             RenderMenuInSinglePage(
                 menu = component.addMenu,
