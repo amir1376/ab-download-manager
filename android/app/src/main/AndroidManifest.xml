@@ -40,6 +40,22 @@
                 android:theme="@style/Theme.ABDownloadManager.Transparent"
                 android:windowSoftInputMode="adjustResize"
         />
+        <activity
+                android:name=".pages.browser.BrowserActivity"
+                android:exported="true"
+                android:theme="@style/Theme.ABDownloadManager"
+                android:windowSoftInputMode="adjustResize"
+                android:configChanges="orientation"
+        >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:mimeType="*/*"/>
+            </intent-filter>
+        </activity>
 
         <!--        Accept external download from browsers/send intents etc...-->
         <activity

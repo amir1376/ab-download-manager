@@ -17,7 +17,8 @@ data class HLSResponseInfo(
     val httpResponseInfo: HttpResponseInfo,
     val hlsManifest: MediaPlaylist
 ) : IResponseInfo {
-    val name = httpResponseInfo.fileName
+    val name: String?
+        get() = httpResponseInfo.fileName
     val duration = hlsManifest.mediaSegments()
         .sumOf { it.duration() }
         .takeIf { it > 0 }
@@ -28,6 +29,8 @@ data class HLSResponseInfo(
         get() = httpResponseInfo.requireBasicAuth
     override val requireBasicAuth: Boolean
         get() = httpResponseInfo.requireBasicAuth
+    override val isWebPage: Boolean
+        get() = httpResponseInfo.isWebPage
     override val resumeSupport: Boolean
         get() = true
 

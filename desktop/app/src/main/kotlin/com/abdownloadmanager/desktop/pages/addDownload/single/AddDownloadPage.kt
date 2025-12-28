@@ -27,7 +27,6 @@ import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
-import com.abdownloadmanager.shared.pages.adddownload.single.AddSingleDownloadPageEffects
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
@@ -55,8 +54,16 @@ fun AddDownloadPage(
 
         HandleEffects(component) {
             when (it) {
-                is AddSingleDownloadPageEffects.SuggestUrl -> {
-                    setLink(it.link)
+                is BaseAddSingleDownloadComponent.Effects.Common -> {
+                    when (it) {
+                        is BaseAddSingleDownloadComponent.Effects.Common.SuggestUrl -> {
+                            setLink(it.link)
+                        }
+                    }
+                }
+
+                is BaseAddSingleDownloadComponent.Effects.Platform -> {
+                    // support platform effects if any
                 }
             }
         }

@@ -5,4 +5,5 @@ interface IResponseInfo {
     val requiresAuth: Boolean
     val requireBasicAuth: Boolean
     val resumeSupport: Boolean
+    val isWebPage: Boolean
 }

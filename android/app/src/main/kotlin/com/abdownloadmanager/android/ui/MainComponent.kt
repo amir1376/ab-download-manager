@@ -6,6 +6,7 @@ import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.android.pages.add.multiple.AddMultiDownloadActivity
 import com.abdownloadmanager.android.pages.add.single.AddSingleDownloadActivity
 import com.abdownloadmanager.android.pages.batchdownload.AndroidBatchDownloadComponent
+import com.abdownloadmanager.android.pages.browser.BrowserActivity
 import com.abdownloadmanager.android.pages.checksum.AndroidFileChecksumComponent
 import com.abdownloadmanager.android.pages.editdownload.AndroidEditDownloadComponent
 import com.abdownloadmanager.android.pages.home.HomeComponent
@@ -20,6 +21,7 @@ import com.abdownloadmanager.android.storage.AndroidOnBoardingStorage
 import com.abdownloadmanager.android.storage.HomePageStorage
 import com.abdownloadmanager.android.ui.Screen.*
 import com.abdownloadmanager.android.util.ABDMAppManager
+import com.abdownloadmanager.android.util.pagemanager.IBrowserPageManager
 import com.abdownloadmanager.android.util.pagemanager.PermissionsPageManager
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.pagemanager.AboutPageManager
@@ -64,7 +66,6 @@ import com.arkivanov.decompose.router.slot.dismiss
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.navigate
-import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushToFront
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
 import ir.amirab.downloader.queue.DefaultQueueInfo
@@ -184,6 +185,7 @@ class MainComponent(
     BatchDownloadPageManager,
     PerHostSettingsPageManager,
     PermissionsPageManager,
+    IBrowserPageManager,
     ContainsEffects<MainComponent.MainAppEffects> by supportEffects() {
     val categoryComponentNavigation = SlotNavigation<Long>()
     val categorySlot = childSlot(
@@ -336,7 +338,8 @@ class MainComponent(
                             perHostSettingsPageManager = this,
                             downloaderInUiRegistry = downloaderInUiRegistry,
                             updateComponent = updaterComponent,
-                            homePageStorage = homePageStorage
+                            homePageStorage = homePageStorage,
+                            browserPageManager = this,
                         )
                     )
                 }
@@ -738,6 +741,14 @@ class MainComponent(
                     (it.instance as? Screen.Home)?.component?.revealItem(downloadId)
                 }
         }
+    }
+
+    override fun openBrowser(url: String?) {
+        val intent = BrowserActivity.createIntent(
+            context = context,
+            url = url,
+        )
+        sendEffect(MainAppEffects.StartActivity(intent))
     }
 
     sealed interface MainAppEffects {

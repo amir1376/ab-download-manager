@@ -6,6 +6,12 @@ import androidx.core.content.FileProvider
 import java.io.File
 
 object AndroidIntentUtils {
+    fun shareText(context: Context, text: String) {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, text)
+        context.startActivity(Intent.createChooser(intent, "Share Via"))
+    }
     fun shareFiles(context: Context, files: List<File>) {
         if (files.isEmpty()) return
 

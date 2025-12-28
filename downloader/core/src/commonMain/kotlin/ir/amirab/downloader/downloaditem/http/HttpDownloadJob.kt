@@ -3,7 +3,6 @@ package ir.amirab.downloader.downloaditem.http
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.connection.HttpDownloaderClient
 import ir.amirab.downloader.connection.response.expectSuccess
-import ir.amirab.downloader.connection.response.isWebPage
 import ir.amirab.downloader.destination.DownloadDestination
 import ir.amirab.downloader.destination.SimpleDownloadDestination
 import ir.amirab.downloader.downloaditem.DownloadJob
@@ -627,7 +626,7 @@ class HttpDownloadJob(
         serverLastModified = runCatching {
             response.lastModified?.let(TimeUtils::convertLastModifiedHeaderToTimestamp)
         }.getOrNull()
-        if (response.isWebPage()) {
+        if (response.isWebPage) {
             if (isDownloadItemIsAWebpage()) {
                 // don't strict if it's a webpage let it download without checks
                 strictDownload = false

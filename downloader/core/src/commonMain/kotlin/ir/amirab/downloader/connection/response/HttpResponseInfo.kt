@@ -53,6 +53,10 @@ data class HttpResponseInfo(
         isPartial && contentLength != null && contentRange?.fullSize != null
     }
 
+    override val isWebPage: Boolean by lazy {
+        responseHeaders["content-type"].orEmpty().contains("text/html", ignoreCase = true)
+    }
+
     val fileName: String? by lazy {
         run {
             val nameFromHeader = responseHeaders["content-disposition"]?.let {
@@ -61,7 +65,7 @@ data class HttpResponseInfo(
             nameFromHeader ?: HttpUrlUtils.extractNameFromLink(requestUrl)
         }
             .orEmpty()
-            .ifThen(isWebPage()) {
+            .ifThen(isWebPage) {
                 FileNameUtil.replaceExtension(
                     this,
                     "html",
@@ -81,9 +85,6 @@ data class HttpResponseInfo(
     }
 }
 
-fun HttpResponseInfo.isWebPage(): Boolean {
-    return responseHeaders["content-type"].orEmpty().contains("text/html")
-}
 
 fun HttpResponseInfo.expectSuccess() = apply {
     if (!isSuccessFul) {
