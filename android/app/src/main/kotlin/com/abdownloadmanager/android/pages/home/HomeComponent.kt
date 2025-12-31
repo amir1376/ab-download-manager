@@ -3,10 +3,12 @@ package com.abdownloadmanager.android.pages.home
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
+import com.abdownloadmanager.android.action.createOpenBrowserAction
 import com.abdownloadmanager.android.pages.enterurl.AndroidEnterNewURLComponent
 import com.abdownloadmanager.android.pages.home.sections.sort.DownloadSortBy
 import com.abdownloadmanager.android.storage.HomePageStorage
 import com.abdownloadmanager.android.util.AppInfo
+import com.abdownloadmanager.android.util.pagemanager.IBrowserPageManager
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.action.createCheckForUpdateAction
 import com.abdownloadmanager.shared.action.createDownloadFromClipboardAction
@@ -97,6 +99,7 @@ class HomeComponent(
     translatorsPageManager: TranslatorsPageManager,
     settingsPageManager: SettingsPageManager,
     perHostSettingsPageManager: PerHostSettingsPageManager,
+    browserPageManager: IBrowserPageManager,
     aboutPageManager: AboutPageManager,
     batchDownloadPageManager: BatchDownloadPageManager,
     defaultCategories: DefaultCategories,
@@ -333,6 +336,8 @@ class HomeComponent(
     val activeQueuesFlow = queueManager.activeQueuesFlow(scope)
         .stateIn(scope, SharingStarted.Eagerly, emptyList())
     val mainMenu = buildMenu {
+        +createOpenBrowserAction(browserPageManager = browserPageManager)
+        separator()
         +createStopAllAction(scope, downloadSystem, {}, activeQueuesFlow)
         separator()
         subMenu(

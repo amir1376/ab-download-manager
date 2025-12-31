@@ -4,7 +4,6 @@ import com.abdownloadmanager.shared.action.createNewQueueAction
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
 import com.abdownloadmanager.shared.pagemanager.NewQueuePageManager
-import com.abdownloadmanager.shared.pagemanager.QueuePageManager
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
@@ -25,10 +24,10 @@ import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.router.slot.dismiss
-import com.arkivanov.decompose.router.slot.navigate
 import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.queue.QueueManager
+import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -137,6 +136,10 @@ class AndroidAddSingleDownloadComponent(
         _showAddQueue.value = value
     }
 
+    val isWebPage = downloadChecker
+        .responseInfo
+        .mapStateFlow { it?.isWebPage ?: false }
+
     fun createQueueWithName(name: String) {
         scope.launch { queueManager.addQueue(name) }
         setShowAddQueue(false)
@@ -150,4 +153,15 @@ class AndroidAddSingleDownloadComponent(
         setShowAddQueue(true)
     }
 
+    fun onRequestOpenLinkInBrowser() {
+        sendEffect(
+            Effects.OpenInBrowser(
+                downloadChecker.credentials.value.link
+            )
+        )
+    }
+
+    sealed interface Effects : BaseAddSingleDownloadComponent.Effects.Platform {
+        data class OpenInBrowser(val link: String) : Effects
+    }
 }

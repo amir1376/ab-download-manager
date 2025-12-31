@@ -42,7 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
-import com.abdownloadmanager.shared.pages.adddownload.single.AddSingleDownloadPageEffects
+import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialogScope
@@ -95,8 +95,16 @@ fun ResponsiveDialogScope.AddSingleDownloadPage(
 
                 HandleEffects(component) {
                     when (it) {
-                        is AddSingleDownloadPageEffects.SuggestUrl -> {
-                            setLink(it.link)
+                        is BaseAddSingleDownloadComponent.Effects.Common -> {
+                            when (it) {
+                                is BaseAddSingleDownloadComponent.Effects.Common.SuggestUrl -> {
+                                    setLink(it.link)
+                                }
+                            }
+                        }
+
+                        is BaseAddSingleDownloadComponent.Effects.Platform -> {
+                            //
                         }
                     }
                 }
@@ -484,25 +492,40 @@ private fun MainActionButtons(component: AndroidAddSingleDownloadComponent) {
                 )
                 Space()
             }
-            Row {
-                val buttonModifier = Modifier.weight(1f)
-                MainConfigActionButton(
-                    text = myStringResource(Res.string.add),
-                    modifier = buttonModifier,
-                    enabled = canAddToDownloads,
-                    onClick = {
-                        component.shouldShowAddToQueue = true
-                    },
-                )
-                Spacer(Modifier.width(8.dp))
-                PrimaryMainActionButton(
-                    text = myStringResource(Res.string.download),
-                    modifier = buttonModifier,
-                    enabled = canAddToDownloads,
-                    onClick = {
-                        component.onRequestDownload()
-                    },
-                )
+            val isWebPage by component.isWebPage.collectAsState()
+            if (isWebPage) {
+                Row {
+                    MainConfigActionButton(
+                        text = myStringResource(Res.string.open_in_browser),
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = canAddToDownloads,
+                        onClick = {
+                            component.onRequestOpenLinkInBrowser()
+                        },
+                    )
+                }
+            } else {
+                Row {
+                    val buttonModifier = Modifier.weight(1f)
+                    MainConfigActionButton(
+                        text = myStringResource(Res.string.add),
+                        modifier = buttonModifier,
+                        enabled = canAddToDownloads,
+                        onClick = {
+                            component.shouldShowAddToQueue = true
+                        },
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    PrimaryMainActionButton(
+                        text = myStringResource(Res.string.download),
+                        modifier = buttonModifier,
+                        enabled = canAddToDownloads,
+                        onClick = {
+                            component.onRequestDownload()
+                        },
+                    )
+                }
+
             }
 
         }

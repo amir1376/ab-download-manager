@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import com.abdownloadmanager.android.pages.browser.BrowserActivity
 import com.abdownloadmanager.android.pages.category.CategorySheet
 import com.abdownloadmanager.android.pages.newqueue.NewQueueSheet
 import com.abdownloadmanager.android.pages.singledownload.SingleDownloadPageActivity
@@ -17,12 +18,14 @@ import com.abdownloadmanager.android.util.activity.putSerializedExtra
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadConfig
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
+import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialog
 import com.abdownloadmanager.shared.util.category.CategoryManager
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
@@ -119,6 +122,14 @@ class AddSingleDownloadActivity : ABDMActivity() {
         val addDownloadComponent = myRetainedComponent.component
         setABDMContent {
             myRetainedComponent.HandleActivityEffects()
+            HandleEffects(addDownloadComponent) {
+                if (it is AndroidAddSingleDownloadComponent.Effects.OpenInBrowser) {
+                    startActivity(
+                        BrowserActivity.createIntent(this, it.link)
+                    )
+                    finish()
+                }
+            }
             val dialogState = rememberResponsiveDialogState(false)
             dialogState.OnFullyDismissed {
                 addDownloadComponent.onRequestClose()
