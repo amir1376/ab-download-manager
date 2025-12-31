@@ -73,6 +73,14 @@ class ABDMAppManager(
         return permissionManager.isReady()
     }
 
+    fun isDownloadSystemBooted(): Boolean {
+        return downloadSystemBooted.isDone()
+    }
+
+    fun isBackgroundServiceRunning(): Boolean {
+        return true
+    }
+
     suspend fun startDownloadSystem() {
         downloadSystemBooted.action {
             downloadSystem.boot()
@@ -370,5 +378,20 @@ class ABDMAppManager(
      */
     fun repostServiceNotification() {
         serviceNotificationManager.updateNotificationWithDefaultValue()
+    }
+
+    fun bootDownloadSystemAndService(): Boolean {
+        if (isDownloadSystemBooted() && isBackgroundServiceRunning()) {
+            return true
+        }
+        if (canStartDownloadEngine()) {
+            scope.launch {
+                startDownloadSystem()
+                startOurService()
+                //
+            }
+            return true
+        }
+        return false
     }
 }

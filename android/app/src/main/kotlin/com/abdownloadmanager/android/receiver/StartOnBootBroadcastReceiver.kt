@@ -13,15 +13,11 @@ import org.koin.core.component.inject
 
 class StartOnBootBroadcastReceiver : BroadcastReceiver(), KoinComponent {
     private val appManager: ABDMAppManager by inject()
-    private val scope: CoroutineScope by inject()
     private val appSettingStorage: BaseAppSettingsStorage by inject()
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            if (appManager.canStartDownloadEngine() && appSettingStorage.autoStartOnBoot.value) {
-                scope.launch {
-                    appManager.startDownloadSystem()
-                    appManager.startOurService()
-                }
+            if (appSettingStorage.autoStartOnBoot.value) {
+                appManager.bootDownloadSystemAndService()
             }
         }
     }
