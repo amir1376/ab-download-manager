@@ -22,7 +22,7 @@ sealed class Arch(val name: String) {
                 "x86", "i686"
             ),
             Arm32 to listOf(
-                "armv7l", "arm"
+                "armv8l", "armv7l", "arm"
             ),
         )
 
