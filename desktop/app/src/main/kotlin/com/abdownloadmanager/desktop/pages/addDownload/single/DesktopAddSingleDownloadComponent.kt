@@ -48,7 +48,7 @@ class DesktopAddSingleDownloadComponent(
     perHostSettingsManager: PerHostSettingsManager,
     importOptions: ImportOptions,
     id: String,
-    downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *>,
+    downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *, *>,
     initialCredentials: AddDownloadCredentialsInUiProps,
     private val categoryDialogManager: CategoryDialogManager,
 ) : BaseAddSingleDownloadComponent(

@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.downloaderinui.hls.edit
 
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditDownloadResult
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditWarnings
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
@@ -7,7 +8,6 @@ import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import com.abdownloadmanager.shared.downloaderinui.hls.HLSLinkChecker
 import ir.amirab.downloader.downloaditem.hls.HLSResponseInfo
 import com.abdownloadmanager.shared.downloaderinui.http.edit.EditDownloadChecker
-import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadItem
 import ir.amirab.util.FileNameValidator
 import ir.amirab.util.HttpUrlUtils
@@ -22,7 +22,7 @@ class HLSEditDownloadChecker(
     linkChecker: HLSLinkChecker,
     conflictDetector: DownloadConflictDetector,
     scope: CoroutineScope
-) : EditDownloadChecker<HLSDownloadItem, HLSDownloadCredentials, HLSResponseInfo, HLSLinkChecker>(
+) : EditDownloadChecker<HLSDownloadItem, HLSDownloadCredentials, HLSResponseInfo, DownloadSize.Duration, HLSLinkChecker>(
     currentDownloadItem = currentDownloadItem,
     editedDownloadItem = editedDownloadItem,
     linkChecker = linkChecker,

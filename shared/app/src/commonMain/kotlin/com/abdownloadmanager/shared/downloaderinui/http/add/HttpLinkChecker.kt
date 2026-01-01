@@ -1,10 +1,12 @@
 package com.abdownloadmanager.shared.downloaderinui.http.add
 
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.util.FilenameFixer
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import ir.amirab.downloader.connection.HttpDownloaderClient
 import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -12,12 +14,14 @@ import kotlinx.coroutines.flow.update
 class HttpLinkChecker(
     initialCredentials: HttpDownloadCredentials = HttpDownloadCredentials.Companion.empty(),
     private val client: HttpDownloaderClient,
-) : LinkChecker<HttpDownloadCredentials, HttpResponseInfo>(initialCredentials) {
+) : LinkChecker<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes>(initialCredentials) {
     private val _suggestedName = MutableStateFlow(null as String?)
     override val suggestedName = _suggestedName.asStateFlow()
 
     private val _length = MutableStateFlow(null as Long?)
-    val length = _length.asStateFlow()
+    override val downloadSize = _length.mapStateFlow {
+        it?.let(DownloadSize::Bytes)
+    }
 
     override fun infoUpdated(responseInfo: HttpResponseInfo?) {
         updateNameAndLength(responseInfo)

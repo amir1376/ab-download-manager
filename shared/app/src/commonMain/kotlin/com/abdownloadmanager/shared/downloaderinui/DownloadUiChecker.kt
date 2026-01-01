@@ -12,10 +12,11 @@ import kotlinx.coroutines.flow.*
 abstract class DownloadUiChecker<
         TCredentials : IDownloadCredentials,
         TResponseInfoType : IResponseInfo,
-        TLinkChecker : LinkChecker<TCredentials, TResponseInfoType>,
+        TDownloadSize : DownloadSize,
+        TLinkChecker : LinkChecker<TCredentials, TResponseInfoType, TDownloadSize>,
         >(
     initialCredentials: TCredentials,
-    linkCheckerFactory: LinkCheckerFactory<TCredentials, TResponseInfoType, TLinkChecker>,
+    linkCheckerFactory: LinkCheckerFactory<TCredentials, TResponseInfoType, TDownloadSize, TLinkChecker>,
     initialFolder: String,
     initialName: String = "",
     downloadSystem: DownloadSystem,
@@ -25,7 +26,6 @@ abstract class DownloadUiChecker<
     val name = MutableStateFlow(initialName)
     val folder = MutableStateFlow(initialFolder)
 
-
     protected val linkChecker = linkCheckerFactory.createLinkChecker(credentials.value)
     protected val addDownloadChecker = AddDownloadChecker(
         linkChecker = linkChecker,
@@ -34,6 +34,8 @@ abstract class DownloadUiChecker<
         downloadSystem = downloadSystem,
         parentScope = scope,
     )
+    val downloadSize: StateFlow<TDownloadSize?> = linkChecker.downloadSize
+
     val gettingResponseInfo = linkChecker.isLoading
     val responseInfo = linkChecker.responseInfo
 

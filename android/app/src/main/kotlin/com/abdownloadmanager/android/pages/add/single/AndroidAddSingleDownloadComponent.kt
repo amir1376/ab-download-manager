@@ -53,7 +53,7 @@ class AndroidAddSingleDownloadComponent(
     perHostSettingsManager: PerHostSettingsManager,
     importOptions: ImportOptions,
     id: String,
-    downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *>,
+    downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *, *>,
     initialCredentials: AddDownloadCredentialsInUiProps,
 ) : BaseAddSingleDownloadComponent(
     ctx = ctx,

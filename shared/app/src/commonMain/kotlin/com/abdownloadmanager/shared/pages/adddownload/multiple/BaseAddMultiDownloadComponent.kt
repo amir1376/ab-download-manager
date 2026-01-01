@@ -4,8 +4,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import arrow.core.Some
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
+import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadInputs
+import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadInputsUniqueIdType
 import com.abdownloadmanager.shared.downloaderinui.add.TANewDownloadInputs
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
@@ -26,15 +30,23 @@ import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.ifThen
+import ir.amirab.util.wildcardMatch
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.collections.forEach
 
 abstract class BaseAddMultiDownloadComponent(
     ctx: ComponentContext,
@@ -56,7 +68,7 @@ abstract class BaseAddMultiDownloadComponent(
     val folder = _folder.asStateFlow()
     fun setFolder(folder: String) {
         this._folder.update { folder }
-        list.forEach {
+        totalList.forEach {
             it.folder.update { folder }
         }
     }
@@ -85,7 +97,11 @@ abstract class BaseAddMultiDownloadComponent(
         _allInSameLocation.update { sameLocation }
     }
 
-
+    private val _filterText = MutableStateFlow("")
+    val filterText = _filterText.asStateFlow()
+    fun setFilterText(text: String) {
+        _filterText.update { text }
+    }
 
     private fun newCheckerWithInputs(
         addDownloadCredentialsInUiProps: AddDownloadCredentialsInUiProps
@@ -104,7 +120,7 @@ abstract class BaseAddMultiDownloadComponent(
 
     fun addItems(list: List<AddDownloadCredentialsInUiProps>) {
         val newItemsToAdd = list.filter {
-            it.credentials !in this.list.map {
+            it.credentials !in this.totalList.map {
                 it.credentials.value
             }
         }.mapNotNull {
@@ -119,10 +135,10 @@ abstract class BaseAddMultiDownloadComponent(
                 }
         }
         enqueueCheck(newItemsToAdd)
-        this.list = this.list.plus(newItemsToAdd)
+        this.totalList = this.totalList.plus(newItemsToAdd)
     }
 
-    var list: List<TANewDownloadInputs> by mutableStateOf(emptyList())
+    var totalList: List<TANewDownloadInputs> by mutableStateOf(emptyList())
 
     private val checkList = MutableSharedFlow<TANewDownloadInputs>()
     private fun enqueueCheck(links: List<TANewDownloadInputs>) {
@@ -140,18 +156,19 @@ abstract class BaseAddMultiDownloadComponent(
             .launchIn(scope)
     }
 
-    var selectionList by mutableStateOf<List<String>>(emptyList())
-    fun isSelected(item: TANewDownloadInputs): Boolean {
-        return item.credentials.value.link in selectionList
+    var selectionList by mutableStateOf<List<NewDownloadInputsUniqueIdType>>(emptyList())
+
+    fun isSelected(itemId: NewDownloadInputsUniqueIdType): Boolean {
+        return itemId in selectionList
     }
 
-    val isAllSelected by derivedStateOf {
-        list.all { it.credentials.value.link in selectionList }
+    val isTotalSelected by derivedStateOf {
+        totalList.all { it.getUniqueId() in selectionList }
     }
 
-    var lastSelectedId by mutableStateOf(null as String?)
+    var lastSelectedId by mutableStateOf(null as NewDownloadInputsUniqueIdType?)
 
-    fun setSelect(id: String, selected: Boolean) {
+    fun setSelect(id: NewDownloadInputsUniqueIdType, selected: Boolean) {
         if (selected) {
             lastSelectedId = id
             if (!selectionList.contains(id)) {
@@ -162,25 +179,30 @@ abstract class BaseAddMultiDownloadComponent(
         }
     }
 
-    fun resetSelectionTo(ids: List<String>, boolean: Boolean) {
+    fun resetSelectionTo(ids: List<NewDownloadInputsUniqueIdType>, boolean: Boolean) {
         selectionList = ids.takeIf { boolean }
             .orEmpty()
     }
 
     fun selectAll(value: Boolean) {
         selectionList = if (value) {
-            list.map { it.credentials.value.link }
+            filteredList.value.map { it.id }
         } else {
             emptyList()
         }
     }
 
     fun toggleSelectInside() {
+        val list = filteredList.value
+        val listIds = list.map { it.id }
+        val selection = selectionList.filter {
+            it !in listIds
+        }
         SelectionUtil.toggleSelectInside(
-            selectionList = selectionList,
+            selectionList = selection,
             fullSortedList = list,
             getId = {
-                it.credentials.value.link
+                it.id
             }
         )?.let {
             selectionList = it
@@ -188,11 +210,16 @@ abstract class BaseAddMultiDownloadComponent(
     }
 
     fun inverseSelection() {
+        val list = filteredList.value
+        val listIds = list.map { it.id }
+        val selection = selectionList.filter {
+            it !in listIds
+        }
         selectionList = SelectionUtil.invertSelection(
-            selectionList = selectionList,
+            selectionList = selection,
             all = list,
             getId = {
-                it.credentials.value.link
+                it.id
             }
         )
     }
@@ -242,8 +269,8 @@ abstract class BaseAddMultiDownloadComponent(
                 CategorySelectionMode.Fixed(it.id)
             }
         }
-        val itemsToAdd = list
-            .filter { it.credentials.value.link in selectionList }
+        val itemsToAdd = totalList
+            .filter { it.getUniqueId() in selectionList }
             .filter {
                 val checker = it.downloadUiChecker
                 checker.canAdd.value
@@ -295,10 +322,10 @@ abstract class BaseAddMultiDownloadComponent(
     }
 
     fun openConfigurableList(
-        itemID: Int?
+        itemID: NewDownloadInputsUniqueIdType?
     ) {
         currentDownloadConfigurableList.value = itemID?.let { id ->
-            list.find { getIdOf(it) == id }
+            totalList.find { getIdOf(it) == id }
         }?.configurableList
     }
 
@@ -315,4 +342,79 @@ abstract class BaseAddMultiDownloadComponent(
     fun requestClose() {
         onRequestClose()
     }
+
+    val listStateFlow: Flow<List<NewMultiDownloadState>> = snapshotFlow { totalList }
+        .flatMapLatest { downloadInputs ->
+            if (downloadInputs.isEmpty()) flowOf(emptyList())
+            else combine(
+                downloadInputs.map { it.asNewDownloadState() },
+            ) {
+                it.toList()
+            }
+        }
+
+    val filteredList = combine(
+        listStateFlow,
+        filterText,
+    ) { list, filterText ->
+        val filterText = filterText.trim()
+        list.ifThen(filterText.isNotBlank()) {
+            filter {
+                wildcardMatch(filterText, it.name)
+            }
+        }
+    }.stateIn(scope, SharingStarted.Eagerly, emptyList())
+
+    val selectedTotalSize = combine(
+        snapshotFlow { selectionList },
+        filteredList,
+    ) { selection, list ->
+        list.filter { it.id in selection }
+            .mapNotNull { it.size }
+            .groupBy { it::class }
+            .values
+            .map {
+                it.fold(it.first()) { acc, item ->
+                    acc.plus(item)
+                }
+            }
+    }.stateIn(scope, SharingStarted.Eagerly, emptyList())
+
+    val isAllFilteredSelected = combine(
+        snapshotFlow { selectionList },
+        filteredList,
+    ) { selection, list ->
+        val ids = list.map { it.id }
+        ids.all { it in selection }
+    }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    private fun NewDownloadInputs<*, *, *, *, *>.asNewDownloadState(): Flow<NewMultiDownloadState> {
+        val id = this@asNewDownloadState.getUniqueId()
+        return combine(
+            name,
+            credentials,
+            downloadUiChecker.downloadSize,
+            lengthStringFlow,
+        ) { name, credentials, downloadSize, lengthString ->
+            NewMultiDownloadState(
+                id = id,
+                name = name,
+                size = downloadSize,
+                sizeString = lengthString,
+                link = credentials.link,
+            )
+        }
+    }
+
 }
+
+/**
+ * this is used to represent multiple download list table
+ */
+data class NewMultiDownloadState(
+    val id: NewDownloadInputsUniqueIdType,
+    val name: String,
+    val size: DownloadSize?,
+    val sizeString: StringSource,
+    val link: String,
+)

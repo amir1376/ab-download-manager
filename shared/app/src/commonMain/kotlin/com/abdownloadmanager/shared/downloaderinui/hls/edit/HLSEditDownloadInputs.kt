@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.downloaderinui.hls.edit
 
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadCheckerFactory
@@ -15,7 +16,6 @@ import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
-import com.abdownloadmanager.shared.util.convertDurationToHumanReadable
 import com.abdownloadmanager.shared.util.FileChecksum
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
 import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
@@ -37,14 +37,15 @@ class HLSEditDownloadInputs(
     editedDownloadItem: MutableStateFlow<HLSDownloadItem>,
     mapper: HlsItemToCredentialMapper,
     conflictDetector: DownloadConflictDetector,
-    linkCheckerFactory: LinkCheckerFactory<HLSDownloadCredentials, HLSResponseInfo, HLSLinkChecker>,
-    editDownloadCheckerFactory: EditDownloadCheckerFactory<HLSDownloadItem, HLSDownloadCredentials, HLSResponseInfo, HLSLinkChecker>,
+    linkCheckerFactory: LinkCheckerFactory<HLSDownloadCredentials, HLSResponseInfo, DownloadSize.Duration, HLSLinkChecker>,
+    editDownloadCheckerFactory: EditDownloadCheckerFactory<HLSDownloadItem, HLSDownloadCredentials, HLSResponseInfo, DownloadSize.Duration, HLSLinkChecker>,
     scope: CoroutineScope,
     private val sizeAndSpeedUnitProvider: SizeAndSpeedUnitProvider,
 ) : EditDownloadInputs<
         HLSDownloadItem,
         HLSDownloadCredentials,
         HLSResponseInfo,
+        DownloadSize.Duration,
         HLSLinkChecker,
         HlsItemToCredentialMapper
         >(
@@ -223,13 +224,7 @@ class HLSEditDownloadInputs(
         }.launchIn(scope)
     }
 
-    override val lengthStringFlow: StateFlow<StringSource> = linkChecker.responseInfo.mapStateFlow {
-        val fileInfo = it ?: return@mapStateFlow Res.string.unknown.asStringSource()
-        fileInfo.duration?.let {
-            convertDurationToHumanReadable(it)
-        }.takeIf {
-            // this is a length of a html page (error)
-            fileInfo.isSuccessFul
-        } ?: Res.string.unknown.asStringSource()
+    override fun downloadSizeToStringSource(downloadSize: DownloadSize.Duration): StringSource {
+        return downloadSize.asStringSource()
     }
 }

@@ -27,7 +27,7 @@ open class BaseEditDownloadComponent(
 ) : BaseComponent(ctx) {
 
     val editDownloadUiChecker =
-        MutableStateFlow(null as EditDownloadInputs<IDownloadItem, IDownloadCredentials, *, *, *>?)
+        MutableStateFlow(null as EditDownloadInputs<IDownloadItem, IDownloadCredentials, *, *, *, *>?)
 
     init {
         scope.launch {

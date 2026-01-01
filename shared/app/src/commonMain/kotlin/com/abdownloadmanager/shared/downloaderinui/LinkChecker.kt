@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.update
 
 abstract class LinkChecker<
         Credentials : IDownloadCredentials,
-        ResponseInfo : IResponseInfo
+        ResponseInfo : IResponseInfo,
+        TDownloadSize : DownloadSize,
         >(
     initialCredentials: Credentials
 ) {
@@ -18,6 +19,7 @@ abstract class LinkChecker<
     val credentials = MutableStateFlow(initialCredentials)
 
     abstract val suggestedName: StateFlow<String?>
+    abstract val downloadSize: StateFlow<TDownloadSize?>
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()

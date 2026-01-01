@@ -59,7 +59,7 @@ abstract class BaseAddSingleDownloadComponent(
     protected val queueManager: QueueManager,
     importOptions: ImportOptions,
     id: String,
-    downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *>,
+    downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *, *>,
     initialCredentials: AddDownloadCredentialsInUiProps,
 ) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage),
     ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects() {

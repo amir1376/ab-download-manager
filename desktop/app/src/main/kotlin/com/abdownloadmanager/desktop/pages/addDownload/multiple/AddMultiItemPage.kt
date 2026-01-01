@@ -2,6 +2,7 @@ package com.abdownloadmanager.desktop.pages.addDownload.multiple
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.onClick
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,15 +14,19 @@ import com.abdownloadmanager.desktop.pages.addDownload.shared.CategorySelect
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.pages.addDownload.shared.LocationTextField
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ShowAddToQueueDialog
+import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
+import com.abdownloadmanager.shared.downloaderinui.rememberString
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.ifThen
 
 @Composable
 fun AddMultiItemPage(
@@ -103,23 +108,44 @@ fun Footer(
                     component = component,
                 )
                 Spacer(Modifier.width(8.dp))
-                Row(Modifier.align(Alignment.Bottom)) {
-                    ActionButton(
-                        text = myStringResource(Res.string.add),
-                        onClick = {
-                            component.openAddToQueueDialog()
-                        },
-                        enabled = component.canClickAdd,
-                        modifier = Modifier,
+                Column(
+                    Modifier.align(Alignment.Bottom)
+                        .width(IntrinsicSize.Max),
+                ) {
+                    val filterText by component.filterText.collectAsState()
+                    SearchBox(
+                        text = filterText,
+                        onTextChange = component::setFilterText,
+                        placeholder = myStringResource(Res.string.search),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.End),
+                        textPadding = PaddingValues(
+                            vertical = 6.dp,
+                            horizontal = 8.dp
+                        ),
                     )
-                    Spacer(Modifier.width(8.dp))
-                    ActionButton(
-                        text = myStringResource(Res.string.cancel),
-                        onClick = {
-                            component.requestClose()
-                        },
-                        modifier = Modifier,
-                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        PrimaryMainActionButton(
+                            text = myStringResource(Res.string.add),
+                            onClick = {
+                                component.openAddToQueueDialog()
+                            },
+                            enabled = component.canClickAdd,
+                            modifier = Modifier,
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        ActionButton(
+                            text = myStringResource(Res.string.cancel),
+                            onClick = {
+                                component.requestClose()
+                            },
+                            modifier = Modifier,
+                        )
+                    }
                 }
             }
             Spacer(
@@ -133,8 +159,9 @@ fun Footer(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
                 SelectionDetail(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                    totalDownloadItems = component.list.count(),
-                    selectedDownloadItems = component.selectionList.count()
+                    totalDownloadItems = component.totalList.size,
+                    selectedDownloadItems = component.selectionList.size,
+                    sizes = component.selectedTotalSize.collectAsState().value,
                 )
             }
         }
@@ -166,7 +193,8 @@ private fun SaveSettings(
 private fun SelectionDetail(
     modifier: Modifier,
     totalDownloadItems: Int,
-    selectedDownloadItems: Int
+    selectedDownloadItems: Int,
+    sizes: List<DownloadSize>,
 ) {
     val selectionCount = "$selectedDownloadItems / $totalDownloadItems"
     Row(
@@ -182,6 +210,21 @@ private fun SelectionDetail(
             )
         }
         Text(selectionCount, fontSize = myTextSizes.base)
+
+        val sizes = sizes.ifThen(sizes.isEmpty()){
+            listOf(DownloadSize.Bytes.Zero)
+        }
+        WithContentAlpha(.25f) {
+            MyIcon(
+                icon = MyIcons.data,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        for (sizeType in sizes) {
+            val sizeString = sizeType.rememberString()
+            Text(sizeString, fontSize = myTextSizes.base)
+        }
     }
 }
 

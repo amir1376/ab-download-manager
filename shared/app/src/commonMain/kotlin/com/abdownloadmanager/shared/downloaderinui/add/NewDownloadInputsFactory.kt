@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.downloaderinui.add
 
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.connection.IResponseInfo
@@ -11,11 +12,13 @@ interface NewDownloadInputsFactory<
         TDownloadItem : IDownloadItem,
         TCredentials : IDownloadCredentials,
         TResponseInfoType : IResponseInfo,
-        TLinkChecker : LinkChecker<TCredentials, TResponseInfoType>,
+        TDownloadSize : DownloadSize,
+        TLinkChecker : LinkChecker<TCredentials, TResponseInfoType, TDownloadSize>,
         TNewDownloadInputs : NewDownloadInputs<
                 TDownloadItem,
                 TCredentials,
                 TResponseInfoType,
+                TDownloadSize,
                 TLinkChecker,
                 >
         > {

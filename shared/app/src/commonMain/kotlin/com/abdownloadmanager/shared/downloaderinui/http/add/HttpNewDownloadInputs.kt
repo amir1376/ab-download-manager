@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.downloaderinui.http.add
 
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadInputs
 import com.abdownloadmanager.shared.ui.configurable.item.FileChecksumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
@@ -9,7 +10,6 @@ import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.util.FileChecksum
-import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsItem
 import com.abdownloadmanager.shared.downloaderinui.http.applyToHttpDownload
@@ -38,12 +38,11 @@ class HttpNewDownloadInputs(
         HttpDownloadItem,
         HttpDownloadCredentials,
         HttpResponseInfo,
-        HttpLinkChecker
+        DownloadSize.Bytes,
+        HttpLinkChecker,
         >(
     downloadUiChecker
 ) {
-    private val length: StateFlow<Long?> = downloadUiChecker.length
-
     //extra settings
     private var threadCount = MutableStateFlow(null as Int?)
     private var speedLimit = MutableStateFlow(0L)
@@ -52,7 +51,7 @@ class HttpNewDownloadInputs(
         this.credentials,
         this.folder,
         this.name,
-        this.length,
+        this.downloadSize,
         this.speedLimit,
         this.threadCount,
         this.fileChecksum,
@@ -70,7 +69,7 @@ class HttpNewDownloadInputs(
             folder = folder,
             name = name,
             link = credentials.link,
-            contentLength = length ?: IDownloadItem.LENGTH_UNKNOWN,
+            contentLength = length?.bytes ?: IDownloadItem.LENGTH_UNKNOWN,
             dateAdded = openedTime,
             startTime = null,
             completeTime = null,
@@ -195,13 +194,7 @@ class HttpNewDownloadInputs(
         )
     )
 
-    override val lengthStringFlow: StateFlow<StringSource> = downloadUiChecker.responseInfo.mapStateFlow {
-        val fileInfo = it ?: return@mapStateFlow Res.string.unknown.asStringSource()
-        fileInfo.totalLength?.let {
-            convertPositiveSizeToHumanReadable(it, sizeAndSpeedUnitProvider.sizeUnit.value)
-        }.takeIf {
-            // this is a length of a html page (error)
-            fileInfo.isSuccessFul
-        } ?: Res.string.unknown.asStringSource()
+    override fun downloadSizeToStringSource(downloadSize: DownloadSize.Bytes): StringSource {
+        return downloadSize.asStringSource(sizeAndSpeedUnitProvider.sizeUnit.value)
     }
 }

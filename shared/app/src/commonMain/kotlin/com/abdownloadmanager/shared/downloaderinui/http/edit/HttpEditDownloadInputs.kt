@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.downloaderinui.http.edit
 
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadCheckerFactory
@@ -14,9 +15,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.util.FileChecksum
-import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
-import ir.amirab.downloader.connection.HttpDownloaderClient
 import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
@@ -24,11 +23,9 @@ import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
-import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -39,9 +36,9 @@ class HttpEditDownloadInputs(
     mapper: HttpCredentialsToItemMapper,
     conflictDetector: DownloadConflictDetector,
     scope: CoroutineScope,
-    linkCheckerFactory: LinkCheckerFactory<HttpDownloadCredentials, HttpResponseInfo, HttpLinkChecker>,
-    editDownloadCheckerFactory: EditDownloadCheckerFactory<HttpDownloadItem, HttpDownloadCredentials, HttpResponseInfo, HttpLinkChecker>
-) : EditDownloadInputs<HttpDownloadItem, HttpDownloadCredentials, HttpResponseInfo, HttpLinkChecker, HttpCredentialsToItemMapper>(
+    linkCheckerFactory: LinkCheckerFactory<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker>,
+    editDownloadCheckerFactory: EditDownloadCheckerFactory<HttpDownloadItem, HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker>
+) : EditDownloadInputs<HttpDownloadItem, HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker, HttpCredentialsToItemMapper>(
     currentDownloadItem = currentDownloadItem,
     editedDownloadItem = editedDownloadItem,
     mapper = mapper,
@@ -172,7 +169,7 @@ class HttpEditDownloadInputs(
             }
         ),
     )
-    val length = linkChecker.length
+    val length = linkChecker.downloadSize
     override val downloadJobConfig: MutableStateFlow<DownloadJobExtraConfig?> = MutableStateFlow(null)
 
     private fun HttpDownloadItem.applyOurChanges(edited: HttpDownloadItem) {
@@ -213,13 +210,7 @@ class HttpEditDownloadInputs(
         }.launchIn(scope)
     }
 
-    override val lengthStringFlow: StateFlow<StringSource> = linkChecker.responseInfo.mapStateFlow {
-        val fileInfo = it ?: return@mapStateFlow Res.string.unknown.asStringSource()
-        fileInfo.totalLength?.let {
-            convertPositiveSizeToHumanReadable(it, sizeAndSpeedUnitProvider.sizeUnit.value)
-        }.takeIf {
-            // this is a length of a html page (error)
-            fileInfo.isSuccessFul
-        } ?: Res.string.unknown.asStringSource()
+    override fun downloadSizeToStringSource(downloadSize: DownloadSize.Bytes): StringSource {
+        return downloadSize.asStringSource(sizeAndSpeedUnitProvider.sizeUnit.value)
     }
 }

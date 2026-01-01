@@ -23,27 +23,28 @@ import kotlinx.coroutines.CoroutineScope
 abstract class DownloaderInUi<
         TCredentials : IDownloadCredentials,
         TResponseInfo : IResponseInfo,
-        TLinkChecker : LinkChecker<TCredentials, TResponseInfo>,
+        TDownloadSize : DownloadSize,
+        TLinkChecker : LinkChecker<TCredentials, TResponseInfo, TDownloadSize>,
         TDownloadItem : IDownloadItem,
-        TNewDownloadInputs : NewDownloadInputs<TDownloadItem, TCredentials, TResponseInfo, TLinkChecker>,
-        TEditDownloadInputs : EditDownloadInputs<TDownloadItem, TCredentials, TResponseInfo, TLinkChecker, TCredentialAndItemMapper>,
+        TNewDownloadInputs : NewDownloadInputs<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>,
+        TEditDownloadInputs : EditDownloadInputs<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker, TCredentialAndItemMapper>,
         TCredentialAndItemMapper : CredentialAndItemMapper<TCredentials, TDownloadItem>,
         TDownloadJob : DownloadJob,
         TDownloader : Downloader<TDownloadItem, TDownloadJob, TCredentials>
         >(
     val downloader: TDownloader
 ) :
-    LinkCheckerFactory<TCredentials, TResponseInfo, TLinkChecker>,
-    EditDownloadCheckerFactory<TDownloadItem, TCredentials, TResponseInfo, TLinkChecker>,
-    NewDownloadInputsFactory<TDownloadItem, TCredentials, TResponseInfo, TLinkChecker, TNewDownloadInputs>,
-    EditDownloadInputsFactory<TDownloadItem, TCredentials, TResponseInfo, TLinkChecker, TCredentialAndItemMapper, TEditDownloadInputs> {
+    LinkCheckerFactory<TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>,
+    EditDownloadCheckerFactory<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>,
+    NewDownloadInputsFactory<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker, TNewDownloadInputs>,
+    EditDownloadInputsFactory<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker, TCredentialAndItemMapper, TEditDownloadInputs> {
     abstract fun newDownloadUiChecker(
         initialCredentials: TCredentials,
         initialFolder: String,
         initialName: String,
         downloadSystem: DownloadSystem,
         scope: CoroutineScope,
-    ): DownloadUiChecker<TCredentials, TResponseInfo, TLinkChecker>
+    ): DownloadUiChecker<TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>
 
 
     abstract fun acceptDownloadCredentials(item: IDownloadCredentials): Boolean
