@@ -14,6 +14,26 @@
 
 ### Security
 
+## 1.8.4
+
+### Added
+
+- In-app browser for Android
+- The Android service now tells the user why it is running
+- The Add-Multi-Download page can now filter downloads using search and wildcards
+
+### Fixed
+
+- Random app crashes on some Android devices caused by service-related issues
+- Issues with the in-app update feature on some Android devices
+
+### Improved
+
+- Updated translations
+- The Android Foreground Service is now only used when necessary (active downloads, active queues, scheduled queues) and
+  automatically stops after inactivity
+- Add-Multi-Download page UI/UX improvements
+
 ## 1.8.3
 
 ### Added
