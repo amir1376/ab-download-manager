@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.downloaderinui.http.edit
 
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditDownloadResult
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditWarnings
@@ -16,7 +17,6 @@ import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -25,7 +25,8 @@ abstract class EditDownloadChecker<
         TDownloadItem : IDownloadItem,
         TCredentials : IDownloadCredentials,
         TResponseInfo : IResponseInfo,
-        TLinkChecker : LinkChecker<TCredentials, TResponseInfo>
+        TDownloadSize : DownloadSize,
+        TLinkChecker : LinkChecker<TCredentials, TResponseInfo, TDownloadSize>
         >(
     val currentDownloadItem: MutableStateFlow<TDownloadItem>,
     val editedDownloadItem: MutableStateFlow<TDownloadItem>,
@@ -48,7 +49,7 @@ class HttpEditDownloadChecker(
     conflictDetector: DownloadConflictDetector,
     scope: CoroutineScope,
     linkChecker: HttpLinkChecker,
-) : EditDownloadChecker<HttpDownloadItem, HttpDownloadCredentials, HttpResponseInfo, HttpLinkChecker>(
+) : EditDownloadChecker<HttpDownloadItem, HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker>(
     currentDownloadItem = currentDownloadItem,
     editedDownloadItem = editedDownloadItem,
     conflictDetector = conflictDetector,
@@ -67,7 +68,7 @@ class HttpEditDownloadChecker(
         _canEditResult.value = check(
             current = currentDownloadItem.value,
             edited = editedDownloadItem.value,
-            newLength = linkChecker.length.value,
+            newLength = linkChecker.downloadSize.value?.bytes,
         )
     }
 

@@ -2,6 +2,7 @@ package com.abdownloadmanager.shared.downloaderinui.hls
 
 import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
 import com.abdownloadmanager.shared.downloaderinui.hls.add.HLSDownloadUIChecker
 import com.abdownloadmanager.shared.downloaderinui.hls.add.HLSNewDownloadInputs
@@ -11,7 +12,6 @@ import com.abdownloadmanager.shared.downloaderinui.http.edit.EditDownloadChecker
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadItem
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadJob
@@ -31,6 +31,7 @@ class HLSDownloaderInUi(
 ) : DownloaderInUi<
         HLSDownloadCredentials,
         HLSResponseInfo,
+        DownloadSize.Duration,
         HLSLinkChecker,
         HLSDownloadItem,
         HLSNewDownloadInputs,
@@ -109,7 +110,7 @@ class HLSDownloaderInUi(
         linkChecker: HLSLinkChecker,
         conflictDetector: DownloadConflictDetector,
         scope: CoroutineScope
-    ): EditDownloadChecker<HLSDownloadItem, HLSDownloadCredentials, HLSResponseInfo, HLSLinkChecker> {
+    ): EditDownloadChecker<HLSDownloadItem, HLSDownloadCredentials, HLSResponseInfo, DownloadSize.Duration, HLSLinkChecker> {
         return HLSEditDownloadChecker(
             currentDownloadItem = currentDownloadItem,
             editedDownloadItem = editedDownloadItem,

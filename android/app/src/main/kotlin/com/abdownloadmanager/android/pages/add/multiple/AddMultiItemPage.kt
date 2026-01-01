@@ -125,6 +125,7 @@ fun Footer(
             .fillMaxWidth()
             .background(myColors.surface)
             .navigationBarsPadding()
+            .imePadding()
     ) {
         Spacer(
             Modifier
@@ -137,7 +138,7 @@ fun Footer(
                 .padding(horizontal = 16.dp)
                 .padding(vertical = 16.dp),
         ) {
-            val total = component.list.size
+            val total = component.totalList.size
             val showMoreOptions by component.showMoreOptions.collectAsState()
             RenderControlSelections(
                 onRequestSelectAll = { component.selectAll(true) },
@@ -168,6 +169,24 @@ fun Footer(
                             .fillMaxWidth(),
                         component = component,
                     )
+                    val text = component.filterText.collectAsState().value
+                    Spacer(Modifier.height(8.dp))
+                    MyTextFieldWithIcons(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = text,
+                        setText = component::setFilterText,
+                        placeHolder = myStringResource(Res.string.search),
+                        end = {
+                            MyTextFieldIcon(
+                                MyIcons.clear,
+                                enabled = text.isNotEmpty(),
+                            ) {
+                                component.setFilterText("")
+                            }
+                        }
+                    )
+                    Spacer(Modifier.height(8.dp))
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -175,7 +194,7 @@ fun Footer(
                 Modifier
             ) {
                 val buttonModifier = Modifier.weight(1f)
-                ActionButton(
+                PrimaryMainActionButton(
                     text = myStringResource(Res.string.add),
                     onClick = {
                         component.openAddToQueueDialog()
@@ -183,7 +202,6 @@ fun Footer(
                     enabled = component.canClickAdd,
                     modifier = buttonModifier,
                 )
-                Spacer(Modifier.width(8.dp))
 //                ActionButton(
 //                    text = myStringResource(Res.string.cancel),
 //                    onClick = {

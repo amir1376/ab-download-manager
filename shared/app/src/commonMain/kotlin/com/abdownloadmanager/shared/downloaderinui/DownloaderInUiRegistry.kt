@@ -15,10 +15,11 @@ import kotlin.reflect.KClass
 typealias TADownloaderInUI = DownloaderInUi<
         IDownloadCredentials,
         IResponseInfo,
-        LinkChecker<IDownloadCredentials, IResponseInfo>,
+        DownloadSize,
+        LinkChecker<IDownloadCredentials, IResponseInfo, DownloadSize>,
         IDownloadItem,
-        NewDownloadInputs<IDownloadItem, IDownloadCredentials, IResponseInfo, LinkChecker<IDownloadCredentials, IResponseInfo>>,
-        EditDownloadInputs<IDownloadItem, IDownloadCredentials, IResponseInfo, LinkChecker<IDownloadCredentials, IResponseInfo>, CredentialAndItemMapper<IDownloadCredentials, IDownloadItem>>,
+        NewDownloadInputs<IDownloadItem, IDownloadCredentials, IResponseInfo, DownloadSize, LinkChecker<IDownloadCredentials, IResponseInfo, DownloadSize>>,
+        EditDownloadInputs<IDownloadItem, IDownloadCredentials, IResponseInfo, DownloadSize, LinkChecker<IDownloadCredentials, IResponseInfo, DownloadSize>, CredentialAndItemMapper<IDownloadCredentials, IDownloadItem>>,
         CredentialAndItemMapper<IDownloadCredentials, IDownloadItem>,
         DownloadJob,
         Downloader<IDownloadItem, DownloadJob, IDownloadCredentials>>
@@ -27,7 +28,7 @@ class DownloaderInUiRegistry
     : DownloadItemStateFactory<IDownloadItem, DownloadJob> {
     private val list = mutableListOf<TADownloaderInUI>()
     private val componentHashes = hashMapOf<Any, TADownloaderInUI>()
-    fun add(downloaderInUi: DownloaderInUi<*, *, *, *, *, *, *, *, *>) {
+    fun add(downloaderInUi: DownloaderInUi<*, *, *, *, *, *, *, *, *, *>) {
         // the compiler gave me error when I add these two generics (TDownloadJob, TDownloader) into the DownloaderInUi
         val element = downloaderInUi as TADownloaderInUI
         @Suppress("UNCHECKED_CAST")
@@ -37,7 +38,7 @@ class DownloaderInUiRegistry
         }
     }
 
-    fun remove(downloaderInUi: DownloaderInUi<*, *, *, *, *, *, *, *, *>) {
+    fun remove(downloaderInUi: DownloaderInUi<*, *, *, *, *, *, *, *, *, *>) {
         list.remove(downloaderInUi)
         @Suppress("UNCHECKED_CAST")
         getComponentsOf(

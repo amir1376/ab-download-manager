@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.downloaderinui.http.add
 
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.downloaderinui.DownloadUiChecker
 import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
@@ -9,13 +10,12 @@ import kotlinx.coroutines.CoroutineScope
 
 class HttpDownloadUiChecker(
     initialCredentials: HttpDownloadCredentials = HttpDownloadCredentials.Companion.empty(),
-    linkCheckerFactory: LinkCheckerFactory<HttpDownloadCredentials, HttpResponseInfo, HttpLinkChecker>,
+    linkCheckerFactory: LinkCheckerFactory<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker>,
     initialFolder: String,
     initialName: String = "",
     downloadSystem: DownloadSystem,
     scope: CoroutineScope,
-) : DownloadUiChecker<HttpDownloadCredentials, HttpResponseInfo, HttpLinkChecker>(
+) : DownloadUiChecker<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker>(
     initialCredentials, linkCheckerFactory, initialFolder, initialName, downloadSystem, scope
 ) {
-    val length = linkChecker.length
 }

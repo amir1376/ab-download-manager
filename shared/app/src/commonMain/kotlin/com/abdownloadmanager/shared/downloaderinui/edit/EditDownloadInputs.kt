@@ -1,6 +1,8 @@
 package com.abdownloadmanager.shared.downloaderinui.edit
 
+import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.CredentialAndItemMapper
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
 import com.abdownloadmanager.shared.ui.configurable.Configurable
@@ -9,6 +11,8 @@ import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import ir.amirab.util.flow.onEachLatest
 import kotlinx.coroutines.CoroutineScope
@@ -23,13 +27,14 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
-typealias TAEditDownloadInputs = EditDownloadInputs<*, *, *, *, *>
+typealias TAEditDownloadInputs = EditDownloadInputs<*, *, *, *, *, *>
 
 abstract class EditDownloadInputs<
         TDownloadItem : IDownloadItem,
         TCredentials : IDownloadCredentials,
         TResponseInfo : IResponseInfo,
-        TLinkChecker : LinkChecker<TCredentials, TResponseInfo>,
+        TDownloadSize : DownloadSize,
+        TLinkChecker : LinkChecker<TCredentials, TResponseInfo, TDownloadSize>,
         TCredentialAndItemMapper : CredentialAndItemMapper<TCredentials, TDownloadItem>
         >(
     val currentDownloadItem: MutableStateFlow<TDownloadItem>,
@@ -37,14 +42,15 @@ abstract class EditDownloadInputs<
     val mapper: TCredentialAndItemMapper,
     val scope: CoroutineScope,
     val conflictDetector: DownloadConflictDetector,
-    linkCheckerFactory: LinkCheckerFactory<TCredentials, TResponseInfo, TLinkChecker>,
-    editDownloadCheckerFactory: EditDownloadCheckerFactory<TDownloadItem, TCredentials, TResponseInfo, TLinkChecker>,
+    linkCheckerFactory: LinkCheckerFactory<TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>,
+    editDownloadCheckerFactory: EditDownloadCheckerFactory<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>,
 ) {
     private val _showMoreSettings = MutableStateFlow(false)
     val showMoreSettings = _showMoreSettings.asStateFlow()
     fun setShowMoreSettings(showMoreSettings: Boolean) {
         _showMoreSettings.value = showMoreSettings
     }
+
     val credentials: MutableStateFlow<TCredentials> = editedDownloadItem.mapTwoWayStateFlow(
         map = {
             mapper.itemToCredentials(it)
@@ -154,7 +160,13 @@ abstract class EditDownloadInputs<
         }.launchIn(scope)
     }
 
-    abstract val lengthStringFlow: StateFlow<StringSource>
+    abstract fun downloadSizeToStringSource(downloadSize: TDownloadSize): StringSource
+    val lengthStringFlow: StateFlow<StringSource> = linkChecker.downloadSize.mapStateFlow {
+        it
+            ?.let(::downloadSizeToStringSource)
+            ?: Res.string.unknown.asStringSource()
+    }
+
     fun getLengthString(): StringSource {
         return lengthStringFlow.value
     }

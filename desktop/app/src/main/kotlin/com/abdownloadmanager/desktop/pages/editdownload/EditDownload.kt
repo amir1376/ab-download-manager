@@ -159,7 +159,7 @@ fun EditDownloadPage(
 @Composable
 fun BrowserImportButton(
     component: DesktopEditDownloadComponent,
-    downloadUiState: EditDownloadInputs<*, *, *, *, *>,
+    downloadUiState: EditDownloadInputs<*, *, *, *, *, *>,
 ) {
     val credentialsImportedFromExternal by component.credentialsImportedFromExternal.collectAsState()
     val downloadPage = downloadUiState.currentDownloadItem.collectAsState().value.downloadPage

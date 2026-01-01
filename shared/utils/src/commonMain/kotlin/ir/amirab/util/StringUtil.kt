@@ -7,6 +7,6 @@ fun wildcardMatch(
     return pattern
         .split("*")
         .joinToString(".*") { Regex.escape(it) }
-        .toRegex()
+        .toRegex(RegexOption.IGNORE_CASE)
         .containsMatchIn(input)
 }

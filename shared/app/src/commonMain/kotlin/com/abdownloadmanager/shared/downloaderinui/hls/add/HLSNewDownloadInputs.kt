@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.downloaderinui.hls.add
 
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadInputs
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import com.abdownloadmanager.shared.downloaderinui.hls.HLSLinkChecker
@@ -12,7 +13,6 @@ import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
-import com.abdownloadmanager.shared.util.convertDurationToHumanReadable
 import com.abdownloadmanager.shared.util.FileChecksum
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsItem
@@ -39,10 +39,11 @@ class HLSNewDownloadInputs(
         HLSDownloadItem,
         HLSDownloadCredentials,
         HLSResponseInfo,
-        HLSLinkChecker>(
+        DownloadSize.Duration,
+        HLSLinkChecker,
+        >(
     downloadUiChecker = downloadUiChecker
 ) {
-    private val duration: StateFlow<Double?> = downloadUiChecker.duration
 
     //extra settings
     private var threadCount = MutableStateFlow(null as Int?)
@@ -52,7 +53,7 @@ class HLSNewDownloadInputs(
         this.credentials,
         this.folder,
         this.name,
-        this.duration,
+        this.downloadSize,
         this.speedLimit,
         this.threadCount,
         this.fileChecksum,
@@ -76,7 +77,7 @@ class HLSNewDownloadInputs(
             preferredConnectionCount = threadCount,
             speedLimit = speedLimit,
             fileChecksum = fileChecksum?.toString(),
-            duration = duration,
+            duration = duration?.duration,
         ).withCredentials(credentials)
     }
     override val downloadJobConfig: StateFlow<DownloadJobExtraConfig?> = downloadUiChecker.responseInfo.mapStateFlow {
@@ -199,13 +200,7 @@ class HLSNewDownloadInputs(
         )
     )
 
-    override val lengthStringFlow: StateFlow<StringSource> = downloadUiChecker.responseInfo.mapStateFlow {
-        val fileInfo = it ?: return@mapStateFlow Res.string.unknown.asStringSource()
-        fileInfo.duration?.let {
-            convertDurationToHumanReadable(it)
-        }.takeIf {
-            // this is a length of a html page (error)
-            fileInfo.isSuccessFul
-        } ?: Res.string.unknown.asStringSource()
+    override fun downloadSizeToStringSource(downloadSize: DownloadSize.Duration): StringSource {
+        return downloadSize.asStringSource()
     }
 }

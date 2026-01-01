@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.downloaderinui.add
 
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.connection.IResponseInfo
@@ -14,11 +15,12 @@ import java.io.File
 
 class AddDownloadChecker<
         Credentials : IDownloadCredentials,
-        ResponseInfo : IResponseInfo
+        ResponseInfo : IResponseInfo,
+        TDownloadSize : DownloadSize,
         >(
     initialName: String,
     initialFolder: String,
-    private val linkChecker: LinkChecker<Credentials, ResponseInfo>,
+    private val linkChecker: LinkChecker<Credentials, ResponseInfo, TDownloadSize>,
     private val downloadSystem: DownloadSystem,
     private val parentScope: CoroutineScope,
 ) {

@@ -163,7 +163,7 @@ fun ResponsiveDialogScope.EditDownloadPage(
 
 @Composable
 fun BrowserImportButton(
-    downloadUiState: EditDownloadInputs<*, *, *, *, *>,
+    downloadUiState: EditDownloadInputs<*, *, *, *, *, *>,
 ) {
     val downloadPage = downloadUiState.currentDownloadItem.collectAsState().value.downloadPage
     IconActionButton(

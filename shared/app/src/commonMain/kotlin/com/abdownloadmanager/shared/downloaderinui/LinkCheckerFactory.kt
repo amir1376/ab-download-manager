@@ -6,7 +6,8 @@ import ir.amirab.downloader.downloaditem.IDownloadCredentials
 interface LinkCheckerFactory<
         TCredentials : IDownloadCredentials,
         TResponseInfo : IResponseInfo,
-        TLinkChecker : LinkChecker<TCredentials, TResponseInfo>,
+        TDownloadSize : DownloadSize,
+        TLinkChecker : LinkChecker<TCredentials, TResponseInfo, TDownloadSize>,
         > {
     fun createLinkChecker(
         initialCredentials: TCredentials

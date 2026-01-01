@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.downloaderinui.add.TANewDownloadInputs
+import com.abdownloadmanager.shared.pages.adddownload.multiple.NewMultiDownloadState
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -48,23 +47,24 @@ fun AddMultiDownloadList(
     itePaddingValues: PaddingValues,
 ) {
     val dividerColor = myColors.onBackground / 0.5f
+    val listState by component.filteredList.collectAsState()
     LazyColumn(modifier) {
         itemsIndexed(
-            items = component.list,
+            items = listState,
         ) { index, item ->
             val isSelected = remember(item, component.selectionList) {
-                component.isSelected(item)
+                component.isSelected(item.id)
             }
             val isFirstItem = index == 0
             RenderAddDownloadItem(
-                newDownloadInput = item,
+                state = item,
                 iconProvider = component.fileIconProvider,
                 onSelectionChange = { selected ->
-                    component.setSelect(item.credentials.value.link, selected)
+                    component.setSelect(item.id, selected)
                 },
                 onLongPress = {
                     component.openConfigurableList(
-                        item.getUniqueId()
+                        item.id
                     )
                 },
                 isSelected = isSelected,
@@ -91,7 +91,7 @@ fun AddMultiDownloadList(
 
 @Composable
 private fun RenderAddDownloadItem(
-    newDownloadInput: TANewDownloadInputs,
+    state: NewMultiDownloadState,
     iconProvider: FileIconProvider,
     isSelected: Boolean,
     onLongPress: () -> Unit,
@@ -99,10 +99,8 @@ private fun RenderAddDownloadItem(
     itemPadding: PaddingValues,
     modifier: Modifier,
 ) {
-    val name by newDownloadInput.name.collectAsState()
-    val credentials by newDownloadInput.credentials.collectAsState()
+    val name = state.name
     val icon = iconProvider.rememberIcon(name)
-    val lengthStringFlow by newDownloadInput.lengthStringFlow.collectAsState()
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -125,7 +123,7 @@ private fun RenderAddDownloadItem(
     ) {
         Column {
             Text(
-                text = credentials.link,
+                text = state.link,
                 color = LocalContentColor.current / 0.75f,
                 maxLines = 1,
                 overflow = TextOverflow.MiddleEllipsis,
@@ -138,7 +136,7 @@ private fun RenderAddDownloadItem(
             )
             Spacer(Modifier.height(mySpacings.mediumSpace))
             val sizeTitle = myStringResource(Res.string.size)
-            val sizeValue = lengthStringFlow.rememberString()
+            val sizeValue = state.sizeString.rememberString()
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {

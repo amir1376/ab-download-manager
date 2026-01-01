@@ -2,6 +2,7 @@ package com.abdownloadmanager.shared.downloaderinui.http
 
 import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
 import com.abdownloadmanager.shared.downloaderinui.http.add.HttpDownloadUiChecker
 import com.abdownloadmanager.shared.downloaderinui.http.add.HttpLinkChecker
@@ -12,7 +13,6 @@ import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloadJob
@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class HttpDownloaderInUi(
     httpDownloader: HttpDownloader,
     private val sizeAndSpeedUnitProvider: SizeAndSpeedUnitProvider,
-) : DownloaderInUi<HttpDownloadCredentials, HttpResponseInfo, HttpLinkChecker, HttpDownloadItem, HttpNewDownloadInputs, HttpEditDownloadInputs, HttpCredentialsToItemMapper, HttpDownloadJob, HttpDownloader>(
+) : DownloaderInUi<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker, HttpDownloadItem, HttpNewDownloadInputs, HttpEditDownloadInputs, HttpCredentialsToItemMapper, HttpDownloadJob, HttpDownloader>(
     downloader = httpDownloader
 ) {
     override fun createLinkChecker(initialCredentials: HttpDownloadCredentials): HttpLinkChecker {
