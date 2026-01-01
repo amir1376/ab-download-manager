@@ -25,6 +25,7 @@ import com.abdownloadmanager.resources.Res
 import ir.amirab.util.compose.asStringSource
 import com.abdownloadmanager.android.R
 import com.abdownloadmanager.android.pages.singledownload.SingleDownloadPageActivity
+import com.abdownloadmanager.android.service.KeepAliveServiceReason
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.TimeNames
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
@@ -45,6 +46,12 @@ class ABDMServiceNotificationManager(
     private val downloadEvents: DownloadManagerMinimalControl,
     private val sizeAndSpeedUnitProvider: SizeAndSpeedUnitProvider,
 ) {
+    private val _keepAliveServiceReason: MutableStateFlow<KeepAliveServiceReason?> = MutableStateFlow(null)
+
+    fun setKeepAliveServiceReason(reason: KeepAliveServiceReason?) {
+        _keepAliveServiceReason.value = reason
+    }
+
     val notificationCreationTime = System.currentTimeMillis()
     private val notificationManagerCompat by lazy {
         NotificationManagerCompat.from(context)
@@ -131,18 +138,15 @@ class ABDMServiceNotificationManager(
     }
 
     fun createMainNotification(): Notification {
-        return createMainNotification(downloads.value.size)
+        return createMainNotification(null, null)
     }
 
     fun createMainNotification(
-        notFinishedCount: Int
+        reason: KeepAliveServiceReason?,
+        statusString: String?,
     ): Notification {
         val flagOfPendingIntent = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         val serviceIsRunningText = Res.string.service_is_running.asStringSource().getString()
-        val status = Res.string.not_finished.asStringSource().getString()
-            .let {
-                "$it: $notFinishedCount"
-            }
         val exit = Res.string.exit.asStringSource().getString()
         val stopAll = Res.string.stop_all.asStringSource().getString()
         val openMainActivityIntent = PendingIntent.getActivity(
@@ -154,7 +158,7 @@ class ABDMServiceNotificationManager(
         return NotificationCompat
             .Builder(context, AndroidConstants.NOTIFICATION_DOWNLOAD_CHANEL_ID)
             .setContentTitle(serviceIsRunningText)
-            .setContentText(status)
+            .setContentText(statusString)
             .setSmallIcon(R.drawable.ic_monochrome)
             // group
 //            .setGroupSummary(true)
@@ -278,12 +282,13 @@ class ABDMServiceNotificationManager(
         downloadMonitor: IDownloadMonitor
     ) {
         val notFinishedDownloads by downloadMonitor.activeDownloadListFlow.collectAsState()
+        val keepAliveServiceReason by _keepAliveServiceReason.collectAsState()
         val notifyUpdate by notificationUpdateSignal.collectAsState()
         CompositionLocalProvider(
             LocalNotificationUpdateSignal provides notifyUpdate
         ) {
             RenderMainNotification(
-                notFinishedCount = notFinishedDownloads.size
+                reason = keepAliveServiceReason
             )
             RenderDownloadItemNotifications(
                 remember(notFinishedDownloads) {
@@ -298,12 +303,13 @@ class ABDMServiceNotificationManager(
 
     @Composable
     fun RenderMainNotification(
-        notFinishedCount: Int,
+        reason: KeepAliveServiceReason?,
     ) {
-        LaunchedEffect(notFinishedCount, LocalNotificationUpdateSignal.current) {
+        val statusString = reason?.rememberReasonString()
+        LaunchedEffect(reason, statusString, LocalNotificationUpdateSignal.current) {
             notificationManagerCompat.notify(
                 AndroidConstants.SERVICE_NOTIFICATION_ID,
-                createMainNotification(notFinishedCount)
+                createMainNotification(reason, statusString)
             )
         }
         DisposableEffect(Unit) {

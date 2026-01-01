@@ -298,13 +298,22 @@ object MyDateAndTimeFormats {
         chars("/")
         monthNumber()
         chars("/")
-        dayOfMonth()
+        day()
         chars(" ")
         hour()
         chars(":")
         minute()
         chars(":")
         second()
+    }
+    val fullDateTimeWithoutYearAndSeconds = LocalDateTime.Format {
+        monthNumber()
+        chars("/")
+        day()
+        chars(" ")
+        hour()
+        chars(":")
+        minute()
     }
 }
 

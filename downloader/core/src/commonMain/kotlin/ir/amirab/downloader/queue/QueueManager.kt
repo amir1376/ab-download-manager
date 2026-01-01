@@ -4,13 +4,9 @@ import ir.amirab.downloader.DownloadManagerMinimalControl
 import ir.amirab.downloader.db.IDownloadQueueDatabase
 import ir.amirab.downloader.db.DownloadQueuePersistedDataAccess
 import ir.amirab.downloader.db.QueueModel
-import ir.amirab.util.ifThen
 import ir.amirab.util.suspendGuardedEntry
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -243,11 +239,12 @@ private class QueueInfoPersistedData(
 }
 
 private fun QueueManager.getActiveOrInactiveQueues(
-    active: Boolean, scope: CoroutineScope,
+    active: Boolean,
 ): Flow<List<DownloadQueue>> {
-    val output: MutableStateFlow<List<DownloadQueue>> = MutableStateFlow(emptyList())
-    scope.launch {
-        queues.collectLatest { latestQueues ->
+    return queues.flatMapLatest { latestQueues ->
+        if (latestQueues.isEmpty()) {
+            flowOf(emptyList())
+        } else {
             combine(
                 latestQueues.map { it.activeFlow }
             ) {
@@ -259,44 +256,31 @@ private fun QueueManager.getActiveOrInactiveQueues(
                         null
                     }
                 }
-            }.collect {
-                output.value = it
             }
         }
     }
-    return output
 }
 
-fun QueueManager.activeQueuesFlow(
-    scope: CoroutineScope
-): Flow<List<DownloadQueue>> {
-    return getActiveOrInactiveQueues(true, scope)
+fun QueueManager.activeQueuesFlow(): Flow<List<DownloadQueue>> {
+    return getActiveOrInactiveQueues(true)
 }
 
-fun QueueManager.inactiveQueuesFlow(
-    scope: CoroutineScope
-): Flow<List<DownloadQueue>> {
-    return getActiveOrInactiveQueues(false, scope)
+fun QueueManager.inactiveQueuesFlow(): Flow<List<DownloadQueue>> {
+    return getActiveOrInactiveQueues(false)
 }
 
-fun QueueManager.queueModelsFlow(
-    scope: CoroutineScope
-): StateFlow<List<QueueModel>> {
-    val o = MutableStateFlow<List<QueueModel>>(emptyList())
-    scope.launch {
-        queues.collectLatest { queues ->
-            coroutineScope {
-                combine(
-                    queues.map { queue -> queue.queueModel }
-                ) { queueModelsArray ->
-                    queueModelsArray.toList()
-                }.collect {
-                    o.value = it
-                }
+fun QueueManager.queueModelsFlow(): Flow<List<QueueModel>> {
+    return queues.flatMapLatest { queues ->
+        if (queues.isEmpty()) {
+            flowOf(emptyList())
+        } else {
+            combine(
+                queues.map { it.queueModel }
+            ) {
+                it.toList()
             }
         }
     }
-    return o
 }
 
 fun DownloadQueue.isMainQueue(): Boolean {

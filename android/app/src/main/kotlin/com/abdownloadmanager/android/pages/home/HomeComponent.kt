@@ -333,7 +333,7 @@ class HomeComponent(
     }
 
 
-    val activeQueuesFlow = queueManager.activeQueuesFlow(scope)
+    val activeQueuesFlow = queueManager.activeQueuesFlow()
         .stateIn(scope, SharingStarted.Eagerly, emptyList())
     val mainMenu = buildMenu {
         +createOpenBrowserAction(browserPageManager = browserPageManager)

@@ -58,7 +58,6 @@ abstract class ABDMActivity : ComponentActivity(), KoinComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidUi.boot()
-        abdmAppManager.bootDownloadSystemAndService()
         val isLight = themeManager.currentThemeColor.value.isLight
         val transparent = Color.Transparent.toArgb()
         val systemBarStyle = if (isLight) {
@@ -73,6 +72,11 @@ abstract class ABDMActivity : ComponentActivity(), KoinComponent {
         if (savedInstanceState == null) {
             handleIntent(intent)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        abdmAppManager.bootDownloadSystemAndService()
     }
 
     @Composable

@@ -83,7 +83,7 @@ data class ScheduleTimes(
             .let {
                 LocalDateTime(it.date, startTime)
             }.toInstant(TimeZone.currentSystemDefault())
-        return (nextTime - now).inWholeMilliseconds
+        return nextTime.toEpochMilliseconds()
     }
 
     fun getNearestTimeToStop(): Long {
@@ -99,7 +99,7 @@ data class ScheduleTimes(
             .let {
                 LocalDateTime(it.date, stopTime)
             }.toInstant(TimeZone.currentSystemDefault())
-        return (nextTime - now).inWholeMilliseconds
+        return nextTime.toEpochMilliseconds()
     }
 }
 
