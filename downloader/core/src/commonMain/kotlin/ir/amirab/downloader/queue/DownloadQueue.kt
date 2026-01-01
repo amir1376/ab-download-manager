@@ -83,7 +83,7 @@ class DownloadQueue(
     private suspend fun onDownloadCanceled(id: Long, e: Throwable) {
         val removed = activeItems.remove(id)
         if (isQueueActive) {
-            if (!trimmedItems.remove(id)){
+            if (!trimmedItems.remove(id)) {
                 canceledItems.add(id)
             }
             swapQueueItem(
@@ -187,7 +187,8 @@ class DownloadQueue(
         val scheduleTimes = scheduleTimes
         if (scheduleTimes.enabledStartTime) {
             autoStartJob = scope.launch {
-                delay(scheduleTimes.getNearestTimeToStart())
+                val now = System.currentTimeMillis()
+                delay(scheduleTimes.getNearestTimeToStart() - now)
                 val wasActive = isQueueActive
                 onEvent(QueueEvent.OnQueueStartTimeReached(id, wasActive))
                 start()
@@ -210,7 +211,8 @@ class DownloadQueue(
         val scheduleTimes = scheduleTimes
         if (scheduleTimes.enabledEndTime) {
             autoStopJob = scope.launch {
-                delay(scheduleTimes.getNearestTimeToStop())
+                val now = System.currentTimeMillis()
+                delay(scheduleTimes.getNearestTimeToStop() - now)
                 val wasActive = isQueueActive
                 onEvent(QueueEvent.QueueEndTimeReached(id, wasActive))
                 stop()
@@ -243,7 +245,7 @@ class DownloadQueue(
         //active item is a synchronized list so we should iterate over it FAST!
         val stopJobs = activeItems.map {
             scope.async {
-                downloadEvents.stopJob(it,StoppedBy(me))
+                downloadEvents.stopJob(it, StoppedBy(me))
             }
         }
         kotlin.runCatching {
@@ -372,12 +374,13 @@ class DownloadQueue(
             }
         }
     }
+
     private val me by lazy { Queue(id) }
     private fun removeAnActiveQueueItem(): Boolean {
         val id = activeItems.lastOrNull() ?: return false
         trimmedItems.add(id)
         val result = activeItems.remove(id)
-        scope.launch { downloadEvents.stopJob(id,StoppedBy(me)) }
+        scope.launch { downloadEvents.stopJob(id, StoppedBy(me)) }
         return result
     }
 
@@ -397,7 +400,7 @@ class DownloadQueue(
         return getDownloadableItemFromQueue()?.let {
             activeItems.add(it)
             scope.launch {
-                downloadEvents.startJob(it,ResumedBy(me))
+                downloadEvents.startJob(it, ResumedBy(me))
             }
             true
         } ?: false

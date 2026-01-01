@@ -12,6 +12,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.content.ContextCompat
 import com.abdownloadmanager.android.pages.onboarding.permissions.PermissionManager
 import com.abdownloadmanager.android.service.DownloadSystemService
+import com.abdownloadmanager.android.service.KeepAliveServiceReason
 import com.abdownloadmanager.android.storage.AppSettingsStorage
 import com.abdownloadmanager.android.util.notification.playNotificationSoundIfAllowed
 import com.abdownloadmanager.resources.Res
@@ -27,6 +28,8 @@ import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.queue.DefaultQueueInfo
+import ir.amirab.downloader.queue.activeQueuesFlow
+import ir.amirab.downloader.queue.queueModelsFlow
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
@@ -37,8 +40,17 @@ import ir.amirab.util.suspendGuardedEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.job
@@ -71,6 +83,14 @@ class ABDMAppManager(
 
     fun canStartDownloadEngine(): Boolean {
         return permissionManager.isReady()
+    }
+
+    fun isDownloadSystemBooted(): Boolean {
+        return downloadSystemBooted.isDone()
+    }
+
+    fun isBackgroundServiceRunning(): Boolean {
+        return DownloadSystemService.isServiceRunning()
     }
 
     suspend fun startDownloadSystem() {
@@ -277,6 +297,8 @@ class ABDMAppManager(
         withContext(Dispatchers.Main) {
             ContextCompat.startForegroundService(context, intent)
         }
+        DownloadSystemService.awaitStart()
+        autoStopService()
     }
 
     suspend fun stopOurService() {
@@ -371,4 +393,68 @@ class ABDMAppManager(
     fun repostServiceNotification() {
         serviceNotificationManager.updateNotificationWithDefaultValue()
     }
+
+    fun bootDownloadSystemAndService(): Boolean {
+        if (isDownloadSystemBooted() && isBackgroundServiceRunning()) {
+            return true
+        }
+        if (canStartDownloadEngine()) {
+            scope.launch {
+                startDownloadSystem()
+                if (!isBackgroundServiceRunning()) {
+                    startOurService()
+                }
+            }
+            return true
+        }
+        return false
+    }
+
+    private val mustStayAliveFlow = combine(
+        downloadSystem.downloadMonitor.activeDownloadCount,
+        downloadSystem.queueManager.activeQueuesFlow(),
+        downloadSystem.queueManager.queueModelsFlow(),
+        ApplicationBackgroundTracker.isInBackgroundFlow,
+    ) { activeDownloads, activeQueues, queueModels, isInBackground ->
+        if (activeQueues.isNotEmpty()) {
+            return@combine KeepAliveServiceReason.ActiveQueue(activeQueues.map { it.getQueueModel() })
+        }
+        if (activeDownloads > 0) {
+            return@combine KeepAliveServiceReason.ActiveDownloads(activeDownloads)
+        }
+        val scheduledTimeQueue = queueModels.filter { it.scheduledTimes.enabledStartTime }
+        if (scheduledTimeQueue.isNotEmpty()) {
+            return@combine KeepAliveServiceReason.ScheduledQueues(scheduledTimeQueue)
+        }
+        if (!isInBackground) {
+            return@combine KeepAliveServiceReason.AppIsInForeground
+        }
+        return@combine null
+    }
+
+    private var autoStopServiceJob: Job? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun autoStopService() {
+        synchronized(this) {
+            autoStopServiceJob?.cancel()
+            autoStopServiceJob = scope.launch {
+                mustStayAliveFlow
+                    .distinctUntilChanged()
+                    .onEach {
+                        serviceNotificationManager.setKeepAliveServiceReason(it)
+                    }
+                    .flatMapLatest {
+                        if (it == null) flow {
+                            // let it be null for 10 seconds
+                            delay(10_000)
+                            emit(Unit)
+                        }
+                        else emptyFlow()
+                    }.first()
+                stopOurService()
+            }
+        }
+    }
 }
+

@@ -34,11 +34,5 @@ class ABDMApp : Application(), KoinComponent {
             )
         )
         appManager.boot()
-        if (appManager.canStartDownloadEngine()) {
-            scope.launch {
-                appManager.startDownloadSystem()
-                appManager.startOurService()
-            }
-        }
     }
 }

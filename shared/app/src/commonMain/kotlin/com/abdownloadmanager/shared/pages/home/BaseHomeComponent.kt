@@ -228,7 +228,7 @@ abstract class BaseHomeComponent(
                 it.id == currentCategory.id
             }
         }.launchIn(scope)
-        queueManager.queueModelsFlow(scope).onEach { queueModels ->
+        queueManager.queueModelsFlow().onEach { queueModels ->
             val currentQueueModel = filterState.queueFilter ?: return@onEach
             filterState.queueFilter = queueModels.find {
                 it.id == currentQueueModel.id

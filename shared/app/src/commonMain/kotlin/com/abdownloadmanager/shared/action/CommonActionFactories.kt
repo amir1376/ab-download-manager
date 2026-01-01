@@ -121,7 +121,7 @@ fun createStartQueueGroupAction(
         items = emptyList()
     ).apply {
         queueManager
-            .inactiveQueuesFlow(scope)
+            .inactiveQueuesFlow()
             .onEach {
                 setItems(it.map {
                     createStartQueueAction(scope, it)

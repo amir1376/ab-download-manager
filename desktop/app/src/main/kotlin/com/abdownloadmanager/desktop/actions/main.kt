@@ -42,7 +42,7 @@ private val downloadSystem = appComponent.downloadSystem
 
 private val activeQueuesFlow = downloadSystem
     .queueManager
-    .activeQueuesFlow(scope)
+    .activeQueuesFlow()
     .stateIn(
         scope,
         SharingStarted.WhileSubscribed(),
