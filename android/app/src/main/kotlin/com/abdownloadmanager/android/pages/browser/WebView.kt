@@ -5,8 +5,15 @@ import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.abdownloadmanager.android.ui.PullToRefreshBox
 import com.abdownloadmanager.android.ui.PullToRefreshState
 import com.abdownloadmanager.android.ui.rememberPullToRefreshState
@@ -21,21 +28,36 @@ fun ABDMWebView(
     pullToRefreshState: PullToRefreshState = rememberPullToRefreshState(),
     webViewHolder: WebViewHolder,
 ) {
+    val context = LocalContext.current
     val tab = webViewHolder.tab
     key(tab.tabId) {
         val wState = tab.tabState
         val navigator = webViewHolder.navigator
+
+        var isPullToRefreshInProgress by rememberSaveable {
+            mutableStateOf(false)
+        }
+        LaunchedEffect(wState.loadingState) {
+            if (wState.loadingState is LoadingState.Finished) {
+                isPullToRefreshInProgress = false
+            }
+        }
+
         PullToRefreshBox(
             modifier = modifier,
-            isRefreshing = wState.isPullToRefreshInProgress,
+            isRefreshing = isPullToRefreshInProgress,
             onRefresh = {
                 if (wState.loadingState is LoadingState.Finished) {
-                    wState.isPullToRefreshInProgress = true
+                    isPullToRefreshInProgress = true
                     navigator.reload()
                 }
             },
             state = pullToRefreshState
         ) {
+            val webView = remember {
+                webViewHolder.activate(context)
+            }
+
             /**
              * Although WebView is inherently scrollable, we apply a scrollable modifier
              * and manage scrolling manually via scrollableState to support pull-to-refresh.
@@ -45,28 +67,26 @@ fun ABDMWebView(
              */
             val scrollState = rememberScrollableState(
                 consumeScrollDelta = { scroll ->
-                    wState.webView
-                        ?.let { view ->
-                            val inverseScroll = -scroll
-                            val consumed = when {
+                    val inverseScroll = -scroll
+                    val consumed = when {
 
-                                inverseScroll < 0 -> {
-                                    inverseScroll.coerceAtLeast(-view.scrollY.toFloat())
-                                }
+                        inverseScroll < 0 -> {
+                            inverseScroll.coerceAtLeast(-webView.scrollY.toFloat())
+                        }
 
-                                inverseScroll > 0 -> {
-                                    if (view.canScrollVertically(1)) {
-                                        inverseScroll
-                                    } else 0f
-                                }
+                        inverseScroll > 0 -> {
+                            if (webView.canScrollVertically(1)) {
+                                inverseScroll
+                            } else 0f
+                        }
 
-                                else -> 0f
-                            }
-                            view.scrollBy(0, consumed.roundToInt())
-                            -consumed
-                        } ?: 0f
+                        else -> 0f
+                    }
+                    webView.scrollBy(0, consumed.roundToInt())
+                    -consumed
                 }
             )
+
             WebView(
                 state = wState,
                 modifier = Modifier
@@ -83,7 +103,7 @@ fun ABDMWebView(
                     webViewHolder.deactivate()
                 },
                 factory = {
-                    webViewHolder.activate(it)
+                    webView
                 },
             )
         }

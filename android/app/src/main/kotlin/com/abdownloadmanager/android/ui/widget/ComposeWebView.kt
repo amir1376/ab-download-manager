@@ -261,7 +261,6 @@ public open class AccompanistWebViewClient : WebViewClient() {
     override fun onPageFinished(view: WebView, url: String?) {
         super.onPageFinished(view, url)
         state.loadingState = LoadingState.Finished
-        state.isPullToRefreshInProgress = false
     }
 
     override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
@@ -457,8 +456,6 @@ public class WebViewState(webContent: WebContent) {
     // We need access to this in the state saver. An internal DisposableEffect or AndroidView
     // onDestroy is called after the state saver and so can't be used.
     internal var webView by mutableStateOf<WebView?>(null)
-
-    var isPullToRefreshInProgress by mutableStateOf(false)
 }
 
 /**
