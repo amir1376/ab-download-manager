@@ -16,15 +16,14 @@ import com.abdownloadmanager.shared.util.AppVersion
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isLinux
 import ir.amirab.util.platform.isWindows
+import kotlin.system.exitProcess
 import kotlinx.coroutines.runBlocking
-import okio.Path.Companion.toOkioPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.system.exitProcess
 
-class App : AutoCloseable,
-    KoinComponent {
+class App : AutoCloseable, KoinComponent {
     private val downloadSystem: DownloadSystem by inject()
     private val appRepository: AppRepository by inject()
     private val integration: Integration by inject()
@@ -32,16 +31,16 @@ class App : AutoCloseable,
     private val updateManager: UpdateManager by inject()
     private val keepAwakeManager: KeepAwakeManager by inject()
 
-    //TODO Setup Native Messaging Feature
-    //private val browserNativeMessaging: NativeMessaging by inject()
+    // TODO Setup Native Messaging Feature
+    // private val browserNativeMessaging: NativeMessaging by inject()
     fun start(
-        appArguments: AppArguments,
-        singleInstanceServerHandler: MutableSingleInstanceServerHandler,
-        globalAppExceptionHandler: GlobalAppExceptionHandler,
+            appArguments: AppArguments,
+            singleInstanceServerHandler: MutableSingleInstanceServerHandler,
+            globalAppExceptionHandler: GlobalAppExceptionHandler,
     ) {
         try {
             runBlocking {
-                //make sure to not get any dependency until boot the DI Container
+                // make sure to not get any dependency until boot the DI Container
                 Di.boot()
                 // it's better to organize these list of boot functions in a separate class
 
@@ -52,10 +51,11 @@ class App : AutoCloseable,
                 previousVersion.boot()
                 keepAwakeManager.boot()
 
-                //TODO Setup Native Messaging Feature
-                //waiting for compose kmp to add multi launcher to nativeDistributions,the PR is already exists but not merger
-                //or maybe I should use a custom solution
-                //browserNativeMessaging.boot()
+                // TODO Setup Native Messaging Feature
+                // waiting for compose kmp to add multi launcher to nativeDistributions,the PR is
+                // already exists but not merger
+                // or maybe I should use a custom solution
+                // browserNativeMessaging.boot()
                 SingleInstanceServerInitializer.boot(singleInstanceServerHandler)
                 Ui.boot(appArguments, globalAppExceptionHandler)
             }
@@ -66,10 +66,9 @@ class App : AutoCloseable,
     }
 
     override fun close() {
-        //nothing yet!
+        // nothing yet!
     }
 }
-
 
 fun main(args: Array<String>) {
     try {
@@ -89,12 +88,11 @@ fun main(args: Array<String>) {
         if (appArguments.getIntegrationPort) {
             dispatchIntegrationPortAndExit(singleInstance)
         }
-        //going to start main app
+        // going to start main app
         defaultApp(
-            singleInstance = singleInstance,
-            appArguments = appArguments,
+                singleInstance = singleInstance,
+                appArguments = appArguments,
         )
-
     } catch (e: Throwable) {
         System.err.println("Fail to start the ${AppInfo.displayName} app because:")
         e.printStackTrace()
@@ -104,12 +102,10 @@ fun main(args: Array<String>) {
 
 private fun startAppInAnotherProcess() {
     val exeFile = requireNotNull(AppInfo.exeFile)
-    val cmd = listOf(
-        exeFile,
-        AppArguments.Args.BACKGROUND
-    ).joinToString(" ").also {
-//        println("executing $it")
-    }
+    val cmd =
+            listOf(exeFile, AppArguments.Args.BACKGROUND).joinToString(" ").also {
+                //        println("executing $it")
+            }
     Runtime.getRuntime().exec(cmd)
 }
 
@@ -125,17 +121,18 @@ private fun exitExistingProcessAndExit(singleInstance: SingleInstanceUtil): Noth
 
 private fun dispatchIntegrationPortAndExit(singleInstance: SingleInstanceUtil): Nothing {
     val port =
-        singleInstance.sendToInstance(Commands.getIntegrationPort)
-            .orElse { IntegrationPortBroadcaster.INTEGRATION_UNKNOWN }
+            singleInstance.sendToInstance(Commands.getIntegrationPort).orElse {
+                IntegrationPortBroadcaster.INTEGRATION_UNKNOWN
+            }
     print(port)
     exitProcess(0)
 }
 
 private fun startAndWaitForRunIfNotRunning(
-    singleInstance: SingleInstanceUtil,
-    howMuchWait: Long = 10_000,
-    initialDelay: Long = 0,
-    eachTimeDelay: Long = 500L,
+        singleInstance: SingleInstanceUtil,
+        howMuchWait: Long = 10_000,
+        initialDelay: Long = 0,
+        eachTimeDelay: Long = 500L,
 ) {
     val deadLine = System.currentTimeMillis() + howMuchWait
     if (initialDelay > 0) {
@@ -143,23 +140,22 @@ private fun startAndWaitForRunIfNotRunning(
     }
     var firstLoop = true
     while (true) {
-        val isReady: Boolean = singleInstance
-            .sendToInstance(Commands.isReady)
-            .orElse {
-//                println("or else $it")
-                false
-            }
-//        println("isReady: $isReady")
+        val isReady: Boolean =
+                singleInstance.sendToInstance(Commands.isReady).orElse {
+                    //                println("or else $it")
+                    false
+                }
+        //        println("isReady: $isReady")
         if (isReady) {
             return
         }
         if (firstLoop) {
             startAppInAnotherProcess()
-//            println("send start signal")
+            //            println("send start signal")
         }
         if (System.currentTimeMillis() >= deadLine) {
-//            println("dead line reached")
-            //deadline reached exiting now
+            //            println("dead line reached")
+            // deadline reached exiting now
             exitProcess(1)
         }
         Thread.sleep(eachTimeDelay)
@@ -168,8 +164,8 @@ private fun startAndWaitForRunIfNotRunning(
 }
 
 private fun defaultApp(
-    appArguments: AppArguments,
-    singleInstance: SingleInstanceUtil,
+        appArguments: AppArguments,
+        singleInstance: SingleInstanceUtil,
 ) {
     val singleInstanceServerHandler by lazy { MutableSingleInstanceServerHandler() }
     try {
@@ -184,8 +180,9 @@ private fun defaultApp(
         println("it seems we are in ide")
     }
 
-    val customRenderApiRequested = System.getenv("SKIKO_RENDER_API") != null ||
-            System.getProperty("skiko.renderApi") != null
+    val customRenderApiRequested =
+            System.getenv("SKIKO_RENDER_API") != null ||
+                    System.getProperty("skiko.renderApi") != null
 
     if (!customRenderApiRequested) {
         if (Platform.isWindows()) {
@@ -194,14 +191,26 @@ private fun defaultApp(
             // - sometimes when I close a window, the window flashes on exiting
             // it seems OPENGL does not have these problems
             System.setProperty("skiko.renderApi", "OPENGL")
+        } else if (isCosmicDesktop()) {
+            System.setProperty("skiko.renderApi", "SOFTWARE")
         }
     }
     val globalExceptionHandler = createAndSetGlobalExceptionHandler()
     App().use {
         it.start(
-            appArguments = appArguments,
-            globalAppExceptionHandler = globalExceptionHandler,
-            singleInstanceServerHandler = singleInstanceServerHandler,
+                appArguments = appArguments,
+                globalAppExceptionHandler = globalExceptionHandler,
+                singleInstanceServerHandler = singleInstanceServerHandler,
         )
     }
+}
+
+private fun isCosmicDesktop(): Boolean {
+    if (!Platform.isLinux()) {
+        return false
+    }
+    val currentDesktop = System.getenv("XDG_CURRENT_DESKTOP")
+    val sessionDesktop = System.getenv("XDG_SESSION_DESKTOP")
+    return currentDesktop?.contains("COSMIC", ignoreCase = true) == true ||
+            sessionDesktop?.contains("COSMIC", ignoreCase = true) == true
 }
