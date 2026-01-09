@@ -21,8 +21,6 @@ val ABDMIcons.FileMusic: ImageVector
         ).apply {
             path(
                 fill = SolidColor(Color.White),
-                fillAlpha = 0.75f,
-                strokeAlpha = 0.75f,
                 pathFillType = PathFillType.EvenOdd
             ) {
                 moveTo(8.25f, 4f)
