@@ -15,6 +15,7 @@ import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.AppVersion
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
+import ir.amirab.util.platform.Arch
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.runBlocking
@@ -189,11 +190,21 @@ private fun defaultApp(
 
     if (!customRenderApiRequested) {
         if (Platform.isWindows()) {
-            // At the moment default render api have some problems on windows!
+            // At the moment default render api have some problems on windows x64:
             // - when I resize a window, the contents of the window will be stretched
             // - sometimes when I close a window, the window flashes on exiting
-            // it seems OPENGL does not have these problems
-            System.setProperty("skiko.renderApi", "OPENGL")
+            // it seems OPENGL does not have these problems on x64.
+            // However, on Windows-ARM64, OPENGL causes silent failures - use Direct3D or ANGLE instead.
+
+            // Option 1 (CURRENT): ANGLE - translates OpenGL ES -> D3D12, more stable
+            // May avoid Direct3D resize/flash bugs while staying GPU-accelerated and power efficient
+            // Note: ANGLE has a known issue with transparent windows (SKIKO-1089)
+            val renderApi = if (Arch.getCurrentArch() == Arch.Arm64) "ANGLE" else "OPENGL"
+            
+            // Option 2 (ALTERNATIVE): Direct3D - native, works on Windows-ARM64
+            // val renderApi = if (Arch.getCurrentArch() == Arch.Arm64) "DIRECT3D" else "OPENGL"
+
+            System.setProperty("skiko.renderApi", renderApi)
         }
     }
     val globalExceptionHandler = createAndSetGlobalExceptionHandler()
