@@ -42,6 +42,7 @@
         />
         <activity
                 android:name=".pages.browser.BrowserActivity"
+                android:label="@string/app_browser"
                 android:exported="true"
                 android:theme="@style/Theme.ABDownloadManager"
                 android:windowSoftInputMode="adjustResize"
@@ -53,9 +54,18 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="http"/>
                 <data android:scheme="https"/>
-                <data android:mimeType="*/*"/>
             </intent-filter>
         </activity>
+        <activity-alias
+                android:name="com.abdownloadmanager.browser.BrowserIconInLauncher"
+                android:enabled="false"
+                android:exported="true"
+                android:targetActivity=".pages.browser.BrowserActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
 
         <!--        Accept external download from browsers/send intents etc...-->
         <activity
