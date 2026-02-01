@@ -19,7 +19,7 @@ kotlin {
                 implementation(project(":downloader:core"))
                 implementation(project(":shared:utils"))
                 implementation(libs.kotlin.coroutines.core)
-                implementation(compose.runtime)
+                implementation(libs.compose.runtime)
             }
         }
     }

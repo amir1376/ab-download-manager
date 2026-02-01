@@ -21,9 +21,9 @@ kotlin {
     }
     sourceSets {
         commonMain.dependencies {
-            api(compose.runtime)
-            api(compose.foundation)
-            api(compose.ui)
+            api(libs.compose.runtime)
+            api(libs.compose.foundation)
+            api(libs.compose.ui)
 
             api(project(":downloader:core"))
             api(project(":downloader:monitor"))

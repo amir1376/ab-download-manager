@@ -43,7 +43,7 @@ kotlin {
                 srcDirs(generateResObject.map { it.outputDir })
             }
             dependencies {
-                implementation(compose.ui)
+                implementation(libs.compose.ui)
                 api(libs.okio.okio)
                 implementation(project(":shared:resources:contracts"))
             }

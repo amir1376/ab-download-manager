@@ -1,8 +1,8 @@
 [versions]
 fastscrollerCore = "0.3.2"
-kotlin = "2.2.21"
+kotlin = "2.3.0"
 ksp = "2.3.3"
-compose = "1.9.3"
+compose = "1.10.0"
 kotlin-serialization = "1.9.0"
 okhttp = "5.3.2"
 okio = "3.16.4"
@@ -14,7 +14,7 @@ essenty = "2.5.0"
 logback = "1.5.22"
 buildConfig = "6.0.6"
 changelog = "2.5.0"
-http4k = "6.25.0.0"
+http4k = "6.26.0.0"
 arrow = "2.2.1.1"
 datastore = "1.2.0"
 aboutLibraries = "13.2.1"
@@ -26,10 +26,10 @@ semver = "3.0.0"
 jgit = "7.3.0.202506031305-r"
 osThemeDetector = "3.9.1"
 kotlinFileWatcher = "1.4.0"
-markdownRenderer = "0.37.0"
+markdownRenderer = "0.39.1"
 autoServiceKsp = "1.2.0"
 autoService = "1.1.1"
-proxyVole = "1.1.7"
+proxyVole = "1.1.8"
 jbrApi = "1.9.0"
 gradleVersions = "0.53.0"
 handlebars = "4.5.0"
@@ -50,7 +50,6 @@ okhttp-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor
 okhttp-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-coroutines = { module = "com.squareup.okhttp3:okhttp-coroutines", version.ref = "okhttp" }
 okio-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
-retrofit-logging = "com.squareup.okhttp3:logging-interceptor:4.9.3"
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version = "1.0.1" }
@@ -82,6 +81,10 @@ http4k-client-okhttp = { module = "org.http4k:http4k-client-okhttp", version.ref
 
 compose-material-rippleEffect = { module = "org.jetbrains.compose.material:material-ripple", version.ref = "compose" }
 compose-reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
+
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
 
 semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }

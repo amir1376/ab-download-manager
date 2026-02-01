@@ -52,8 +52,8 @@ kotlin.compilerOptions {
     jvmTarget = JvmTarget.JVM_21
 }
 dependencies {
-    implementation(compose.runtime)
-    implementation(compose.foundation)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.foundation)
     implementation(libs.androidx.activity.compose)
     implementation(libs.decompose.jbCompose)
     implementation(libs.aboutLibraries.core)
