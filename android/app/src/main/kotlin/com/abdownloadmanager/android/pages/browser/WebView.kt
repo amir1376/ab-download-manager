@@ -18,7 +18,7 @@ fun ABDMWebView(
         WebView(
             state = wState,
             modifier = modifier,
-            captureBackPresses = true,
+            captureBackPresses = false,
             navigator = navigator,
             client = webViewHolder.client,
             chromeClient = webViewHolder.chromeClient,
