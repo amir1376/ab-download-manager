@@ -100,6 +100,14 @@ fun BrowserPage(
             viewRegistry.getWebViewHolder(it)
         }
     }
+    BackHandler(tabs.tabsSize > 1) {
+        tab?.let {
+            browserComponent.closeTab(tab.tabId)
+        }
+    }
+    BackHandler(tabWebViewHolder?.navigator?.canGoBack ?: false) {
+        tabWebViewHolder?.webView?.goBack()
+    }
     LaunchedEffect(tabs) {
         viewRegistry.onTabsUpdated(tabs)
     }
