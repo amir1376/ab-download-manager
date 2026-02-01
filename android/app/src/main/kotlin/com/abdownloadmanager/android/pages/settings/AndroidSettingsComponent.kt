@@ -117,6 +117,11 @@ class AndroidSettingsComponent(
             ),
             ConfigurableGroup(
                 nestedConfigurable = listOf(
+                    AndroidSettings.browserIconInLauncher(appSettings),
+                )
+            ),
+            ConfigurableGroup(
+                nestedConfigurable = listOf(
                     AndroidSettings.permissionSettings(permissionsPageManager),
                     AndroidSettings.ignoreBatteryOptimizations(),
                 )

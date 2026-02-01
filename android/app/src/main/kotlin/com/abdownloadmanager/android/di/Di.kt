@@ -11,6 +11,7 @@ import com.abdownloadmanager.android.pages.home.HomePageStateToPersist
 import com.abdownloadmanager.android.pages.onboarding.permissions.ABDMPermissions
 import com.abdownloadmanager.android.pages.onboarding.permissions.PermissionManager
 import com.abdownloadmanager.android.receiver.StartOnBootBroadcastReceiver
+import com.abdownloadmanager.android.repository.AppRepository
 import com.abdownloadmanager.android.storage.AndroidExtraDownloadItemSettings
 import com.abdownloadmanager.android.storage.AndroidExtraQueueSettings
 import com.abdownloadmanager.android.storage.AndroidOnBoardingStorage
@@ -437,7 +438,7 @@ fun getAppModule(context: ABDMApp) = module {
         bind<AndroidDefinedPaths>()
     }
     single {
-        BaseAppRepository(
+        AppRepository(
             get(),
             get(),
             get(),
