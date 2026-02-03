@@ -52,12 +52,13 @@ import com.abdownloadmanager.shared.ui.widget.useNotification
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.ui.ProvideDebugInfo
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import ir.amirab.util.compose.IconSource
+import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.buildMenu
-import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.desktop.PlatformDockToggler
 import ir.amirab.util.desktop.mac.event.MacEventHandler
-import ir.amirab.util.desktop.systemtray.IComposeSystemTray
+import com.kdroid.composetray.tray.api.Tray
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
@@ -224,18 +225,49 @@ private fun ApplicationScope.SystemTray(
     val useSystemTray by component.useSystemTray.collectAsState()
     if (useSystemTray) {
         LaunchedEffect(Unit) { PlatformDockToggler.hide() }
-        IComposeSystemTray.Instance.ComposeSystemTray(
-            icon = MyIcons.appIcon,
-            onClick = showDownloadList,
-            tooltip = AppInfo.displayName.asStringSource(),
-            menu = remember {
-                buildMenu {
-                    +showDownloadList
-                    +gotoSettingsAction
-                    +requestExitAction
+        val menu = remember {
+            buildMenu {
+                +showDownloadList
+                +gotoSettingsAction
+                +requestExitAction
+            }
+        }
+        Tray(
+            icon = MyIcons.appIcon.rememberPainter(),
+            tooltip = AppInfo.displayName,
+            primaryAction = { showDownloadList.onClick() },
+        ) {
+            for (item in menu) {
+                when (item) {
+                    is MenuItem.SingleItem -> {
+                        val title = item.title.value.getString()
+                        val isEnabled = item.isEnabled.value
+                        when (val iconSource = item.icon.value) {
+                            is IconSource.VectorIconSource -> Item(
+                                label = title,
+                                icon = iconSource.value,
+                                isEnabled = isEnabled,
+                            ) { item.onClick() }
+                            is IconSource.PainterIconSource -> Item(
+                                label = title,
+                                icon = iconSource.value,
+                                isEnabled = isEnabled,
+                            ) { item.onClick() }
+                            null -> Item(
+                                label = title,
+                                isEnabled = isEnabled,
+                            ) { item.onClick() }
+                        }
+                    }
+                    is MenuItem.SubMenu -> {
+                        val title = item.title.value.getString()
+                        val isEnabled = item.isEnabled.value
+                        SubMenu(label = title, isEnabled = isEnabled) {}
+                    }
+                    is MenuItem.Separator -> Divider()
                 }
             }
-        )
+        }
     } else {
         LaunchedEffect(Unit) { PlatformDockToggler.show() }
     }

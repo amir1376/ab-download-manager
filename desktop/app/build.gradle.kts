@@ -62,24 +62,7 @@ dependencies {
     implementation(project(":desktop:shared"))
     implementation(project(":desktop:app-utils"))
 
-    implementation(project(":desktop:tray:common"))
-
-    // Detection based on the operating system
-    when (Platform.getCurrentPlatform()) {
-        Platform.Desktop.Windows -> {
-            implementation(project(":desktop:tray:windows"))
-        }
-
-        Platform.Desktop.Linux -> {
-            implementation(project(":desktop:tray:linux"))
-        }
-
-        Platform.Desktop.MacOS -> {
-            implementation(project(":desktop:tray:mac"))
-        }
-
-        else -> Unit
-    }
+    implementation(libs.composeNativeTray)
 
     implementation(project(":shared:app"))
     implementation(project(":shared:utils"))
