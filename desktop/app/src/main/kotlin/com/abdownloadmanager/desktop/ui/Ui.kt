@@ -52,12 +52,11 @@ import com.abdownloadmanager.shared.ui.widget.useNotification
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.ui.ProvideDebugInfo
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.util.compose.action.buildMenu
-import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.desktop.PlatformDockToggler
 import ir.amirab.util.desktop.mac.event.MacEventHandler
-import ir.amirab.util.desktop.systemtray.IComposeSystemTray
+import com.kdroid.composetray.tray.api.Tray
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
@@ -224,18 +223,19 @@ private fun ApplicationScope.SystemTray(
     val useSystemTray by component.useSystemTray.collectAsState()
     if (useSystemTray) {
         LaunchedEffect(Unit) { PlatformDockToggler.hide() }
-        IComposeSystemTray.Instance.ComposeSystemTray(
-            icon = MyIcons.appIcon,
-            onClick = showDownloadList,
-            tooltip = AppInfo.displayName.asStringSource(),
-            menu = remember {
-                buildMenu {
-                    +showDownloadList
-                    +gotoSettingsAction
-                    +requestExitAction
-                }
-            }
-        )
+        val appIconVector = (MyIcons.appIcon as IconSource.VectorIconSource).value
+        val showDownloadsLabel = showDownloadList.title.collectAsState().value.rememberString()
+        val settingsLabel = gotoSettingsAction.title.collectAsState().value.rememberString()
+        val exitLabel = requestExitAction.title.collectAsState().value.rememberString()
+        Tray(
+            icon = appIconVector,
+            tooltip = AppInfo.displayName,
+            primaryAction = { showDownloadList.onClick() },
+        ) {
+            Item(label = showDownloadsLabel) { showDownloadList.onClick() }
+            Item(label = settingsLabel) { gotoSettingsAction.onClick() }
+            Item(label = exitLabel) { requestExitAction.onClick() }
+        }
     } else {
         LaunchedEffect(Unit) { PlatformDockToggler.show() }
     }

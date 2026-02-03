@@ -27,8 +27,6 @@ jgit = "7.3.0.202506031305-r"
 osThemeDetector = "3.9.1"
 kotlinFileWatcher = "1.4.0"
 markdownRenderer = "0.39.1"
-autoServiceKsp = "1.2.0"
-autoService = "1.1.1"
 proxyVole = "1.1.8"
 jbrApi = "1.9.0"
 gradleVersions = "0.53.0"
@@ -119,10 +117,7 @@ handlebarsJava = { module = "com.github.jknack:handlebars", version.ref = "handl
 
 kotlinFileWatcher = { module = "io.github.irgaly.kfswatch:kfswatch", version.ref = "kotlinFileWatcher" }
 
-autoService-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoServiceKsp" }
-autoService-annoations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
-
-systemTray = "com.dorkbox:SystemTray:4.4"
+composeNativeTray = "io.github.kdroidfilter:composenativetray:1.0.8"
 proxyVole = { module = "org.bidib.com.github.markusbernhardt:proxy-vole", version.ref = "proxyVole" }
 jbrApi = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jbrApi" }
 [plugins]
