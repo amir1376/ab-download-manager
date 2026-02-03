@@ -117,7 +117,7 @@ handlebarsJava = { module = "com.github.jknack:handlebars", version.ref = "handl
 
 kotlinFileWatcher = { module = "io.github.irgaly.kfswatch:kfswatch", version.ref = "kotlinFileWatcher" }
 
-composeNativeTray = "io.github.kdroidfilter:composenativetray:1.0.8"
+composeNativeTray = "io.github.kdroidfilter:composenativetray:1.0.9"
 proxyVole = { module = "org.bidib.com.github.markusbernhardt:proxy-vole", version.ref = "proxyVole" }
 jbrApi = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jbrApi" }
 [plugins]
