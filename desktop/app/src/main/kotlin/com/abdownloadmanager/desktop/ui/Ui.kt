@@ -53,6 +53,8 @@ import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.ui.ProvideDebugInfo
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import ir.amirab.util.compose.IconSource
+import ir.amirab.util.compose.action.MenuItem
+import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.desktop.PlatformDockToggler
 import ir.amirab.util.desktop.mac.event.MacEventHandler
@@ -223,18 +225,48 @@ private fun ApplicationScope.SystemTray(
     val useSystemTray by component.useSystemTray.collectAsState()
     if (useSystemTray) {
         LaunchedEffect(Unit) { PlatformDockToggler.hide() }
-        val appIconVector = (MyIcons.appIcon as IconSource.VectorIconSource).value
-        val showDownloadsLabel = showDownloadList.title.collectAsState().value.rememberString()
-        val settingsLabel = gotoSettingsAction.title.collectAsState().value.rememberString()
-        val exitLabel = requestExitAction.title.collectAsState().value.rememberString()
+        val menu = remember {
+            buildMenu {
+                +showDownloadList
+                +gotoSettingsAction
+                +requestExitAction
+            }
+        }
         Tray(
-            icon = appIconVector,
+            icon = MyIcons.appIcon.rememberPainter(),
             tooltip = AppInfo.displayName,
             primaryAction = { showDownloadList.onClick() },
         ) {
-            Item(label = showDownloadsLabel) { showDownloadList.onClick() }
-            Item(label = settingsLabel) { gotoSettingsAction.onClick() }
-            Item(label = exitLabel) { requestExitAction.onClick() }
+            for (item in menu) {
+                when (item) {
+                    is MenuItem.SingleItem -> {
+                        val title = item.title.value.getString()
+                        val isEnabled = item.isEnabled.value
+                        when (val iconSource = item.icon.value) {
+                            is IconSource.VectorIconSource -> Item(
+                                label = title,
+                                icon = iconSource.value,
+                                isEnabled = isEnabled,
+                            ) { item.onClick() }
+                            is IconSource.PainterIconSource -> Item(
+                                label = title,
+                                icon = iconSource.value,
+                                isEnabled = isEnabled,
+                            ) { item.onClick() }
+                            null -> Item(
+                                label = title,
+                                isEnabled = isEnabled,
+                            ) { item.onClick() }
+                        }
+                    }
+                    is MenuItem.SubMenu -> {
+                        val title = item.title.value.getString()
+                        val isEnabled = item.isEnabled.value
+                        SubMenu(label = title, isEnabled = isEnabled) {}
+                    }
+                    is MenuItem.Separator -> Divider()
+                }
+            }
         }
     } else {
         LaunchedEffect(Unit) { PlatformDockToggler.show() }
