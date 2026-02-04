@@ -10,6 +10,9 @@ dependencyResolutionManagement {
         mavenCentral()
         google()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/kpm/public/")
+        maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies/")
+        maven("https://www.jetbrains.com/intellij-repository/releases")
     }
 }
 
@@ -18,6 +21,7 @@ rootProject.name = "ABDownloadManager"
 include("android:app")
 include("desktop:app")
 include("desktop:app-utils")
+include("desktop:jewel")
 include("desktop:shared")
 include("desktop:mac_utils")
 include("downloader:core")

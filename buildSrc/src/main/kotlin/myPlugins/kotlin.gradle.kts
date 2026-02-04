@@ -7,6 +7,9 @@ repositories {
     mavenCentral()
     google()
     maven("https://jitpack.io")
+    maven("https://packages.jetbrains.team/maven/p/kpm/public/")
+    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies/")
+    maven("https://www.jetbrains.com/intellij-repository/releases")
 }
 
 fun getOptIns(): Set<String> = setOf(

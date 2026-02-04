@@ -5,5 +5,6 @@ plugins {
 dependencies {
     api(project(":desktop:shared"))
     api(project(":shared:app"))
+    api(project(":desktop:jewel"))
     implementation(libs.jbrApi)
 }

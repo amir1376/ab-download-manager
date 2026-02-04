@@ -29,6 +29,7 @@ kotlinFileWatcher = "1.4.0"
 markdownRenderer = "0.39.1"
 proxyVole = "1.1.8"
 jbrApi = "1.9.0"
+jewel = "0.33.0-253.29795"
 gradleVersions = "0.53.0"
 handlebars = "4.5.0"
 
@@ -120,6 +121,15 @@ kotlinFileWatcher = { module = "io.github.irgaly.kfswatch:kfswatch", version.ref
 composeNativeTray = "io.github.kdroidfilter:composenativetray:1.0.9"
 proxyVole = { module = "org.bidib.com.github.markusbernhardt:proxy-vole", version.ref = "proxyVole" }
 jbrApi = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jbrApi" }
+
+jewel-ui = { module = "org.jetbrains.jewel:jewel-ui", version.ref = "jewel" }
+jewel-foundation = { module = "org.jetbrains.jewel:jewel-foundation", version.ref = "jewel" }
+jewel-decorated-window = { module = "org.jetbrains.jewel:jewel-decorated-window", version.ref = "jewel" }
+jewel-int-ui-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version.ref = "jewel" }
+jewel-int-ui-decorated-window = { module = "org.jetbrains.jewel:jewel-int-ui-decorated-window", version.ref = "jewel" }
+intellij-icons = "com.jetbrains.intellij.platform:icons:252.26830.102"
+compose-foundation-desktop = { module = "org.jetbrains.compose.foundation:foundation-desktop", version.ref = "compose" }
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
