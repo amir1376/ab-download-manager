@@ -76,7 +76,7 @@ private fun FrameWindowScope.CustomWindowFrame(
                 .fillMaxSize()
                 .ifThen(!JBR.isWindowDecorationsSupported()) {
                     ifThen(isWindowFloating()) {
-                        border(1.dp, Color.Gray.copy(0.25f), RectangleShape)
+                        border(1.dp, Color.DarkGray, RectangleShape)
                             .padding(1.dp)
                     }
                 }
@@ -349,21 +349,18 @@ fun CustomWindow(
     val icon = windowController.icon ?: defaultAppIcon.rememberPainter()
 
 
-    val transparent: Boolean
     val undecorated: Boolean
     val isAeroSnapSupported = JBR.isWindowDecorationsSupported()
     if (isAeroSnapSupported) {
         //we use aero snap
-        transparent = false
         undecorated = false
     } else {
         //we decorate window and add our custom layout
-        transparent = true
         undecorated = true
     }
     Window(
         state = state,
-        transparent = transparent,
+        transparent = false,
         undecorated = undecorated,
         icon = icon,
         title = title,
