@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -227,7 +228,7 @@ public fun WebView(
                 webViewClient = client
             }.also { state.webView = it }
         },
-        modifier = modifier,
+        modifier = modifier.clipToBounds(),
         onRelease = {
             onDispose(it)
         }
