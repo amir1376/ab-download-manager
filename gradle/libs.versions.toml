@@ -31,6 +31,7 @@ proxyVole = "1.1.8"
 jbrApi = "1.9.0"
 gradleVersions = "0.53.0"
 handlebars = "4.5.0"
+composeNativeTray = "1.0.9"
 
 agp = "8.12.3"
 androidx-core = "1.17.0"
@@ -117,7 +118,7 @@ handlebarsJava = { module = "com.github.jknack:handlebars", version.ref = "handl
 
 kotlinFileWatcher = { module = "io.github.irgaly.kfswatch:kfswatch", version.ref = "kotlinFileWatcher" }
 
-composeNativeTray = "io.github.kdroidfilter:composenativetray:1.0.9"
+composeNativeTray = { module = "io.github.kdroidfilter:composenativetray", version.ref = "composeNativeTray" }
 proxyVole = { module = "org.bidib.com.github.markusbernhardt:proxy-vole", version.ref = "proxyVole" }
 jbrApi = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jbrApi" }
 [plugins]
