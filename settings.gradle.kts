@@ -21,7 +21,7 @@ rootProject.name = "ABDownloadManager"
 include("android:app")
 include("desktop:app")
 include("desktop:app-utils")
-include("desktop:jewel")
+include("desktop:jewel-decorated-window")
 include("desktop:shared")
 include("desktop:mac_utils")
 include("downloader:core")
