@@ -83,6 +83,7 @@ abstract class HttpDownloaderClient {
 
     companion object {
         fun createRangeHeader(start: Long, end: Long?) = "Range" to "bytes=$start-${end ?: ""}"
+        fun getDefaultUserAgent(): String = UserAgent.getDefault()
     }
 }
 
