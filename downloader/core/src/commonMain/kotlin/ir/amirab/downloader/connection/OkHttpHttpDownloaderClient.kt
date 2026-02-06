@@ -12,7 +12,7 @@ import java.net.ProxySelector
 
 class OkHttpHttpDownloaderClient(
     private val okHttpClient: OkHttpClient,
-    private val defaultUserAgentProvider: UserAgentProvider,
+    private val customUserAgentProvider: UserAgentProvider,
     private val proxyStrategyProvider: ProxyStrategyProvider,
     private val systemProxySelectorProvider: SystemProxySelectorProvider,
     private val autoConfigurableProxyProvider: AutoConfigurableProxyProvider,
@@ -38,9 +38,9 @@ class OkHttpHttpDownloaderClient(
                         // we don't to add something that we sure that it will be overridden later
                         if (downloadCredentials.userAgent == null) {
                             // only add default user agent if we don't specify it
-                            defaultUserAgentProvider.getUserAgent()?.let { userAgent ->
-                                header("User-Agent", userAgent)
-                            }
+                            val customUserAgent = customUserAgentProvider.getUserAgent()
+                                ?: getDefaultUserAgent()
+                            header("User-Agent", customUserAgent)
                         }
                         downloadCredentials.headers
                             ?.filter {
