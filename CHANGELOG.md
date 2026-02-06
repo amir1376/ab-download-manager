@@ -14,6 +14,29 @@
 
 ### Security
 
+## 1.8.5
+
+### Added
+
+- Windows ARM support (#1055)
+- In-app browser bookmark feature on Android (#1072)
+- In-app browser can be added to the launcher (App Menu)
+- In-app browser can be used as the default browser
+
+### Fixed
+
+- System tray crash on some Linux environments (#1060)
+- Black screen issue on some Linux environments (#1066)
+- Notification sound playing even when notification sounds are muted on Android (#1064)
+
+### Improved
+
+- Updated translations
+- In-app browser UI/UX improvements on Android
+- System tray now uses native UI on Windows (#1060)
+- Use a default User-Agent when no value is provided by the user (#1071)
+- Small UI improvements
+
 ## 1.8.4
 
 ### Added
