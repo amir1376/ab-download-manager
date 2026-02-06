@@ -5,6 +5,9 @@ import android.content.Intent
 import androidx.compose.runtime.Stable
 import com.abdownloadmanager.android.pages.add.multiple.AddMultiDownloadActivity
 import com.abdownloadmanager.android.pages.add.single.AddSingleDownloadActivity
+import com.abdownloadmanager.android.pages.browser.bookmark.EditBookmarkState
+import com.abdownloadmanager.android.storage.BrowserBookmark
+import com.abdownloadmanager.android.storage.BrowserBookmarksStorage
 import com.abdownloadmanager.android.ui.widget.WebContent
 import com.abdownloadmanager.android.ui.widget.WebViewState
 import com.abdownloadmanager.resources.Res
@@ -16,19 +19,24 @@ import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.HttpUrlUtils
+import ir.amirab.util.compose.action.AnAction
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.action.simpleAction
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.ifThen
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
 import java.util.UUID
+import kotlin.text.orEmpty
 
 class BrowserComponent(
     componentContext: ComponentContext,
     private val context: Context,
     private val json: Json,
+    private val browserBookmarksStorage: BrowserBookmarksStorage,
 ) : BaseComponent(
     componentContext,
 ), ContainsEffects<BrowserComponent.Effects> by supportEffects() {
@@ -61,6 +69,37 @@ class BrowserComponent(
     val tabs = MutableStateFlow(
         ABDMTabs.createDefault()
     )
+    val bookmarks = browserBookmarksStorage.bookmarksFlow
+    private val _mainMenu: MutableStateFlow<MenuItem.SubMenu?> = MutableStateFlow(null)
+    val mainMenu = _mainMenu.asStateFlow()
+    fun openMainMenu() {
+        val tab = tabs.value.activeTab
+        val url = tab?.tabState?.lastLoadedUrl
+        val title = tab?.tabState?.pageTitle
+        _mainMenu.value = MenuItem.SubMenu(
+            title = title?.asStringSource() ?: Res.string.menu.asStringSource(),
+            items = buildMenu {
+                +createNewTabAction()
+                separator()
+                +createShowBookmarksAction()
+                if (url != null) {
+                    if (isBookmarked(url)) {
+                        +createRemoveFromBookmarkAction(url)
+                    } else {
+                        +createAddToBookmarkAction(url, title)
+                    }
+                }
+                tab?.let {
+                    separator()
+                    +createCloseTabAction(it)
+                }
+            }
+        )
+    }
+
+    fun closeMainMenu() {
+        _mainMenu.value = null
+    }
 
     fun newTab(
         url: String? = ABDMBrowserTab.blankPage,
@@ -107,6 +146,69 @@ class BrowserComponent(
                 }.getOrElse { -1 },
             )
         }
+    }
+
+    fun addToBookmarks(
+        bookmark: BrowserBookmark,
+        replaceWith: BrowserBookmark?,
+    ) {
+        browserBookmarksStorage.bookmarksFlow.update { currentBookmarks ->
+            if (replaceWith != null) {
+                currentBookmarks.map { item ->
+                    item.ifThen(item == replaceWith) {
+                        bookmark
+                    }
+                }
+            } else {
+                currentBookmarks.plus(bookmark)
+            }
+        }
+    }
+
+    private val _showBookmarkList: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showBookmarkList = _showBookmarkList.asStateFlow()
+    fun setShowBookmarkList(show: Boolean) {
+        _showBookmarkList.value = show
+    }
+
+    private val _editBookmarkState = MutableStateFlow<EditBookmarkState?>(null)
+    val editBookmarkState = _editBookmarkState.asStateFlow()
+    fun promptAddBookmark(
+        bookmark: BrowserBookmark,
+    ) {
+        _editBookmarkState.value = EditBookmarkState(
+            initialValue = bookmark,
+            editMode = false,
+        )
+    }
+
+    fun promptEditBookmark(
+        bookmark: BrowserBookmark
+    ) {
+        _editBookmarkState.value = EditBookmarkState(
+            initialValue = bookmark,
+            editMode = true,
+        )
+    }
+
+    fun dismissEditBookmark() {
+        _editBookmarkState.value = null
+    }
+
+    fun removeBookmark(url: String) {
+        browserBookmarksStorage.bookmarksFlow.update {
+            it.filterNot { bookmark -> bookmark.url == url }
+        }
+    }
+
+    fun clearBookmarks() {
+        browserBookmarksStorage.bookmarksFlow.value = emptyList()
+    }
+
+    fun isBookmarked(url: String): Boolean {
+        return browserBookmarksStorage.bookmarksFlow.value.find {
+            it.url == url
+        } != null
     }
 
     fun switchTab(tabId: ABDMBrowserTabId) {
@@ -204,10 +306,72 @@ class BrowserComponent(
                         tab = tab,
                     )
                 }
+                if (isBookmarked(link)) {
+                    +createRemoveFromBookmarkAction(link)
+                } else {
+                    +createAddToBookmarkAction(link, null)
+                }
             }
         )
     }
 
+    fun createNewTabAction(): AnAction {
+        return simpleAction(
+            title = Res.string.browser_new_tab.asStringSource(),
+            icon = MyIcons.file,
+        ) {
+            newTab(
+                url = null,
+                switch = true,
+            )
+        }
+    }
+
+    fun createAddToBookmarkAction(
+        url: String,
+        title: String?,
+    ): AnAction {
+        return simpleAction(
+            Res.string.browser_add_to_bookmarks.asStringSource(),
+            MyIcons.add,
+        ) {
+            promptAddBookmark(
+                BrowserBookmark(
+                    url = url,
+                    title = title.orEmpty(),
+                )
+            )
+        }
+    }
+
+    fun createRemoveFromBookmarkAction(
+        url: String,
+    ): AnAction {
+        return simpleAction(
+            Res.string.browser_remove_from_bookmarks.asStringSource(),
+            MyIcons.remove,
+        ) {
+            removeBookmark(url)
+        }
+    }
+
+    fun createCloseTabAction(tab: ABDMBrowserTab): AnAction {
+        return simpleAction(
+            title = Res.string.browser_close_tab.asStringSource(),
+            icon = MyIcons.close,
+        ) {
+            closeTab(tab.tabId)
+        }
+    }
+
+    fun createShowBookmarksAction(): AnAction {
+        return simpleAction(
+            title = Res.string.browser_bookmarks.asStringSource(),
+            icon = MyIcons.hearth,
+        ) {
+            setShowBookmarkList(true)
+        }
+    }
 
     sealed interface Effects {
         data class StartActivity(

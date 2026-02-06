@@ -16,6 +16,7 @@ import com.abdownloadmanager.android.storage.AndroidExtraDownloadItemSettings
 import com.abdownloadmanager.android.storage.AndroidExtraQueueSettings
 import com.abdownloadmanager.android.storage.AndroidOnBoardingStorage
 import com.abdownloadmanager.android.storage.AppSettingsStorage
+import com.abdownloadmanager.android.storage.BrowserBookmarksStorage
 import com.abdownloadmanager.android.storage.HomePageStorage
 import com.abdownloadmanager.android.storage.OnBoardingData
 import com.abdownloadmanager.android.util.ABDMAppManager
@@ -605,6 +606,16 @@ fun getAppModule(context: ABDMApp) = module {
                 paths.homePageFile.toFile(),
                 get(),
                 ::HomePageStateToPersist,
+            )
+        )
+    }
+    single {
+        val paths = get<AndroidDefinedPaths>()
+        BrowserBookmarksStorage(
+            kotlinxSerializationDataStore(
+                paths.browserBookmarksFile.toFile(),
+                get(),
+                ::emptyList,
             )
         )
     }

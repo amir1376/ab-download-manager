@@ -14,11 +14,18 @@ import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import androidx.core.net.toUri
+import com.abdownloadmanager.android.storage.BrowserBookmarksStorage
 
 class BrowserActivity : ABDMActivity() {
-    val json: Json by inject()
+    private val browserBookmarksStorage: BrowserBookmarksStorage by inject()
+    private val json: Json by inject()
     val component by lazy {
-        BrowserComponent(defaultComponentContext(), applicationContext, json)
+        BrowserComponent(
+            componentContext = defaultComponentContext(),
+            context = applicationContext,
+            json = json,
+            browserBookmarksStorage = browserBookmarksStorage,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

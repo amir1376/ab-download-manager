@@ -42,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.semantics.Role
@@ -51,6 +50,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.android.pages.browser.bookmark.BookmarkList
+import com.abdownloadmanager.android.pages.browser.bookmark.EditBookmarkSheet
+import com.abdownloadmanager.android.storage.BrowserBookmark
 import com.abdownloadmanager.android.ui.SheetHeader
 import com.abdownloadmanager.android.ui.SheetTitle
 import com.abdownloadmanager.android.ui.SheetUI
@@ -162,10 +164,10 @@ fun BrowserPage(
                     }
                     WithContentColor(myColors.onSurface) {
                         AddressBar(
-                            browserComponent,
-                            tabWebViewHolder,
-                            tabs,
-                            Modifier,
+                            browserComponent = browserComponent,
+                            currentWebViewHolder = tabWebViewHolder,
+                            tabs = tabs,
+                            modifier = Modifier,
                         )
                     }
                 }
@@ -192,6 +194,9 @@ fun BrowserPage(
                             browserComponent.createNewUrlFor(it)
                         )
                     }
+                },
+                onRequestOpenBookmarks = {
+                    browserComponent.setShowBookmarkList(true)
                 }
             )
         }
@@ -200,12 +205,59 @@ fun BrowserPage(
         browserComponent.contextMenu.collectAsState().value,
         browserComponent::closeContextMenu
     )
+    BookmarkList(
+        visible = browserComponent.showBookmarkList.collectAsState().value,
+        onDismissRequest = {
+            browserComponent.setShowBookmarkList(false)
+        },
+        onRemoveBookmarkRequest = {
+            browserComponent.removeBookmark(it.url)
+        },
+        onBookmarkClick = {
+            browserComponent.setShowBookmarkList(false)
+            val newLink = browserComponent.createNewUrlFor(it.url)
+            tabWebViewHolder
+                ?.navigator
+                ?.loadUrl(newLink)
+                ?: browserComponent.newTab(newLink)
+        },
+        bookmarks = browserComponent.bookmarks.collectAsState().value,
+        onRequestEditBookmark = browserComponent::promptEditBookmark,
+        onRequestNewBookmark = {
+            browserComponent.promptAddBookmark((BrowserBookmark("", "")))
+        },
+    )
+    val editBookmarkState by browserComponent.editBookmarkState.collectAsState()
+    editBookmarkState?.let { s ->
+        EditBookmarkSheet(
+            state = s,
+            onSave = {
+                browserComponent.addToBookmarks(
+                    it,
+                    if (s.editMode) {
+                        s.initialValue
+                    } else {
+                        null
+                    },
+                )
+                browserComponent.dismissEditBookmark()
+            },
+            onCancel = {
+                browserComponent.dismissEditBookmark()
+            }
+        )
+    }
+    RenderMenuInSheet(
+        browserComponent.mainMenu.collectAsState().value,
+        browserComponent::closeMainMenu,
+    )
 }
 
 @Composable
 fun EmptyPage(
     modifier: Modifier,
     onRequestOpenUrlFromClipboard: () -> Unit,
+    onRequestOpenBookmarks: () -> Unit,
 ) {
     Box(modifier) {
         Column(
@@ -223,6 +275,19 @@ fun EmptyPage(
                 start = {
                     MyIcon(
                         MyIcons.paste,
+                        null,
+                        Modifier.size(mySpacings.iconSize)
+                    )
+                    Spacer(Modifier.width(mySpacings.mediumSpace))
+                }
+            )
+            Spacer(Modifier.height(mySpacings.largeSpace))
+            ActionButton(
+                text = myStringResource(Res.string.browser_bookmarks),
+                onClick = onRequestOpenBookmarks,
+                start = {
+                    MyIcon(
+                        MyIcons.hearth,
                         null,
                         Modifier.size(mySpacings.iconSize)
                     )
@@ -324,6 +389,12 @@ fun AddressBar(
                     maxLines = 1,
                     fontWeight = FontWeight.Bold,
                 )
+            }
+            TransparentIconActionButton(
+                MyIcons.menu,
+                contentDescription = Res.string.menu.asStringSource()
+            ) {
+                browserComponent.openMainMenu()
             }
         }
     }
