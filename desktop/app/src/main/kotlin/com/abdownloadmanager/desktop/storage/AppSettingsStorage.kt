@@ -26,7 +26,7 @@ data class AppSettingsModel(
     override val language: String? = null,
     override val font: String? = null,
     override val uiScale: Float? = null,
-    val mergeTopBarWithTitleBar: Boolean = false,
+    val mergeTopBarWithTitleBar: Boolean = true,
     val useNativeMenuBar: Boolean = false,
     override val showIconLabels: Boolean = true,
     override val useRelativeDateTime: Boolean = true,
