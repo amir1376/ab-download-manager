@@ -117,10 +117,7 @@ class SimpleDownloadDestination(
         }
     }
 
-    @HeavyCall
-    override suspend fun prepareFile(onProgressUpdate: (Int?) -> Unit) {
-//        println("preparing file ")
-//        println("file info path=$outputFile size=${outputFile.runCatching { length() }.getOrNull()}")
+    fun prepareDestinationFolder() {
         val incompleteFile = fileToWrite
         incompleteFile.parentFile.let {
             it.canonicalFile.mkdirs()
@@ -132,6 +129,14 @@ class SimpleDownloadDestination(
                 error("${incompleteFile.parentFile} is not a directory")
             }
         }
+    }
+
+    @HeavyCall
+    override suspend fun prepareFile(onProgressUpdate: (Int?) -> Unit) {
+//        println("preparing file ")
+//        println("file info path=$outputFile size=${outputFile.runCatching { length() }.getOrNull()}")
+        val incompleteFile = fileToWrite
+        prepareDestinationFolder()
         emptyFileCreator
             .prepareFile(incompleteFile, outputSize, onProgressUpdate)
     }
