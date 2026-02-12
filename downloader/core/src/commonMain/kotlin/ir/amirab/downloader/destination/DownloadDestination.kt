@@ -94,4 +94,21 @@ abstract class DownloadDestination(
             }
         }
     }
+
+    companion object {
+        fun prepareDestinationFolder(
+            outputFile: File,
+        ) {
+            outputFile.parentFile.let {
+                it.canonicalFile.mkdirs()
+                if (!it.exists()) {
+                    error("can't create folder for destination file $it")
+                }
+
+                if (!it.isDirectory) {
+                    error("${outputFile.parentFile} is not a directory")
+                }
+            }
+        }
+    }
 }

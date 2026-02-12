@@ -85,6 +85,7 @@ class SegmentedDownloadDestination(
             outputFile,
             onProgressUpdate
         )
+        super.onAllPartsCompleted(onProgressUpdate)
     }
 
     fun assemble(
@@ -92,6 +93,7 @@ class SegmentedDownloadDestination(
         destination: File,
         onProgress: (Int) -> Unit
     ) {
+        DownloadDestination.prepareDestinationFolder(outputFile)
         val totalLength = sources.sumOf { it.length() }
         var totalWritten = 0L
         val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
