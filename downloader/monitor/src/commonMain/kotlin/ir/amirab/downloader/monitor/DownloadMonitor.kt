@@ -8,6 +8,7 @@ import ir.amirab.util.flow.saved
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.downloaditem.DownloadJob
 import ir.amirab.downloader.downloaditem.IDownloadItem
+import ir.amirab.downloader.queue.ManualDownloadQueue
 import ir.amirab.util.flow.combineStateFlows
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 
 class DownloadMonitor(
     private val downloadManager: DownloadManager,
+    private val manualDownloadQueue: ManualDownloadQueue,
     downloadItemStateFactory: Lazy<DownloadItemStateFactory<IDownloadItem, DownloadJob>>
 ) : IDownloadMonitor {
     val downloadItemStateFactory by downloadItemStateFactory
@@ -166,7 +168,7 @@ class DownloadMonitor(
             val initialData = downloadManager.getDownloadList().filter {
                 it.status == DownloadStatus.Completed
             }.map {
-                downloadItemStateFactory.createCompletedDownloadItemStateFromDownloadItem(it)
+                downloadItemStateFactory.createCompletedDownloadItemState(it)
             }
             completedDownloadListFlow.update { initialData }
             downloadManager.listOfJobsEvents
@@ -175,7 +177,7 @@ class DownloadMonitor(
                     when (event) {
                         is DownloadManagerEvents.OnJobCompleted -> {
                             val item = downloadItemStateFactory
-                                .createCompletedDownloadItemStateFromDownloadItem(event.downloadItem)
+                                .createCompletedDownloadItemState(event.downloadItem)
                             completedDownloadListFlow.update { current ->
                                 //replace if this id is already in the completed list
                                 // this is happened when we are creating a job from a completed download
@@ -207,7 +209,7 @@ class DownloadMonitor(
                             completedDownloadListFlow.update { current ->
                                 if (shouldAdd) {
                                     val item =
-                                        downloadItemStateFactory.createCompletedDownloadItemStateFromDownloadItem(event.downloadItem)
+                                        downloadItemStateFactory.createCompletedDownloadItemState(event.downloadItem)
                                     val exists = current.find {
                                         it.id == item.id
                                     } != null
@@ -246,11 +248,13 @@ class DownloadMonitor(
 
 
     private var downloadListUpdaterJob: Job? = null
+    private val headlessQueuePendingItemsFlow = manualDownloadQueue.pendingItems
     private fun startUpdateActiveDownloadList() {
         downloadListUpdaterJob?.cancel()
         downloadListUpdaterJob = merge(
             downloadManager.listOfJobsEvents.map { },
             downloadSpeedFlow,
+            headlessQueuePendingItemsFlow,
             intervalFlow(500)
         ).onEach {
             val newList = downloadManager.downloadJobs.filter {
@@ -260,9 +264,13 @@ class DownloadMonitor(
                 val speed = if (status is DownloadJobStatus.IsActive) {
                     getSpeedOf(it.id)
                 } else 0L
-                downloadItemStateFactory.createProcessingDownloadItemStateFromDownloadJob(
-                    it,
-                    speed = speed
+                val isWaiting = headlessQueuePendingItemsFlow.value.contains(it.id)
+                downloadItemStateFactory.createProcessingDownloadItemState(
+                    ProcessingDownloadItemFactoryInputs(
+                        downloadJob = it,
+                        speed = speed,
+                        isWaiting = isWaiting,
+                    )
                 )
             }
             activeDownloadListFlow.update { newList }

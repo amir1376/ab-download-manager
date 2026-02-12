@@ -12,12 +12,15 @@ import com.abdownloadmanager.shared.downloaderinui.http.edit.HttpEditDownloadInp
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.connection.response.HttpResponseInfo
+import ir.amirab.downloader.downloaditem.DownloadJob
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloadJob
 import ir.amirab.downloader.downloaditem.http.HttpDownloader
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
+import ir.amirab.downloader.monitor.CompletedDownloadItemState
+import ir.amirab.downloader.monitor.ProcessingDownloadItemFactoryInputs
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.RangeBasedProcessingDownloadItemState
 import ir.amirab.downloader.monitor.UiRangedPart
@@ -109,9 +112,9 @@ class HttpDownloaderInUi(
     }
 
     override fun createProcessingDownloadItemState(
-        downloadJob: HttpDownloadJob,
-        speed: Long
+        props: ProcessingDownloadItemFactoryInputs<HttpDownloadJob>
     ): ProcessingDownloadItemState {
+        val downloadJob = props.downloadJob
         val downloadItem = downloadJob.downloadItem
         val downloadJobStatus = downloadJob.status.value
         val parts = downloadJob.getParts()
@@ -132,9 +135,10 @@ class HttpDownloaderInUi(
                     totalLength = contentLength,
                 )
             },
-            speed = speed,
+            speed = props.speed,
             supportResume = downloadJob.supportsConcurrent,
-            downloadLink = downloadItem.link
+            downloadLink = downloadItem.link,
+            isWaiting = props.isWaiting,
         )
     }
 

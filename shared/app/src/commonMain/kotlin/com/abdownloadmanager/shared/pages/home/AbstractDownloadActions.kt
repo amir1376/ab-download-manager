@@ -16,6 +16,7 @@ import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.monitor.IDownloadItemState
+import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.isFinished
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.queue.QueueManager
@@ -24,7 +25,6 @@ import ir.amirab.util.compose.action.simpleAction
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
-import ir.amirab.util.ifThen
 import ir.amirab.util.isNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -57,13 +57,21 @@ abstract class AbstractDownloadActions(
         }
     }
     val resumableSelections = selections.mapStateFlow {
-        it.filter {
-            it.statusOrFinished() is DownloadJobStatus.CanBeResumed
+        it.filter { state ->
+            if (state is ProcessingDownloadItemState) {
+                state.canBeResumed()
+            } else {
+                false
+            }
         }
     }
     val pausableSelections = selections.mapStateFlow {
-        it.filter {
-            it.statusOrFinished() is DownloadJobStatus.IsActive
+        it.filter { state ->
+            if (state is ProcessingDownloadItemState) {
+                state.canBePaused()
+            } else {
+                false
+            }
         }
     }
     val openFileAction = simpleAction(
@@ -101,7 +109,7 @@ abstract class AbstractDownloadActions(
             scope.launch {
                 resumableSelections.value.forEach {
                     runCatching {
-                        downloadSystem.manualResume(it.id)
+                        downloadSystem.userManualResume(it.id)
                     }
                 }
             }
@@ -117,7 +125,7 @@ abstract class AbstractDownloadActions(
                 scope.launch {
                     runCatching {
                         downloadSystem.reset(it.id)
-                        downloadSystem.manualResume(it.id)
+                        downloadSystem.userManualResume(it.id)
                     }
                 }
             }
@@ -143,9 +151,14 @@ abstract class AbstractDownloadActions(
     val editDownloadAction = simpleAction(
         title = Res.string.edit.asStringSource(),
         icon = MyIcons.edit,
-        checkEnable = defaultItem.mapStateFlow {
-            it ?: return@mapStateFlow false
-            it.statusOrFinished() !is DownloadJobStatus.IsActive
+        checkEnable = defaultItem.mapStateFlow { state ->
+            state ?: return@mapStateFlow false
+            // don't allow edit if download is active
+            if (state is ProcessingDownloadItemState) {
+                !state.canBePaused()
+            } else {
+                true
+            }
         },
         onActionPerformed = {
             scope.launch {
@@ -177,7 +190,7 @@ abstract class AbstractDownloadActions(
                 val credentialsList = selections.value
                     .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
                     .filterIsInstance<HttpDownloadItem>()
-                    .map { HttpDownloadCredentials.Companion.from(it) }
+                    .map { HttpDownloadCredentials.from(it) }
                 ClipboardUtil.copy(DownloadCredentialsFromCurl.generateCurlCommands(credentialsList).joinToString("\n"))
             }
         }

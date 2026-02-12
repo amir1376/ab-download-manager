@@ -670,12 +670,12 @@ private fun ToggleButton(
     }
 
     val isResumeSupported = itemState.supportResume == true
-    val (icon, text) = when (itemState.status) {
-        is DownloadJobStatus.CanBeResumed -> {
+    val (icon, text) = when {
+        itemState.canBeResumed() -> {
             MyIcons.resume to Res.string.resume
         }
 
-        is DownloadJobStatus.IsActive -> {
+        itemState.canBePaused() -> {
             MyIcons.pause to Res.string.pause
         }
 

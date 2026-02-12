@@ -18,6 +18,7 @@ import ir.amirab.downloader.downloaditem.hls.HLSDownloadJob
 import ir.amirab.downloader.downloaditem.hls.HLSDownloader
 import ir.amirab.downloader.downloaditem.hls.HLSResponseInfo
 import ir.amirab.downloader.downloaditem.hls.IHLSCredentials
+import ir.amirab.downloader.monitor.ProcessingDownloadItemFactoryInputs
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.compose.StringSource
@@ -86,12 +87,10 @@ class HLSDownloaderInUi(
     }
 
     override fun createProcessingDownloadItemState(
-        downloadJob: HLSDownloadJob,
-        speed: Long
+        props: ProcessingDownloadItemFactoryInputs<HLSDownloadJob>
     ): ProcessingDownloadItemState {
         return UiProcessingItemForHSLFactory.create(
-            downloadJob,
-            speed,
+            props,
         )
     }
 

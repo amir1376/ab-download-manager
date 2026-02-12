@@ -12,6 +12,8 @@ import ir.amirab.downloader.downloaditem.DownloadJob
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
+import ir.amirab.downloader.monitor.DownloadItemStateFactory
+import ir.amirab.downloader.monitor.ProcessingDownloadItemFactoryInputs
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +39,8 @@ abstract class DownloaderInUi<
     LinkCheckerFactory<TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>,
     EditDownloadCheckerFactory<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>,
     NewDownloadInputsFactory<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker, TNewDownloadInputs>,
-    EditDownloadInputsFactory<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker, TCredentialAndItemMapper, TEditDownloadInputs> {
+    EditDownloadInputsFactory<TDownloadItem, TCredentials, TResponseInfo, TDownloadSize, TLinkChecker, TCredentialAndItemMapper, TEditDownloadInputs>,
+    DownloadItemStateFactory<TDownloadItem, TDownloadJob> {
     abstract fun newDownloadUiChecker(
         initialCredentials: TCredentials,
         initialFolder: String,
@@ -55,12 +58,11 @@ abstract class DownloaderInUi<
         basicDownloadItem: BasicDownloadItem
     ): TDownloadItem
 
-    abstract fun createProcessingDownloadItemState(
-        downloadJob: TDownloadJob,
-        speed: Long,
+    abstract override fun createProcessingDownloadItemState(
+        props: ProcessingDownloadItemFactoryInputs<TDownloadJob>,
     ): ProcessingDownloadItemState
 
-    open fun createCompletedDownloadItemState(
+    override fun createCompletedDownloadItemState(
         downloadItem: TDownloadItem,
     ): CompletedDownloadItemState {
         return CompletedDownloadItemState.fromDownloadItem(downloadItem)

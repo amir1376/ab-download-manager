@@ -195,16 +195,9 @@ class HomeComponent(
     }
 
     suspend fun toggleDownload(dItem: ProcessingDownloadItemState) {
-        when (dItem.status) {
-            is DownloadJobStatus.CanBeResumed -> {
-                downloadSystem.manualResume(dItem.id)
-            }
-
-            is DownloadJobStatus.IsActive -> {
-                downloadSystem.manualPause(dItem.id)
-            }
-
-            else -> {}
+        when {
+            dItem.canBeResumed() -> downloadSystem.userManualResume(dItem.id)
+            dItem.canBePaused() -> downloadSystem.manualPause(dItem.id)
         }
     }
 

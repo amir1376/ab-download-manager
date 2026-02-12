@@ -931,7 +931,7 @@ class AppComponent(
                 queueId = DefaultQueueInfo.ID,
                 categoryId = categoryId,
             ).also {
-                downloadSystem.manualResume(it)
+                downloadSystem.userManualResume(it)
             }
         }
     }

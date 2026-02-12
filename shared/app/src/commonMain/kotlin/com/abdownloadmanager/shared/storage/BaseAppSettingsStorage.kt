@@ -14,6 +14,7 @@ interface IAppSettingsModel {
     val showIconLabels: Boolean
     val useRelativeDateTime: Boolean
     val threadCount: Int
+    val maxConcurrentDownloads: Int
     val maxDownloadRetryCount: Int
     val dynamicPartCreation: Boolean
     val useServerLastModifiedTime: Boolean
@@ -50,6 +51,7 @@ interface BaseAppSettingsStorage :
     val showIconLabels: MutableStateFlow<Boolean>
     val useRelativeDateTime: MutableStateFlow<Boolean>
     val threadCount: MutableStateFlow<Int>
+    val maxConcurrentDownloads: MutableStateFlow<Int>
     val dynamicPartCreation: MutableStateFlow<Boolean>
     val useServerLastModifiedTime: MutableStateFlow<Boolean>
     val appendExtensionToIncompleteDownloads: MutableStateFlow<Boolean>

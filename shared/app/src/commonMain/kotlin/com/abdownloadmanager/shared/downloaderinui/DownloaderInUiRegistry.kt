@@ -9,6 +9,7 @@ import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.DownloadItemStateFactory
+import ir.amirab.downloader.monitor.ProcessingDownloadItemFactoryInputs
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import kotlin.reflect.KClass
 
@@ -74,16 +75,16 @@ class DownloaderInUiRegistry
     }
 
 
-    override fun createProcessingDownloadItemStateFromDownloadJob(
-        downloadJob: DownloadJob,
-        speed: Long
+    override fun createProcessingDownloadItemState(
+        props: ProcessingDownloadItemFactoryInputs<DownloadJob>,
     ): ProcessingDownloadItemState {
+        val downloadJob = props.downloadJob
         return requireNotNull(getDownloaderOf(downloadJob)) {
             "there is no downloader in UI registered for this download job: ${downloadJob::class.qualifiedName}"
-        }.createProcessingDownloadItemState(downloadJob, speed)
+        }.createProcessingDownloadItemState(props)
     }
 
-    override fun createCompletedDownloadItemStateFromDownloadItem(downloadItem: IDownloadItem): CompletedDownloadItemState {
+    override fun createCompletedDownloadItemState(downloadItem: IDownloadItem): CompletedDownloadItemState {
         return requireNotNull(getDownloaderOf(downloadItem)) {
             "there is no downloader in UI registered for this download item: ${downloadItem::class.qualifiedName}"
         }.createCompletedDownloadItemState(downloadItem)

@@ -19,6 +19,11 @@ sealed interface ProcessingDownloadItemState : IDownloadItemState {
 
     //remaining time in seconds
     val remainingTime: Long?
+
+    val isWaiting: Boolean
+
+    fun canBePaused() = isWaiting || status is DownloadJobStatus.IsActive
+    fun canBeResumed() = status is DownloadJobStatus.CanBeResumed && !isWaiting
 }
 
 @Immutable
@@ -36,6 +41,7 @@ data class RangeBasedProcessingDownloadItemState(
     override val speed: Long,
     override val parts: List<UiPart>,
     override val supportResume: Boolean?,
+    override val isWaiting: Boolean,
 ) : ProcessingDownloadItemState {
     override val progress = parts.sumOf {
         it.howMuchProceed
@@ -77,7 +83,9 @@ data class DurationBasedProcessingDownloadItemState(
     val optimisticLength: Long,
     val duration: Double?,
     override val progress: Long,
-    override val percent: Int
+    override val percent: Int,
+    override val isWaiting: Boolean,
+
 ) : ProcessingDownloadItemState {
 
     override val hasProgress get() = progress > 0
