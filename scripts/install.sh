@@ -99,9 +99,24 @@ check_dependencies() {
     done
 }
 
+get_arch() {
+  case "$(uname -m)" in
+    x86_64 | amd64)
+      echo "x64"
+      ;;
+    aarch64 | arm64)
+      echo "arm64"
+      ;;
+    *)
+      logger error "Unsupported architecture: $(uname -m)"
+      return 1
+      ;;
+  esac
+}
+
 APP_NAME="ABDownloadManager"
 PLATFORM="linux"
-ARCH="x64"
+ARCH="$(get_arch)" || exit 1
 EXT="tar.gz"
 
 RELEASE_URL="https://api.github.com/repos/amir1376/ab-download-manager/releases/latest"
