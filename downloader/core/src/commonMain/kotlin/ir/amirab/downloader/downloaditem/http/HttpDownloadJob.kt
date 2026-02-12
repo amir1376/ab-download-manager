@@ -214,6 +214,15 @@ class HttpDownloadJob(
                     supportsConcurrent != false
                 }
                 ?: IDownloadItem.LENGTH_UNKNOWN
+            // first we try to create the folder
+            // maybe the storage wasn't mounted yet, in that case we get an exception here
+            // it should be here to prevent resetting the download
+            try {
+                destination.prepareDestinationFolder()
+            } catch (e: Exception) {
+                e.throwIfCancelled()
+                throw PrepareDestinationFailedException(e)
+            }
             if (!destination.isDownloadedPartsIsValid()) {
                 //file deleted or something!
                 parts.forEach { it.resetCurrent() }
