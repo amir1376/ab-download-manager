@@ -196,7 +196,7 @@ class DownloadManager(
     }
 
     suspend fun pause(id: Long, context: DownloadItemContext = EmptyContext) {
-        val job = getDownloadJob(id)!!
+        val job = getDownloadJob(id) ?: return
         contextContainer.updateContext(id) { it + context }
         job.pause()
     }

@@ -19,6 +19,7 @@ import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
+import ir.amirab.downloader.queue.ManualDownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +35,7 @@ import java.io.File
 class DownloadSystem(
     val downloadManager: DownloadManager,
     val queueManager: QueueManager,
+    val manualDownloadQueue: ManualDownloadQueue,
     val categoryManager: CategoryManager,
     val downloadMonitor: IDownloadMonitor,
     val onDownloadCompletionActionRunner: OnDownloadCompletionActionRunner,
@@ -54,6 +56,7 @@ class DownloadSystem(
         queueManager.boot()
         downloadManager.boot()
         categoryManager.boot()
+        manualDownloadQueue.boot()
         onDownloadCompletionActionRunner.startListening()
         onQueueEventActionRunner.startListening()
         booted.update { true }
@@ -134,12 +137,14 @@ class DownloadSystem(
         extraDownloadSettingsStorage.deleteExtraDownloadItemSettings(id)
     }
 
-    suspend fun manualResume(id: Long): Boolean {
-        manualResume(id, ResumedBy(User))
+    suspend fun userManualResume(id: Long): Boolean {
+        manualDownloadQueue.resume(id)
         return true
     }
 
     suspend fun manualResume(id: Long, context: DownloadItemContext): Boolean {
+        // it won't go though headless queue
+        // to respect the max concurrent limits
         downloadManager.resume(id, context)
         return true
     }
@@ -150,10 +155,7 @@ class DownloadSystem(
     }
 
     suspend fun manualPause(id: Long): Boolean {
-//        if (mainDownloadQueue.isQueueActive) {
-//            return false
-//        }
-        downloadManager.pause(id, StoppedBy(User))
+        manualDownloadQueue.pause(id)
         return true
     }
 
@@ -172,6 +174,7 @@ class DownloadSystem(
         queueManager.getAll().forEach {
             it.stop()
         }
+        manualDownloadQueue.clearQueue()
         downloadManager.stopAll()
     }
 
@@ -310,7 +313,7 @@ class DownloadSystem(
             updater = applyUpdate,
         )
         if (wasActive) {
-            manualResume(id)
+            userManualResume(id)
         }
     }
 

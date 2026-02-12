@@ -238,7 +238,7 @@ class ABDMAppManager(
                             .takeIf { it > -1 }
                             ?.let {
                                 scope.launch {
-                                    downloadSystem.manualResume(it)
+                                    downloadSystem.userManualResume(it)
                                 }
                             }
                     }
@@ -319,7 +319,7 @@ class ABDMAppManager(
                 queueId = DefaultQueueInfo.ID,
                 categoryId = categoryId,
             ).also {
-                downloadSystem.manualResume(it)
+                downloadSystem.userManualResume(it)
             }
         }
     }

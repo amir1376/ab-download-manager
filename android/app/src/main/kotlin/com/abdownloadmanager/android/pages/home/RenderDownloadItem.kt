@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.singledownloadpage.createStatusString
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -265,26 +266,6 @@ fun RenderCenterSubText(itemState: IDownloadItemState, modifier: Modifier) {
             RenderTextStatus(itemState, modifier)
         }
     }
-}
-
-private fun createStatusString(it: IDownloadItemState): StringSource {
-
-    return when (val status = it.statusOrFinished()) {
-        is DownloadJobStatus.Canceled -> {
-            if (ExceptionUtils.isNormalCancellation(status.e)) {
-                Res.string.paused
-            } else {
-                Res.string.error
-            }
-        }
-
-        DownloadJobStatus.Downloading -> Res.string.downloading
-        DownloadJobStatus.Finished -> Res.string.finished
-        DownloadJobStatus.IDLE -> Res.string.idle
-        is DownloadJobStatus.PreparingFile -> Res.string.preparing_file
-        DownloadJobStatus.Resuming -> Res.string.resuming
-        is DownloadJobStatus.Retrying -> Res.string.retrying
-    }.asStringSource()
 }
 
 @Composable

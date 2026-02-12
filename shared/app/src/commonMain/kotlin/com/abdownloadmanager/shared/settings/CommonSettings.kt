@@ -64,6 +64,22 @@ object CommonSettings {
             },
         )
     }
+    fun maxConcurrentDownloads(appRepository: BaseAppRepository): IntConfigurable {
+        return IntConfigurable(
+            title = Res.string.settings_download_max_concurrent_downloads.asStringSource(),
+            description = Res.string.settings_download_max_concurrent_downloads_description.asStringSource(),
+            backedBy = appRepository.maxConcurrentDownloads,
+            range = 0..Int.MAX_VALUE,
+            renderMode = IntConfigurable.RenderMode.TextField,
+            describe = {
+                if (it == 0) {
+                    Res.string.unlimited.asStringSource()
+                } else {
+                    "$it".asStringSource()
+                }
+            },
+        )
+    }
 
     fun maxDownloadRetryCount(appRepository: BaseAppRepository): IntConfigurable {
         return IntConfigurable(

@@ -83,7 +83,7 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
             val queue = queueManager.getQueue(task.queueId!!)
             queue.start()
         } else {
-            downloadSystem.manualResume(id)
+            downloadSystem.userManualResume(id)
         }
     }
 

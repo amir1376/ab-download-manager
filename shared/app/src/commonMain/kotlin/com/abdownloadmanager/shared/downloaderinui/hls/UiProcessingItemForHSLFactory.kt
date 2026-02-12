@@ -2,14 +2,15 @@ package com.abdownloadmanager.shared.downloaderinui.hls
 
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadJob
 import ir.amirab.downloader.monitor.DurationBasedProcessingDownloadItemState
+import ir.amirab.downloader.monitor.ProcessingDownloadItemFactoryInputs
 import ir.amirab.downloader.monitor.UiDurationBasedPart
 import ir.amirab.downloader.part.PartDownloadStatus
 
 object UiProcessingItemForHSLFactory {
     fun create(
-        downloadJob: HLSDownloadJob,
-        speed: Long
+        props: ProcessingDownloadItemFactoryInputs<HLSDownloadJob>
     ): DurationBasedProcessingDownloadItemState {
+        val downloadJob = props.downloadJob
         val item = downloadJob.downloadItem
         val downloadParts = downloadJob.getParts()
         val totalPartsCount = downloadParts.size
@@ -54,7 +55,7 @@ object UiProcessingItemForHSLFactory {
             name = item.name,
             folder = item.folder,
             status = downloadJob.status.value,
-            speed = speed,
+            speed = props.speed,
             supportResume = true,
             contentLength = item.contentLength,
             parts = uiParts,
@@ -67,6 +68,7 @@ object UiProcessingItemForHSLFactory {
             progress = downloadedBytes,
             percent = (percentFraction * 100).toInt(),
             optimisticLength = length,
+            isWaiting = props.isWaiting,
         )
     }
 

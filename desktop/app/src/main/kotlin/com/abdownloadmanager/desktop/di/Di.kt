@@ -112,6 +112,7 @@ import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloader
 import ir.amirab.downloader.monitor.DownloadItemStateFactory
 import ir.amirab.downloader.monitor.IDownloadMonitor
+import ir.amirab.downloader.queue.ManualDownloadQueue
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.util.compose.IIconResolver
 import ir.amirab.util.compose.localizationmanager.LanguageManager
@@ -245,10 +246,14 @@ val downloaderModule = module {
             )
         )
     }.bind(DownloadManagerMinimalControl::class)
+    single {
+        ManualDownloadQueue(get(), get())
+    }
     single<IDownloadMonitor> {
         DownloadMonitor(
             downloadManager = get(),
-            downloadItemStateFactory = inject()
+            manualDownloadQueue = get(),
+            downloadItemStateFactory = inject(),
         )
     }
 }
@@ -291,6 +296,7 @@ val downloadSystemModule = module {
 
     single {
         DownloadSystem(
+            get(),
             get(),
             get(),
             get(),

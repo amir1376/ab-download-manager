@@ -3,12 +3,16 @@ package com.abdownloadmanager.shared.singledownloadpage
 import com.abdownloadmanager.resources.Res
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
+import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 
 fun createStatusString(it: IDownloadItemState): StringSource {
+    if (it is ProcessingDownloadItemState && it.isWaiting) {
+        return Res.string.waiting.asStringSource()
+    }
     return when (val status = it.statusOrFinished()) {
         is DownloadJobStatus.Canceled -> {
             if (ExceptionUtils.isNormalCancellation(status.e)) {

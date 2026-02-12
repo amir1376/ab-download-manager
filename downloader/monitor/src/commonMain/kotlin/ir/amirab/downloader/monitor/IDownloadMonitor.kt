@@ -22,8 +22,6 @@ fun IDownloadMonitor.isDownloadActiveFlow(
     return activeDownloadListFlow.mapStateFlow { activeDownloadList ->
         activeDownloadList.find {
             downloadId == it.id
-        }?.statusOrFinished()?.let {
-            it is DownloadJobStatus.IsActive
-        } ?: false
+        }?.canBePaused() ?: false
     }
 }

@@ -33,7 +33,7 @@ open class BaseAppRepository(
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
     private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor
 
-
+    val maxConcurrentDownloads = appSettings.maxConcurrentDownloads
     val speedLimiter = appSettings.speedLimit
     val threadCount = appSettings.threadCount
     val dynamicPartCreation = appSettings.dynamicPartCreation
@@ -156,6 +156,11 @@ open class BaseAppRepository(
                 } else {
                     removedDownloadsFromDiskTracker.stop()
                 }
+            }.launchIn(scope)
+        maxConcurrentDownloads
+            .debounce(500)
+            .onEach {
+                downloadSystem.manualDownloadQueue.setMaxConcurrent(it)
             }.launchIn(scope)
     }
 }

@@ -212,7 +212,8 @@ fun StatusCell(
                         } else {
                             DownloadProgressStatus.Error
                         },
-                        itemState.gotAnyProgress
+                        itemState.gotAnyProgress,
+                        itemState.isWaiting,
                     )
                 }
 
@@ -224,7 +225,8 @@ fun StatusCell(
                         } else {
                             DownloadProgressStatus.Paused
                         },
-                        itemState.gotAnyProgress
+                        itemState.gotAnyProgress,
+                        itemState.isWaiting,
                     )
                 }
 
@@ -232,7 +234,8 @@ fun StatusCell(
                     ProgressAndPercent(
                         itemState.percent,
                         DownloadProgressStatus.Downloading,
-                        itemState.gotAnyProgress
+                        itemState.gotAnyProgress,
+                        itemState.isWaiting,
                     )
                 }
 
@@ -240,7 +243,8 @@ fun StatusCell(
                     ProgressAndPercent(
                         status.percent,
                         DownloadProgressStatus.CreatingFile,
-                        itemState.gotAnyProgress
+                        itemState.gotAnyProgress,
+                        itemState.isWaiting,
                     )
                 }
 
@@ -248,7 +252,8 @@ fun StatusCell(
                     ProgressAndPercent(
                         itemState.percent,
                         DownloadProgressStatus.Resuming,
-                        itemState.gotAnyProgress
+                        itemState.gotAnyProgress,
+                        itemState.isWaiting,
                     )
                 }
 
@@ -256,7 +261,8 @@ fun StatusCell(
                     ProgressAndPercent(
                         itemState.percent,
                         DownloadProgressStatus.Retrying,
-                        itemState.gotAnyProgress
+                        itemState.gotAnyProgress,
+                        itemState.isWaiting,
                     )
                 }
 
@@ -366,6 +372,7 @@ private fun ProgressAndPercent(
     percent: Int?,
     status: DownloadProgressStatus,
     gotAnyProgress: Boolean,
+    isWaiting: Boolean,
 ) {
     val background = when (status) {
         DownloadProgressStatus.Error -> myColors.errorGradient
@@ -375,7 +382,13 @@ private fun ProgressAndPercent(
         DownloadProgressStatus.Downloading -> myColors.primaryGradient
         DownloadProgressStatus.Retrying -> myColors.errorGradient
     }
-    val statusString = myStringResource(status.toStringResource())
+    val statusString = myStringResource(
+        if (isWaiting) {
+            Res.string.waiting
+        } else {
+            status.toStringResource()
+        }
+    )
     Column {
         val statusText = if (gotAnyProgress) {
             "${percent ?: "."}% $statusString"

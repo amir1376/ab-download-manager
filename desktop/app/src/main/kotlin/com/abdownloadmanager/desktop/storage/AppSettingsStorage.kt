@@ -32,6 +32,7 @@ data class AppSettingsModel(
     override val useRelativeDateTime: Boolean = true,
     val useSystemTray: Boolean = true,
     override val threadCount: Int = 8,
+    override val maxConcurrentDownloads: Int = 0,
     override val maxDownloadRetryCount: Int = 3,
     override val dynamicPartCreation: Boolean = true,
     override val useServerLastModifiedTime: Boolean = false,
@@ -75,6 +76,7 @@ data class AppSettingsModel(
             val useRelativeDateTime = booleanKeyOf("useRelativeDateTime")
             val useSystemTray = booleanKeyOf("useSystemTray")
             val threadCount = intKeyOf("threadCount")
+            val maxConcurrentDownloads = intKeyOf("maxConcurrentDownloads")
             val maxDownloadRetryCount = intKeyOf("maxDownloadRetryCount")
             val dynamicPartCreation = booleanKeyOf("dynamicPartCreation")
             val useServerLastModifiedTime = booleanKeyOf("useServerLastModifiedTime")
@@ -115,6 +117,7 @@ data class AppSettingsModel(
                 useRelativeDateTime = source.get(Keys.useRelativeDateTime) ?: default.useRelativeDateTime,
                 useSystemTray = source.get(Keys.useSystemTray) ?: default.useSystemTray,
                 threadCount = source.get(Keys.threadCount) ?: default.threadCount,
+                maxConcurrentDownloads = source.get(Keys.maxConcurrentDownloads) ?: default.maxConcurrentDownloads,
                 maxDownloadRetryCount = source.get(Keys.maxDownloadRetryCount) ?: default.maxDownloadRetryCount,
                 dynamicPartCreation = source.get(Keys.dynamicPartCreation) ?: default.dynamicPartCreation,
                 useServerLastModifiedTime = source.get(Keys.useServerLastModifiedTime)
@@ -159,6 +162,7 @@ data class AppSettingsModel(
                 put(Keys.useRelativeDateTime, focus.useRelativeDateTime)
                 put(Keys.useSystemTray, focus.useSystemTray)
                 put(Keys.threadCount, focus.threadCount)
+                put(Keys.maxConcurrentDownloads, focus.maxConcurrentDownloads)
                 put(Keys.maxDownloadRetryCount, focus.maxDownloadRetryCount)
                 put(Keys.dynamicPartCreation, focus.dynamicPartCreation)
                 put(Keys.useServerLastModifiedTime, focus.useServerLastModifiedTime)
@@ -232,6 +236,7 @@ class AppSettingsStorage(
     override val useRelativeDateTime = from(AppSettingsModel.useRelativeDateTime)
     val useSystemTray = from(AppSettingsModel.useSystemTray)
     override val threadCount = from(AppSettingsModel.threadCount)
+    override val maxConcurrentDownloads = from(AppSettingsModel.maxConcurrentDownloads)
     override val dynamicPartCreation = from(AppSettingsModel.dynamicPartCreation)
     override val useServerLastModifiedTime = from(AppSettingsModel.useServerLastModifiedTime)
     override val appendExtensionToIncompleteDownloads = from(AppSettingsModel.appendExtensionToIncompleteDownloads)

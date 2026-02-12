@@ -1,6 +1,5 @@
 package com.abdownloadmanager.shared.singledownloadpage
 
-import arrow.optics.copy
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
@@ -29,8 +28,6 @@ import ir.amirab.downloader.monitor.DurationBasedProcessingDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
-import ir.amirab.downloader.monitor.statusOrFinished
-import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
@@ -246,10 +243,9 @@ abstract class BaseSingleDownloadComponent<
     fun toggle() {
         val state = itemStateFlow.value as? ProcessingDownloadItemState ?: return
         scope.launch {
-            if (state.status is DownloadJobStatus.IsActive) {
-                downloadSystem.manualPause(downloadId)
-            } else {
-                downloadSystem.manualResume(downloadId)
+            when {
+                state.canBePaused() -> downloadSystem.manualPause(downloadId)
+                state.canBeResumed() -> downloadSystem.userManualResume(downloadId)
             }
         }
     }
@@ -257,8 +253,8 @@ abstract class BaseSingleDownloadComponent<
     fun resume() {
         val state = itemStateFlow.value as? ProcessingDownloadItemState ?: return
         scope.launch {
-            if (state.status is DownloadJobStatus.CanBeResumed) {
-                downloadSystem.manualResume(downloadId)
+            if (state.canBeResumed()) {
+                downloadSystem.userManualResume(downloadId)
             }
         }
     }
@@ -266,7 +262,7 @@ abstract class BaseSingleDownloadComponent<
     fun pause() {
         val state = itemStateFlow.value as? ProcessingDownloadItemState ?: return
         scope.launch {
-            if (state.status is DownloadJobStatus.IsActive) {
+            if (state.canBePaused()) {
                 downloadSystem.manualPause(downloadId)
             }
         }
@@ -284,7 +280,7 @@ abstract class BaseSingleDownloadComponent<
             if (deletePartialFileOnDownloadCancellation.value) {
                 downloadSystem.reset(downloadId)
             } else {
-                if (state?.status is DownloadJobStatus.IsActive) {
+                if (state?.canBePaused() ?: false) {
                     downloadSystem.manualPause(downloadId)
                 }
             }
