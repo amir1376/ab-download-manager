@@ -9,6 +9,7 @@ import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.StoppedBy
 import ir.amirab.downloader.utils.swap
 import ir.amirab.downloader.utils.swapped
+import ir.amirab.util.coroutines.debounce
 import ir.amirab.util.guardedEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -52,7 +53,7 @@ class DownloadQueue(
         this.onQueueEvent(event)
     }
 
-    suspend fun boot() {
+    fun boot() {
         booted.action {
             startListenerJob()
             setupAutoStartAndStop()
@@ -80,18 +81,12 @@ class DownloadQueue(
         }
     }
 
-    private suspend fun onDownloadCanceled(id: Long, e: Throwable) {
+    private fun onDownloadCanceled(id: Long, e: Throwable) {
         val removed = activeItems.remove(id)
         if (isQueueActive) {
             if (!trimmedItems.remove(id)) {
                 canceledItems.add(id)
             }
-            swapQueueItem(
-                item = id,
-                //I make it function because of StateFlow::update
-                toPosition = { q ->
-                    q.lastIndex
-                })
         }
         shake(
             itemChangeHappened = removed,
@@ -106,15 +101,18 @@ class DownloadQueue(
         )
     }
 
-    suspend fun start(): Boolean {
-        if (stopping) return false
+    fun start() {
+        if (stopping) return
 //        println("on start queue")
         canceledItems.clear()
         trimmedItems.clear()
         ensureBooted()
         setActive(true)
 //        println("starting")
-        return shake()
+        shake(
+            delayed = false
+        )
+        return
     }
 
     private fun ensureBooted() {
@@ -123,7 +121,18 @@ class DownloadQueue(
         }
     }
 
-    fun shake(
+    private fun shake(
+        itemChangeHappened: Boolean = false,
+        delayed: Boolean = true,
+    ) {
+        if (delayed) {
+            debouncedShake(itemChangeHappened)
+        } else {
+            actualShake(itemChangeHappened)
+        }
+    }
+
+    private fun actualShake(
         itemChangeHappened: Boolean = false
     ): Boolean {
 //        println("shake queue")
@@ -149,6 +158,19 @@ class DownloadQueue(
             }
         }
     }
+
+    // Note: it mostly happens in ManualDownloadQueue. couldn't fully reproduce it here yet. adding it just for safety.
+    // If multiple downloads are canceled at the same time, multiple `shake` calls may occur.
+    // In these situations, there is an issue where other downloads might resume
+    // (even though they are already being stopped but their events have not been received yet).
+    // So we use a debounced call to ensure all events are received first.
+    val debouncedShake = scope.debounce(
+        fn = ::actualShake,
+        delayMillis = 500,
+        previousValueMerge = { wasItemChangeHappened, itemChangeHappened ->
+            wasItemChangeHappened || itemChangeHappened
+        }
+    )
 
     private var listenerJob: Job? = null
     private fun startListenerJob() {
@@ -293,7 +315,7 @@ class DownloadQueue(
         if (diff == 0) return
         _queueModel.update { q ->
             val movingIndexes = listOfIds.mapNotNull {
-                q.queueItems.indexOf(it).takeIf { index -> index != null }
+                q.queueItems.indexOf(it).takeIf { index -> index != -1 }
             }
                 //from big to small
                 .sortedDescending()
