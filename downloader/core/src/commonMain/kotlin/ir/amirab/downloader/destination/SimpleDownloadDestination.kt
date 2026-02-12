@@ -118,17 +118,7 @@ class SimpleDownloadDestination(
     }
 
     fun prepareDestinationFolder() {
-        val incompleteFile = fileToWrite
-        incompleteFile.parentFile.let {
-            it.canonicalFile.mkdirs()
-            if (!it.exists()) {
-                error("can't create folder for destination file $it")
-            }
-
-            if (!it.isDirectory) {
-                error("${incompleteFile.parentFile} is not a directory")
-            }
-        }
+        DownloadDestination.prepareDestinationFolder(fileToWrite)
     }
 
     @HeavyCall
