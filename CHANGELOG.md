@@ -14,6 +14,25 @@
 
 ### Security
 
+## 1.8.6
+
+### Added
+
+- Linux ARM support (#1081)
+- An option to set max concurrent downloads for manually resumed downloads (#1085)
+
+### Fixed
+
+- Do not reset the download if storage is not mounted yet (#1087)
+- Error when assembling HLS media if destination folder was not created yet (#1089)
+- Do not reset the download if server changes status code from 206 to 200 (#1088)
+
+### Improved
+
+- Updated translations
+- Queue logic improvements (#1086)
+- Linux Installation Script updated to support ARM devices (#1090)
+
 ## 1.8.5
 
 ### Added
