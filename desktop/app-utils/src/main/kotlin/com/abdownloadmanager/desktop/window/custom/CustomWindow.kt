@@ -65,6 +65,7 @@ private fun FrameWindowScope.CustomWindowFrame(
     windowIcon: Painter? = null,
     background: Color,
     onBackground: Color,
+    isLight: Boolean,
     start: (@Composable () -> Unit)?,
     end: (@Composable () -> Unit)?,
     content: @Composable () -> Unit,
@@ -76,7 +77,8 @@ private fun FrameWindowScope.CustomWindowFrame(
                 .fillMaxSize()
                 .ifThen(!JBR.isWindowDecorationsSupported()) {
                     ifThen(isWindowFloating()) {
-                        border(1.dp, Color.DarkGray, RectangleShape)
+                        val borderColor = if (isLight) Color.LightGray else Color.DarkGray
+                        border(1.dp, borderColor, RectangleShape)
                             .padding(1.dp)
                     }
                 }
@@ -400,6 +402,7 @@ fun CustomWindow(
                     windowIcon = icon,
                     background = background,
                     onBackground = myColors.onBackground,
+                    isLight = isLight,
                     start = start,
                     end = end,
                 ) {
