@@ -1,5 +1,6 @@
 package com.abdownloadmanager.android.pages.directorypicker
 
+import android.content.Context
 import android.os.Environment
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -30,17 +31,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.android.pages.onboarding.permissions.ABDMPermissions
 import com.abdownloadmanager.android.pages.onboarding.permissions.rememberAppPermissionState
 import com.abdownloadmanager.android.ui.SheetHeader
 import com.abdownloadmanager.android.ui.SheetTitleWithDescription
 import com.abdownloadmanager.android.ui.SheetUI
+import com.abdownloadmanager.android.ui.configurable.RenderSpinnerInSheet
 import com.abdownloadmanager.android.ui.configurable.SheetInput
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.MyTextField
+import com.abdownloadmanager.shared.ui.widget.PrimaryMainActionButton
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.OnFullyDismissed
@@ -66,6 +70,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.Path
 import okio.Path.Companion.toOkioPath
+import okio.Path.Companion.toPath
 
 val alwaysAllowedPaths = listOf(
     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toOkioPath(),
@@ -78,6 +83,7 @@ fun DirectoryPicker(
     initialDirectory: Path,
     onDirectorySelected: (Path?) -> Unit
 ) {
+    var changingRoot by remember { mutableStateOf(false) }
     val state = rememberResponsiveDialogState(false)
     LaunchedEffect(isVisible) {
         if (isVisible) {
@@ -262,7 +268,15 @@ fun DirectoryPicker(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        ActionButton(
+                        IconActionButton(
+                            MyIcons.folder,
+                            contentDescription = Res.string.storage_roots.asStringSource(),
+                            onClick = {
+                                changingRoot = true
+                            }
+                        )
+                        Spacer(Modifier.width(mySpacings.mediumSpace))
+                        PrimaryMainActionButton(
                             text = myStringResource(Res.string.ok),
                             onClick = {
                                 onDirectorySelected(currentDirectory)
@@ -305,6 +319,17 @@ fun DirectoryPicker(
                 )
             }
         }
+        StorageRoots(
+            onRequestChangeStorageRoot = {
+                currentDirectory = it
+                changingRoot = false
+            },
+            currentDirectory = currentDirectory,
+            isOpened = changingRoot,
+            onDismiss = {
+                changingRoot = false
+            }
+        )
     }
 }
 
@@ -328,6 +353,58 @@ private fun RenderDirectoryItem(
         Spacer(Modifier.width(mySpacings.mediumSpace))
         Text(item.name)
     }
+}
+
+@Composable
+private fun StorageRoots(
+    onRequestChangeStorageRoot: (Path) -> Unit,
+    currentDirectory: Path,
+    isOpened: Boolean,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val roots = remember {
+        runCatching { getRootPaths(context) }
+            .onFailure { it.printStackTrace() }
+            .getOrElse { emptyList() }
+    }
+    val currentRoot = remember(currentDirectory) {
+        roots.firstOrNull {
+            currentDirectory.startsWith(it)
+        }
+    }
+    RenderSpinnerInSheet(
+        title = Res.string.storage_roots.asStringSource(),
+        isOpened = isOpened,
+        onDismiss = onDismiss,
+        possibleValues = roots,
+        value = currentRoot,
+        onSelect = {
+            if (it == null) {
+                onDismiss()
+            } else {
+                onRequestChangeStorageRoot(it)
+            }
+        },
+    ) {
+        Row {
+            Text(it.toString())
+        }
+    }
+}
+
+private fun getRootPaths(context: Context): List<Path> {
+    val externalFilesDirs = context.getExternalFilesDirs(null)
+    if (externalFilesDirs.isNullOrEmpty()) {
+        return emptyList()
+    }
+    return externalFilesDirs
+        .map {
+            it
+                .absolutePath
+                .substringBefore("/Android/")
+                .toPath()
+        }
 }
 
 @Immutable
