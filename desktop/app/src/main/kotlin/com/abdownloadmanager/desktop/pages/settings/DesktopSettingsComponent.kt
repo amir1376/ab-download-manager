@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
+import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.settings.BaseSettingsComponent
@@ -55,6 +56,7 @@ class DesktopSettingsComponent(
     private val themeManager by inject<ThemeManager>()
     private val languageManager by inject<LanguageManager>()
     private val fontManager by inject<FontManager>()
+    private val customRenderApi by inject<CustomRenderApi>()
     private val allConfigs = object : SettingSectionGetter {
         override operator fun get(key: SettingSection): List<ConfigurableGroup> {
             return when (key) {
@@ -102,6 +104,11 @@ class DesktopSettingsComponent(
                         nestedConfigurable = listOf(
                             CommonSettings.autoShowDownloadProgressWindow(appSettings),
                             CommonSettings.showDownloadFinishWindow(appSettings),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            DesktopSettings.renderApi(customRenderApi),
                         )
                     )
                 )

@@ -32,6 +32,7 @@ import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManif
 import com.abdownloadmanager.desktop.utils.proxy.AutoConfigurableProxyProviderForDesktop
 import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvider
 import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
+import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.HttpDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
@@ -649,6 +650,11 @@ val appModule = module {
         PerHostSettingsManager(get())
     }
     single { NotificationManager() }
+
+    single {
+        val definedPaths = get<DesktopDefinedPaths>()
+        CustomRenderApi(definedPaths.renderApiFile)
+    }
 }
 
 

@@ -8,6 +8,7 @@ import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
 import com.abdownloadmanager.desktop.utils.singleInstance.MutableSingleInstanceServerHandler
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
@@ -15,11 +16,7 @@ import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.AppVersion
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
-import ir.amirab.util.platform.Arch
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.runBlocking
-import okio.Path.Companion.toOkioPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.system.exitProcess
@@ -32,6 +29,7 @@ class App : AutoCloseable,
     private val previousVersion: PreviousVersion by inject()
     private val updateManager: UpdateManager by inject()
     private val keepAwakeManager: KeepAwakeManager by inject()
+    private val customRenderApi: CustomRenderApi by inject()
 
     //TODO Setup Native Messaging Feature
     //private val browserNativeMessaging: NativeMessaging by inject()
@@ -47,12 +45,12 @@ class App : AutoCloseable,
                 // it's better to organize these list of boot functions in a separate class
 
                 // boot configs from the storage so download manager can use them on boot!
+                customRenderApi.boot()
                 appRepository.boot()
                 integration.boot()
                 downloadSystem.boot()
                 previousVersion.boot()
                 keepAwakeManager.boot()
-
                 //TODO Setup Native Messaging Feature
                 //waiting for compose kmp to add multi launcher to nativeDistributions,the PR is already exists but not merger
                 //or maybe I should use a custom solution
@@ -185,28 +183,6 @@ private fun defaultApp(
         println("it seems we are in ide")
     }
 
-    val customRenderApiRequested = System.getenv("SKIKO_RENDER_API") != null ||
-            System.getProperty("skiko.renderApi") != null
-
-    if (!customRenderApiRequested) {
-        if (Platform.isWindows()) {
-            // At the moment default render api have some problems on windows x64:
-            // - when I resize a window, the contents of the window will be stretched
-            // - sometimes when I close a window, the window flashes on exiting
-            // it seems OPENGL does not have these problems on x64.
-            // However, on Windows-ARM64, OPENGL causes silent failures - use Direct3D or ANGLE instead.
-
-            // Option 1 (CURRENT): ANGLE - translates OpenGL ES -> D3D12, more stable
-            // May avoid Direct3D resize/flash bugs while staying GPU-accelerated and power efficient
-            // Note: ANGLE has a known issue with transparent windows (SKIKO-1089)
-            val renderApi = if (Arch.getCurrentArch() == Arch.Arm64) "ANGLE" else "OPENGL"
-            
-            // Option 2 (ALTERNATIVE): Direct3D - native, works on Windows-ARM64
-            // val renderApi = if (Arch.getCurrentArch() == Arch.Arm64) "DIRECT3D" else "OPENGL"
-
-            System.setProperty("skiko.renderApi", renderApi)
-        }
-    }
     val globalExceptionHandler = createAndSetGlobalExceptionHandler()
     App().use {
         it.start(

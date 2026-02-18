@@ -1,9 +1,13 @@
 package com.abdownloadmanager.desktop.pages.settings
 
+import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.ui.configurable.platform.item.FontConfigurable
+import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
+import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
@@ -78,6 +82,23 @@ object DesktopSettings {
             possibleValues = fontManager.selectableFonts.value,
             describe = {
                 it.name
+            }
+        )
+    }
+
+    fun renderApi(
+        customRenderApi: CustomRenderApi,
+    ): EnumConfigurable<RenderApi?> {
+        return EnumConfigurable(
+            title = "Render API".asStringSource(),
+            description = "Configures the Render API backend used by the application. A restart is required for the change to take effect.".asStringSource(),
+            backedBy = customRenderApi.data,
+            possibleValues = buildList {
+                add(null)
+                addAll(customRenderApi.getSupportedRenderApiForThisPlatform())
+            },
+            describe = {
+                it?.prettyName?.asStringSource()?: Res.string.default.asStringSource()
             }
         )
     }
