@@ -17,6 +17,14 @@ fun Path.writeText(
     }
 }
 
+fun Path.readText(
+    fileSystem: FileSystem = FileSystem.SYSTEM
+): String {
+    return fileSystem.read(this) {
+        readUtf8()
+    }
+}
+
 fun Path.exists(
     fileSystem: FileSystem = FileSystem.SYSTEM
 ): Boolean {
