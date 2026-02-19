@@ -29,34 +29,39 @@ import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
+import ir.amirab.util.ifThen
 
 @Composable
 fun MyTextFieldWithIcons(
     text: String,
-    setText: (String) -> Unit,
-    placeHolder: String,
+    onTextChange: (String) -> Unit,
+    placeholder: String,
     modifier: Modifier,
     errorText: String? = null,
-    start: @Composable() (() -> Unit)? = null,
-    end: @Composable() (() -> Unit)? = null,
+    enabled: Boolean = true,
+    singleLine: Boolean = true,
+    start: @Composable (() -> Unit)? = null,
+    end: @Composable (() -> Unit)? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val dividerModifier = Modifier.Companion
+    val dividerModifier = Modifier
         .fillMaxHeight()
         .padding(vertical = 1.dp)
         //to not conflict with text-field border
         .width(1.dp)
-        .background(if (isFocused) myColors.onBackground / 10 else Color.Companion.Transparent)
+        .background(if (isFocused) myColors.onBackground / 10 else Color.Transparent)
     Column(modifier) {
         MyTextField(
-            text,
-            setText,
-            placeHolder,
-            modifier = Modifier.Companion.fillMaxWidth(),
+            text = text,
+            onTextChange = onTextChange,
+            placeholder = placeholder,
+            modifier = Modifier.fillMaxWidth(),
             background = myColors.surface / 50,
             interactionSource = interactionSource,
             shape = myShapes.defaultRounded,
+            singleLine = singleLine,
+            enabled = enabled,
             start = start?.let {
                 {
                     WithContentAlpha(0.5f) {
@@ -76,7 +81,7 @@ fun MyTextFieldWithIcons(
             if (errorText != null) {
                 Text(
                     errorText,
-                    Modifier.Companion.padding(bottom = 4.dp, start = 4.dp),
+                    Modifier.padding(bottom = 4.dp, start = 4.dp),
                     fontSize = myTextSizes.sm,
                     color = myColors.error,
                 )
@@ -89,13 +94,18 @@ fun MyTextFieldWithIcons(
 fun MyTextFieldIcon(
     icon: IconSource,
     enabled: Boolean = true,
-    onClick: () -> Unit,
+    contentDescription: String? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     MyIcon(
-        icon, null, Modifier
-            .pointerHoverIcon(PointerIcon.Default)
+        icon = icon,
+        contentDescription = contentDescription,
+        modifier = Modifier
             .fillMaxHeight()
-            .clickable(enabled = enabled, onClick = onClick)
+            .ifThen(onClick != null) {
+                pointerHoverIcon(PointerIcon.Default)
+                    .clickable(enabled = enabled, onClick = onClick)
+            }
             .wrapContentHeight()
             .padding(horizontal = 8.dp)
             .size(mySpacings.iconSize)
