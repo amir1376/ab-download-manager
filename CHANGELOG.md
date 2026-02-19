@@ -14,6 +14,23 @@
 
 ### Security
 
+## 1.8.7
+
+### Added
+
+- Ability to change the storage root when selecting the download location on Android (e.g., save to SD card) (#1101)
+- Option to choose the render API on Desktop (#1103)
+
+### Changed
+
+- Default render API set to `SOFTWARE` on Linux
+
+### Improved
+
+- Updated translations
+- Increment/decrement buttons in number fields are now more accessible (#1104)
+- Minor UI improvements
+
 ## 1.8.6
 
 ### Added
