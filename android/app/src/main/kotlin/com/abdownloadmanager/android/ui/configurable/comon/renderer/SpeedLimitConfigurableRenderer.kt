@@ -95,7 +95,7 @@ object SpeedLimitConfigurableRenderer : ConfigurableRenderer<SpeedLimitConfigura
                         Row(
                             Modifier
                                 .padding(vertical = 8.dp)
-                                .width(200.dp)
+                                .width(250.dp)
                         ) {
                             DoubleTextField(
                                 value = currentValue,

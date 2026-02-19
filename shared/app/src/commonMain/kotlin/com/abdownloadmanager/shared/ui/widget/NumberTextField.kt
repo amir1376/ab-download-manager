@@ -5,7 +5,6 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import ir.amirab.util.ifThen
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.hoverable
@@ -14,10 +13,12 @@ import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
@@ -27,6 +28,8 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import ir.amirab.util.compose.IconSource
 
 private val DefaultShape
     @Composable
@@ -322,7 +325,7 @@ private fun <T : Comparable<T>> VerticalDirectionHandle(
     WithContentAlpha(
         animateFloatAsState(if (isDragging || isHovered) 1f else 0.5f).value
     ) {
-        Column(
+        Row(
             modifier
                 .ifThen(enabled) {
                     hoverable(interactionSource)
@@ -334,26 +337,35 @@ private fun <T : Comparable<T>> VerticalDirectionHandle(
                             onValueChange(enc(-times))
                         }
                 }
-                .pointerHoverIcon(PointerIcon.Default)
-                .padding(end = 2.dp),
+                .pointerHoverIcon(PointerIcon.Default),
         ) {
-            val iconModifier = Modifier
-                .padding(1.dp)
-                .size(8.dp)
-            MyIcon(
-                MyIcons.up,
-                null,
-                Modifier
-                    .clickable { onValueChange(enc(1)) }
-                    .then(iconModifier),
-            )
-            MyIcon(
+            DirectionIcon(
                 MyIcons.down,
-                null,
-                Modifier
-                    .clickable { onValueChange(enc(-1)) }
-                    .then(iconModifier),
+                enabled = enabled,
+                onClick = { onValueChange(enc(-1)) },
+            )
+            DirectionIcon(
+                MyIcons.up,
+                enabled = enabled,
+                onClick = { onValueChange(enc(1)) },
             )
         }
     }
+}
+
+@Composable
+private fun DirectionIcon(
+    icon: IconSource,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    MyIcon(
+        icon, null, Modifier
+            .pointerHoverIcon(PointerIcon.Default)
+            .fillMaxHeight()
+            .clickable(enabled = enabled, onClick = onClick)
+            .wrapContentHeight()
+            .padding(horizontal = 4.dp)
+            .size(mySpacings.iconSize)
+    )
 }

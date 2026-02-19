@@ -328,7 +328,7 @@ private fun WildcardLengthUi(
                     },
                     range = 1..10,
                     keyboardOptions = KeyboardOptions.Default,
-                    modifier = Modifier.width(72.dp)
+                    modifier = Modifier.width(96.dp)
                 )
             }
         }

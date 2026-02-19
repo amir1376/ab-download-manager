@@ -395,7 +395,7 @@ object ProxyConfigurableRenderer : ConfigurableRenderer<ProxyConfigurable> {
                         onValueChange = setPort,
                         placeholder = myStringResource(Res.string.port),
                         range = 1..65535,
-                        modifier = Modifier.width(96.dp),
+                        modifier = Modifier.width(120.dp),
                         keyboardOptions = KeyboardOptions(),
                         textPadding = PaddingValues(8.dp),
                         shape = RoundedCornerShape(12.dp),
