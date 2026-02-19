@@ -1,8 +1,8 @@
 package com.abdownloadmanager.android.pages.crashreport
 
+import android.os.Build
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import com.abdownloadmanager.shared.util.ui.widget.ScreenSurface
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import androidx.compose.foundation.background
@@ -85,7 +85,6 @@ private fun ErrorUi(
         Spacer(Modifier.height(8.dp))
     }
 }
-
 fun createInformation(
     exceptionString: ThrowableData,
 ): String {
@@ -98,6 +97,11 @@ fun createInformation(
 ```
 appVersion = $version
 platform = $platform
+Brand: ${Build.BRAND}
+Manufacturer: ${Build.MANUFACTURER}
+Model: ${Build.MODEL}
+Android Version: ${Build.VERSION.RELEASE}
+SDK: ${Build.VERSION.SDK_INT}
 ```
 ###### Exception
 ```
