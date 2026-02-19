@@ -175,8 +175,8 @@ fun Footer(
                         modifier = Modifier
                             .fillMaxWidth(),
                         text = text,
-                        setText = component::setFilterText,
-                        placeHolder = myStringResource(Res.string.search),
+                        onTextChange = component::setFilterText,
+                        placeholder = myStringResource(Res.string.search),
                         end = {
                             MyTextFieldIcon(
                                 MyIcons.clear,

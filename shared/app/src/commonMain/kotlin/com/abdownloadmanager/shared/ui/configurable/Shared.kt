@@ -141,7 +141,7 @@ fun <T> RenderSpinner(
                             .padding(vertical = borderWidth)
                             .width(borderWidth).background(myColors.onBackground / 10)
                     )
-                    MyIcon(MyIcons.down, null, Modifier.padding(4.dp).size(12.dp))
+                    MyIcon(MyIcons.down, null, Modifier.padding(4.dp).size(mySpacings.iconSize))
                 }
             }
         }
@@ -245,7 +245,7 @@ fun <T> RenderSpinner(
                                             Modifier.width(borderWidth)
                                         )
                                         if (selected) {
-                                            MyIcon(MyIcons.check, null, Modifier.padding(4.dp).size(12.dp))
+                                            MyIcon(MyIcons.check, null, Modifier.padding(4.dp).size(mySpacings.iconSize))
                                         }
                                     }
                                 }

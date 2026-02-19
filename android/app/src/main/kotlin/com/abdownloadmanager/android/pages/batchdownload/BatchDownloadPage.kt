@@ -2,8 +2,6 @@ package com.abdownloadmanager.android.pages.batchdownload
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
@@ -12,9 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.android.ui.SheetHeader
 import com.abdownloadmanager.android.ui.SheetTitle
@@ -22,8 +17,6 @@ import com.abdownloadmanager.android.ui.SheetUI
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.ifThen
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
@@ -35,11 +28,8 @@ import com.abdownloadmanager.shared.util.ResponsiveDialogScope
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.VerticalScrollableContent
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 
@@ -109,7 +99,7 @@ private fun ResponsiveDialogScope.BatchDownloadPage(
                             Text(myStringResource(Res.string.batch_download_link_help))
                         },
                         content = {
-                            BatchDownloadPageTextField(
+                            MyTextFieldWithIcons(
                                 text = link,
                                 onTextChange = setLink,
                                 placeholder = "https://example.com/photo-*.png",
@@ -120,7 +110,7 @@ private fun ResponsiveDialogScope.BatchDownloadPage(
                                     MyTextFieldIcon(MyIcons.link)
                                 },
                                 end = {
-                                    MyTextFieldIcon(MyIcons.paste, {
+                                    MyTextFieldIcon(MyIcons.paste, onClick = {
                                         val v = ClipboardUtil.read()
                                         if (v != null) {
                                             setLink(v)
@@ -154,7 +144,7 @@ private fun ResponsiveDialogScope.BatchDownloadPage(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                BatchDownloadPageTextField(
+                                MyTextFieldWithIcons(
                                     text = start,
                                     onTextChange = setStart,
                                     placeholder = "",
@@ -170,7 +160,7 @@ private fun ResponsiveDialogScope.BatchDownloadPage(
                                 Text("...")
                                 Spacer(Modifier.width(8.dp))
 
-                                BatchDownloadPageTextField(
+                                MyTextFieldWithIcons(
                                     text = end,
                                     onTextChange = setEnd,
                                     placeholder = "",
@@ -294,7 +284,7 @@ private fun WildcardLengthUi(
     onChangeWildcardLength: (WildcardLength) -> Unit,
 ) {
     var customLength by remember {
-        mutableStateOf(2)
+        mutableIntStateOf(2)
     }
     FlowRow(
         itemVerticalAlignment = Alignment.CenterVertically
@@ -345,77 +335,4 @@ private fun LabeledContent(
         Spacer(Modifier.height(8.dp))
         content()
     }
-}
-
-
-@Composable
-private fun BatchDownloadPageTextField(
-    text: String,
-    onTextChange: (String) -> Unit,
-    placeholder: String,
-    modifier: Modifier,
-    errorText: String? = null,
-    start: @Composable() (() -> Unit)? = null,
-    end: @Composable() (() -> Unit)? = null,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-    val dividerModifier = Modifier
-        .fillMaxHeight()
-        .padding(vertical = 1.dp)
-        //to not conflict with text-field border
-        .width(1.dp)
-        .background(if (isFocused) myColors.onBackground / 10 else Color.Transparent)
-    Column(modifier) {
-        MyTextField(
-            text,
-            onTextChange,
-            placeholder,
-            modifier = Modifier.fillMaxWidth(),
-            background = myColors.surface / 50,
-            interactionSource = interactionSource,
-            shape = myShapes.defaultRounded,
-            start = start?.let {
-                {
-                    WithContentAlpha(0.5f) {
-                        it()
-                    }
-                    Spacer(dividerModifier)
-                }
-            },
-            end = end?.let {
-                {
-                    Spacer(dividerModifier)
-                    it()
-                }
-            }
-        )
-        AnimatedVisibility(errorText != null) {
-            if (errorText != null) {
-                Text(
-                    errorText,
-                    Modifier.padding(bottom = 4.dp, start = 4.dp),
-                    fontSize = myTextSizes.sm,
-                    color = myColors.error,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun MyTextFieldIcon(
-    icon: IconSource,
-    onClick: (() -> Unit)? = null,
-) {
-    MyIcon(
-        icon, null, Modifier
-            .fillMaxHeight()
-            .ifThen(onClick != null) {
-                pointerHoverIcon(PointerIcon.Default)
-                    .clickable { onClick?.invoke() }
-            }
-            .wrapContentHeight()
-            .padding(horizontal = 8.dp)
-            .size(16.dp))
 }

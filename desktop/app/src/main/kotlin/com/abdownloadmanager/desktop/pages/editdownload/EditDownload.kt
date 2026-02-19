@@ -11,8 +11,6 @@ import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -479,7 +477,7 @@ private fun UrlTextField(
     errorText: String? = null,
     modifier: Modifier = Modifier,
 ) {
-    AddDownloadPageTextField(
+    MyTextFieldWithIcons(
         text,
         setText,
         myStringResource(Res.string.download_link),
@@ -505,67 +503,12 @@ private fun NameTextField(
     setText: (String) -> Unit,
     errorText: String? = null,
 ) {
-    AddDownloadPageTextField(
+    MyTextFieldWithIcons(
         text,
         setText,
         myStringResource(Res.string.name),
         modifier = Modifier.fillMaxWidth(),
         errorText = errorText,
     )
-}
-
-@Composable
-private fun AddDownloadPageTextField(
-    text: String,
-    setText: (String) -> Unit,
-    placeHolder: String,
-    modifier: Modifier,
-    errorText: String? = null,
-    start: @Composable (() -> Unit)? = null,
-    end: @Composable (() -> Unit)? = null,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-    val dividerModifier = Modifier
-        .fillMaxHeight()
-        .padding(vertical = 1.dp)
-        //to not conflict with text-field border
-        .width(1.dp)
-        .background(if (isFocused) myColors.onBackground / 10 else Color.Transparent)
-    Column(modifier) {
-        MyTextField(
-            text,
-            setText,
-            placeHolder,
-            modifier = Modifier.fillMaxWidth(),
-            background = myColors.surface / 50,
-            interactionSource = interactionSource,
-            shape = myShapes.defaultRounded,
-            start = start?.let {
-                {
-                    WithContentAlpha(0.5f) {
-                        it()
-                    }
-                    Spacer(dividerModifier)
-                }
-            },
-            end = end?.let {
-                {
-                    Spacer(dividerModifier)
-                    it()
-                }
-            }
-        )
-        AnimatedVisibility(errorText != null) {
-            if (errorText != null) {
-                Text(
-                    errorText,
-                    Modifier.padding(bottom = 4.dp, start = 4.dp),
-                    fontSize = myTextSizes.sm,
-                    color = myColors.error,
-                )
-            }
-        }
-    }
 }
 
