@@ -21,16 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +52,8 @@ import com.abdownloadmanager.shared.ui.widget.rememberMyPopupPositionProviderAtP
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.asStringSource
+import sh.calvin.reorderable.ReorderableColumn
+import sh.calvin.reorderable.ReorderableListItemScope
 
 @Composable
 fun Categories(
@@ -102,6 +102,9 @@ fun Categories(
                 },
                 onRequestOpenOptionMenu = { category, offset ->
                     showCategoryOption(category, offset)
+                },
+                onCategoryReorderRequest = { index, delta ->
+                    component.reorderCategory(index, delta)
                 }
             )
         }
@@ -156,18 +159,20 @@ private fun ShowOptionsInPopupWithOffset(
 
 
 @Composable
-private fun CategoryFilterItem(
+private fun ReorderableListItemScope.CategoryFilterItem(
     modifier: Modifier,
     category: Category,
     isSelected: Boolean,
     onItemsDropped: (ids: List<Long>) -> Unit,
     onClick: () -> Unit,
+    isDragging: Boolean,
     onRequestOpenOptionMenu: (Category?, Offset) -> Unit,
 ) {
 //    var isDraggingOnMe by remember { mutableStateOf(false) }
     var layoutCoordinates by remember {
         mutableStateOf<LayoutCoordinates?>(null)
     }
+    val shouldShowDrag = isSelected || isDragging
     Box(
         modifier
 //            .dropDownloadItemsHere(
@@ -229,7 +234,7 @@ private fun CategoryFilterItem(
                 MyIcon(
                     iconPainter ?: MyIcons.folder,
                     null,
-                    Modifier.size(16.dp),
+                    Modifier.size(mySpacings.iconSize),
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
@@ -240,6 +245,16 @@ private fun CategoryFilterItem(
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     fontSize = myTextSizes.base
                 )
+                AnimatedVisibility(shouldShowDrag) {
+                    MyIcon(
+                        MyIcons.grip,
+                        null,
+                        Modifier
+                            .draggableHandle()
+                            .size(mySpacings.iconSize)
+                            .alpha(if (isDragging) 1f else 0.5f),
+                    )
+                }
             }
         }
         AnimatedVisibility(
@@ -274,6 +289,7 @@ fun StatusFilterItem(
     currentStatusCategoryFilter: DownloadStatusCategoryFilter?,
     statusFilter: DownloadStatusCategoryFilter,
     categories: List<Category>,
+    onCategoryReorderRequest: (index: Int, delta: Int) -> Unit,
     onItemsDroppedInCategory: (category: Category, downloadIds: List<Long>) -> Unit,
     onFilterChange: (
         typeFilter: Category?,
@@ -327,7 +343,7 @@ fun StatusFilterItem(
                         MyIcon(
                             statusFilter.icon,
                             null,
-                            Modifier.size(16.dp)
+                            Modifier.size(mySpacings.iconSize)
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
@@ -376,9 +392,14 @@ fun StatusFilterItem(
             }
         },
         body = {
-            Column(Modifier) {
-                categories.forEach { category ->
-                    key(category.id) {
+            ReorderableColumn(
+                list = categories,
+                onSettle = { from, to ->
+                    onCategoryReorderRequest(from, to - from)
+                },
+            ) { index, category, isDragging ->
+                key(category.id) {
+                    ReorderableItem {
                         CategoryFilterItem(
                             modifier = Modifier,
                             category = category,
@@ -390,9 +411,10 @@ fun StatusFilterItem(
                                 onFilterChange(category)
                             },
                             onRequestOpenOptionMenu = onRequestOpenOptionMenu,
+                            isDragging = isDragging,
                         )
-                        Spacer(Modifier.height(2.dp))
                     }
+                    Spacer(Modifier.height(2.dp))
                 }
             }
         }

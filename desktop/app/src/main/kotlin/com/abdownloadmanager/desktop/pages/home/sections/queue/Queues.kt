@@ -60,6 +60,7 @@ import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.downloader.db.QueueModel
@@ -124,7 +125,7 @@ internal fun QueuesSection(
                             MyIcon(
                                 MyIcons.queue,
                                 null,
-                                Modifier.size(16.dp)
+                                Modifier.size(mySpacings.iconSize)
                             )
                             Spacer(Modifier.width(4.dp))
                             Text(
@@ -259,7 +260,7 @@ private fun QueueFilterItem(
                 MyIcon(
                     MyIcons.folder,
                     null,
-                    Modifier.size(16.dp)
+                    Modifier.size(mySpacings.iconSize)
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
