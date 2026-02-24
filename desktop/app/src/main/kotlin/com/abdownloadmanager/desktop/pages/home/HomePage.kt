@@ -764,6 +764,9 @@ private fun Categories(
                 },
                 onRequestOpenOptionMenu = {
                     showCategoryOption(it)
+                },
+                onCategoryReorderRequest = {fromIndex, delta ->
+                    component.reorderCategory(fromIndex, delta)
                 }
             )
         }

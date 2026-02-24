@@ -15,6 +15,9 @@ import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.ui.widget.ExpandableItem
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.selection.selectable
@@ -29,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
@@ -44,19 +48,26 @@ import com.abdownloadmanager.shared.pages.home.category.DownloadStatusCategoryFi
 import com.abdownloadmanager.shared.ui.widget.DelayedTooltipPopup
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.rememberIconPainter
+import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
+import sh.calvin.reorderable.ReorderableColumn
+import sh.calvin.reorderable.ReorderableListItemScope
 
 
 @Composable
-private fun CategoryFilterItem(
+private fun ReorderableListItemScope.CategoryFilterItem(
     modifier: Modifier,
     category: Category,
     isSelected: Boolean,
     onItemsDropped: (ids: List<Long>) -> Unit,
     onClick: () -> Unit,
+    isDragging: Boolean,
 ) {
     var isDraggingOnMe by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val shouldShowDragIcon = isHovered && !isDraggingOnMe || isDragging
     Box(
         modifier
             .dropDownloadItemsHere(
@@ -64,6 +75,7 @@ private fun CategoryFilterItem(
                 onDragDone = { isDraggingOnMe = false },
                 onItemsDropped = onItemsDropped,
             )
+            .hoverable(interactionSource)
             .background(
                 if (isSelected) {
                     myColors.onBackground / 0.05f
@@ -114,6 +126,24 @@ private fun CategoryFilterItem(
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     fontSize = myTextSizes.base
                 )
+                AnimatedVisibility(
+                    visible = shouldShowDragIcon,
+                ) {
+                    MyIcon(
+                        MyIcons.grip,
+                        null,
+                        Modifier
+                            .draggableHandle()
+                            .size(16.dp)
+                            .alpha(
+                                if (isDragging) {
+                                    1f
+                                } else {
+                                    0.5f
+                                }
+                            )
+                    )
+                }
             }
         }
         AnimatedVisibility(
@@ -148,6 +178,7 @@ fun StatusFilterItem(
     currentStatusCategoryFilter: DownloadStatusCategoryFilter?,
     statusFilter: DownloadStatusCategoryFilter,
     categories: List<Category>,
+    onCategoryReorderRequest: (index: Int, delta: Int) -> Unit,
     onItemsDroppedInCategory: (category: Category, downloadIds: List<Long>) -> Unit,
     onFilterChange: (
         typeFilter: Category?,
@@ -193,7 +224,7 @@ fun StatusFilterItem(
                         MyIcon(
                             statusFilter.icon,
                             null,
-                            Modifier.size(16.dp)
+                            Modifier.size(mySpacings.iconSize)
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
@@ -241,9 +272,14 @@ fun StatusFilterItem(
             }
         },
         body = {
-            Column(Modifier) {
-                categories.forEach { category ->
-                    key(category.id) {
+            ReorderableColumn(
+                list = categories,
+                onSettle = { from, to ->
+                    onCategoryReorderRequest(from, to - from)
+                },
+            ) { index, category, isDragging ->
+                key(category.id) {
+                    ReorderableItem {
                         CategoryFilterItem(
                             modifier = Modifier
                                 .onClick(
@@ -258,10 +294,11 @@ fun StatusFilterItem(
                             },
                             onClick = {
                                 onFilterChange(category)
-                            }
+                            },
+                            isDragging = isDragging,
                         )
-                        Spacer(Modifier.height(2.dp))
                     }
+                    Spacer(Modifier.height(2.dp))
                 }
             }
         }

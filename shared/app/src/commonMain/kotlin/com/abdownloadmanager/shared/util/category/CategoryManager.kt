@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.util.category
 
-import ir.amirab.util.guardedEntry
+import ir.amirab.util.ifThen
+import ir.amirab.util.shifted
 import ir.amirab.util.suspendGuardedEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -231,6 +232,17 @@ class CategoryManager(
                         path = currentDownloadFolder.resolve(relativePath).absolutePath
                     )
                 }
+            }
+        }
+    }
+
+    fun reorderCategory(
+        index: Int,
+        delta: Int,
+    ) {
+        _categories.update { categories ->
+            categories.ifThen(index in categories.indices && (index + delta) in categories.indices) {
+                shifted(index, delta)
             }
         }
     }

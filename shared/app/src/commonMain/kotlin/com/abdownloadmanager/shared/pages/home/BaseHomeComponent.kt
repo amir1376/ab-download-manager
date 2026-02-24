@@ -147,6 +147,12 @@ abstract class BaseHomeComponent(
         }
     }
 
+    fun reorderCategory(index: Int, delta: Int) {
+        scope.launch {
+            categoryManager.reorderCategory(index, delta)
+        }
+    }
+
     fun moveItemsToQueue(queue: DownloadQueue, items: List<Long>) {
         scope.launch {
             queueManager.addToQueue(queue.id, items)
