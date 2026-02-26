@@ -410,7 +410,7 @@ class HomeComponent(
         "$metaKey V" to newDownloadFromClipboardAction
         "$metaKey C" to downloadActions.copyDownloadLinkAction
         "$metaKey alt S" to gotoSettingsAction
-        "$metaKey W" to requestExitAction
+        "$metaKey Q" to requestExitAction
         "$metaKey O" to downloadActions.openFileAction
         "$metaKey F" to downloadActions.openFolderAction
         "$metaKey E" to downloadActions.editDownloadAction
