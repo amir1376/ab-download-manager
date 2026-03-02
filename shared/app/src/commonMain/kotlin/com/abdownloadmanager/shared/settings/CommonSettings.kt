@@ -590,6 +590,22 @@ object CommonSettings {
         )
     }
 
+    fun quickDownloadEnabled(appRepository: BaseAppRepository): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = "Quick Download".asStringSource(),
+            description = "Start downloads instantly in a temporary folder with a compact confirmation dialogue.".asStringSource(),
+            backedBy = appRepository.quickDownloadEnabled,
+            renderMode = BooleanConfigurable.RenderMode.Switch,
+            describe = {
+                if (it) {
+                    Res.string.enabled.asStringSource()
+                } else {
+                    Res.string.disabled.asStringSource()
+                }
+            }
+        )
+    }
+
     fun browserIntegrationEnabled(appRepository: BaseAppRepository): BooleanConfigurable {
         return BooleanConfigurable(
             title = Res.string.settings_browser_integration.asStringSource(),
