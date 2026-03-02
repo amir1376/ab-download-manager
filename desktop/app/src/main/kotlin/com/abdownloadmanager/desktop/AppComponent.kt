@@ -19,6 +19,7 @@ import com.abdownloadmanager.desktop.pages.perhostsettings.DesktopPerHostSetting
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.DesktopSettingsComponent
 import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
+import com.abdownloadmanager.desktop.pages.quickdownload.QuickDownloadComponent
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.DesktopSingleDownloadComponent
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
@@ -287,6 +288,60 @@ class AppComponent(
 
     override fun closeEditDownloadDialog() {
         editDownload.dismiss()
+    }
+
+    // --- Quick Download Dialog ---
+
+    data class QuickDownloadConfig(
+        val downloadId: Long,
+        val url: String,
+        val name: String,
+        val folder: String,
+    )
+
+    private val quickDownloadNavigation = SlotNavigation<QuickDownloadConfig>()
+    val quickDownloadSlot = childSlot(
+        quickDownloadNavigation,
+        serializer = null,
+        key = "quickDownload",
+        childFactory = { config: QuickDownloadConfig, componentContext: ComponentContext ->
+            QuickDownloadComponent(
+                ctx = componentContext,
+                downloadSystem = downloadSystem,
+                downloadId = config.downloadId,
+                initialUrl = config.url,
+                initialName = config.name,
+                initialFolder = config.folder,
+                onFinish = ::closeQuickDownloadDialog,
+            )
+        }
+    ).subscribeAsStateFlow()
+
+    fun openQuickDownloadDialog(
+        downloadId: Long,
+        url: String,
+        name: String,
+        folder: String,
+    ) {
+        scope.launch {
+            val currentComponent = quickDownloadSlot.value.child?.instance
+            if (currentComponent != null && currentComponent.downloadId == downloadId) {
+                currentComponent.bringToFront()
+            } else {
+                quickDownloadNavigation.activate(
+                    QuickDownloadConfig(
+                        downloadId = downloadId,
+                        url = url,
+                        name = name,
+                        folder = folder,
+                    )
+                )
+            }
+        }
+    }
+
+    fun closeQuickDownloadDialog() {
+        quickDownloadNavigation.dismiss()
     }
 
     override fun openSettings() {

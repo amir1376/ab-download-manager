@@ -117,6 +117,25 @@ class Integration(
                 }
                 MyResponse.Text("OK")
             }
+            post("/quick-download") {
+                runBlocking {
+                    val itemsToAdd = kotlin.runCatching {
+                        val message = it.getBody().orEmpty()
+                        AddDownloadsFromIntegration.createFromRequest(
+                            json = json,
+                            jsonData = message
+                        )
+                    }
+                    itemsToAdd.onFailure { it.printStackTrace() }
+                    itemsToAdd.getOrThrow().let { newImportRequest ->
+                        integrationHandler.quickDownload(
+                            newImportRequest.items,
+                            newImportRequest.options,
+                        )
+                    }
+                }
+                MyResponse.Text("OK")
+            }
             post("/ping") {
                 MyResponse.Text("pong")
             }

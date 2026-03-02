@@ -36,6 +36,7 @@ interface IAppSettingsModel {
     val ignoreSSLCertificates: Boolean
     val useCategoryByDefault: Boolean
     val userAgent: String
+    val quickDownloadEnabled: Boolean
 }
 
 
@@ -73,4 +74,5 @@ interface BaseAppSettingsStorage :
     val ignoreSSLCertificates: MutableStateFlow<Boolean>
     val useCategoryByDefault: MutableStateFlow<Boolean>
     val userAgent: MutableStateFlow<String>
+    val quickDownloadEnabled: MutableStateFlow<Boolean>
 }

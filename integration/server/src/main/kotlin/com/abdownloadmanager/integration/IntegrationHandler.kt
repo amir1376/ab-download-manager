@@ -7,4 +7,8 @@ interface IntegrationHandler{
     )
     fun listQueues(): List<ApiQueueModel>
     suspend fun addDownloadTask(task: NewDownloadTask)
+    suspend fun quickDownload(
+        list: List<IDownloadCredentialsFromIntegration>,
+        options: AddDownloadOptionsFromIntegration,
+    )
 }

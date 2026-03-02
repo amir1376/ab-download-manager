@@ -11,10 +11,14 @@ import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.db.IDownloadListDb
 import ir.amirab.downloader.downloaditem.*
+import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.StoppedBy
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.downloader.downloaditem.DownloadStatus
+import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
+import ir.amirab.util.HttpUrlUtils
+import ir.amirab.util.tryAtomicMove
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
@@ -320,5 +324,82 @@ class DownloadSystem(
     suspend fun deleteQueue(queueId: Long) {
         queueManager.deleteQueue(queueId)
         extraQueueSettingsStorage.deleteExtraQueueSettings(queueId)
+    }
+
+    suspend fun quickDownload(
+        link: String,
+        suggestedName: String?,
+        headers: Map<String, String>?,
+        tempFolder: String,
+    ): Long {
+        File(tempFolder).mkdirs()
+        val name = suggestedName ?: HttpUrlUtils.extractNameFromLink(link) ?: "download"
+        val downloadItem = HttpDownloadItem(
+            link = link,
+            headers = headers,
+            id = -1,
+            folder = tempFolder,
+            name = name,
+        )
+        val id = addDownload(
+            newDownload = NewDownloadItemProps(
+                downloadItem = downloadItem,
+                extraConfig = null,
+                onDuplicateStrategy = OnDuplicateStrategy.AddNumbered,
+                context = EmptyContext,
+            ),
+            queueId = null,
+            categoryId = null,
+        )
+        manualResume(id, ResumedBy(User))
+        return id
+    }
+
+    suspend fun finalizeQuickDownload(
+        downloadId: Long,
+        finalName: String,
+        finalFolder: String,
+        queueId: Long?,
+        categoryId: Long?,
+    ) {
+        val downloadItem = getDownloadItemById(downloadId) ?: return
+        val isCompleted = downloadItem.status == DownloadStatus.Completed
+
+        if (isCompleted) {
+            val currentFile = getDownloadFile(downloadItem)
+            val finalFile = File(finalFolder, finalName)
+            if (currentFile.exists()) {
+                finalFile.parentFile?.mkdirs()
+                currentFile.tryAtomicMove(finalFile)
+            }
+            editDownload(downloadId, {
+                it.name = finalName
+                it.folder = finalFolder
+            }, null)
+        } else {
+            // Download is still in progress — update the record so the engine
+            // writes to the new location after resume. Clean up old temp partial file.
+            val oldTempFile = File(downloadItem.folder, downloadItem.name)
+            File(finalFolder).mkdirs()
+            editDownload(downloadId, {
+                it.name = finalName
+                it.folder = finalFolder
+            }, null)
+            if (oldTempFile.exists()) {
+                oldTempFile.delete()
+            }
+        }
+
+        queueId?.let {
+            queueManager.addToQueue(it, downloadId)
+        }
+        categoryId?.let {
+            categoryManager.addItemsToCategory(it, listOf(downloadId))
+        }
+    }
+
+    suspend fun cancelQuickDownload(downloadId: Long) {
+        manualPause(downloadId)
+        removeDownload(downloadId, true, RemovedBy(User))
     }
 }

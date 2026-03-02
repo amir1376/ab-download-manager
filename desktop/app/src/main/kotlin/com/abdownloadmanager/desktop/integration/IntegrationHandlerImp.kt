@@ -35,6 +35,11 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
         list: List<IDownloadCredentialsFromIntegration>,
         options: AddDownloadOptionsFromIntegration,
     ) {
+        // If Quick Download is enabled, route through the quick download flow
+        if (appSettings.quickDownloadEnabled.value) {
+            quickDownload(list, options)
+            return
+        }
         appComponent.externalCredentialComingIntoApp(
             list.map {
                 convertToDownloadSystemCredentials(it)
@@ -55,6 +60,35 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
             ApiQueueModel(id = queueModel.id, name = queueModel.name)
         }
     }
+    override suspend fun quickDownload(
+        list: List<IDownloadCredentialsFromIntegration>,
+        options: AddDownloadOptionsFromIntegration,
+    ) {
+        val item = list.firstOrNull() ?: return
+        val defaultFolder = appSettings.saveLocation.value
+        val tempFolder = System.getProperty("java.io.tmpdir") + "/ab-download-manager-temp"
+        val suggestedName = item.suggestedName
+        val headers = when (item) {
+            is HttpDownloadCredentialsFromIntegration -> item.headers
+            is HLSDownloadCredentialsFromIntegration -> item.headers
+        }
+        val downloadId = downloadSystem.quickDownload(
+            link = item.link,
+            suggestedName = suggestedName,
+            headers = headers,
+            tempFolder = tempFolder,
+        )
+        // Get the actual name assigned by DownloadSystem (may have been extracted from URL)
+        val downloadItem = downloadSystem.getDownloadItemById(downloadId)
+        val actualName = downloadItem?.name ?: suggestedName ?: "download"
+        appComponent.openQuickDownloadDialog(
+            downloadId = downloadId,
+            url = item.link,
+            name = actualName,
+            folder = defaultFolder,
+        )
+    }
+
     override suspend fun addDownloadTask(task: NewDownloadTask) {
         val addDownloaderInUiProps = convertToDownloadSystemCredentials(task.downloadSource)
         val downloaderInUi = downloaderInUiRegistry.getDownloaderOf(

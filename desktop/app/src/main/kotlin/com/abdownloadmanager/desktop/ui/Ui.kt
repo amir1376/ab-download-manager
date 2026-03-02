@@ -27,6 +27,7 @@ import com.abdownloadmanager.desktop.pages.checksum.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
 import com.abdownloadmanager.desktop.pages.perhostsettings.PerHostSettingsWindow
+import com.abdownloadmanager.desktop.pages.quickdownload.ShowQuickDownloadDialog
 import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
 import com.abdownloadmanager.desktop.pages.settings.FontManager
 import com.abdownloadmanager.desktop.pages.settings.SettingWindow
@@ -133,6 +134,15 @@ object Ui : KoinComponent {
                 }
                 EnterNewDownloadWindow(appComponent)
                 ShowAddDownloadDialogs(appComponent)
+                // Quick Download Dialog
+                val quickDownloadSlot =
+                    appComponent.quickDownloadSlot.collectAsState().value
+                quickDownloadSlot.child?.instance?.let { quickComponent ->
+                    ShowQuickDownloadDialog(
+                        component = quickComponent,
+                        onRequestClose = appComponent::closeQuickDownloadDialog,
+                    )
+                }
                 ShowDownloadDialogs(appComponent)
                 ShowCategoryDialogs(appComponent)
                 FileChecksumWindow(appComponent)
@@ -223,9 +233,37 @@ private fun ApplicationScope.SystemTray(
     val useSystemTray by component.useSystemTray.collectAsState()
     if (useSystemTray) {
         LaunchedEffect(Unit) { PlatformDockToggler.hide() }
+        val trayScope = rememberCoroutineScope()
         val menu = remember {
             buildMenu {
                 +showDownloadList
+                item(
+                    title = "Quick Download from Clipboard".asStringSource(),
+                    icon = MyIcons.paste,
+                    onClick = {
+                        trayScope.launch {
+                            val clipText = com.abdownloadmanager.shared.util.ClipboardUtil.read()
+                            if (!clipText.isNullOrBlank() &&
+                                com.abdownloadmanager.desktop.clipboard.ClipboardMonitor.isValidUrl(clipText)
+                            ) {
+                                val tempFolder = System.getProperty("java.io.tmpdir") + "/ab-download-manager-temp"
+                                val downloadId = component.downloadSystem.quickDownload(
+                                    link = clipText.trim(),
+                                    suggestedName = null,
+                                    headers = null,
+                                    tempFolder = tempFolder,
+                                )
+                                val downloadItem = component.downloadSystem.getDownloadItemById(downloadId)
+                                component.openQuickDownloadDialog(
+                                    downloadId = downloadId,
+                                    url = clipText.trim(),
+                                    name = downloadItem?.name ?: "download",
+                                    folder = component.appRepository.saveLocation.value,
+                                )
+                            }
+                        }
+                    }
+                )
                 +gotoSettingsAction
                 +requestExitAction
             }
