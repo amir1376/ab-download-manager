@@ -326,7 +326,7 @@ class AppComponent(
         scope.launch {
             val currentComponent = quickDownloadSlot.value.child?.instance
             if (currentComponent != null && currentComponent.downloadId == downloadId) {
-                currentComponent.bringToFront()
+                return@launch // dialog already open for this download
             } else {
                 quickDownloadNavigation.activate(
                     QuickDownloadConfig(
