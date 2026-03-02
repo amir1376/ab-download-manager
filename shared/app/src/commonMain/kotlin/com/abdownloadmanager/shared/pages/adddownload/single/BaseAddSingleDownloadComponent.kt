@@ -62,6 +62,7 @@ abstract class BaseAddSingleDownloadComponent(
     downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *, *>,
     initialCredentials: AddDownloadCredentialsInUiProps,
 ) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage),
+    ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects() {
     private val _shouldShowWindow = MutableStateFlow(importOptions.silentImport == null)
     override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
     val backgroundDownloadId = MutableStateFlow<Long?>(null)

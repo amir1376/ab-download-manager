@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.util
 
+import com.abdownloadmanager.shared.storage.IExtraDownloadItemSettings
 import com.abdownloadmanager.shared.storage.IExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.util.category.CategoryItemWithId
@@ -7,6 +8,7 @@ import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.CategorySelectionMode
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionRunner
 import com.abdownloadmanager.shared.util.onqueuecompletion.OnQueueEventActionRunner
+import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.db.IDownloadListDb
@@ -28,6 +30,9 @@ import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
@@ -65,8 +70,8 @@ class DownloadSystem(
         onQueueEventActionRunner.startListening()
 
         downloadEvents
-            .kotlinx.coroutines.flow.filterIsInstance<ir.amirab.downloader.DownloadManagerEvents.OnJobCompleted>()
-            .kotlinx.coroutines.flow.onEach { event ->
+            .filterIsInstance<ir.amirab.downloader.DownloadManagerEvents.OnJobCompleted>()
+            .onEach { event ->
                 val id = event.downloadItem.id
                 val settings = extraDownloadSettingsStorage.getExtraDownloadItemSettings(id)
                 val finalFolder = settings.finalDestinationFolder
@@ -94,7 +99,7 @@ class DownloadSystem(
                     storage.setExtraDownloadItemSettings(clearedSettings)
                 }
             }
-            .kotlinx.coroutines.flow.launchIn(scope)
+            .launchIn(scope)
 
         booted.update { true }
     }
@@ -395,8 +400,8 @@ class DownloadSystem(
         queueId: Long?,
         categoryId: Long?,
     ) {
-        val downloadItem = downloadManager.getDownloadItem(downloadId)
-        val isCompleted = downloadItem?.status == ir.amirab.downloader.downloaditem.DownloadStatus.Completed
+        val downloadItem = getDownloadItemById(downloadId)
+        val isCompleted = downloadItem?.status == DownloadStatus.Completed
         
         if (downloadItem != null && isCompleted) {
             val currentFile = getDownloadFile(downloadItem)

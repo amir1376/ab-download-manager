@@ -611,6 +611,12 @@ object CommonSettings {
             title = "Quick Download Temp Folder".asStringSource(),
             description = "The temporary location where quick downloads are stored while downloading.".asStringSource(),
             backedBy = appRepository.quickDownloadTempFolder,
+            validate = {
+                FileUtils.Companion.canWriteInThisFolder(it)
+            },
+            describe = {
+                it.asStringSource()
+            }
         )
     }
 
