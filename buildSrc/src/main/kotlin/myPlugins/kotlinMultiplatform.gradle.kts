@@ -22,7 +22,7 @@ fun getFeatures(): Set<String> = setOf(
 
 kotlin {
     compilerOptions {
-        val optIns = getOptIns().map { "-Xopt-in=$it" }
+        val optIns = getOptIns().map { "-opt-in=$it" }
         val features = getFeatures().map { "-X$it" }
         freeCompilerArgs.set(optIns + features)
     }

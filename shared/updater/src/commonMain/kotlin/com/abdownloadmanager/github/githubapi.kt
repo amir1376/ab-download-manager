@@ -45,7 +45,7 @@ class GithubApi(
                 error(response.message)
             }
             val release = json.decodeFromString<Release>(
-                response.body!!.string()
+                response.body.string()
             )
             return release
         }
