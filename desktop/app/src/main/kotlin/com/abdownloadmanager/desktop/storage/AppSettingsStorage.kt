@@ -57,7 +57,7 @@ data class AppSettingsModel(
     override val ignoreSSLCertificates: Boolean = false,
     override val useCategoryByDefault: Boolean = true,
     override val userAgent: String = "",
-    override val quickDownloadEnabled: Boolean = false,
+    override val quickDownloadEnabled: Boolean = true,
 ) : IAppSettingsModel {
     companion object {
         val default: AppSettingsModel get() = AppSettingsModel()
