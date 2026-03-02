@@ -47,7 +47,7 @@ class QuickDownloadComponent(
         scope.launch {
             _isFinalizing.value = true
             try {
-                downloadSystem.finalizeQuickDownload(
+                downloadSystem.setFinalDestination<com.abdownloadmanager.shared.storage.IExtraDownloadItemSettings>(
                     downloadId = downloadId,
                     finalName = fileName.value,
                     finalFolder = saveFolder.value,

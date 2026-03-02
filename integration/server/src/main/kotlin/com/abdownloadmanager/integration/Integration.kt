@@ -128,7 +128,7 @@ class Integration(
                     }
                     itemsToAdd.onFailure { it.printStackTrace() }
                     itemsToAdd.getOrThrow().let { newImportRequest ->
-                        integrationHandler.quickDownload(
+                        integrationHandler.addDownload(
                             newImportRequest.items,
                             newImportRequest.options,
                         )
