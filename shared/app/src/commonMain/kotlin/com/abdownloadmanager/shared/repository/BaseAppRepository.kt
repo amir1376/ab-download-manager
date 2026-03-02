@@ -47,6 +47,7 @@ open class BaseAppRepository(
     val integrationPort = appSettings.browserIntegrationPort
     val trackDeletedFilesOnDisk = appSettings.trackDeletedFilesOnDisk
     val quickDownloadEnabled = appSettings.quickDownloadEnabled
+    val quickDownloadTempFolder = appSettings.quickDownloadTempFolder
 
     override val sizeUnit = appSettings.sizeUnit.mapStateFlow {
         it.toConfig()

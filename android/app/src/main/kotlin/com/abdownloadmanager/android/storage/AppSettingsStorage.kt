@@ -52,6 +52,7 @@ data class AppSettingsModel(
     override val useCategoryByDefault: Boolean = true,
     override val userAgent: String = "",
     override val quickDownloadEnabled: Boolean = false,
+    override val quickDownloadTempFolder: String = "/storage/emulated/0/Download/ABDM/Temp",
     val browserIconInLauncher: Boolean = false,
 ) : IAppSettingsModel {
     companion object {
@@ -95,6 +96,7 @@ data class AppSettingsModel(
             val useCategoryByDefault = booleanKeyOf("useCategoryByDefault")
             val userAgent = stringKeyOf("userAgent")
             val quickDownloadEnabled = booleanKeyOf("quickDownloadEnabled")
+            val quickDownloadTempFolder = stringKeyOf("quickDownloadTempFolder")
             val browserIconInLauncher = booleanKeyOf("browserIconInLauncher")
         }
 
@@ -141,6 +143,7 @@ data class AppSettingsModel(
                 useCategoryByDefault = source.get(Keys.useCategoryByDefault) ?: default.useCategoryByDefault,
                 userAgent = source.get(Keys.userAgent) ?: default.userAgent,
                 quickDownloadEnabled = source.get(Keys.quickDownloadEnabled) ?: default.quickDownloadEnabled,
+                quickDownloadTempFolder = source.get(Keys.quickDownloadTempFolder) ?: default.quickDownloadTempFolder,
                 browserIconInLauncher = source.get(Keys.browserIconInLauncher) ?: default.browserIconInLauncher,
             )
         }
@@ -179,6 +182,7 @@ data class AppSettingsModel(
                 put(Keys.useCategoryByDefault, focus.useCategoryByDefault)
                 put(Keys.userAgent, focus.userAgent)
                 put(Keys.quickDownloadEnabled, focus.quickDownloadEnabled)
+                put(Keys.quickDownloadTempFolder, focus.quickDownloadTempFolder)
                 put(Keys.browserIconInLauncher, focus.browserIconInLauncher)
             }
         }
@@ -253,6 +257,7 @@ class AppSettingsStorage(
     override val useCategoryByDefault = from(AppSettingsModel.useCategoryByDefault)
     override val userAgent = from(AppSettingsModel.userAgent)
     override val quickDownloadEnabled = from(AppSettingsModel.quickDownloadEnabled)
+    override val quickDownloadTempFolder = from(AppSettingsModel.quickDownloadTempFolder)
 
     val browserIconInLauncher = from(AppSettingsModel.browserIconInLauncher)
 }

@@ -606,6 +606,14 @@ object CommonSettings {
         )
     }
 
+    fun quickDownloadTempFolder(appRepository: BaseAppRepository): FolderConfigurable {
+        return FolderConfigurable(
+            title = "Quick Download Temp Folder".asStringSource(),
+            description = "The temporary location where quick downloads are stored while downloading.".asStringSource(),
+            backedBy = appRepository.quickDownloadTempFolder,
+        )
+    }
+
     fun browserIntegrationEnabled(appRepository: BaseAppRepository): BooleanConfigurable {
         return BooleanConfigurable(
             title = Res.string.settings_browser_integration.asStringSource(),

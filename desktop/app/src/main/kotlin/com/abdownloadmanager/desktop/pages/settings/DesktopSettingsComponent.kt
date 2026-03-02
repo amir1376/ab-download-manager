@@ -119,6 +119,7 @@ class DesktopSettingsComponent(
                         nestedConfigurable = listOf(
                             CommonSettings.browserIntegrationEnabled(appRepository),
                             CommonSettings.quickDownloadEnabled(appRepository),
+                            CommonSettings.quickDownloadTempFolder(appRepository),
                             CommonSettings.browserIntegrationPort(appRepository)
                         )
                     )

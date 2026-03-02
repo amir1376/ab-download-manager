@@ -58,6 +58,7 @@ data class AppSettingsModel(
     override val useCategoryByDefault: Boolean = true,
     override val userAgent: String = "",
     override val quickDownloadEnabled: Boolean = true,
+    override val quickDownloadTempFolder: String = System.getProperty("java.io.tmpdir") + "/ab-download-manager-temp",
 ) : IAppSettingsModel {
     companion object {
         val default: AppSettingsModel get() = AppSettingsModel()
@@ -100,6 +101,7 @@ data class AppSettingsModel(
             val useCategoryByDefault = booleanKeyOf("useCategoryByDefault")
             val userAgent = stringKeyOf("userAgent")
             val quickDownloadEnabled = booleanKeyOf("quickDownloadEnabled")
+            val quickDownloadTempFolder = stringKeyOf("quickDownloadTempFolder")
         }
 
 
@@ -148,6 +150,7 @@ data class AppSettingsModel(
                 useCategoryByDefault = source.get(Keys.useCategoryByDefault) ?: default.useCategoryByDefault,
                 userAgent = source.get(Keys.userAgent) ?: default.userAgent,
                 quickDownloadEnabled = source.get(Keys.quickDownloadEnabled) ?: default.quickDownloadEnabled,
+                quickDownloadTempFolder = source.get(Keys.quickDownloadTempFolder) ?: default.quickDownloadTempFolder,
             )
         }
 
@@ -188,6 +191,7 @@ data class AppSettingsModel(
                 put(Keys.useCategoryByDefault, focus.useCategoryByDefault)
                 put(Keys.userAgent, focus.userAgent)
                 put(Keys.quickDownloadEnabled, focus.quickDownloadEnabled)
+                put(Keys.quickDownloadTempFolder, focus.quickDownloadTempFolder)
             }
         }
     }
@@ -264,4 +268,5 @@ class AppSettingsStorage(
     override val useCategoryByDefault = from(AppSettingsModel.useCategoryByDefault)
     override val userAgent = from(AppSettingsModel.userAgent)
     override val quickDownloadEnabled = from(AppSettingsModel.quickDownloadEnabled)
+    override val quickDownloadTempFolder = from(AppSettingsModel.quickDownloadTempFolder)
 }

@@ -12,6 +12,11 @@ interface IExtraDownloadSettingsStorage<T : IExtraDownloadItemSettings> {
 
 interface IExtraDownloadItemSettings {
     val id: Long
+    val finalDestinationFolder: String?
+    val finalDestinationName: String?
+
+    fun copyWithFinalDestination(folder: String?, name: String?): IExtraDownloadItemSettings
+
 
     interface DataClassDefinitions<T : IExtraDownloadItemSettings> {
         fun createDefault(id: Long): T

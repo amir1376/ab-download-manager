@@ -63,6 +63,39 @@ class DownloadSystem(
         manualDownloadQueue.boot()
         onDownloadCompletionActionRunner.startListening()
         onQueueEventActionRunner.startListening()
+
+        downloadEvents
+            .kotlinx.coroutines.flow.filterIsInstance<ir.amirab.downloader.DownloadManagerEvents.OnJobCompleted>()
+            .kotlinx.coroutines.flow.onEach { event ->
+                val id = event.downloadItem.id
+                val settings = extraDownloadSettingsStorage.getExtraDownloadItemSettings(id)
+                val finalFolder = settings.finalDestinationFolder
+                val finalName = settings.finalDestinationName
+                
+                if (finalFolder != null && finalName != null) {
+                    val currentFile = getDownloadFile(event.downloadItem)
+                    val finalFile = File(finalFolder, finalName)
+                    if (currentFile.exists() && currentFile.absolutePath != finalFile.absolutePath) {
+                        finalFile.parentFile?.mkdirs()
+                        runCatching {
+                            currentFile.tryAtomicMove(finalFile)
+                        }.onSuccess {
+                            editDownload(id, {
+                                it.name = finalName
+                                it.folder = finalFolder
+                            }, null)
+                        }
+                    }
+                    
+                    // Clear the deferred location setting so it isn't moved again
+                    @Suppress("UNCHECKED_CAST")
+                    val storage = extraDownloadSettingsStorage as IExtraDownloadSettingsStorage<IExtraDownloadItemSettings>
+                    val clearedSettings = settings.copyWithFinalDestination(null, null)
+                    storage.setExtraDownloadItemSettings(clearedSettings)
+                }
+            }
+            .kotlinx.coroutines.flow.launchIn(scope)
+
         booted.update { true }
     }
 
@@ -355,39 +388,37 @@ class DownloadSystem(
         return id
     }
 
-    suspend fun finalizeQuickDownload(
+    suspend fun <T : IExtraDownloadItemSettings> setFinalDestination(
         downloadId: Long,
         finalName: String,
         finalFolder: String,
         queueId: Long?,
         categoryId: Long?,
     ) {
-        val downloadItem = getDownloadItemById(downloadId) ?: return
-        val isCompleted = downloadItem.status == DownloadStatus.Completed
-
-        if (isCompleted) {
+        val downloadItem = downloadManager.getDownloadItem(downloadId)
+        val isCompleted = downloadItem?.status == ir.amirab.downloader.downloaditem.DownloadStatus.Completed
+        
+        if (downloadItem != null && isCompleted) {
             val currentFile = getDownloadFile(downloadItem)
             val finalFile = File(finalFolder, finalName)
-            if (currentFile.exists()) {
+            if (currentFile.exists() && currentFile.absolutePath != finalFile.absolutePath) {
                 finalFile.parentFile?.mkdirs()
-                currentFile.tryAtomicMove(finalFile)
+                runCatching {
+                    currentFile.tryAtomicMove(finalFile)
+                }.onSuccess {
+                    editDownload(downloadId, {
+                        it.name = finalName
+                        it.folder = finalFolder
+                    }, null)
+                }
             }
-            editDownload(downloadId, {
-                it.name = finalName
-                it.folder = finalFolder
-            }, null)
         } else {
-            // Download is still in progress — update the record so the engine
-            // writes to the new location after resume. Clean up old temp partial file.
-            val oldTempFile = File(downloadItem.folder, downloadItem.name)
-            File(finalFolder).mkdirs()
-            editDownload(downloadId, {
-                it.name = finalName
-                it.folder = finalFolder
-            }, null)
-            if (oldTempFile.exists()) {
-                oldTempFile.delete()
-            }
+            @Suppress("UNCHECKED_CAST")
+            val storage = extraDownloadSettingsStorage as IExtraDownloadSettingsStorage<T>
+            val currentSettings = storage.getExtraDownloadItemSettings(downloadId)
+            @Suppress("UNCHECKED_CAST")
+            val newSettings = currentSettings.copyWithFinalDestination(finalFolder, finalName) as T
+            storage.setExtraDownloadItemSettings(newSettings)
         }
 
         queueId?.let {

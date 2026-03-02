@@ -127,6 +127,12 @@ class AndroidSettingsComponent(
                     AndroidSettings.ignoreBatteryOptimizations(),
                 )
             ),
+            ConfigurableGroup(
+                nestedConfigurable = listOf(
+                    CommonSettings.quickDownloadEnabled(appRepository),
+                    CommonSettings.quickDownloadTempFolder(appRepository),
+                )
+            ),
 
             // browser integration
             // disabled for now
