@@ -9,3 +9,26 @@ local.properties
 
 # Ignore android keystores
 *.jks
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor/IDE
+*.swp
+*.swo
+*~
+.vscode/
+
+# Temp and backup files
+*.tmp
+*.bak
+*.orig
+
+# Planning/scratch files
+coding_plan.md
