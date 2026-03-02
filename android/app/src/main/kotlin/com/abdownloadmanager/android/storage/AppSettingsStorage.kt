@@ -51,6 +51,7 @@ data class AppSettingsModel(
     override val ignoreSSLCertificates: Boolean = false,
     override val useCategoryByDefault: Boolean = true,
     override val userAgent: String = "",
+    override val quickDownloadEnabled: Boolean = false,
     val browserIconInLauncher: Boolean = false,
 ) : IAppSettingsModel {
     companion object {
@@ -93,6 +94,7 @@ data class AppSettingsModel(
             val ignoreSSLCertificates = booleanKeyOf("ignoreSSLCertificates")
             val useCategoryByDefault = booleanKeyOf("useCategoryByDefault")
             val userAgent = stringKeyOf("userAgent")
+            val quickDownloadEnabled = booleanKeyOf("quickDownloadEnabled")
             val browserIconInLauncher = booleanKeyOf("browserIconInLauncher")
         }
 
@@ -138,6 +140,7 @@ data class AppSettingsModel(
                 ignoreSSLCertificates = source.get(Keys.ignoreSSLCertificates) ?: default.ignoreSSLCertificates,
                 useCategoryByDefault = source.get(Keys.useCategoryByDefault) ?: default.useCategoryByDefault,
                 userAgent = source.get(Keys.userAgent) ?: default.userAgent,
+                quickDownloadEnabled = source.get(Keys.quickDownloadEnabled) ?: default.quickDownloadEnabled,
                 browserIconInLauncher = source.get(Keys.browserIconInLauncher) ?: default.browserIconInLauncher,
             )
         }
@@ -175,6 +178,7 @@ data class AppSettingsModel(
                 put(Keys.ignoreSSLCertificates, focus.ignoreSSLCertificates)
                 put(Keys.useCategoryByDefault, focus.useCategoryByDefault)
                 put(Keys.userAgent, focus.userAgent)
+                put(Keys.quickDownloadEnabled, focus.quickDownloadEnabled)
                 put(Keys.browserIconInLauncher, focus.browserIconInLauncher)
             }
         }
@@ -248,6 +252,7 @@ class AppSettingsStorage(
     override val ignoreSSLCertificates = from(AppSettingsModel.ignoreSSLCertificates)
     override val useCategoryByDefault = from(AppSettingsModel.useCategoryByDefault)
     override val userAgent = from(AppSettingsModel.userAgent)
+    override val quickDownloadEnabled = from(AppSettingsModel.quickDownloadEnabled)
 
     val browserIconInLauncher = from(AppSettingsModel.browserIconInLauncher)
 }
