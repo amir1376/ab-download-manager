@@ -10,7 +10,9 @@ repositories {
 }
 
 fun getOptIns(): Set<String> = setOf(
-    // No Compose opt-ins here — this plugin is used by non-Compose modules
+    "androidx.compose.animation.ExperimentalAnimationApi",
+    "androidx.compose.foundation.ExperimentalFoundationApi",
+    "androidx.compose.ui.ExperimentalComposeUiApi",
 )
 
 fun getFeatures(): Set<String> = setOf(
