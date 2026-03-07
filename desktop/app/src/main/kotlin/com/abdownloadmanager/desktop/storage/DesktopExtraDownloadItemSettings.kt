@@ -9,9 +9,18 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DesktopExtraDownloadItemSettings(
     override val id: Long,
+    override val finalDestinationFolder: String? = null,
+    override val finalDestinationName: String? = null,
     val powerActionTypeOnFinish: PowerActionConfig.Type? = null,
     val powerActionUseForceOnFinish: Boolean = false,
 ) : IExtraDownloadItemSettings, ContainsPowerActionConfigOnFinish {
+
+    override fun copyWithFinalDestination(
+        folder: String?,
+        name: String?
+    ): IExtraDownloadItemSettings {
+        return this.copy(finalDestinationFolder = folder, finalDestinationName = name)
+    }
 
     override fun getPowerActionConfigOnFinish() = powerActionTypeOnFinish?.let {
         PowerActionConfig(

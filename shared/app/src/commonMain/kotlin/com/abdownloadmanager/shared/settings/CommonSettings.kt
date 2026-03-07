@@ -590,6 +590,36 @@ object CommonSettings {
         )
     }
 
+    fun quickDownloadEnabled(appRepository: BaseAppRepository): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = "Quick Download".asStringSource(),
+            description = "Start downloads instantly in a temporary folder with a compact confirmation dialogue.".asStringSource(),
+            backedBy = appRepository.quickDownloadEnabled,
+            renderMode = BooleanConfigurable.RenderMode.Switch,
+            describe = {
+                if (it) {
+                    Res.string.enabled.asStringSource()
+                } else {
+                    Res.string.disabled.asStringSource()
+                }
+            }
+        )
+    }
+
+    fun quickDownloadTempFolder(appRepository: BaseAppRepository): FolderConfigurable {
+        return FolderConfigurable(
+            title = "Quick Download Temp Folder".asStringSource(),
+            description = "The temporary location where quick downloads are stored while downloading.".asStringSource(),
+            backedBy = appRepository.quickDownloadTempFolder,
+            validate = {
+                FileUtils.Companion.canWriteInThisFolder(it)
+            },
+            describe = {
+                it.asStringSource()
+            }
+        )
+    }
+
     fun browserIntegrationEnabled(appRepository: BaseAppRepository): BooleanConfigurable {
         return BooleanConfigurable(
             title = Res.string.settings_browser_integration.asStringSource(),

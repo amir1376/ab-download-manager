@@ -65,6 +65,17 @@ abstract class BaseAddSingleDownloadComponent(
     ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects() {
     private val _shouldShowWindow = MutableStateFlow(importOptions.silentImport == null)
     override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
+    val backgroundDownloadId = MutableStateFlow<Long?>(null)
+
+    fun close() {
+        backgroundDownloadId.value?.let { bgId ->
+            appScope.launch {
+                downloadSystem.cancelQuickDownload(bgId)
+            }
+        }
+        backgroundDownloadId.value = null
+        onRequestClose()
+    }
     val downloadInputsComponent = downloaderInUi.createNewDownloadInputs(
         initialFolder = appRepository.saveLocation.value,
         initialName = initialCredentials.extraConfig.getAndFixSuggestedName().orEmpty(),
@@ -149,6 +160,30 @@ abstract class BaseAddSingleDownloadComponent(
     }
 
     init {
+        if (appSettings.quickDownloadEnabled.value) {
+            scope.launch {
+                try {
+                    credentials.first { it.link.isNotBlank() }
+                    val link = credentials.value.link
+                    val suggestedName = name.value.ifBlank { null }
+                    val tempFolder = appSettings.quickDownloadTempFolder.value
+                    val headers = when (val c = credentials.value) {
+                        is ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials -> c.headers
+                        is ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials -> c.headers
+                        else -> null
+                    }
+                    val id = downloadSystem.quickDownload(
+                        link = link,
+                        suggestedName = suggestedName,
+                        headers = headers,
+                        tempFolder = tempFolder,
+                    )
+                    backgroundDownloadId.value = id
+                } catch (e: Exception) {
+                    // Ignore, might have been cancelled
+                }
+            }
+        }
         credentials
             .map { it.link }
             .distinctUntilChanged()
@@ -238,18 +273,32 @@ abstract class BaseAddSingleDownloadComponent(
     fun onRequestDownload() {
         val downloadItem = this@BaseAddSingleDownloadComponent.downloadItem.value
         val downloadJobExtraConfig = downloadJobConfig.value
+        val bgId = backgroundDownloadId.value
         consumeDialog {
             saveLocationIfNecessary(downloadItem.folder)
-            onRequestDownload(
-                item = NewDownloadItemProps(
-                    downloadItem = downloadItem,
-                    extraConfig = downloadJobExtraConfig,
-                    onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
-                    context = EmptyContext
-                ),
-                categoryId = getCategoryIfUseCategoryIsOn()?.id
-            )
-            onRequestClose()
+            if (bgId != null) {
+                appScope.launch {
+                    downloadSystem.setFinalDestination<com.abdownloadmanager.shared.storage.IExtraDownloadItemSettings>(
+                        downloadId = bgId,
+                        finalName = downloadItem.name,
+                        finalFolder = downloadItem.folder,
+                        queueId = null,
+                        categoryId = getCategoryIfUseCategoryIsOn()?.id,
+                    )
+                }
+            } else {
+                onRequestDownload(
+                    item = NewDownloadItemProps(
+                        downloadItem = downloadItem,
+                        extraConfig = downloadJobExtraConfig,
+                        onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
+                        context = EmptyContext
+                    ),
+                    categoryId = getCategoryIfUseCategoryIsOn()?.id
+                )
+            }
+            backgroundDownloadId.value = null // prevent cancel in close
+            close()
         }
     }
 
@@ -281,25 +330,42 @@ abstract class BaseAddSingleDownloadComponent(
     ) {
         val downloadItem = downloadItem.value
         val downloadJobConfig = downloadJobConfig.value
+        val bgId = backgroundDownloadId.value
         consumeDialog {
             saveLocationIfNecessary(downloadItem.folder)
-            onRequestAddToQueue(
-                item = NewDownloadItemProps(
-                    downloadItem = downloadItem,
-                    extraConfig = downloadJobConfig,
-                    onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
-                    context = EmptyContext,
-                ),
-                queueId = queueId,
-                categoryId = getCategoryIfUseCategoryIsOn()?.id,
-            ).invokeOnCompletion {
-                if (queueId != null && startQueue) {
-                    GlobalScope.launch {
+            if (bgId != null) {
+                appScope.launch {
+                    downloadSystem.setFinalDestination<com.abdownloadmanager.shared.storage.IExtraDownloadItemSettings>(
+                        downloadId = bgId,
+                        finalName = downloadItem.name,
+                        finalFolder = downloadItem.folder,
+                        queueId = queueId,
+                        categoryId = getCategoryIfUseCategoryIsOn()?.id,
+                    )
+                    if (queueId != null && startQueue) {
                         downloadSystem.startQueue(queueId)
                     }
                 }
+            } else {
+                onRequestAddToQueue(
+                    item = NewDownloadItemProps(
+                        downloadItem = downloadItem,
+                        extraConfig = downloadJobConfig,
+                        onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
+                        context = EmptyContext,
+                    ),
+                    queueId = queueId,
+                    categoryId = getCategoryIfUseCategoryIsOn()?.id,
+                ).invokeOnCompletion {
+                    if (queueId != null && startQueue) {
+                        GlobalScope.launch {
+                            downloadSystem.startQueue(queueId)
+                        }
+                    }
+                }
             }
-            onRequestClose()
+            backgroundDownloadId.value = null
+            close()
         }
     }
 
@@ -308,7 +374,7 @@ abstract class BaseAddSingleDownloadComponent(
             ?.itemId
             ?.let {
                 openExistingDownload(it)
-                onRequestClose()
+                close()
             }
     }
 
@@ -317,7 +383,7 @@ abstract class BaseAddSingleDownloadComponent(
             ?.itemId
             ?.let {
                 updateExistingDownloadCredentials(it, downloadItem.value, downloadJobConfig.value)
-                onRequestClose()
+                close()
             }
     }
 
@@ -343,7 +409,7 @@ abstract class BaseAddSingleDownloadComponent(
             appScope.launch {
                 downloadItemOpener.openDownloadItem(itemId)
             }
-            onRequestClose()
+            close()
         }
     }
 
@@ -367,7 +433,7 @@ abstract class BaseAddSingleDownloadComponent(
                     name.first { it.isNotEmpty() }
                 }
             } catch (_: Exception) {
-                onRequestClose()
+                close()
                 return@launch
             }
             val failAutoAdd = async {

@@ -27,6 +27,7 @@ import com.abdownloadmanager.desktop.pages.checksum.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
 import com.abdownloadmanager.desktop.pages.perhostsettings.PerHostSettingsWindow
+
 import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
 import com.abdownloadmanager.desktop.pages.settings.FontManager
 import com.abdownloadmanager.desktop.pages.settings.SettingWindow
@@ -54,6 +55,7 @@ import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.ui.ProvideDebugInfo
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import ir.amirab.util.compose.action.buildMenu
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.desktop.PlatformDockToggler
 import ir.amirab.util.desktop.mac.event.MacEventHandler
@@ -133,6 +135,7 @@ object Ui : KoinComponent {
                 }
                 EnterNewDownloadWindow(appComponent)
                 ShowAddDownloadDialogs(appComponent)
+
                 ShowDownloadDialogs(appComponent)
                 ShowCategoryDialogs(appComponent)
                 FileChecksumWindow(appComponent)
@@ -223,6 +226,7 @@ private fun ApplicationScope.SystemTray(
     val useSystemTray by component.useSystemTray.collectAsState()
     if (useSystemTray) {
         LaunchedEffect(Unit) { PlatformDockToggler.hide() }
+        val trayScope = rememberCoroutineScope()
         val menu = remember {
             buildMenu {
                 +showDownloadList

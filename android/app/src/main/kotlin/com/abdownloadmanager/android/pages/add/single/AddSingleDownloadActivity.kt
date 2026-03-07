@@ -132,7 +132,7 @@ class AddSingleDownloadActivity : ABDMActivity() {
             }
             val dialogState = rememberResponsiveDialogState(false)
             dialogState.OnFullyDismissed {
-                addDownloadComponent.onRequestClose()
+                addDownloadComponent.close()
             }
             LaunchedEffect(Unit) {
                 // animate open after activity becomes fully open

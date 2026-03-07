@@ -484,7 +484,7 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
             text = myStringResource(Res.string.cancel),
             modifier = Modifier,
             onClick = {
-                component.onRequestClose()
+                component.close()
             },
         )
     }
