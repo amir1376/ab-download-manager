@@ -18,12 +18,12 @@ object DefinedStatusCategories {
     }
     val Finished = DownloadStatusCategoryFilterByList(
         Res.string.finished.asStringSource(),
-        MyIcons.folder,
+        MyIcons.folderFinished,
         listOf(DownloadStatus.Completed)
     )
     val Unfinished = DownloadStatusCategoryFilterByList(
         Res.string.Unfinished.asStringSource(),
-        MyIcons.folder,
+        MyIcons.folderUnfinished,
         listOf(
             DownloadStatus.Error,
             DownloadStatus.Added,

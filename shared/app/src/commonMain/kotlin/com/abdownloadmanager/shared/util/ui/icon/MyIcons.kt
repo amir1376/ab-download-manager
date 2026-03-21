@@ -66,6 +66,8 @@ object MyIcons : BaseMyColors() {
     override val share = ABDMIcons.Share.asIconSource("share")
     override val file = ABDMIcons.File.asIconSource("file")
     override val folder = ABDMIcons.Folder.asIconSource("folder")
+    override val folderFinished = ABDMIcons.FolderFinished.asIconSource("folderFinished")
+    override val folderUnfinished = ABDMIcons.FolderUnfinished.asIconSource("folderUnfinished")
 
     override val fileOpen = file
     override val folderOpen = folder

@@ -58,6 +58,8 @@ interface IMyIcons {
     val share: IconSource
     val file: IconSource
     val folder: IconSource
+    val folderFinished: IconSource
+    val folderUnfinished: IconSource
     val fileOpen: IconSource
     val folderOpen: IconSource
     val pictureFile: IconSource
