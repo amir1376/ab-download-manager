@@ -86,9 +86,11 @@ abstract class DownloadUiChecker<
 
 
         linkChecker.suggestedName
-            .onEach {
-                it?.let { name ->
-                    this.name.update { name }
+            .onEach { nameFromServer ->
+                nameFromServer?.let { 
+                    this.name.update { nameFromIntegration ->
+                        if (nameFromIntegration.isEmpty()) nameFromServer else nameFromIntegration
+                    }
                 }
             }.launchIn(scope)
 
