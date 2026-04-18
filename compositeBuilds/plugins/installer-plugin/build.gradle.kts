@@ -1,9 +1,7 @@
 plugins {
     `kotlin-dsl`
 }
-repositories {
-    mavenCentral()
-}
+
 version = 1
 group = "ir.amirab.plugin"
 dependencies {

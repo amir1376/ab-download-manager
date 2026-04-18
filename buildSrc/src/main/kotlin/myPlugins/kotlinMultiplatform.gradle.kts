@@ -4,12 +4,6 @@ plugins {
     kotlin("multiplatform")
 }
 
-repositories {
-    mavenCentral()
-    google()
-    maven("https://jitpack.io")
-}
-
 fun getOptIns(): Set<String> = setOf(
     "androidx.compose.animation.ExperimentalAnimationApi",
     "androidx.compose.foundation.ExperimentalFoundationApi",

@@ -3,11 +3,6 @@ package myPlugins
 plugins {
     kotlin("android")
 }
-repositories {
-    mavenCentral()
-    google()
-    maven("https://jitpack.io")
-}
 
 fun getOptIns(): Set<String> = setOf(
     "androidx.compose.animation.ExperimentalAnimationApi",
