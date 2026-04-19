@@ -1,6 +1,8 @@
 package com.abdownloadmanager.desktop.actions.onevennts
 
 import com.abdownloadmanager.desktop.PowerActionManager
+import com.abdownloadmanager.desktop.utils.NotificationSoundEvent
+import com.abdownloadmanager.desktop.utils.NotificationSoundPlayer
 import ir.amirab.util.desktop.poweraction.PowerActionConfig
 import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
 import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
@@ -13,6 +15,7 @@ import kotlin.getValue
 
 class DesktopOnQueueEventActionProvider(
     private val desktopExtraQueueSettingsStorage: IExtraQueueSettingsStorage<DesktopExtraQueueSettings>,
+    private val notificationSoundPlayer: NotificationSoundPlayer,
 ) : OnQueueCompletionActionProvider, KoinComponent {
     // TODO: BUG
     // at the moment if I move this to constructor the DI halts
@@ -23,6 +26,7 @@ class DesktopOnQueueEventActionProvider(
     override suspend fun getOnQueueEventActions(queueId: Long): List<OnQueueEventAction> {
         return desktopExtraQueueSettingsStorage.getExtraQueueSettings(queueId).let {
             buildList {
+                add(NotificationSoundOnQueueEvent(notificationSoundPlayer))
                 it.getPowerActionConfigOnFinish()?.let { powerAction ->
                     add(
                         PowerActionOnQueueFinishOrTimeEnd(
@@ -40,6 +44,8 @@ class PowerActionOnQueueFinishOrTimeEnd(
     private val powerActionManager: PowerActionManager,
     private val powerActionConfig: PowerActionConfig,
 ) : OnQueueEventAction {
+    override suspend fun onQueueStarted(queueId: Long) = Unit
+
     override suspend fun onQueueCompleted(queueId: Long) {
         powerActionManager.initiatePowerAction(
             powerActionConfig,
@@ -52,5 +58,25 @@ class PowerActionOnQueueFinishOrTimeEnd(
             powerActionConfig,
             PowerActionComponent.PowerActionReason.QueueEndTimeReached
         )
+    }
+
+    override suspend fun onQueueStopped(queueId: Long) = Unit
+}
+
+class NotificationSoundOnQueueEvent(
+    private val notificationSoundPlayer: NotificationSoundPlayer,
+) : OnQueueEventAction {
+    override suspend fun onQueueStarted(queueId: Long) {
+        notificationSoundPlayer.play(NotificationSoundEvent.QueueStarted)
+    }
+
+    override suspend fun onQueueCompleted(queueId: Long) {
+        notificationSoundPlayer.play(NotificationSoundEvent.QueueEnded)
+    }
+
+    override suspend fun onQueueEndTimeReached(queueId: Long) = Unit
+
+    override suspend fun onQueueStopped(queueId: Long) {
+        notificationSoundPlayer.play(NotificationSoundEvent.QueueEnded)
     }
 }
