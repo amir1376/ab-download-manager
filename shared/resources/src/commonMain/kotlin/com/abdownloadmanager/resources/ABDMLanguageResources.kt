@@ -26,7 +26,7 @@ object ABDMLanguageResources {
 
 }
 
-internal object ResourceUtil {
+object ResourceUtil {
     fun readResourceAsByteArray(path: String): ByteArray {
         return FileSystem.RESOURCES.read(path.toPath()) {
             readByteArray()
