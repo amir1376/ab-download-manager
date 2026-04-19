@@ -23,6 +23,13 @@ class OnQueueEventActionRunner(
         job = queueManager.queueEvents
             .onEach {
                 when (it) {
+                    is QueueEvent.OnQueueStarted -> {
+                        val actions = onQueueCompletionActionProvider.getOnQueueEventActions(it.queueId)
+                        actions.forEach { action ->
+                            action.onQueueStarted(it.queueId)
+                        }
+                    }
+
                     is QueueEvent.OnQueueBecomesEmpty -> {
                         val actions = onQueueCompletionActionProvider.getOnQueueEventActions(it.queueId)
                         actions.forEach { action ->
@@ -42,6 +49,13 @@ class OnQueueEventActionRunner(
 
                     is QueueEvent.OnQueueStartTimeReached -> {
                         // nothing
+                    }
+
+                    is QueueEvent.OnQueueStopped -> {
+                        val actions = onQueueCompletionActionProvider.getOnQueueEventActions(it.queueId)
+                        actions.forEach { action ->
+                            action.onQueueStopped(it.queueId)
+                        }
                     }
                 }
             }
