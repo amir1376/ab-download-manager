@@ -89,6 +89,14 @@ class DesktopSettingsComponent(
                     ),
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
+                            DesktopSettings.downloadCompletedSound(appSettings),
+                            DesktopSettings.downloadErrorSound(appSettings),
+                            DesktopSettings.queueStartedSound(appSettings),
+                            DesktopSettings.queueEndedSound(appSettings),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
                             CommonSettings.autoStartConfig(appSettings),
                             DesktopSettings.useSystemTray(appSettings),
                         )
