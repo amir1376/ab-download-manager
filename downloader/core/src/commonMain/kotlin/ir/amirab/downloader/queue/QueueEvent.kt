@@ -3,6 +3,10 @@ package ir.amirab.downloader.queue
 sealed interface QueueEvent {
     val queueId: Long
 
+    data class OnQueueStarted(
+        override val queueId: Long,
+    ) : QueueEvent
+
     data class QueueEndTimeReached(
         override val queueId: Long,
         val wasActive: Boolean,
@@ -15,5 +19,9 @@ sealed interface QueueEvent {
     data class OnQueueStartTimeReached(
         override val queueId: Long,
         val wasActive: Boolean,
+    ) : QueueEvent
+
+    data class OnQueueStopped(
+        override val queueId: Long,
     ) : QueueEvent
 }
