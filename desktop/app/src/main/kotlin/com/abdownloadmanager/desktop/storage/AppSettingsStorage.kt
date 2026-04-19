@@ -44,6 +44,10 @@ data class AppSettingsModel(
     override val speedLimit: Long = 0,
     override val autoStartOnBoot: Boolean = true,
     override val notificationSound: Boolean = true,
+    val downloadCompletedSoundPath: String = "",
+    val downloadErrorSoundPath: String = "",
+    val queueStartedSoundPath: String = "",
+    val queueEndedSoundPath: String = "",
     override val defaultDownloadFolder: String = PlatformDownloadLocationProvider
         .instance.getDownloadLocation()
         .resolve("ABDM")
@@ -88,6 +92,10 @@ data class AppSettingsModel(
             val speedLimit = longKeyOf("speedLimit")
             val autoStartOnBoot = booleanKeyOf("autoStartOnBoot")
             val notificationSound = booleanKeyOf("notificationSound")
+            val downloadCompletedSoundPath = stringKeyOf("downloadCompletedSoundPath")
+            val downloadErrorSoundPath = stringKeyOf("downloadErrorSoundPath")
+            val queueStartedSoundPath = stringKeyOf("queueStartedSoundPath")
+            val queueEndedSoundPath = stringKeyOf("queueEndedSoundPath")
             val defaultDownloadFolder = stringKeyOf("defaultDownloadFolder")
             val browserIntegrationEnabled = booleanKeyOf("browserIntegrationEnabled")
             val browserIntegrationPort = intKeyOf("browserIntegrationPort")
@@ -133,6 +141,10 @@ data class AppSettingsModel(
                 speedLimit = source.get(Keys.speedLimit) ?: default.speedLimit,
                 autoStartOnBoot = source.get(Keys.autoStartOnBoot) ?: default.autoStartOnBoot,
                 notificationSound = source.get(Keys.notificationSound) ?: default.notificationSound,
+                downloadCompletedSoundPath = source.get(Keys.downloadCompletedSoundPath) ?: default.downloadCompletedSoundPath,
+                downloadErrorSoundPath = source.get(Keys.downloadErrorSoundPath) ?: default.downloadErrorSoundPath,
+                queueStartedSoundPath = source.get(Keys.queueStartedSoundPath) ?: default.queueStartedSoundPath,
+                queueEndedSoundPath = source.get(Keys.queueEndedSoundPath) ?: default.queueEndedSoundPath,
                 defaultDownloadFolder = source.get(Keys.defaultDownloadFolder) ?: default.defaultDownloadFolder,
                 browserIntegrationEnabled = source.get(Keys.browserIntegrationEnabled)
                     ?: default.browserIntegrationEnabled,
@@ -174,6 +186,10 @@ data class AppSettingsModel(
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
                 put(Keys.notificationSound, focus.notificationSound)
+                put(Keys.downloadCompletedSoundPath, focus.downloadCompletedSoundPath)
+                put(Keys.downloadErrorSoundPath, focus.downloadErrorSoundPath)
+                put(Keys.queueStartedSoundPath, focus.queueStartedSoundPath)
+                put(Keys.queueEndedSoundPath, focus.queueEndedSoundPath)
                 put(Keys.defaultDownloadFolder, focus.defaultDownloadFolder)
                 put(Keys.browserIntegrationEnabled, focus.browserIntegrationEnabled)
                 put(Keys.browserIntegrationPort, focus.browserIntegrationPort)
@@ -248,6 +264,10 @@ class AppSettingsStorage(
     override val speedLimit = from(AppSettingsModel.speedLimit)
     override val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)
     override val notificationSound = from(AppSettingsModel.notificationSound)
+    val downloadCompletedSoundPath = from(AppSettingsModel.downloadCompletedSoundPath)
+    val downloadErrorSoundPath = from(AppSettingsModel.downloadErrorSoundPath)
+    val queueStartedSoundPath = from(AppSettingsModel.queueStartedSoundPath)
+    val queueEndedSoundPath = from(AppSettingsModel.queueEndedSoundPath)
     override val defaultDownloadFolder = from(AppSettingsModel.defaultDownloadFolder)
     override val browserIntegrationEnabled = from(AppSettingsModel.browserIntegrationEnabled)
     override val browserIntegrationPort = from(AppSettingsModel.browserIntegrationPort)
