@@ -1,57 +1,49 @@
 package com.abdownloadmanager.desktop.pages.queue
 
-import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
-import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
-import com.abdownloadmanager.shared.util.ui.LocalContentAlpha
-import com.abdownloadmanager.shared.util.ui.LocalContentColor
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isCtrlPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.shared.ui.widget.*
+import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
+import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.LocalContentAlpha
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
+import com.abdownloadmanager.shared.util.ui.VerticalScrollableContent
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.util.compose.resources.myStringResource
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.queue.DownloadQueue
+import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.isCtrlPressed
 import ir.amirab.util.desktop.isShiftPressed
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -256,7 +248,8 @@ fun RenderQueueItems(
                     }
                 }
         ) {
-            itemsIndexed(downloadItems,
+            itemsIndexed(
+                downloadItems,
                 key = { _, item -> item.id }
             ) { index, downloadItem ->
                 RenderQueueItem(
@@ -335,11 +328,7 @@ private fun LazyItemScope.RenderQueueItem(
                     setSelected(!isSelected)
                 },
                 content = {
-                    val isActive = if (value.statusOrFinished() is DownloadJobStatus.IsActive) {
-                        true
-                    } else {
-                        false
-                    }
+                    val isActive = value.statusOrFinished() is DownloadJobStatus.IsActive
                     Row {
                         Text(
                             "${index + 1}. ",
@@ -373,17 +362,26 @@ private fun RenderQueueConfig(
     component: QueueInfoComponent,
 ) {
     val configurables: List<ConfigurableGroup> = component.configurations
-    Column(
-        modifier
-            .verticalScroll(rememberScrollState())
-    ) {
-        for ((index, cfgGroup) in configurables.withIndex()) {
-            RenderConfigurableGroup(
-                cfgGroup,
-                Modifier
-            )
-            if (index != configurables.lastIndex) {
-                Spacer(Modifier.height(4.dp))
+    val scrollState = rememberScrollState()
+    VerticalScrollableContent(scrollState) {
+        Column(
+            modifier
+                .verticalScroll(scrollState)
+                .padding(
+                    horizontal = 8.dp,
+                    vertical = 8.dp,
+                ),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            for ((index, cfgGroup) in configurables.withIndex()) {
+                RenderConfigurableGroup(
+                    cfgGroup,
+                    Modifier,
+                    itemPadding = PaddingValues(
+                        vertical = 8.dp,
+                        horizontal = 16.dp
+                    ),
+                )
             }
         }
     }
@@ -427,16 +425,17 @@ private fun QueueListSection(
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))
-                    Spacer(Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (isQueueActive) {
-                                myColors.success
-                            } else {
-                                myColors.onSurface / 50
-                            }
-                        )
+                    Spacer(
+                        Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (isQueueActive) {
+                                    myColors.success
+                                } else {
+                                    myColors.onSurface / 50
+                                }
+                            )
                     )
                 }
             }

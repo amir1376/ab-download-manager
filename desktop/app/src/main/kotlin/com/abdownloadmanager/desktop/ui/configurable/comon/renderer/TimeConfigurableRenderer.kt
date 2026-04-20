@@ -50,7 +50,7 @@ object TimeConfigurableRenderer : ConfigurableRenderer<TimeConfigurable> {
             )
         }
 
-        val textFieldModifier = Modifier.width(64.dp)
+        val textFieldModifier = Modifier.width(86.dp)
         ConfigTemplate(
             modifier = configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
