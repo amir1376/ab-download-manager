@@ -138,8 +138,13 @@ abstract class BaseSingleDownloadComponent<
             }.launchIn(scope)
     }
 
-    private val _showPartInfo = MutableStateFlow(defaultShowPartInfo)
-    val showPartInfo = _showPartInfo.asStateFlow()
+    private val _showPartInfo by lazy {
+        // I make it lazy because [defaultShowPartInfo] is an open val, overridden properties won't apply in supper class initialization which makes our logic buggy
+        MutableStateFlow(defaultShowPartInfo)
+    }
+    val showPartInfo by lazy {
+        _showPartInfo.asStateFlow()
+    }
     open fun setShowPartInfo(value: Boolean) {
         _showPartInfo.value = value
     }
