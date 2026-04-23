@@ -6,12 +6,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
-import com.abdownloadmanager.shared.util.LocalShortCutManager
+import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.rememberWindowController
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import com.abdownloadmanager.desktop.utils.AppInfo
+import com.abdownloadmanager.shared.util.LocalShortCutManager
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.awt.Dimension
 
 @Composable
@@ -53,8 +56,11 @@ fun HomeWindow(
                     homeComponent.setWindowSize(windowState.size)
                 }
             }
-            LaunchedEffect(windowState.placement) {
-                homeComponent.setIsMaximized(windowState.placement == WindowPlacement.Maximized)
+            LaunchedEffect(windowState) {
+                snapshotFlow { windowState.placement }
+                    .onEach {
+                        homeComponent.setIsMaximized(windowState.placement == WindowPlacement.Maximized)
+                    }.launchIn(this)
             }
             window.minimumSize = Dimension(
                 400, 400
