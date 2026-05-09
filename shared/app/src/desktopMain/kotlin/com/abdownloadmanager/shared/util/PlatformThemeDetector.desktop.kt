@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import java.util.function.Consumer
 
 actual typealias PlatformThemeDetector = DesktopSystemThemeDetector
 
@@ -18,7 +19,7 @@ class DesktopSystemThemeDetector : ISystemThemeDetector {
     private val detector by lazy { OsThemeDetector.getDetector() }
 
     private val isSystemDarkFlowByLibrary = callbackFlow<Boolean> {
-        val listener: (Boolean) -> Unit = { isDark: Boolean ->
+        val listener = Consumer<Boolean> { isDark: Boolean ->
             trySend(isDark)
         }
         detector.registerListener(listener)
