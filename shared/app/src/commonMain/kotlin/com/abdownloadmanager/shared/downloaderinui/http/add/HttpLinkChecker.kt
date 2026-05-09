@@ -6,13 +6,14 @@ import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import ir.amirab.downloader.connection.HttpDownloaderClient
 import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class HttpLinkChecker(
-    initialCredentials: HttpDownloadCredentials = HttpDownloadCredentials.Companion.empty(),
+    initialCredentials: HttpDownloadCredentials = HttpDownloadCredentials.empty(),
     private val client: HttpDownloaderClient,
 ) : LinkChecker<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes>(initialCredentials) {
     private val _suggestedName = MutableStateFlow(null as String?)
@@ -33,7 +34,7 @@ class HttpLinkChecker(
 
     private fun updateNameAndLength(responseInfo: HttpResponseInfo?) {
         val suggestedName = responseInfo
-            ?.fileName
+            ?.fileName ?: HttpUrlUtils.extractNameFromLink(credentials.value.link)
             ?.let(FilenameFixer::fix)
         val length = responseInfo?.run {
             totalLength.takeIf { isSuccessFul }

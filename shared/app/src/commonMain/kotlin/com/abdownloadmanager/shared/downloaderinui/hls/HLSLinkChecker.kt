@@ -2,9 +2,11 @@ package com.abdownloadmanager.shared.downloaderinui.hls
 
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
+import com.abdownloadmanager.shared.util.FilenameFixer
 import ir.amirab.downloader.connection.HttpDownloaderClient
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import ir.amirab.downloader.downloaditem.hls.HLSResponseInfo
+import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +26,8 @@ class HLSLinkChecker(
         it?.let(DownloadSize::Duration)
     }
     override fun infoUpdated(responseInfo: HLSResponseInfo?) {
-        _suggestedName.value = responseInfo?.name
+        _suggestedName.value = responseInfo?.name ?: HttpUrlUtils.extractNameFromLink(credentials.value.link)
+            ?.let(FilenameFixer::fix)
         _duration.value = responseInfo?.duration
     }
 
