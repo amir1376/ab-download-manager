@@ -3,6 +3,7 @@ package com.abdownloadmanager.desktop.ui.configurable.comon
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.BooleanConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.DayOfWeekConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.EnumConfigurableRenderer
+import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.FileConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.FileChecksumConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.FloatConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.FolderConfigurableRenderer
@@ -19,6 +20,7 @@ import com.abdownloadmanager.shared.ui.configurable.CommonConfigurableRenderers
 val CommonConfigurableRenderersForDesktop = CommonConfigurableRenderers(
     booleanConfigurableRenderer = BooleanConfigurableRenderer,
     dayOfWeekConfigurableRenderer = DayOfWeekConfigurableRenderer,
+    fileConfigurableRenderer = FileConfigurableRenderer,
     fileChecksumConfigurableRenderer = FileChecksumConfigurableRenderer,
     floatConfigurableRenderer = FloatConfigurableRenderer,
     folderConfigurableRenderer = FolderConfigurableRenderer,

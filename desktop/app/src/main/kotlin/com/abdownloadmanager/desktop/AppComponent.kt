@@ -96,7 +96,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.awt.Toolkit
 import kotlin.system.exitProcess
 
 sealed interface AppEffects {
@@ -138,6 +137,7 @@ class AppComponent(
     val iconFromUriResolver: IIconResolver by inject()
     val updaterManager: UpdateManager by inject()
     val extraDownloadSettingStorage: ExtraDownloadSettingsStorage<DesktopExtraDownloadItemSettings> by inject()
+    private val notificationSoundPlayer: NotificationSoundPlayer by inject()
     val useSystemTray = appSettings.useSystemTray
     fun openHome() {
         scope.launch {
@@ -546,7 +546,6 @@ class AppComponent(
     }
 
     override fun sendNotification(tag: Any, title: StringSource, description: StringSource, type: NotificationType) {
-        beep()
         showNotification(tag = tag, title = title, description = description, type = type)
     }
 
@@ -555,14 +554,7 @@ class AppComponent(
         description: StringSource,
         type: MessageDialogType,
     ) {
-        beep()
         newDialogMessage(MessageDialogModel(title = title, description = description, type = type))
-    }
-
-    private fun beep() {
-        if (appSettings.notificationSound.value) {
-            Toolkit.getDefaultToolkit().beep()
-        }
     }
 
     private fun showNotification(
@@ -655,6 +647,7 @@ class AppComponent(
                 description = listOf(prefix, reason).combineStringSources(),
                 type = NotificationType.Error,
             )
+            notificationSoundPlayer.play(NotificationSoundEvent.DownloadError)
         }
         if (it is DownloadManagerEvents.OnJobCompleted) {
             sendNotification(
@@ -663,6 +656,7 @@ class AppComponent(
                 description = Res.string.finished.asStringSource(),
                 type = NotificationType.Success,
             )
+            notificationSoundPlayer.play(NotificationSoundEvent.DownloadCompleted)
             if (appSettings.showDownloadCompletionDialog.value) {
                 openDownloadDialog(it.downloadItem.id)
             }

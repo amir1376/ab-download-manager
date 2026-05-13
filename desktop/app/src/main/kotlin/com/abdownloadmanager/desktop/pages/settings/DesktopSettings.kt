@@ -3,9 +3,12 @@ package com.abdownloadmanager.desktop.pages.settings
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.ui.configurable.platform.item.FontConfigurable
+import com.abdownloadmanager.desktop.utils.NotificationSoundEvent
+import com.abdownloadmanager.desktop.utils.NotificationSoundPlayer
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.configurable.item.FileConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
@@ -17,8 +20,20 @@ import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
+import java.io.File
 
 object DesktopSettings {
+    private fun isAllowedSoundPath(path: String): Boolean {
+        return path.isBlank() || path.endsWith(".wav", ignoreCase = true)
+    }
+
+    private fun describeSoundPath(path: String) =
+        if (path.isBlank()) {
+            Res.string.settings_notification_sound_default.asStringSource()
+        } else {
+            File(path).name.ifBlank { path }.asStringSource()
+        }
+
     fun mergeTopBarWithTitleBarConfig(appSettings: AppSettingsStorage): BooleanConfigurable {
         return BooleanConfigurable(
             title = Res.string.settings_compact_top_bar.asStringSource(),
@@ -100,6 +115,50 @@ object DesktopSettings {
             describe = {
                 it?.prettyName?.asStringSource()?: Res.string.default.asStringSource()
             }
+        )
+    }
+
+    fun downloadCompletedSound(appSettings: AppSettingsStorage): FileConfigurable {
+        return FileConfigurable(
+            title = Res.string.settings_download_completed_sound.asStringSource(),
+            description = Res.string.settings_notification_sound_file_description.asStringSource(),
+            backedBy = appSettings.downloadCompletedSoundPath,
+            validate = ::isAllowedSoundPath,
+            describe = ::describeSoundPath,
+            onPreview = { NotificationSoundPlayer().preview(NotificationSoundEvent.DownloadCompleted) },
+        )
+    }
+
+    fun downloadErrorSound(appSettings: AppSettingsStorage): FileConfigurable {
+        return FileConfigurable(
+            title = Res.string.settings_download_error_sound.asStringSource(),
+            description = Res.string.settings_notification_sound_file_description.asStringSource(),
+            backedBy = appSettings.downloadErrorSoundPath,
+            validate = ::isAllowedSoundPath,
+            describe = ::describeSoundPath,
+            onPreview = { NotificationSoundPlayer().preview(NotificationSoundEvent.DownloadError) },
+        )
+    }
+
+    fun queueStartedSound(appSettings: AppSettingsStorage): FileConfigurable {
+        return FileConfigurable(
+            title = Res.string.settings_queue_started_sound.asStringSource(),
+            description = Res.string.settings_notification_sound_file_description.asStringSource(),
+            backedBy = appSettings.queueStartedSoundPath,
+            validate = ::isAllowedSoundPath,
+            describe = ::describeSoundPath,
+            onPreview = { NotificationSoundPlayer().preview(NotificationSoundEvent.QueueStarted) },
+        )
+    }
+
+    fun queueEndedSound(appSettings: AppSettingsStorage): FileConfigurable {
+        return FileConfigurable(
+            title = Res.string.settings_queue_ended_sound.asStringSource(),
+            description = Res.string.settings_notification_sound_file_description.asStringSource(),
+            backedBy = appSettings.queueEndedSoundPath,
+            validate = ::isAllowedSoundPath,
+            describe = ::describeSoundPath,
+            onPreview = { NotificationSoundPlayer().preview(NotificationSoundEvent.QueueEnded) },
         )
     }
 }

@@ -3,6 +3,7 @@ package com.abdownloadmanager.shared.ui.configurable
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.DayOfWeekConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.FileConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.FileChecksumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.FloatConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.FolderConfigurable
@@ -22,6 +23,7 @@ interface ContainsConfigurableRenderers {
 data class CommonConfigurableRenderers(
     val booleanConfigurableRenderer: ConfigurableRenderer<BooleanConfigurable>,
     val dayOfWeekConfigurableRenderer: ConfigurableRenderer<DayOfWeekConfigurable>,
+    val fileConfigurableRenderer: ConfigurableRenderer<FileConfigurable>,
     val fileChecksumConfigurableRenderer: ConfigurableRenderer<FileChecksumConfigurable>,
     val floatConfigurableRenderer: ConfigurableRenderer<FloatConfigurable>,
     val folderConfigurableRenderer: ConfigurableRenderer<FolderConfigurable>,
@@ -40,6 +42,7 @@ data class CommonConfigurableRenderers(
         return mapOf(
             BooleanConfigurable.Key to booleanConfigurableRenderer,
             DayOfWeekConfigurable.Key to dayOfWeekConfigurableRenderer,
+            FileConfigurable.Key to fileConfigurableRenderer,
             FileChecksumConfigurable.Key to fileChecksumConfigurableRenderer,
             FloatConfigurable.Key to floatConfigurableRenderer,
             FolderConfigurable.Key to folderConfigurableRenderer,

@@ -338,8 +338,11 @@ val downloadSystemModule = module {
     single<OnDownloadCompletionActionProvider> {
         DesktopOnDownloadCompletionActionProvider(get())
     }
+    single {
+        NotificationSoundPlayer()
+    }
     single<OnQueueCompletionActionProvider> {
-        DesktopOnQueueEventActionProvider(get())
+        DesktopOnQueueEventActionProvider(get(), get())
     }
     single {
         OnDownloadCompletionActionRunner(
