@@ -3,7 +3,7 @@ package com.abdownloadmanager.shared.ui.modifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import org.jetbrains.skiko.Cursor
+import java.awt.Cursor
 
 actual fun Modifier.myPointerHoverIcon(
     pointerHoverIcon: MyPointerHoverIcon,
@@ -21,13 +21,18 @@ private fun MyPointerHoverIcon.toDesktopIcon(): PointerIcon {
         MyPointerHoverIcon.Default -> PointerIcon.Default
         MyPointerHoverIcon.Hand -> PointerIcon.Hand
         MyPointerHoverIcon.Text -> PointerIcon.Text
-        MyPointerHoverIcon.HorizontalResize -> pointerIconFromCursorInt(Cursor.S_RESIZE_CURSOR)
-        MyPointerHoverIcon.VerticalResize -> pointerIconFromCursorInt(Cursor.E_RESIZE_CURSOR)
+        MyPointerHoverIcon.HorizontalResize -> MyDesktopCursors.horizontalResize
+        MyPointerHoverIcon.VerticalResize -> MyDesktopCursors.verticalResize
     }
 }
 
-private fun pointerIconFromCursorInt(
-    cursorInt: Int
-): PointerIcon {
-    return PointerIcon(Cursor(cursorInt))
+private object MyDesktopCursors {
+    val horizontalResize = pointerIconFromCursorInt(Cursor.S_RESIZE_CURSOR)
+    val verticalResize = pointerIconFromCursorInt(Cursor.E_RESIZE_CURSOR)
+
+    private fun pointerIconFromCursorInt(
+        cursorInt: Int
+    ): PointerIcon {
+        return PointerIcon(Cursor(cursorInt))
+    }
 }

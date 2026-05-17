@@ -1,19 +1,21 @@
 package com.abdownloadmanager.shared.util
 
-import org.jetbrains.skiko.ClipboardManager
+import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.StringSelection
 
 actual object ClipboardUtil {
-    private val clipboardManager = ClipboardManager()
+    private val clipboard get() = Toolkit.getDefaultToolkit().systemClipboard
 
     actual fun copy(text: String) {
         runCatching {
-            clipboardManager.setText(text.toString())
+            clipboard.setContents(StringSelection(text), null)
         }
     }
 
     actual fun read(): String? {
         return runCatching {
-            clipboardManager.getText()
+            clipboard.getData(DataFlavor.stringFlavor) as? String
         }.getOrNull()
     }
 }
