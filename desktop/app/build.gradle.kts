@@ -105,6 +105,8 @@ compose {
             // Define the main class for the application.
             mainClass = "$desktopPackageName.AppKt"
             nativeDistributions {
+                // avoid java 25 warning
+                jvmArgs("--enable-native-access=ALL-UNNAMED")
                 modules(
                     "java.instrument",
                     "jdk.unsupported",
