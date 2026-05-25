@@ -1,13 +1,17 @@
 package com.abdownloadmanager.desktop.utils
 
-import com.abdownloadmanager.desktop.ui.error.ErrorWindow
-import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.window.*
+import androidx.compose.ui.window.LocalWindowExceptionHandlerFactory
+import androidx.compose.ui.window.WindowExceptionHandler
+import androidx.compose.ui.window.WindowExceptionHandlerFactory
+import androidx.compose.ui.window.application
+import com.abdownloadmanager.desktop.ui.error.ErrorWindow
+import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
+import ir.amirab.util.logger.appLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import java.awt.Window
@@ -107,14 +111,18 @@ private class GlobalExceptionHandlerImpl : GlobalAppExceptionHandler {
 
     private fun showErrorInConsole(thread: Thread, e: Throwable) {
         val output = System.err
-        output.println("""Exception in thread "${thread.name}" ${e::class.qualifiedName}""")
+        val eTitle = """Exception in thread "${thread.name}" ${e::class.qualifiedName}"""
+        output.println(eTitle)
         e.printStackTrace(output)
+        appLogger.e(e) { eTitle }
     }
 
     private fun showErrorInConsole(window: Window, throwable: Throwable) {
         val output = System.err
-        output.println("""Exception in windows $window ,${throwable::class.qualifiedName}""")
+        val eTitle = """Exception in windows $window ,${throwable::class.qualifiedName}"""
+        output.println(eTitle)
         throwable.printStackTrace(output)
+        appLogger.e(throwable) { eTitle }
     }
 
     override fun uncaughtException(t: Thread, e: Throwable) {

@@ -3,7 +3,6 @@
 package ir.amirab.util.logger.slf4j.impl
 
 import co.touchlab.kermit.BaseLogger
-import co.touchlab.kermit.LoggerConfig
 import co.touchlab.kermit.Severity
 import org.slf4j.Marker
 import org.slf4j.event.Level
@@ -11,11 +10,12 @@ import org.slf4j.event.Level.*
 import org.slf4j.helpers.AbstractLogger
 
 class Slf4jKermitLogger(
-    private val name: String,
-    config: LoggerConfig,
+    private val defaultTag: String,
+    private val loggerProvider: () -> BaseLogger,
 ) : AbstractLogger() {
-    private val logger = BaseLogger(config)
     override fun getName(): String = "slf4j-over-kermit"
+
+    val logger get() = loggerProvider()
 
     //region Is Logging enabled at various levels
     override fun isTraceEnabled() = logger.config.minSeverity <= Severity.Verbose
@@ -54,7 +54,7 @@ class Slf4jKermitLogger(
         messagePattern.let {
             logger.log(
                 severity,
-                marker?.toString() ?: name,
+                marker?.toString() ?: defaultTag,
                 throwable,
                 formatted ?: (messagePattern ?: "")
             )

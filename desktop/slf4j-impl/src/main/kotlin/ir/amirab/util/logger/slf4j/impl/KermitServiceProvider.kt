@@ -7,6 +7,7 @@ import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
 import com.google.auto.service.AutoService
+import ir.amirab.util.logger.AppLogger
 import org.slf4j.ILoggerFactory
 import org.slf4j.helpers.BasicMarkerFactory
 import org.slf4j.helpers.NOPMDCAdapter
@@ -17,7 +18,7 @@ class KermitServiceProvider : SLF4JServiceProvider {
     private val markerFactory = BasicMarkerFactory()
     private val mdcAdapter = NOPMDCAdapter()
     override fun getLoggerFactory() = ILoggerFactory {
-        Slf4jKermitLogger(it, config)
+        Slf4jKermitLogger(it, AppLogger::get)
     }
 
     override fun getMarkerFactory() = markerFactory
