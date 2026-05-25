@@ -7,9 +7,6 @@ plugins {
 kotlin {
     jvm("desktop")
     androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
     }
     sourceSets.commonMain.dependencies {
         implementation(libs.okio.okio)
