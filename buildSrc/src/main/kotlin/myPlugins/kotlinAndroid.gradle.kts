@@ -19,7 +19,10 @@ fun getFeatures(): Set<String> = setOf(
     "context-parameters",
 )
 
+val jvmToolchainVersion =  providers.gradleProperty("jvm.toolchain").get().toInt()
+
 kotlin {
+    jvmToolchain(jvmToolchainVersion)
     compilerOptions {
         val optIns = getOptIns().map { "-Xopt-in=$it" }
         val features = getFeatures().map { "-X$it" }

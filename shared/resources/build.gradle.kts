@@ -31,9 +31,6 @@ val generateResObject by tasks.registering(GenerateResObject::class) {
 kotlin {
     jvm("desktop")
     androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
     }
     sourceSets {
         commonMain {

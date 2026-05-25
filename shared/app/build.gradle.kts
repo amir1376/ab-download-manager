@@ -15,9 +15,6 @@ plugins {
 kotlin {
     jvm("desktop")
     androidTarget("android") {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
     }
     sourceSets {
         commonMain.dependencies {

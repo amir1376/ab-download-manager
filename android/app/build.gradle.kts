@@ -43,14 +43,8 @@ android {
         compose = true
         buildConfig = true
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
 }
-kotlin.compilerOptions {
-    jvmTarget = JvmTarget.JVM_21
-}
+
 dependencies {
     implementation(libs.compose.runtime)
     implementation(libs.compose.foundation)
