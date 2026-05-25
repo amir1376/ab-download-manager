@@ -32,7 +32,7 @@ jbrApi = "1.10.1"
 gradleVersions = "0.53.0"
 handlebars = "4.5.0"
 composeNativeTray = "1.3.0"
-
+kermit = "2.1.0"
 agp = "8.13.2"
 androidx-core = "1.18.0"
 androidx-activity-compose = "1.13.0"
@@ -72,6 +72,7 @@ fastscroller-core = { module = "io.github.oikvpqya.compose.fastscroller:fastscro
 
 loggers-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "logback" }
 loggers-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 nanoHttpd-core = "org.nanohttpd:nanohttpd:2.3.1"
 http4k-core = { module = "org.http4k:http4k-core", version.ref = "http4k" }
