@@ -18,6 +18,7 @@ kotlin {
             api(libs.kotlin.datetime)
             api(libs.semver)
             api(libs.arrow.optics)
+            api(libs.kermit)
             api("ir.amirab.util:platform:1")
         }
         val desktopMain by getting

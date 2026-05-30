@@ -69,6 +69,7 @@ dependencies {
     implementation(project(":shared:updater"))
     implementation(project(":shared:nanohttp4k"))
     implementation(project(":desktop:mac_utils"))
+    implementation(project(":desktop:slf4j-impl"))
 }
 
 aboutLibraries {

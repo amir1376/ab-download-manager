@@ -13,10 +13,14 @@ import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunni
 import com.abdownloadmanager.desktop.utils.singleInstance.MutableSingleInstanceServerHandler
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
 import com.abdownloadmanager.integration.Integration
-import com.abdownloadmanager.shared.util.AppVersion
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
+import ir.amirab.util.logger.AppLogger
+import ir.amirab.util.logger.appLogger
+import ir.amirab.util.writeText
 import kotlinx.coroutines.runBlocking
+import okio.FileSystem
+import okio.Path.Companion.toPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.system.exitProcess
@@ -75,6 +79,12 @@ fun main(args: Array<String>) {
         AppArguments.init(args)
         AppProperties.boot()
         val appArguments = AppArguments.get()
+        AppLogger.init(
+            writeToConsole = false,
+            logFilePath = AppInfo.definedPaths.logDir.takeIf {
+                AppInfo.isInDebugMode()
+            },
+        )
         if (appArguments.version) {
             dispatchVersionAndExit()
         }
@@ -95,6 +105,7 @@ fun main(args: Array<String>) {
         )
 
     } catch (e: Throwable) {
+        appLogger.e(throwable = e) { "Fail to start the ${AppInfo.displayName} app because:" }
         System.err.println("Fail to start the ${AppInfo.displayName} app because:")
         e.printStackTrace()
         exitProcess(-1)
@@ -178,9 +189,11 @@ private fun defaultApp(
         singleInstance.sendToInstance(Commands.showUserThatAppIsRunning)
         return
     }
+    val startedMessage = "${AppInfo.displayName}-${AppInfo.version} started"
+    appLogger.i { startedMessage }
+    println(startedMessage)
     if (AppInfo.isInIDE()) {
-        println("app version ${AppVersion.get()} is started")
-        println("it seems we are in ide")
+        appLogger.i { "App is in IDE" }
     }
 
     val globalExceptionHandler = createAndSetGlobalExceptionHandler()
