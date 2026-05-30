@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
+import okhttp3.internal.closeQuietly
 import okio.*
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -78,13 +79,12 @@ internal open class FileLogWriter(
     }
 
     private suspend fun writer() {
-
-        val currentLogSink = createNewLogSink()
-
-        while (currentCoroutineContext().isActive) {
-            val buffer = loggingChannel.receiveCatching().getOrNull() ?: break
-            currentLogSink.write(buffer, buffer.size)
-            currentLogSink.flush()
+        createNewLogSink().use {
+            while (currentCoroutineContext().isActive) {
+                val buffer = loggingChannel.receiveCatching().getOrNull() ?: break
+                it.write(buffer, buffer.size)
+                it.flush()
+            }
         }
     }
 }

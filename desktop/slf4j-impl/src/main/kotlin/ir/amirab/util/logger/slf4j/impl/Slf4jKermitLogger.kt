@@ -48,8 +48,12 @@ class Slf4jKermitLogger(
         }
 
         val formatted = if (messagePattern != null && arguments != null) {
-            String.format(messagePattern, *(arguments.toList().toTypedArray()))
-        } else null
+            org.slf4j.helpers.MessageFormatter
+                .arrayFormat(messagePattern, arguments)
+                .message
+        } else {
+            null
+        }
 
         messagePattern.let {
             logger.log(

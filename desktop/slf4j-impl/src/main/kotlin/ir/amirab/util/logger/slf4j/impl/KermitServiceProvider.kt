@@ -33,7 +33,7 @@ class KermitServiceProvider : SLF4JServiceProvider {
         private val writers = mutableListOf<LogWriter>().apply {
             add(CommonWriter())
         }
-        var config: StaticConfig = StaticConfig(logWriterList = writers)
+        private var config: StaticConfig = StaticConfig(logWriterList = writers)
 
         var minSeverity: Severity
             get() = config.minSeverity
