@@ -140,74 +140,77 @@ impl HlsJob {
 
     /// Fetch and parse the M3U8 playlist.
     async fn fetch_playlist(&self) -> anyhow::Result<()> {
-        let item = self.item.read().await;
-        let url = &item.link;
-        let headers = HeaderMap::new();
+        loop {
+            let url = {
+                let item = self.item.read().await;
+                item.link.clone()
+            };
+            let headers = HeaderMap::new();
 
-        let resp = self.client.inner().get(url).headers(headers).send().await?;
-        let body = resp.bytes().await?;
-        let body_str = String::from_utf8_lossy(&body);
+            let resp = self.client.inner().get(&url).headers(headers).send().await?;
+            let body = resp.bytes().await?;
+            let body_str = String::from_utf8_lossy(&body);
 
-        let parsed = m3u8_rs::parse_playlist_res(body_str.as_bytes());
-        match parsed {
-            Ok(m3u8_rs::Playlist::MediaPlaylist(playlist)) => {
-                let mut segments = self.segments.lock().await;
-                segments.clear();
+            let parsed = m3u8_rs::parse_playlist_res(body_str.as_bytes());
+            match parsed {
+                Ok(m3u8_rs::Playlist::MediaPlaylist(playlist)) => {
+                    let mut segments = self.segments.lock().await;
+                    segments.clear();
 
-                let mut current_key_uri: Option<String> = None;
-                let mut current_iv: Option<[u8; 16]> = None;
-                let mut byte_offset: i64 = 0;
+                    let mut current_key_uri: Option<String> = None;
+                    let mut current_iv: Option<[u8; 16]> = None;
+                    let mut byte_offset: i64 = 0;
 
-                for (seq, segment) in playlist.segments.iter().enumerate() {
-                    // Check for key changes
-                    if let Some(ref key) = segment.key {
-                        if key.method == "AES-128" {
-                            current_key_uri = key.uri.clone();
-                            current_iv = key.iv.as_ref().and_then(|iv_str| {
-                                parse_hex_iv(iv_str)
-                            });
-                        } else if key.method == "NONE" {
-                            current_key_uri = None;
-                            current_iv = None;
+                    for (seq, segment) in playlist.segments.iter().enumerate() {
+                        // Check for key changes
+                        if let Some(ref key) = segment.key {
+                            if key.method == m3u8_rs::KeyMethod::AES128 {
+                                current_key_uri = key.uri.clone();
+                                current_iv = key.iv.as_ref().and_then(|iv_str| {
+                                    parse_hex_iv(iv_str)
+                                });
+                            } else if key.method == m3u8_rs::KeyMethod::None {
+                                current_key_uri = None;
+                                current_iv = None;
+                            }
                         }
+
+                        let iv = current_iv.unwrap_or_else(|| {
+                            // Default IV: media sequence number as big-endian 16-byte value
+                            let seq_num = (playlist.media_sequence + seq as u64) as u128;
+                            seq_num.to_be_bytes()
+                        });
+
+                        segments.push(HlsSegment {
+                            uri: resolve_url(&url, &segment.uri),
+                            duration: segment.duration as f64,
+                            byte_offset,
+                            key_uri: current_key_uri.clone(),
+                            iv: Some(iv),
+                            downloaded: false,
+                        });
+
+                        // Estimate offset (will be corrected after actual download)
+                        byte_offset += 1; // placeholder
                     }
 
-                    let iv = current_iv.unwrap_or_else(|| {
-                        // Default IV: media sequence number as big-endian 16-byte value
-                        let seq_num = (playlist.media_sequence + seq as u64) as u128;
-                        seq_num.to_be_bytes()
-                    });
-
-                    segments.push(HlsSegment {
-                        uri: resolve_url(&item.link, &segment.uri),
-                        duration: segment.duration as f64,
-                        byte_offset,
-                        key_uri: current_key_uri.clone(),
-                        iv: Some(iv),
-                        downloaded: false,
-                    });
-
-                    // Estimate offset (will be corrected after actual download)
-                    byte_offset += 1; // placeholder
+                    info!("Parsed {} HLS segments", segments.len());
+                    return Ok(());
                 }
-
-                info!("Parsed {} HLS segments", segments.len());
-            }
-            Ok(m3u8_rs::Playlist::MasterPlaylist(master)) => {
-                // Select best variant (highest bandwidth)
-                if let Some(best) = master.variants.iter().max_by_key(|v| v.bandwidth) {
-                    let mut item = self.item.write().await;
-                    item.link = resolve_url(&item.link, &best.uri);
-                    drop(item);
-                    // Recurse with the media playlist URL
-                    return self.fetch_playlist().await;
+                Ok(m3u8_rs::Playlist::MasterPlaylist(master)) => {
+                    // Select best variant (highest bandwidth)
+                    if let Some(best) = master.variants.iter().max_by_key(|v| v.bandwidth) {
+                        let mut item = self.item.write().await;
+                        item.link = resolve_url(&url, &best.uri);
+                        drop(item);
+                        // Loop instead of recursing
+                        continue;
+                    }
+                    anyhow::bail!("No variants found in master playlist");
                 }
-                anyhow::bail!("No variants found in master playlist");
+                Err(e) => anyhow::bail!("Failed to parse M3U8 playlist: {:?}", e),
             }
-            Err(e) => anyhow::bail!("Failed to parse M3U8 playlist: {:?}", e),
         }
-
-        Ok(())
     }
 
     /// Prepare the output file.

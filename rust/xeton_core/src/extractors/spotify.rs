@@ -50,22 +50,33 @@ impl Extractor for SpotifyExtractor {
             None
         };
 
-        // Note: Spotify doesn't provide full audio streams publicly.
-        // A complete implementation would either:
-        // 1. Return the 30s preview URL (parsed from the web page HTML).
-        // 2. Use the metadata to perform a search on YouTube/YouTube Music and return that stream.
-        // For this port, we will just return the metadata as this requires more complex integration.
-
+        // Use the metadata to perform a search on YouTube using yt-dlp.
         let mut streams = Vec::new();
-        // Placeholder for stream fetching logic...
+        let title = metadata.as_ref().and_then(|m| m.title.clone()).unwrap_or_else(|| "Spotify Track".to_string());
+        let mut duration_sec = None;
+        let mut uploader = None;
+        let mut description = None;
+
+        if let Some(m) = metadata.as_ref() {
+            if let Some(t) = &m.title {
+                let search_query = format!("ytsearch1:{}", t);
+                let ytdlp = super::ytdlp::YtDlpExtractor::default();
+                if let Ok(yt_media) = ytdlp.extract(&search_query).await {
+                    streams = yt_media.streams;
+                    duration_sec = yt_media.duration_sec;
+                    uploader = yt_media.uploader;
+                    description = yt_media.description;
+                }
+            }
+        }
         
         Ok(ExtractedMedia {
-            title: metadata.as_ref().and_then(|m| m.title.clone()).unwrap_or_else(|| "Spotify Track".to_string()),
+            title,
             streams,
             thumbnail: metadata.as_ref().and_then(|m| m.thumbnail_url.clone()),
-            duration_sec: None,
-            uploader: None,
-            description: None,
+            duration_sec,
+            uploader,
+            description,
         })
     }
 

@@ -13,6 +13,7 @@ use tokio::sync::{watch, Mutex, RwLock};
 use tracing::{debug, error, info, warn};
 
 use crate::db::{DownloadDb, PartDb};
+use crate::part::split_to_ranges;
 use crate::destination::DiskActor;
 use crate::models::*;
 use crate::throttle::Throttler;
@@ -31,11 +32,12 @@ pub struct FtpJob {
     global_throttler: Arc<Throttler>,
     status_tx: watch::Sender<JobStatus>,
     pub status_rx: watch::Receiver<JobStatus>,
-    disk: Mutex<Option<DiskActor>>,
+    disk: Mutex<Option<Arc<DiskActor>>>,
     data_dir: PathBuf,
 }
 
 /// Parsed FTP URL components.
+#[derive(Clone)]
 struct FtpUrl {
     host: String,
     port: u16,
@@ -116,59 +118,116 @@ impl FtpJob {
             }
         }
 
+        // Prepare parts
+        let mut parts = self.part_db.get_parts(id).await?;
+        let conn_count = self.settings.read().await.default_thread_count as i32;
+        let min_part_size = self.settings.read().await.min_part_size as i64;
+        
+        let should_init = parts.is_empty() || parts.len() != conn_count as usize;
+        if should_init {
+            parts.clear();
+            let ranges = split_to_ranges(file_size as i64, conn_count as u32, min_part_size);
+            for (start, end) in ranges {
+                parts.push(RangedPart::new(start, Some(end), start));
+            }
+        } else {
+            if parts.is_empty() {
+                let end = if file_size > 0 { Some(file_size as i64 - 1) } else { None };
+                parts.push(RangedPart::new(0, end, 0));
+            }
+        }
+        self.part_db.set_parts(id, &parts).await?;
+
         // Prepare destination
-        let item = self.item.read().await;
-        let output_path = PathBuf::from(&item.folder).join(&item.name);
-        let disk = DiskActor::spawn(output_path, Some(file_size as u64)).await?;
-        *self.disk.lock().await = Some(disk);
-        drop(item);
+        let item_read = self.item.read().await;
+        let output_path = PathBuf::from(&item_read.folder).join(&item_read.name);
+        drop(item_read);
+        let disk = Arc::new(DiskActor::spawn(output_path, Some(file_size as u64)).await?);
+        *self.disk.lock().await = Some(Arc::clone(&disk));
 
         let _ = self.status_tx.send(JobStatus::Downloading);
 
-        // Download using RETR with passive mode
-        // For simplicity, using single-connection download for now.
-        // Multi-connection FTP requires separate control sessions (FTP protocol limitation).
-        let mut data_stream = control
-            .retr_as_stream(&ftp_url.path)
-            .await
-            .map_err(|e| anyhow::anyhow!("FTP RETR failed: {}", e))?;
+        // Spawn a task for each part
+        let mut join_set = tokio::task::JoinSet::new();
 
-        let disk_guard = self.disk.lock().await;
-        let disk = disk_guard.as_ref().ok_or_else(|| anyhow::anyhow!("No disk"))?;
-        let mut writer = disk.writer_for(0);
+        for (idx, part) in parts.into_iter().enumerate() {
+            let part = Arc::new(RwLock::new(part));
+            let ftp_url = ftp_url.clone();
+            let disk = Arc::clone(&disk);
+            let throttler = Arc::clone(&self.global_throttler);
+            let part_db = Arc::clone(&self.part_db);
 
-        use tokio::io::AsyncReadExt;
-        let mut buf = vec![0u8; 65536];
-        let mut total_read: u64 = 0;
+            join_set.spawn(async move {
+                let mut p = part.read().await.clone();
+                if p.is_completed() {
+                    return Ok::<(), anyhow::Error>(());
+                }
 
-        loop {
-            let n = data_stream
-                .read(&mut buf)
-                .await
-                .map_err(|e| anyhow::anyhow!("FTP read failed: {}", e))?;
+                let mut control = AsyncFtpStream::connect(format!("{}:{}", ftp_url.host, ftp_url.port))
+                    .await
+                    .map_err(|e| anyhow::anyhow!("FTP part connect failed: {}", e))?;
 
-            if n == 0 {
-                break;
-            }
+                let user = ftp_url.username.as_deref().unwrap_or("anonymous");
+                let pass = ftp_url.password.as_deref().unwrap_or("guest@");
+                control.login(user, pass).await.map_err(|e| anyhow::anyhow!("FTP part login failed: {}", e))?;
+                control.transfer_type(FileType::Binary).await.map_err(|e| anyhow::anyhow!("FTP part TYPE I failed: {}", e))?;
 
-            self.global_throttler.acquire(n as u32).await;
+                control.resume_transfer(p.current as usize).await.map_err(|e| anyhow::anyhow!("FTP part REST failed: {}", e))?;
 
-            let data = Bytes::copy_from_slice(&buf[..n]);
-            writer
-                .write(data)
-                .await
-                .map_err(|e| anyhow::anyhow!("Write failed: {}", e))?;
+                let data_stream = control.retr_as_stream(&ftp_url.path).await.map_err(|e| anyhow::anyhow!("FTP part RETR failed: {}", e))?;
 
-            total_read += n as u64;
+                use tokio_util::compat::FuturesAsyncReadCompatExt;
+                let mut data_stream = data_stream.compat();
+                let mut writer = disk.writer_for(p.current as u64);
+
+                use tokio::io::AsyncReadExt;
+                let mut buf = vec![0u8; 65536];
+                
+                let target_len = p.remaining().unwrap_or(std::i64::MAX);
+                let mut bytes_read = 0;
+
+                while bytes_read < target_len {
+                    let to_read = std::cmp::min(buf.len() as i64, target_len - bytes_read) as usize;
+                    let n = data_stream.read(&mut buf[..to_read]).await.map_err(|e| anyhow::anyhow!("FTP read failed: {}", e))?;
+                    if n == 0 { break; }
+                    
+                    throttler.acquire(n as u32).await;
+                    let data = Bytes::copy_from_slice(&buf[..n]);
+                    writer.write(data).await.map_err(|e| anyhow::anyhow!("Write failed: {}", e))?;
+                    
+                    bytes_read += n as i64;
+                    
+                    // Simple auto-save simulation
+                    p.current += n as i64;
+                    *part.write().await = p.clone();
+                }
+
+                control.finalize_retr_stream(data_stream.into_inner()).await.map_err(|e| anyhow::anyhow!("FTP finalize failed: {}", e))?;
+                control.quit().await.ok();
+
+                Ok(())
+            });
         }
 
-        // Finalize
-        control
-            .finalize_retr_stream(data_stream)
-            .await
-            .map_err(|e| anyhow::anyhow!("FTP finalize failed: {}", e))?;
+        // Wait for all to finish
+        let mut total_success = true;
+        while let Some(res) = join_set.join_next().await {
+            match res {
+                Ok(Ok(_)) => {},
+                Ok(Err(e)) => {
+                    error!("Part failed: {}", e);
+                    total_success = false;
+                },
+                Err(e) => {
+                    error!("Join error: {}", e);
+                    total_success = false;
+                }
+            }
+        }
 
-        control.quit().await.ok();
+        if !total_success {
+            return Err(anyhow::anyhow!("Some parts failed"));
+        }
 
         // Update item
         {
@@ -189,7 +248,7 @@ impl FtpJob {
         }
 
         let _ = self.status_tx.send(JobStatus::Finished);
-        info!("FTP job #{} completed ({} bytes)", id, total_read);
+        info!("FTP job #{} completed", id);
         Ok(())
     }
 

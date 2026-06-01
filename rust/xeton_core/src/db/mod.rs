@@ -4,8 +4,12 @@
 // with an embedded SurrealDB v3 instance using RocksDB for durable storage.
 
 mod store;
+pub mod progress_batcher;
 
 pub use store::SurrealStore;
+pub use progress_batcher::ProgressBatcher;
+
+
 
 use crate::models::{DownloadItem, QueueModel, RangedPart};
 use async_trait::async_trait;
@@ -46,3 +50,14 @@ pub trait QueueDb: Send + Sync {
     async fn set_queue(&self, model: &QueueModel) -> anyhow::Result<()>;
     async fn remove_queue(&self, id: i64) -> anyhow::Result<()>;
 }
+
+// ─── Block DB trait ─────────────────────────────────────────────────────────
+
+/// Trait abstracting block-level persistence for downloads.
+#[async_trait]
+pub trait BlockDb: Send + Sync {
+    async fn get_blocks(&self, task_id: i64) -> anyhow::Result<Vec<crate::models::Block>>;
+    async fn set_blocks(&self, task_id: i64, blocks: &[crate::models::Block]) -> anyhow::Result<()>;
+    async fn remove_blocks(&self, task_id: i64) -> anyhow::Result<()>;
+}
+

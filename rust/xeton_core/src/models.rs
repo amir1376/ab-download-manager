@@ -4,12 +4,14 @@
 // and `DownloadSettings` with value semantics (Clone + Send + Sync).
 
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::Thing;
+use surrealdb::types::RecordId;
+use surrealdb::types::SurrealValue;
 
 // ─── Download Status ────────────────────────────────────────────────────────
 
 /// Mirrors `ir.amirab.downloader.downloaditem.DownloadStatus`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, uniffi::Enum, surrealdb::SurrealValue)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, uniffi::Enum, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 pub enum DownloadStatus {
     Added,
     Downloading,
@@ -48,7 +50,8 @@ impl Default for JobStatus {
 // ─── Download Protocol ──────────────────────────────────────────────────────
 
 /// Protocol discriminator for multi-protocol dispatch.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, uniffi::Enum, surrealdb::SurrealValue)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, uniffi::Enum, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 pub enum DownloadProtocol {
     Http,
     Hls,
@@ -66,7 +69,8 @@ impl Default for DownloadProtocol {
 
 /// Persistent download record.
 /// Mirrors `ir.amirab.downloader.downloaditem.http.HttpDownloadItem` (and HLS variant).
-#[derive(Clone, Debug, Serialize, Deserialize, uniffi::Record, surrealdb::SurrealValue)]
+#[derive(Clone, Debug, Serialize, Deserialize, uniffi::Record, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 pub struct DownloadItem {
     /// SurrealDB record id (table:id). The `id` field used by the rest of the
     /// code is the numeric suffix extracted from this record id.
@@ -102,8 +106,8 @@ pub struct DownloadItem {
 impl DownloadItem {
     pub const LENGTH_UNKNOWN: i64 = -1;
 
-    pub fn record_id(&self) -> Thing {
-        Thing::from(("downloads", self.numeric_id.to_string().as_str()))
+    pub fn record_id(&self) -> RecordId {
+        RecordId::new("downloads", self.numeric_id)
     }
 }
 
@@ -131,7 +135,8 @@ impl Default for DownloadItem {
 
 /// A byte-range segment of a download.
 /// Mirrors `ir.amirab.downloader.part.RangedPart`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, surrealdb::SurrealValue)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 pub struct RangedPart {
     /// Absolute start byte offset within the file.
     pub from: i64,
@@ -231,7 +236,8 @@ impl Default for DuplicateStrategy {
 
 /// Global settings for the download engine.
 /// Mirrors `ir.amirab.downloader.DownloadSettings`.
-#[derive(Clone, Debug, Serialize, Deserialize, uniffi::Record, surrealdb::SurrealValue)]
+#[derive(Clone, Debug, Serialize, Deserialize, uniffi::Record, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 pub struct DownloadSettings {
     /// Default number of concurrent connections per download.
     pub default_thread_count: u32,
@@ -267,7 +273,8 @@ impl Default for DownloadSettings {
 
 /// Persistent queue descriptor.
 /// Mirrors `ir.amirab.downloader.db.QueueModel`.
-#[derive(Clone, Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
+#[derive(Clone, Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 pub struct QueueModel {
     pub id: i64,
     pub name: String,
@@ -292,12 +299,27 @@ impl Default for QueueModel {
 
 /// Scheduled start/stop times for a queue.
 /// Mirrors `ir.amirab.downloader.queue.ScheduleTimes`.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, surrealdb::SurrealValue)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 pub struct ScheduleTimes {
     pub enabled_start_time: bool,
     pub start_time_ms: i64,
     pub enabled_end_time: bool,
     pub end_time_ms: i64,
+}
+
+// ─── Block Struct ───────────────────────────────────────────────────────────
+
+/// Represents a small sub-chunk (block) of a ranged part or file, used for fine-grained progress/checksumming.
+#[derive(Clone, Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
+pub struct Block {
+    pub task_id: i64,
+    pub block_index: u32,
+    pub start_offset: u64,
+    pub end_offset: u64,
+    pub checksum: Option<u32>,
+    pub is_completed: bool,
 }
 
 // ─── Manager Events ─────────────────────────────────────────────────────────

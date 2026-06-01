@@ -22,9 +22,9 @@ use crate::models::{ManagerEvent, QueueModel, ScheduleTimes};
 /// which items should be active and starts/stops them accordingly.
 pub struct Queue {
     pub model: Arc<RwLock<QueueModel>>,
-    active_ids: Mutex<HashSet<i64>>,
-    canceled_ids: Mutex<HashSet<i64>>,
-    trimmed_ids: Mutex<HashSet<i64>>,
+    active_ids: Arc<Mutex<HashSet<i64>>>,
+    canceled_ids: Arc<Mutex<HashSet<i64>>>,
+    trimmed_ids: Arc<Mutex<HashSet<i64>>>,
     active_flow: watch::Sender<bool>,
     pub active_rx: watch::Receiver<bool>,
     /// Channel to send start/stop commands to the manager.
@@ -59,9 +59,9 @@ impl Queue {
 
         Arc::new(Self {
             model: Arc::new(RwLock::new(model)),
-            active_ids: Mutex::new(HashSet::new()),
-            canceled_ids: Mutex::new(HashSet::new()),
-            trimmed_ids: Mutex::new(HashSet::new()),
+            active_ids: Arc::new(Mutex::new(HashSet::new())),
+            canceled_ids: Arc::new(Mutex::new(HashSet::new())),
+            trimmed_ids: Arc::new(Mutex::new(HashSet::new())),
             active_flow,
             active_rx,
             command_tx,
@@ -217,7 +217,7 @@ impl Queue {
         } else if active_count > max {
             // Stop excess downloads
             let to_stop = active_count - max;
-            let stop_ids: Vec<i64> = active.iter().rev().take(to_stop).copied().collect();
+            let stop_ids: Vec<i64> = active.iter().take(to_stop).copied().collect();
             for id in stop_ids {
                 active.remove(&id);
                 let _ = command_tx.send(QueueCommand::StopJob {

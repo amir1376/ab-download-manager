@@ -13,26 +13,29 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use surrealdb::engine::local::SurrealKv;
-use surrealdb::sql::Thing;
+use surrealdb::types::RecordId;
+use surrealdb::types::SurrealValue;
 use surrealdb::Surreal;
 use tracing::{debug, info, warn};
 
-use crate::db::{DownloadDb, PartDb, QueueDb};
-use crate::models::{DownloadItem, QueueModel, RangedPart};
+use crate::db::{DownloadDb, PartDb, QueueDb, BlockDb};
+use crate::models::{DownloadItem, QueueModel, RangedPart, Block};
 
 // ─── Internal record wrappers ───────────────────────────────────────────────
 // SurrealDB returns records with an `id` field. These wrappers let serde
 // deserialize the full record including the SurrealDB id.
 
-#[derive(Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
+#[derive(Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 struct DownloadRecord {
-    id: Option<Thing>,
+    id: Option<RecordId>,
     #[serde(flatten)]
     inner: DownloadItemData,
 }
 
 /// The actual persisted fields (no `numeric_id` — that's the SurrealDB key).
-#[derive(Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
+#[derive(Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 struct DownloadItemData {
     numeric_id: i64,
     name: String,
@@ -89,23 +92,34 @@ impl From<DownloadItemData> for DownloadItem {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
+#[derive(Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 struct PartsRecord {
-    id: Option<Thing>,
+    id: Option<RecordId>,
     download_id: i64,
     parts: Vec<RangedPart>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, surrealdb::SurrealValue)]
+#[derive(Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
+struct BlocksRecord {
+    id: Option<RecordId>,
+    task_id: i64,
+    blocks: Vec<Block>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 struct QueueRecord {
-    id: Option<Thing>,
+    id: Option<RecordId>,
     #[serde(flatten)]
     inner: QueueModel,
 }
 
-#[derive(Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
+#[derive(Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
 struct CounterRecord {
-    id: Option<Thing>,
+    id: Option<RecordId>,
     value: i64,
 }
 
@@ -127,7 +141,7 @@ impl SurrealStore {
         let db_path = data_dir.join("xeton.db");
         info!("Opening SurrealDB at {}", db_path.display());
 
-        let db = Surreal::new::<Surrealkv>(db_path.to_str().unwrap_or("xeton.db")).await?;
+        let db = Surreal::new::<SurrealKv>(db_path.to_str().unwrap_or("xeton.db")).await?;
 
         // Select namespace and database — SurrealDB requires these even for embedded.
         db.use_ns("xeton").use_db("core").await?;
@@ -147,6 +161,7 @@ impl SurrealStore {
                 DEFINE INDEX IF NOT EXISTS idx_download_numeric_id ON TABLE downloads COLUMNS numeric_id UNIQUE;
                 DEFINE INDEX IF NOT EXISTS idx_parts_download_id   ON TABLE parts     COLUMNS download_id UNIQUE;
                 DEFINE INDEX IF NOT EXISTS idx_queue_id            ON TABLE queues    COLUMNS inner.id UNIQUE;
+                DEFINE INDEX IF NOT EXISTS idx_blocks_task_id      ON TABLE blocks    COLUMNS task_id UNIQUE;
                 ",
             )
             .await?;
@@ -205,7 +220,8 @@ impl DownloadDb for SurrealStore {
             .query("SELECT numeric_id FROM downloads ORDER BY numeric_id DESC LIMIT 1")
             .await?;
 
-        #[derive(Deserialize)]
+        #[derive(Deserialize, SurrealValue)]
+        #[surreal(crate = "surrealdb::types")]
         struct IdOnly {
             numeric_id: i64,
         }
@@ -300,6 +316,35 @@ impl QueueDb for SurrealStore {
 
     async fn remove_queue(&self, id: i64) -> anyhow::Result<()> {
         let _: Option<QueueRecord> = self.db.delete(("queues", id)).await?;
+        Ok(())
+    }
+}
+
+// ─── BlockDb impl ───────────────────────────────────────────────────────────
+
+#[async_trait]
+impl BlockDb for SurrealStore {
+    async fn get_blocks(&self, task_id: i64) -> anyhow::Result<Vec<Block>> {
+        let record: Option<BlocksRecord> = self.db.select(("blocks", task_id)).await?;
+        Ok(record.map(|r| r.blocks).unwrap_or_default())
+    }
+
+    async fn set_blocks(&self, task_id: i64, blocks: &[Block]) -> anyhow::Result<()> {
+        let record = BlocksRecord {
+            id: None,
+            task_id,
+            blocks: blocks.to_vec(),
+        };
+        let _: Option<BlocksRecord> = self
+            .db
+            .upsert(("blocks", task_id))
+            .content(record)
+            .await?;
+        Ok(())
+    }
+
+    async fn remove_blocks(&self, task_id: i64) -> anyhow::Result<()> {
+        let _: Option<BlocksRecord> = self.db.delete(("blocks", task_id)).await?;
         Ok(())
     }
 }

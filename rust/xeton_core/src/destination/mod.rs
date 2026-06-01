@@ -188,7 +188,32 @@ impl DiskActor {
         Ok(())
     }
 
-    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+    #[cfg(target_os = "macos")]
+    async fn preallocate(file: &File, size: u64) -> Result<(), DestinationError> {
+        use std::os::unix::io::AsRawFd;
+        let fd = file.as_raw_fd();
+        let mut store = libc::fstore_t {
+            fst_flags: libc::F_ALLOCATECONTIG,
+            fst_posmode: libc::F_PEOFPOSMODE,
+            fst_offset: 0,
+            fst_length: size as libc::off_t,
+            fst_bytesalloc: 0,
+        };
+        let mut res = unsafe { libc::fcntl(fd, libc::F_PREALLOCATE, &store) };
+        if res == -1 {
+            store.fst_flags = libc::F_ALLOCATEALL;
+            res = unsafe { libc::fcntl(fd, libc::F_PREALLOCATE, &store) };
+        }
+        if res != -1 {
+            unsafe { libc::ftruncate(fd, size as libc::off_t) };
+        } else {
+            return Err(DestinationError::Io(std::io::Error::last_os_error()));
+        }
+        debug!("Pre-allocated {} bytes (macOS)", size);
+        Ok(())
+    }
+
+    #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
     async fn preallocate(file: &File, size: u64) -> Result<(), DestinationError> {
         // Fallback: just set the file length
         file.set_len(size).await?;

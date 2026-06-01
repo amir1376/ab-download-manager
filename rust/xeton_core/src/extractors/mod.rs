@@ -6,6 +6,7 @@
 pub mod ytdlp;
 pub mod soundcloud;
 pub mod spotify;
+pub mod social;
 
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -64,10 +65,14 @@ impl ExtractorRouter {
     pub fn new() -> Self {
         let mut extractors: Vec<Box<dyn Extractor>> = Vec::new();
 
-        // yt-dlp handles YouTube, TikTok, Instagram, and many more
-        extractors.push(Box::new(ytdlp::YtDlpExtractor::default()));
+        // Register custom fast-path extractors first
+        extractors.push(Box::new(social::TikTokExtractor::default()));
+        extractors.push(Box::new(social::InstagramExtractor::default()));
         extractors.push(Box::new(soundcloud::SoundCloudExtractor::default()));
         extractors.push(Box::new(spotify::SpotifyExtractor::default()));
+
+        // yt-dlp acts as the generic fallback
+        extractors.push(Box::new(ytdlp::YtDlpExtractor::default()));
 
         Self { extractors }
     }

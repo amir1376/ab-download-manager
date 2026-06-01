@@ -36,6 +36,12 @@ surrealdb = { version = "3", features = ["kv-surrealkv"] }
 # CRC32 SIMD checksum (block-level integrity validation)
 crc32fast = "1"
 
+# Chrono for HTTP last modified header parsing
+chrono = "0.4"
+
+# Filetime for setting output file timestamp
+filetime = "0.2"
+
 # Atomic primitives for torrent piece bitfields
 portable-atomic = "1"
 
@@ -53,13 +59,14 @@ cbc = "0.1"
 urlencoding = "2"
 libc = "0.2"
 cipher = "0.4"
+regex = "1"
 
 # Token-bucket rate limiter (global + per-job speed limits)
 governor = "0.10"
 
 # Async stream utilities
 tokio-stream = "0.1"
-tokio-util = "0.7"
+tokio-util = { version = "0.7", features = ["compat"] }
 
 # Structured logging
 tracing            = "0.1"

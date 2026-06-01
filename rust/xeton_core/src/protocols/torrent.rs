@@ -28,9 +28,9 @@ pub struct TorrentJob {
     pub status_rx: watch::Receiver<JobStatus>,
     data_dir: PathBuf,
     /// librqbit session handle.
-    session: RwLock<Option<librqbit::Session>>,
+    session: RwLock<Option<Arc<librqbit::Session>>>,
     /// Active torrent handle index.
-    torrent_handle: RwLock<Option<librqbit::ManagedTorrentHandle>>,
+    torrent_handle: RwLock<Option<Arc<librqbit::ManagedTorrent>>>,
 }
 
 impl TorrentJob {
@@ -116,7 +116,7 @@ impl TorrentJob {
         // Update item with torrent metadata
         {
             let mut item = self.item.write().await;
-            if let Some(total_bytes) = handle.info().total_bytes() {
+            if let Some(total_bytes) = handle.metadata.load().as_ref().map(|r| r.lengths.total_length()) {
                 item.content_length = total_bytes as i64;
             }
             item.status = DownloadStatus::Downloading;
@@ -188,7 +188,9 @@ impl TorrentJob {
     /// Pause the torrent.
     pub async fn pause(&self) -> anyhow::Result<()> {
         if let Some(handle) = self.torrent_handle.write().await.take() {
-            handle.pause();
+            if let Some(session) = self.session.read().await.as_ref() {
+                let _ = session.pause(&handle).await;
+            }
         }
         let _ = self.status_tx.send(JobStatus::Canceled {
             reason: "paused".into(),

@@ -582,19 +582,15 @@ fn now_ms() -> i64 {
 
 /// Parse an HTTP `Last-Modified` header into epoch milliseconds.
 fn parse_last_modified(value: &str) -> Result<i64, ()> {
-    // HTTP date format: "Thu, 01 Dec 1994 16:00:00 GMT"
-    // Use a simple parser — we don't need full RFC 7231 compliance
-    let formats = [
-        "%a, %d %b %Y %H:%M:%S GMT",
-        "%A, %d-%b-%y %H:%M:%S GMT",
-        "%a %b %e %H:%M:%S %Y",
-    ];
-
-    for fmt in &formats {
-        // Use time crate or manual parsing
-        // For simplicity, store the raw string and parse later if needed
+    use chrono::DateTime;
+    // HTTP date format: "Thu, 01 Dec 1994 16:00:00 GMT" (RFC 2822/7231)
+    if let Ok(dt) = DateTime::parse_from_rfc2822(value) {
+        return Ok(dt.timestamp_millis());
     }
-
+    // Also try RFC 3339 just in case it's poorly formatted but ISO
+    if let Ok(dt) = DateTime::parse_from_rfc3339(value) {
+        return Ok(dt.timestamp_millis());
+    }
     // Fallback: just return an error if we can't parse
     Err(())
 }
