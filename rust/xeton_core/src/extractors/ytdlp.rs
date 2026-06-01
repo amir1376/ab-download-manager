@@ -11,7 +11,7 @@ use std::process::Stdio;
 use async_trait::async_trait;
 use serde::Deserialize;
 use tokio::process::Command;
-use tracing::{debug, warn};
+use tracing::debug;
 
 use super::{ExtractedMedia, Extractor, MediaStream};
 

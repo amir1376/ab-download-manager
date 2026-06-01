@@ -3,16 +3,16 @@
 // Port of `ir.amirab.downloader.DownloadManager`.
 // Central coordinator: job registry, event bus, download lifecycle.
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use dashmap::DashMap;
 use tokio::sync::{broadcast, RwLock};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info, warn};
 
 use crate::connection::proxy::ProxyConfig;
-use crate::db::{DownloadDb, PartDb, QueueDb, SurrealStore};
+use crate::db::{DownloadDb, PartDb, SurrealStore};
 use crate::http::job::HttpJob;
 use crate::models::*;
 use crate::queue::manager::QueueManager;

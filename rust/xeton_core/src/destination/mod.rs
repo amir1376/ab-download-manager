@@ -9,16 +9,14 @@
 //   - A single Tokio task owns the file handle, eliminating seek/write races.
 //   - CRC32 block validation is performed before queuing writes.
 
-use std::io::SeekFrom;
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
 
 use bytes::Bytes;
 use thiserror::Error;
 use tokio::fs::{self, File, OpenOptions};
-use tokio::io::{AsyncSeekExt, AsyncWriteExt};
+use tokio::io::AsyncWriteExt;
 use tokio::sync::{mpsc, oneshot};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error};
 
 // ─── Errors ─────────────────────────────────────────────────────────────────
 

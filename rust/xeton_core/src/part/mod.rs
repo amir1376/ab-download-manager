@@ -15,16 +15,15 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-use bytes::Bytes;
 use thiserror::Error;
 use tokio::sync::{watch, Mutex};
 use tokio::time::{sleep, Duration};
 use tokio_stream::StreamExt;
-use tracing::{debug, error, warn};
+use tracing::{debug, warn};
 
-use crate::connection::{ConnectionError, HttpClient, PartConnection};
-use crate::destination::{compute_crc32, PartWriter};
-use crate::models::{PartStatus, RangedPart, ResponseInfo};
+use crate::connection::{ConnectionError, HttpClient};
+use crate::destination::PartWriter;
+use crate::models::{PartStatus, RangedPart};
 use crate::throttle::ThrottleChain;
 
 /// Maximum retries per part before declaring failure.
@@ -387,7 +386,7 @@ pub fn split_to_ranges(size: i64, max_parts: u32, min_part_size: i64) -> Vec<(i6
         return vec![(0, 0)];
     }
 
-    let mut part_count = (max_parts as i64).min(size / min_part_size.max(1)).max(1);
+    let part_count = (max_parts as i64).min(size / min_part_size.max(1)).max(1);
     let part_size = size / part_count;
     let mut ranges = Vec::with_capacity(part_count as usize);
 

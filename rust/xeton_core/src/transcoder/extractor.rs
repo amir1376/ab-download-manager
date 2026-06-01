@@ -1,7 +1,7 @@
 // xeton_core::transcoder::extractor — Audio extraction logic.
 
 use std::path::Path;
-use tracing::{debug, info};
+use tracing::info;
 
 use super::AudioFormat;
 

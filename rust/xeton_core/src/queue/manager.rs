@@ -5,8 +5,7 @@
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use tokio::sync::RwLock;
-use tracing::{debug, info};
+use tracing::info;
 
 use crate::db::QueueDb;
 use crate::models::QueueModel;

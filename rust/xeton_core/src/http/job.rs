@@ -13,16 +13,16 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use reqwest::header::HeaderMap;
 use tokio::sync::{watch, Mutex, RwLock};
 use tokio::task::JoinHandle;
-use tokio::time::{interval, sleep, Duration};
+use tokio::time::{interval, Duration};
 use tokio_util::sync::CancellationToken;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info};
 
 use crate::connection::{HttpClient, DEFAULT_USER_AGENT};
 use crate::connection::proxy::ProxyConfig;
 use crate::db::{DownloadDb, PartDb};
 use crate::destination::{atomic_rename, DiskActor, IncompleteFileUtil};
 use crate::models::*;
-use crate::part::{split_to_ranges, PartRunner, SplitGuard, PART_MAX_TRIES};
+use crate::part::{split_to_ranges, PartRunner, SplitGuard};
 use crate::throttle::{ThrottleChain, Throttler};
 
 /// Delay between retry attempts in milliseconds.
@@ -428,7 +428,7 @@ impl HttpJob {
         for part in incomplete_parts {
             let writer = disk.writer_for(part.current as u64);
             let runner = Arc::new(PartRunner::new(part));
-            let handle = runner.clone().start(
+            let _handle = runner.clone().start(
                 self.client.clone(),
                 url.clone(),
                 headers.clone(),

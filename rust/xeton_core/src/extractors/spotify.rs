@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use serde::Deserialize;
 use tracing::debug;
 
-use super::{ExtractedMedia, Extractor, MediaStream};
+use super::{ExtractedMedia, Extractor};
 
 pub struct SpotifyExtractor {
     client: reqwest::Client,

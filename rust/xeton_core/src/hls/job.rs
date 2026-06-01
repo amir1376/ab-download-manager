@@ -11,7 +11,7 @@ use std::sync::Arc;
 #[cfg(feature = "hls")]
 use aes::Aes128;
 #[cfg(feature = "hls")]
-use bytes::{Bytes, BytesMut};
+use bytes::Bytes;
 #[cfg(feature = "hls")]
 use cbc::cipher::{BlockDecryptMut, KeyIvInit};
 #[cfg(feature = "hls")]
@@ -19,7 +19,7 @@ use reqwest::header::HeaderMap;
 #[cfg(feature = "hls")]
 use tokio::sync::{watch, Mutex, RwLock};
 #[cfg(feature = "hls")]
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info};
 
 #[cfg(feature = "hls")]
 use crate::connection::HttpClient;

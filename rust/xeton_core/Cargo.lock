@@ -5644,6 +5644,7 @@ dependencies = [
  "lazy-regex",
  "log",
  "pin-project",
+ "rustls",
  "rustls-pki-types",
  "thiserror 2.0.18",
 ]

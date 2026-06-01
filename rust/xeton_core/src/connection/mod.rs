@@ -6,10 +6,9 @@
 pub mod proxy;
 
 use std::pin::Pin;
-use std::sync::Arc;
 
 use bytes::Bytes;
-use reqwest::header::{HeaderMap, HeaderValue, ACCEPT_RANGES, CONTENT_LENGTH, CONTENT_RANGE, CONTENT_TYPE, ETAG, LAST_MODIFIED, RANGE, USER_AGENT};
+use reqwest::header::{HeaderMap, ACCEPT_RANGES, CONTENT_LENGTH, CONTENT_RANGE, CONTENT_TYPE, ETAG, LAST_MODIFIED, RANGE};
 use reqwest::{Client, Response, StatusCode};
 use thiserror::Error;
 use tokio_stream::Stream;

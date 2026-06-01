@@ -208,7 +208,7 @@ impl SurrealStore {
             })
             .await?;
 
-        if let Some(counter) = result {
+        if let Some(_counter) = result {
             let updated: Option<CounterRecord> = self
                 .db
                 .query("UPDATE counters:download_id SET value += 1 RETURN AFTER")

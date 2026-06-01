@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use tokio::sync::{watch, RwLock};
-use tracing::{debug, info, warn};
+use tracing::{debug, info};
 
 use crate::db::DownloadDb;
 use crate::models::*;
@@ -155,7 +155,7 @@ impl TorrentJob {
             };
 
             let stats = handle.stats();
-            let progress_bytes = stats.progress_bytes;
+            let _progress_bytes = stats.progress_bytes;
             let total_bytes = stats.total_bytes;
 
             // Update item

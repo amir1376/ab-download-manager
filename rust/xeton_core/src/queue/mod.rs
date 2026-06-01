@@ -10,10 +10,10 @@ use std::sync::Arc;
 use tokio::sync::{broadcast, watch, Mutex, RwLock};
 use tokio::task::JoinHandle;
 use tokio::time::{sleep, Duration};
-use tracing::{debug, info, warn};
+use tracing::warn;
 
 use crate::db::QueueDb;
-use crate::models::{ManagerEvent, QueueModel, ScheduleTimes};
+use crate::models::QueueModel;
 
 /// A download queue that manages concurrent download scheduling.
 ///
@@ -151,7 +151,7 @@ impl Queue {
             let canceled_ids = self.canceled_ids.clone();
             let active_flow = self.active_rx.clone();
             let command_tx = self.command_tx.clone();
-            let queue_db = self.queue_db.clone();
+            let _queue_db = self.queue_db.clone();
 
             // Dummy reference — actual debounce logic inlined
             let handle = tokio::spawn(async move {

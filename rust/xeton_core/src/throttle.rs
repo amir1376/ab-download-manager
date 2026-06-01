@@ -8,7 +8,6 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicI64, Ordering};
 
 use governor::{Quota, RateLimiter, clock::DefaultClock, state::{InMemoryState, NotKeyed}};
-use tokio::time::Duration;
 
 /// Async-compatible rate limiter wrapping `governor::RateLimiter`.
 ///

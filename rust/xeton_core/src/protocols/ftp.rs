@@ -91,9 +91,11 @@ impl FtpJob {
             if !native_certs.errors.is_empty() {
                 warn!("Some errors occurred while loading native certificates: {:?}", native_certs.errors);
             }
-            for cert in webpki_roots::TLS_SERVER_ROOTS {
-                let _ = root_store.add(cert.clone());
-            }
+            root_store.extend(
+                webpki_roots::TLS_SERVER_ROOTS
+                    .iter()
+                    .cloned(),
+            );
 
             let config = suppaftp::rustls::ClientConfig::builder()
                 .with_root_certificates(root_store)
@@ -181,12 +183,12 @@ impl FtpJob {
         // Spawn a task for each part
         let mut join_set = tokio::task::JoinSet::new();
 
-        for (idx, part) in parts.into_iter().enumerate() {
+        for (_idx, part) in parts.into_iter().enumerate() {
             let part = Arc::new(RwLock::new(part));
             let ftp_url = ftp_url.clone();
             let disk = Arc::clone(&disk);
             let throttler = Arc::clone(&self.global_throttler);
-            let part_db = Arc::clone(&self.part_db);
+            let _part_db = Arc::clone(&self.part_db);
 
             join_set.spawn(async move {
                 let mut p = part.read().await.clone();
