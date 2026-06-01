@@ -126,19 +126,15 @@ data class WebViewHolder(
     val isGeckoMode: Boolean get() = geckoTabState != null
 
     /**
-     * For the Gecko path: opens the [GeckoSession] against the process-wide runtime.
-     * For the WebView path: inflates or resumes the [ABDMWebView].
+     * For the Gecko path: returns `null` — the session is opened and the native [GeckoView]
+     * surface is managed entirely by the [GeckoWebView] composable.
+     *
+     * For the WebView fallback path: inflates or resumes the [ABDMWebView].
      *
      * Must be called from the main thread.
      */
     fun activate(context: Context): ABDMWebView? {
-        if (isGeckoMode) {
-            // Ensure the Gecko session is open and attached to the runtime. The composable
-            // GeckoWebView will bind the session to a GeckoView surface separately.
-            val runtime = GeckoEngineProvider.getOrCreate(context)
-            geckoTabState!!.open(runtime)
-            return null // GeckoWebView composable manages the native view
-        }
+        if (isGeckoMode) return null
         return if (webView != null) {
             webView!!.also { it.onResume() }
         } else {

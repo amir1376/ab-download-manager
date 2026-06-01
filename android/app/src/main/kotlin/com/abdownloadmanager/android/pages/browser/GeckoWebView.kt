@@ -14,9 +14,10 @@ import org.mozilla.geckoview.GeckoView
  * native view and manages attach/detach of the session surface.
  *
  * The composable:
+ * - Ensures [GeckoTabState.open] is called once the [Context] is available (inside `factory`).
  * - Creates the [GeckoView] once per composition key (i.e. per tab ID).
- * - Attaches `tabState.session` to the view inside `AndroidView.factory`.
- * - Detaches the session when the composable leaves the composition.
+ * - Attaches `tabState.session` to the view's surface.
+ * - Detaches the session when the composable leaves the composition via [DisposableEffect].
  *
  * @param tabState The [GeckoTabState] whose [org.mozilla.geckoview.GeckoSession] drives this view.
  * @param modifier Compose [Modifier] applied to the [AndroidView] container.
@@ -26,33 +27,35 @@ fun GeckoWebView(
     tabState: GeckoTabState,
     modifier: Modifier = Modifier,
 ) {
-    // Remember a stable reference to the GeckoView so AndroidView can reuse it across
-    // recompositions without recreating the native view.
-    val geckoView = remember(tabState.tab.tabId) {
-        // Creation is deferred until factory is called with a Context, but we capture the
-        // reference here so the DisposableEffect below can clean up.
-        GeckoViewHolder()
-    }
+    // Remember a stable reference so the DisposableEffect below can release the session surface
+    // even though the GeckoView is created inside AndroidView.factory.
+    val nativeViewRef = remember(tabState.tab.tabId) { GeckoViewRef() }
 
     DisposableEffect(tabState.tab.tabId) {
         onDispose {
-            // Detach the session from the GeckoView surface when the composable is removed.
-            // The session itself remains alive (owned by GeckoTabState) so tab state is preserved.
-            geckoView.view?.releaseSession()
+            // Release the session from the GeckoView surface when this composable is removed.
+            // The GeckoSession itself remains alive (it is owned by GeckoTabState / BrowserComponent)
+            // so tab state (history, scroll position) is preserved for later re-attachment.
+            nativeViewRef.view?.releaseSession()
+            nativeViewRef.view = null
         }
     }
 
     AndroidView(
         modifier = modifier,
         factory = { context: Context ->
+            // Ensure the Gecko session is open against the process-wide runtime.
+            val runtime = GeckoEngineProvider.getOrCreate(context)
+            tabState.open(runtime)
+
             createGeckoView(context).also { view ->
-                geckoView.view = view
-                // Attach the session — this causes Gecko to render into the view's surface.
+                nativeViewRef.view = view
                 view.setSession(tabState.session)
             }
         },
         update = { view ->
-            // If the session changed (e.g. after a session restore) re-attach it.
+            // Re-attach the session if it changed between recompositions (e.g. after process death
+            // and a session restore produces a new GeckoSession instance).
             if (view.session !== tabState.session) {
                 view.releaseSession()
                 view.setSession(tabState.session)
@@ -60,19 +63,19 @@ fun GeckoWebView(
         },
         onRelease = { view ->
             view.releaseSession()
-            geckoView.view = null
+            nativeViewRef.view = null
         },
     )
 }
 
-/** Mutable holder so [DisposableEffect] can reach the [GeckoView] created inside [AndroidView]. */
-private class GeckoViewHolder {
+/** Mutable holder allowing [DisposableEffect] to reach the [GeckoView] created in [AndroidView]. */
+private class GeckoViewRef {
     var view: GeckoView? = null
 }
 
 /**
- * Constructs a [GeckoView] with layout parameters matching the parent's full size.
- * We set these eagerly so Compose's measurement pass can correctly size the AndroidView container.
+ * Constructs a [GeckoView] with layout parameters matching the parent container.
+ * Setting these eagerly prevents a zero-size measurement on the first layout pass.
  */
 private fun createGeckoView(context: Context): GeckoView {
     return GeckoView(context).apply {
