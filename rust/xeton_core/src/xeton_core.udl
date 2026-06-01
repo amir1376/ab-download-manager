@@ -1,4 +1,8 @@
-namespace xeton_core {};
+namespace xeton_core {
+    [Async] void extract_audio(string input_path, string output_path, AudioFormat format);
+    [Async] void merge_video_audio(string video_path, string audio_path, string output_path);
+    [Async] ExtractedMedia extract_media_info(string url);
+};
 
 // ─── Enums ──────────────────────────────────────────────────────────────────
 
@@ -58,6 +62,27 @@ enum AudioFormat {
 };
 
 // ─── Records ────────────────────────────────────────────────────────────────
+
+dictionary MediaStream {
+    string url;
+    string format_id;
+    string stream_type;
+    string? container;
+    string? video_codec;
+    string? audio_codec;
+    u32? height;
+    u32? audio_bitrate;
+    i64? filesize;
+};
+
+dictionary ExtractedMedia {
+    string title;
+    sequence<MediaStream> streams;
+    string? thumbnail;
+    u32? duration_sec;
+    string? uploader;
+    string? description;
+};
 
 dictionary DownloadSettings {
     u32 default_thread_count;

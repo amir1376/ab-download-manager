@@ -12,7 +12,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 /// A resolved media stream from an extractor.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, uniffi::Record)]
 pub struct MediaStream {
     pub url: String,
     pub format_id: String,
@@ -33,7 +33,7 @@ pub struct MediaStream {
 }
 
 /// Extracted media metadata from a URL.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, uniffi::Record)]
 pub struct ExtractedMedia {
     pub title: String,
     pub streams: Vec<MediaStream>,

@@ -118,3 +118,43 @@ impl XetonEngine {
         }
     }
 }
+
+/// Extract audio from a media file using FFmpeg.
+#[uniffi::export]
+pub async fn extract_audio(
+    input_path: String,
+    output_path: String,
+    format: crate::transcoder::AudioFormat,
+) -> Result<(), String> {
+    crate::transcoder::extractor::extract_audio(
+        std::path::Path::new(&input_path),
+        std::path::Path::new(&output_path),
+        format,
+    )
+    .await
+    .map_err(|e| e.to_string())
+}
+
+/// Losslessly merge a video and audio track into a single container.
+#[uniffi::export]
+pub async fn merge_video_audio(
+    video_path: String,
+    audio_path: String,
+    output_path: String,
+) -> Result<(), String> {
+    crate::transcoder::merger::merge_video_audio(
+        std::path::Path::new(&video_path),
+        std::path::Path::new(&audio_path),
+        std::path::Path::new(&output_path),
+    )
+    .await
+    .map_err(|e| e.to_string())
+}
+
+/// Extract media info (URLs, streams, metadata) from a platform URL.
+#[uniffi::export]
+pub async fn extract_media_info(url: String) -> Result<crate::extractors::ExtractedMedia, String> {
+    let router = crate::extractors::ExtractorRouter::new();
+    router.extract(&url).await.map_err(|e| e.to_string())
+}
+

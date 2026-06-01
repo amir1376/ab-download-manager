@@ -17,4 +17,7 @@ pub mod transcoder;
 pub mod throttle;
 pub mod uniffi_api;
 
+pub use uniffi_api::{extract_audio, merge_video_audio, extract_media_info};
+
 uniffi::setup_scaffolding!();
+
