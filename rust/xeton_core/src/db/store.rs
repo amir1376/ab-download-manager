@@ -2,12 +2,13 @@
 //
 // Uses the `kv-rocksdb` feature for durable on-disk storage.
 // Schema:
-//   - `downloads` table:  DownloadItem records keyed by numeric id
-//   - `parts` table:      Per-download part lists keyed by download id
-//   - `queues` table:     QueueModel records keyed by queue id
-//   - `counters` table:   Auto-increment counter for download IDs
+//   - `task` table:           DownloadTask records (schemafull)
+//   - `part` table:           PartSegment records (schemafull)
+//   - `block_checksum` table: BlockChecksum records (schemafull)
+//   - `queues` table:         QueueModel records keyed by queue id
+//   - `counters` table:       Auto-increment counter for download IDs
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use async_trait::async_trait;
@@ -19,18 +20,45 @@ use surrealdb::Surreal;
 use tracing::{debug, info, warn};
 
 use crate::db::{DownloadDb, PartDb, QueueDb, BlockDb};
-use crate::models::{DownloadItem, QueueModel, RangedPart, Block};
+use crate::models::{DownloadItem, QueueModel, RangedPart, Block, DownloadTask, PartSegment, BlockChecksum};
+
+/// Discover default data directory based on OS.
+pub fn discover_data_dir() -> PathBuf {
+    #[cfg(target_os = "windows")]
+    {
+        if let Ok(app_data) = std::env::var("APPDATA") {
+            PathBuf::from(app_data).join("Xeton").join("data")
+        } else {
+            PathBuf::from("C:\\Xeton\\data")
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join("Library").join("Application Support").join("Xeton").join("data")
+        } else {
+            PathBuf::from("/Library/Application Support/Xeton/data")
+        }
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    {
+        // Linux/Android/Fallback
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".config").join("xeton").join("data")
+        } else {
+            PathBuf::from("/data/local/tmp/xeton/data")
+        }
+    }
+}
 
 // ─── Internal record wrappers ───────────────────────────────────────────────
-// SurrealDB returns records with an `id` field. These wrappers let serde
-// deserialize the full record including the SurrealDB id.
 
 #[derive(Debug, Serialize, Deserialize, SurrealValue)]
 #[surreal(crate = "surrealdb::types")]
 struct DownloadRecord {
     id: Option<RecordId>,
     #[serde(flatten)]
-    inner: DownloadItemData,
+    inner: DownloadTask,
 }
 
 /// The actual persisted fields (no `numeric_id` — that's the SurrealDB key).
@@ -92,22 +120,6 @@ impl From<DownloadItemData> for DownloadItem {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, SurrealValue)]
-#[surreal(crate = "surrealdb::types")]
-struct PartsRecord {
-    id: Option<RecordId>,
-    download_id: i64,
-    parts: Vec<RangedPart>,
-}
-
-#[derive(Debug, Serialize, Deserialize, SurrealValue)]
-#[surreal(crate = "surrealdb::types")]
-struct BlocksRecord {
-    id: Option<RecordId>,
-    task_id: i64,
-    blocks: Vec<Block>,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, SurrealValue)]
 #[surreal(crate = "surrealdb::types")]
 struct QueueRecord {
@@ -125,25 +137,16 @@ struct CounterRecord {
 
 // ─── SurrealStore ───────────────────────────────────────────────────────────
 
-/// Unified SurrealDB store implementing all three DB traits.
-///
-/// The database is opened once at startup with `SurrealStore::open()` and
-/// shared via `Arc<SurrealStore>` across the manager, jobs, and queues.
 pub struct SurrealStore {
     db: Surreal<surrealdb::engine::local::Db>,
 }
 
 impl SurrealStore {
-    /// Open (or create) the embedded SurrealDB database at the given directory.
-    ///
-    /// The SurrealKV data files are stored inside `<data_dir>/xeton.db/`.
     pub async fn open(data_dir: &Path) -> anyhow::Result<Arc<Self>> {
         let db_path = data_dir.join("xeton.db");
         info!("Opening SurrealDB at {}", db_path.display());
 
         let db = Surreal::new::<SurrealKv>(db_path.to_str().unwrap_or("xeton.db")).await?;
-
-        // Select namespace and database — SurrealDB requires these even for embedded.
         db.use_ns("xeton").use_db("core").await?;
 
         let store = Arc::new(Self { db });
@@ -151,17 +154,43 @@ impl SurrealStore {
         Ok(store)
     }
 
-    /// Create tables and indexes if they don't exist.
     async fn ensure_schema(&self) -> anyhow::Result<()> {
-        // SurrealDB v3 is schemaless by default — tables are created on first write.
-        // We create indexes for fast lookups.
         self.db
             .query(
                 "
-                DEFINE INDEX IF NOT EXISTS idx_download_numeric_id ON TABLE downloads COLUMNS numeric_id UNIQUE;
-                DEFINE INDEX IF NOT EXISTS idx_parts_download_id   ON TABLE parts     COLUMNS download_id UNIQUE;
-                DEFINE INDEX IF NOT EXISTS idx_queue_id            ON TABLE queues    COLUMNS inner.id UNIQUE;
-                DEFINE INDEX IF NOT EXISTS idx_blocks_task_id      ON TABLE blocks    COLUMNS task_id UNIQUE;
+                DEFINE TABLE task SCHEMAFULL;
+                DEFINE FIELD id ON TABLE task TYPE record<task>;
+                DEFINE FIELD numeric_id ON TABLE task TYPE int;
+                DEFINE FIELD url ON TABLE task TYPE string;
+                DEFINE FIELD dest_path ON TABLE task TYPE string;
+                DEFINE FIELD protocol ON TABLE task TYPE any;
+                DEFINE FIELD total_size ON TABLE task TYPE int;
+                DEFINE FIELD status ON TABLE task TYPE any;
+
+                DEFINE TABLE part SCHEMAFULL;
+                DEFINE FIELD id ON TABLE part TYPE record<part>;
+                DEFINE FIELD task_id ON TABLE part TYPE int;
+                DEFINE FIELD part_index ON TABLE part TYPE int;
+                DEFINE FIELD from_offset ON TABLE part TYPE int;
+                DEFINE FIELD to_offset ON TABLE part TYPE any;
+                DEFINE FIELD current_offset ON TABLE part TYPE int;
+
+                DEFINE TABLE block_checksum SCHEMAFULL;
+                DEFINE FIELD id ON TABLE block_checksum TYPE record<block_checksum>;
+                DEFINE FIELD task_id ON TABLE block_checksum TYPE int;
+                DEFINE FIELD block_index ON TABLE block_checksum TYPE int;
+                DEFINE FIELD expected_crc32 ON TABLE block_checksum TYPE int;
+                DEFINE FIELD start_offset ON TABLE block_checksum TYPE int;
+                DEFINE FIELD end_offset ON TABLE block_checksum TYPE int;
+                DEFINE FIELD is_completed ON TABLE block_checksum TYPE bool;
+
+                DEFINE TABLE queues SCHEMALESS;
+                DEFINE TABLE counters SCHEMALESS;
+
+                DEFINE INDEX IF NOT EXISTS idx_download_numeric_id ON TABLE task COLUMNS numeric_id UNIQUE;
+                DEFINE INDEX IF NOT EXISTS idx_parts_download_id   ON TABLE part COLUMNS task_id, part_index UNIQUE;
+                DEFINE INDEX IF NOT EXISTS idx_queue_id            ON TABLE queues COLUMNS inner.id UNIQUE;
+                DEFINE INDEX IF NOT EXISTS idx_blocks_task_id      ON TABLE block_checksum COLUMNS task_id, block_index UNIQUE;
                 ",
             )
             .await?;
@@ -169,9 +198,7 @@ impl SurrealStore {
         Ok(())
     }
 
-    /// Get the next auto-increment download ID.
     async fn next_download_id(&self) -> anyhow::Result<i64> {
-        // Atomic increment using SurrealDB's UPDATE ... SET value += 1
         let result: Option<CounterRecord> = self
             .db
             .upsert(("counters", "download_id"))
@@ -182,7 +209,6 @@ impl SurrealStore {
             .await?;
 
         if let Some(counter) = result {
-            // If the counter already existed, increment it
             let updated: Option<CounterRecord> = self
                 .db
                 .query("UPDATE counters:download_id SET value += 1 RETURN AFTER")
@@ -200,14 +226,14 @@ impl SurrealStore {
 #[async_trait]
 impl DownloadDb for SurrealStore {
     async fn get_all(&self) -> anyhow::Result<Vec<DownloadItem>> {
-        let records: Vec<DownloadRecord> = self.db.select("downloads").await?;
+        let records: Vec<DownloadRecord> = self.db.select("task").await?;
         Ok(records.into_iter().map(|r| r.inner.into()).collect())
     }
 
     async fn get_by_id(&self, id: i64) -> anyhow::Result<Option<DownloadItem>> {
         let mut result = self
             .db
-            .query("SELECT * FROM downloads WHERE numeric_id = $id LIMIT 1")
+            .query("SELECT * FROM task WHERE numeric_id = $id LIMIT 1")
             .bind(("id", id))
             .await?;
         let records: Vec<DownloadRecord> = result.take(0)?;
@@ -217,7 +243,7 @@ impl DownloadDb for SurrealStore {
     async fn get_last_id(&self) -> anyhow::Result<i64> {
         let mut result = self
             .db
-            .query("SELECT numeric_id FROM downloads ORDER BY numeric_id DESC LIMIT 1")
+            .query("SELECT numeric_id FROM task ORDER BY numeric_id DESC LIMIT 1")
             .await?;
 
         #[derive(Deserialize, SurrealValue)]
@@ -231,29 +257,28 @@ impl DownloadDb for SurrealStore {
     }
 
     async fn add(&self, item: &DownloadItem) -> anyhow::Result<()> {
-        let data = DownloadItemData::from(item);
+        let data = DownloadTask::from(item);
         let _: Option<DownloadRecord> = self
             .db
-            .create(("downloads", item.numeric_id))
+            .create(("task", item.numeric_id))
             .content(data)
             .await?;
-        debug!("Added download #{}", item.numeric_id);
+        debug!("Added download task #{}", item.numeric_id);
         Ok(())
     }
 
     async fn update(&self, item: &DownloadItem) -> anyhow::Result<()> {
-        let data = DownloadItemData::from(item);
+        let data = DownloadTask::from(item);
         let _: Option<DownloadRecord> = self
             .db
-            .update(("downloads", item.numeric_id))
+            .update(("task", item.numeric_id))
             .content(data)
             .await?;
         Ok(())
     }
-
     async fn remove(&self, id: i64) -> anyhow::Result<()> {
-        let _: Option<DownloadRecord> = self.db.delete(("downloads", id)).await?;
-        debug!("Removed download #{}", id);
+        let _: Option<DownloadRecord> = self.db.delete(("task", id)).await?;
+        debug!("Removed download task #{}", id);
         Ok(())
     }
 }
@@ -263,26 +288,30 @@ impl DownloadDb for SurrealStore {
 #[async_trait]
 impl PartDb for SurrealStore {
     async fn get_parts(&self, download_id: i64) -> anyhow::Result<Vec<RangedPart>> {
-        let record: Option<PartsRecord> = self.db.select(("parts", download_id)).await?;
-        Ok(record.map(|r| r.parts).unwrap_or_default())
+        let mut result = self.db.query("SELECT * FROM part WHERE task_id = $download_id ORDER BY part_index ASC")
+            .bind(("download_id", download_id))
+            .await?;
+        let segments: Vec<PartSegment> = result.take(0)?;
+        Ok(segments.into_iter().map(|s| s.to_ranged_part()).collect())
     }
 
     async fn set_parts(&self, download_id: i64, parts: &[RangedPart]) -> anyhow::Result<()> {
-        let record = PartsRecord {
-            id: None,
-            download_id,
-            parts: parts.to_vec(),
-        };
-        let _: Option<PartsRecord> = self
-            .db
-            .upsert(("parts", download_id))
-            .content(record)
-            .await?;
+        self.remove_parts(download_id).await?;
+        for (idx, part) in parts.iter().enumerate() {
+            let segment = PartSegment::from_ranged_part(download_id, idx as u32, part);
+            let _: Option<PartSegment> = self.db
+                .create(("part", format!("{}_{}", download_id, idx)))
+                .content(segment)
+                .await?;
+        }
         Ok(())
     }
 
     async fn remove_parts(&self, download_id: i64) -> anyhow::Result<()> {
-        let _: Option<PartsRecord> = self.db.delete(("parts", download_id)).await?;
+        let _: Vec<PartSegment> = self.db.query("DELETE FROM part WHERE task_id = $download_id")
+            .bind(("download_id", download_id))
+            .await?
+            .take(0)?;
         Ok(())
     }
 }
@@ -325,26 +354,30 @@ impl QueueDb for SurrealStore {
 #[async_trait]
 impl BlockDb for SurrealStore {
     async fn get_blocks(&self, task_id: i64) -> anyhow::Result<Vec<Block>> {
-        let record: Option<BlocksRecord> = self.db.select(("blocks", task_id)).await?;
-        Ok(record.map(|r| r.blocks).unwrap_or_default())
+        let mut result = self.db.query("SELECT * FROM block_checksum WHERE task_id = $task_id ORDER BY block_index ASC")
+            .bind(("task_id", task_id))
+            .await?;
+        let checksums: Vec<BlockChecksum> = result.take(0)?;
+        Ok(checksums.into_iter().map(|bc| bc.into()).collect())
     }
 
     async fn set_blocks(&self, task_id: i64, blocks: &[Block]) -> anyhow::Result<()> {
-        let record = BlocksRecord {
-            id: None,
-            task_id,
-            blocks: blocks.to_vec(),
-        };
-        let _: Option<BlocksRecord> = self
-            .db
-            .upsert(("blocks", task_id))
-            .content(record)
-            .await?;
+        self.remove_blocks(task_id).await?;
+        for (idx, block) in blocks.iter().enumerate() {
+            let bc = BlockChecksum::from(block);
+            let _: Option<BlockChecksum> = self.db
+                .create(("block_checksum", format!("{}_{}", task_id, idx)))
+                .content(bc)
+                .await?;
+        }
         Ok(())
     }
 
     async fn remove_blocks(&self, task_id: i64) -> anyhow::Result<()> {
-        let _: Option<BlocksRecord> = self.db.delete(("blocks", task_id)).await?;
+        let _: Vec<BlockChecksum> = self.db.query("DELETE FROM block_checksum WHERE task_id = $task_id")
+            .bind(("task_id", task_id))
+            .await?
+            .take(0)?;
         Ok(())
     }
 }
@@ -352,11 +385,8 @@ impl BlockDb for SurrealStore {
 // ─── JSON Migration ─────────────────────────────────────────────────────────
 
 impl SurrealStore {
-    /// Attempt to migrate legacy Kotlin JSON state files into SurrealDB.
-    /// This is called once on first boot. If the SurrealDB already has data,
-    /// migration is skipped.
     pub async fn migrate_from_json_if_needed(&self, data_dir: &Path) -> anyhow::Result<()> {
-        let existing: Vec<DownloadRecord> = self.db.select("downloads").await?;
+        let existing: Vec<DownloadRecord> = self.db.select("task").await?;
         if !existing.is_empty() {
             debug!("SurrealDB already has {} downloads, skipping JSON migration", existing.len());
             return Ok(());
@@ -370,35 +400,19 @@ impl SurrealStore {
 
         info!("Migrating legacy JSON data from {}", json_dir.display());
 
-        // Scan for download item JSON files
         let mut migrated = 0u32;
         if let Ok(entries) = std::fs::read_dir(&json_dir) {
             for entry in entries.flatten() {
                 let path = entry.path();
                 if path.extension().is_some_and(|ext| ext == "json") {
-                    match std::fs::read_to_string(&path) {
-                        Ok(json_str) => {
-                            // Attempt to parse as a DownloadItem
-                            match serde_json::from_str::<DownloadItemData>(&json_str) {
-                                Ok(data) => {
-                                    let item: DownloadItem = data.into();
-                                    if let Err(e) = self.add(&item).await {
-                                        warn!("Failed to migrate {}: {}", path.display(), e);
-                                    } else {
-                                        migrated += 1;
-                                    }
-                                }
-                                Err(e) => {
-                                    debug!(
-                                        "Skipping non-download JSON file {}: {}",
-                                        path.display(),
-                                        e
-                                    );
-                                }
+                    if let Ok(json_str) = std::fs::read_to_string(&path) {
+                        if let Ok(data) = serde_json::from_str::<DownloadItemData>(&json_str) {
+                            let item: DownloadItem = data.into();
+                            if let Err(e) = self.add(&item).await {
+                                warn!("Failed to migrate {}: {}", path.display(), e);
+                            } else {
+                                migrated += 1;
                             }
-                        }
-                        Err(e) => {
-                            warn!("Failed to read {}: {}", path.display(), e);
                         }
                     }
                 }

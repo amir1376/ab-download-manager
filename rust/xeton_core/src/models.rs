@@ -107,7 +107,7 @@ impl DownloadItem {
     pub const LENGTH_UNKNOWN: i64 = -1;
 
     pub fn record_id(&self) -> RecordId {
-        RecordId::new("downloads", self.numeric_id)
+        RecordId::new("task", self.numeric_id)
     }
 }
 
@@ -362,3 +362,120 @@ pub struct ResponseInfo {
     pub last_modified: Option<String>,
     pub is_webpage: bool,
 }
+
+// ─── Database Native Models ──────────────────────────────────────────────────
+
+#[derive(Clone, Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
+pub struct DownloadTask {
+    pub id: i64,
+    pub url: String,
+    pub dest_path: String,
+    pub protocol: DownloadProtocol,
+    pub total_size: i64,
+    pub status: DownloadStatus,
+}
+
+impl From<&DownloadItem> for DownloadTask {
+    fn from(item: &DownloadItem) -> Self {
+        Self {
+            id: item.numeric_id,
+            url: item.link.clone(),
+            dest_path: format!("{}/{}", item.folder, item.name),
+            protocol: item.protocol.clone(),
+            total_size: item.content_length,
+            status: item.status.clone(),
+        }
+    }
+}
+
+impl From<DownloadTask> for DownloadItem {
+    fn from(task: DownloadTask) -> Self {
+        let path = std::path::Path::new(&task.dest_path);
+        let folder = path.parent().map(|p| p.to_string_lossy().into_owned()).unwrap_or_default();
+        let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+        Self {
+            numeric_id: task.id,
+            name,
+            folder,
+            link: task.url,
+            content_length: task.total_size,
+            status: task.status,
+            protocol: task.protocol,
+            server_etag: None,
+            date_added: 0,
+            start_time: None,
+            complete_time: None,
+            preferred_connections: None,
+            speed_limit: 0,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
+pub struct PartSegment {
+    pub task_id: i64,
+    pub part_index: u32,
+    pub from_offset: i64,
+    pub to_offset: Option<i64>,
+    pub current_offset: i64,
+}
+
+impl PartSegment {
+    pub fn to_ranged_part(&self) -> RangedPart {
+        RangedPart {
+            from: self.from_offset,
+            to: self.to_offset,
+            current: self.current_offset,
+        }
+    }
+
+    pub fn from_ranged_part(task_id: i64, part_index: u32, part: &RangedPart) -> Self {
+        Self {
+            task_id,
+            part_index,
+            from_offset: part.from,
+            to_offset: part.to,
+            current_offset: part.current,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, SurrealValue)]
+#[surreal(crate = "surrealdb::types")]
+pub struct BlockChecksum {
+    pub task_id: i64,
+    pub block_index: u32,
+    pub expected_crc32: u32,
+    pub start_offset: u64,
+    pub end_offset: u64,
+    pub is_completed: bool,
+}
+
+impl From<&Block> for BlockChecksum {
+    fn from(block: &Block) -> Self {
+        Self {
+            task_id: block.task_id,
+            block_index: block.block_index,
+            expected_crc32: block.checksum.unwrap_or(0),
+            start_offset: block.start_offset,
+            end_offset: block.end_offset,
+            is_completed: block.is_completed,
+        }
+    }
+}
+
+impl From<BlockChecksum> for Block {
+    fn from(bc: BlockChecksum) -> Self {
+        Self {
+            task_id: bc.task_id,
+            block_index: bc.block_index,
+            start_offset: bc.start_offset,
+            end_offset: bc.end_offset,
+            checksum: Some(bc.expected_crc32),
+            is_completed: bc.is_completed,
+        }
+    }
+}
+

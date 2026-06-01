@@ -37,6 +37,20 @@ pub enum DestinationError {
     Crc32Mismatch { expected: u32, actual: u32 },
 }
 
+#[cfg(unix)]
+use std::os::unix::fs::FileExt;
+
+pub type DiskWriterActor = DiskActor;
+
+#[cfg(unix)]
+async fn write_all_at(file: &tokio::fs::File, data: Bytes, offset: u64) -> std::io::Result<()> {
+    let cloned = file.try_clone().await?;
+    let std_file = cloned.into_std().await;
+    tokio::task::spawn_blocking(move || {
+        std_file.write_all_at(&data, offset)
+    }).await.map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?
+}
+
 // ─── Write Commands ─────────────────────────────────────────────────────────
 
 /// Commands sent to the DiskActor through the mpsc channel.
@@ -102,12 +116,21 @@ impl DiskActor {
             while let Some(cmd) = rx.recv().await {
                 match cmd {
                     WriteCmd::Write { offset, data } => {
-                        if let Err(e) = file.seek(SeekFrom::Start(offset)).await {
-                            error!("Seek error at offset {}: {}", offset, e);
-                            continue;
+                        #[cfg(unix)]
+                        {
+                            if let Err(e) = write_all_at(&file, data, offset).await {
+                                error!("Write error at offset {}: {}", offset, e);
+                            }
                         }
-                        if let Err(e) = file.write_all(&data).await {
-                            error!("Write error at offset {}: {}", offset, e);
+                        #[cfg(not(unix))]
+                        {
+                            if let Err(e) = file.seek(SeekFrom::Start(offset)).await {
+                                error!("Seek error at offset {}: {}", offset, e);
+                                continue;
+                            }
+                            if let Err(e) = file.write_all(&data).await {
+                                error!("Write error at offset {}: {}", offset, e);
+                            }
                         }
                     }
                     WriteCmd::Flush { reply } => {
@@ -125,8 +148,15 @@ impl DiskActor {
             // Drain remaining writes before closing
             while let Ok(cmd) = rx.try_recv() {
                 if let WriteCmd::Write { offset, data } = cmd {
-                    let _ = file.seek(SeekFrom::Start(offset)).await;
-                    let _ = file.write_all(&data).await;
+                    #[cfg(unix)]
+                    {
+                        let _ = write_all_at(&file, data, offset).await;
+                    }
+                    #[cfg(not(unix))]
+                    {
+                        let _ = file.seek(SeekFrom::Start(offset)).await;
+                        let _ = file.write_all(&data).await;
+                    }
                 }
             }
             let _ = file.flush().await;

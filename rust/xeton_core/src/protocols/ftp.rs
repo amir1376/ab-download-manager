@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use bytes::Bytes;
-use suppaftp::AsyncFtpStream;
+use suppaftp::{AsyncRustlsFtpStream, AsyncRustlsConnector};
 use suppaftp::types::FileType;
 use tokio::sync::{watch, Mutex, RwLock};
 use tracing::{debug, error, info, warn};
@@ -77,19 +77,34 @@ impl FtpJob {
     }
 
     /// Resume the FTP download.
-    pub async fn resume(self: &Arc<Self>) -> anyhow::Result<()> {
-        let item = self.item.read().await;
-        let id = item.numeric_id;
-        info!("Resuming FTP job #{}", id);
-        let _ = self.status_tx.send(JobStatus::Resuming);
-
-        let ftp_url = Self::parse_ftp_url(&item.link)?;
-        drop(item);
-
-        // Establish control connection
-        let mut control = AsyncFtpStream::connect(format!("{}:{}", ftp_url.host, ftp_url.port))
+    async fn connect_control(ftp_url: &FtpUrl) -> anyhow::Result<AsyncRustlsFtpStream> {
+        let mut control = AsyncRustlsFtpStream::connect(format!("{}:{}", ftp_url.host, ftp_url.port))
             .await
             .map_err(|e| anyhow::anyhow!("FTP connect failed: {}", e))?;
+
+        if ftp_url.secure {
+            let mut root_store = suppaftp::rustls::RootCertStore::empty();
+            let native_certs = rustls_native_certs::load_native_certs();
+            for cert in native_certs.certs {
+                let _ = root_store.add(cert);
+            }
+            if !native_certs.errors.is_empty() {
+                warn!("Some errors occurred while loading native certificates: {:?}", native_certs.errors);
+            }
+            for cert in webpki_roots::TLS_SERVER_ROOTS {
+                let _ = root_store.add(cert.clone());
+            }
+
+            let config = suppaftp::rustls::ClientConfig::builder()
+                .with_root_certificates(root_store)
+                .with_no_client_auth();
+            
+            let connector = AsyncRustlsConnector::from(futures_rustls::TlsConnector::from(std::sync::Arc::new(config)));
+            control = control
+                .into_secure(connector, &ftp_url.host)
+                .await
+                .map_err(|e| anyhow::anyhow!("FTPS upgrade failed: {}", e))?;
+        }
 
         // Authenticate
         let user = ftp_url.username.as_deref().unwrap_or("anonymous");
@@ -104,6 +119,22 @@ impl FtpJob {
             .transfer_type(FileType::Binary)
             .await
             .map_err(|e| anyhow::anyhow!("FTP TYPE I failed: {}", e))?;
+
+        Ok(control)
+    }
+
+    /// Resume the FTP download.
+    pub async fn resume(self: &Arc<Self>) -> anyhow::Result<()> {
+        let item = self.item.read().await;
+        let id = item.numeric_id;
+        info!("Resuming FTP job #{}", id);
+        let _ = self.status_tx.send(JobStatus::Resuming);
+
+        let ftp_url = Self::parse_ftp_url(&item.link)?;
+        drop(item);
+
+        // Establish control connection
+        let mut control = Self::connect_control(&ftp_url).await?;
 
         // Get file size
         let file_size = control
@@ -163,14 +194,7 @@ impl FtpJob {
                     return Ok::<(), anyhow::Error>(());
                 }
 
-                let mut control = AsyncFtpStream::connect(format!("{}:{}", ftp_url.host, ftp_url.port))
-                    .await
-                    .map_err(|e| anyhow::anyhow!("FTP part connect failed: {}", e))?;
-
-                let user = ftp_url.username.as_deref().unwrap_or("anonymous");
-                let pass = ftp_url.password.as_deref().unwrap_or("guest@");
-                control.login(user, pass).await.map_err(|e| anyhow::anyhow!("FTP part login failed: {}", e))?;
-                control.transfer_type(FileType::Binary).await.map_err(|e| anyhow::anyhow!("FTP part TYPE I failed: {}", e))?;
+                let mut control = Self::connect_control(&ftp_url).await?;
 
                 control.resume_transfer(p.current as usize).await.map_err(|e| anyhow::anyhow!("FTP part REST failed: {}", e))?;
 
