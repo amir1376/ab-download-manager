@@ -7,6 +7,7 @@ repositories {
     mavenCentral()
     google()
     maven("https://jitpack.io")
+    maven("https://maven.mozilla.org/maven2/")
 }
 
 fun getOptIns(): Set<String> = setOf(

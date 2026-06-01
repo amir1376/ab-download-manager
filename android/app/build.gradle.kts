@@ -23,6 +23,11 @@ plugins {
     id(Plugins.aboutLibraries)
     id(Plugins.aboutLibrariesAndroid)
 }
+repositories {
+    mavenCentral()
+    google()
+    maven("https://maven.mozilla.org/maven2/")
+}
 android {
     defaultConfig {
         minSdk = 26
