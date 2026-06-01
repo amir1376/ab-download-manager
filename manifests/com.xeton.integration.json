@@ -1,0 +1,9 @@
+{
+  "name": "com.xeton.integration",
+  "description": "Xeton Download Manager Native Messaging Host",
+  "path": "/usr/local/bin/xeton_native_host",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://YOUR_EXTENSION_ID_HERE/"
+  ]
+}

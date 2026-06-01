@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Xeton Integration",
+  "version": "1.0",
+  "description": "Send videos and files to Xeton Download Manager.",
+  "permissions": [
+    "nativeMessaging",
+    "contextMenus",
+    "activeTab",
+    "downloads"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Download with Xeton"
+  },
+  "icons": {
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
