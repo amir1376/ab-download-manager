@@ -24,7 +24,7 @@ use crate::models::{DownloadItem, QueueModel, RangedPart};
 // SurrealDB returns records with an `id` field. These wrappers let serde
 // deserialize the full record including the SurrealDB id.
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
 struct DownloadRecord {
     id: Option<Thing>,
     #[serde(flatten)]
@@ -32,7 +32,7 @@ struct DownloadRecord {
 }
 
 /// The actual persisted fields (no `numeric_id` — that's the SurrealDB key).
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
 struct DownloadItemData {
     numeric_id: i64,
     name: String,
@@ -89,21 +89,21 @@ impl From<DownloadItemData> for DownloadItem {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
 struct PartsRecord {
     id: Option<Thing>,
     download_id: i64,
     parts: Vec<RangedPart>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, surrealdb::SurrealValue)]
 struct QueueRecord {
     id: Option<Thing>,
     #[serde(flatten)]
     inner: QueueModel,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, surrealdb::SurrealValue)]
 struct CounterRecord {
     id: Option<Thing>,
     value: i64,
