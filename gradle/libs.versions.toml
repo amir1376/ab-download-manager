@@ -39,6 +39,7 @@ agp = "8.13.2"
 androidx-core = "1.18.0"
 androidx-activity-compose = "1.13.0"
 slf4jApi = "2.0.18"
+geckoview = "138.0.20250501212748"
 
 [libraries]
 
@@ -119,6 +120,8 @@ arrow-opticKsp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref =
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+
+mozilla-geckoview = { module = "org.mozilla.geckoview:geckoview", version.ref = "geckoview" }
 
 osThemeDetector = { module = "com.github.Dansoftowner:jSystemThemeDetector", version.ref = "osThemeDetector" }
 markdownRenderer-core = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdownRenderer" }

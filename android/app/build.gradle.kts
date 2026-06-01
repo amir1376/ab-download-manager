@@ -53,6 +53,8 @@ dependencies {
     implementation(libs.aboutLibraries.core)
     implementation(project(":shared:app"))
     ksp(libs.arrow.opticKsp)
+    // GeckoView — Mozilla Firefox rendering engine for the integrated browser
+    implementation(libs.mozilla.geckoview)
 }
 
 androidEnableFileTypesGeneratorForManifest(
