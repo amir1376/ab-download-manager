@@ -1,0 +1,103 @@
+[package]
+name    = "xeton_core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+# ── UniFFI scaffolding binary ────────────────────────────────────────────────
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi_bindgen.rs"
+
+# ─────────────────────────────────────────────────────────────────────────────
+[dependencies]
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# HTTP client — HTTP/1.1 + HTTP/2, TLS, proxy, streaming
+reqwest = { version = "0.12", features = [
+    "stream", "socks", "rustls-tls", "gzip", "brotli"
+], default-features = false }
+
+# Zero-copy byte buffers
+bytes = "1"
+
+# Lock-free concurrent map (job registry)
+dashmap = "6"
+
+# SurrealDB v3 — embedded, no external server required.
+# kv-surrealkv: pure-Rust native storage engine (avoids RocksDB C++ bindgen issues)
+# Records are serialized via serde_json (surrealdb uses it natively).
+surrealdb = { version = "3", features = ["kv-surrealkv"] }
+
+# CRC32 SIMD checksum (block-level integrity validation)
+crc32fast = "1"
+
+# Atomic primitives for torrent piece bitfields
+portable-atomic = "1"
+
+# Serialization for persisted models
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# UniFFI FFI binding generator (async Tokio support)
+uniffi = { version = "0.28", features = ["tokio", "cli"] }
+uniffi_bindgen = { version = "0.28" }
+
+# AES-128-CBC for HLS segment decryption (pure Rust)
+aes = "0.8"
+cbc = "0.1"
+urlencoding = "2"
+libc = "0.2"
+cipher = "0.4"
+
+# Token-bucket rate limiter (global + per-job speed limits)
+governor = "0.10"
+
+# Async stream utilities
+tokio-stream = "0.1"
+tokio-util = "0.7"
+
+# Structured logging
+tracing            = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error ergonomics
+thiserror = "2"
+anyhow    = "1"
+
+# Async trait support
+async-trait = "0.1"
+
+# FTP/FTPS engine
+suppaftp = { version = "6", features = ["async-secure"], optional = true }
+
+# BitTorrent engine
+librqbit = { version = "8", features = [
+    "tokio-console", "timed_existence"
+], optional = true }
+
+# M3U8 playlist parsing for HLS
+m3u8-rs = { version = "6", optional = true }
+
+# SHA-1 for HLS EXT-X-KEY IV derivation
+sha1 = { version = "0.10", features = ["oid"], optional = true }
+
+# FFmpeg bindings (audio transcoder — optional feature)
+ffmpeg-next = { version = "7", optional = true }
+
+# ─────────────────────────────────────────────────────────────────────────────
+[build-dependencies]
+uniffi = { version = "0.28", features = ["build"] }
+
+# ─────────────────────────────────────────────────────────────────────────────
+[features]
+default    = ["ftp", "hls", "torrent", "extractors"]
+ftp        = ["suppaftp"]
+hls        = ["m3u8-rs", "sha1"]
+torrent    = ["librqbit"]
+extractors = []
+transcoder = ["ffmpeg-next"]

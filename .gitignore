@@ -9,3 +9,6 @@ local.properties
 
 # Ignore android keystores
 *.jks
+
+
+/rust/xeton_core/target/

@@ -1,0 +1,116 @@
+namespace xeton_core {};
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum DownloadStatus {
+    "Added",
+    "Downloading",
+    "Paused",
+    "Completed",
+    "Error"
+};
+
+enum JobStatus {
+    "Idle",
+    "Resuming",
+    "Downloading",
+    "PreparingFile",
+    "Retrying",
+    "Canceled",
+    "Finished"
+};
+
+enum DownloadProtocol {
+    "Http",
+    "Hls",
+    "Ftp",
+    "Torrent"
+};
+
+enum DuplicateStrategy {
+    "AddNumbered",
+    "Override",
+    "Abort"
+};
+
+enum ProxyConfig {
+    "None",
+    "Http",
+    "Socks5",
+    "System"
+};
+
+enum ManagerEvent {
+    "JobAdded",
+    "JobStarting",
+    "JobStarted",
+    "JobCanceled",
+    "JobCompleted",
+    "JobChanged",
+    "JobRemoved"
+};
+
+enum AudioFormat {
+    "Mp3",
+    "Aac",
+    "Opus",
+    "Flac"
+};
+
+// ─── Records ────────────────────────────────────────────────────────────────
+
+dictionary DownloadSettings {
+    u32 default_thread_count;
+    boolean dynamic_part_creation;
+    boolean use_server_last_modified;
+    i64 global_speed_limit;
+    i64 min_part_size;
+    u32 max_retry_count;
+    boolean append_extension_to_incomplete;
+};
+
+dictionary DownloadItem {
+    string name;
+    string folder;
+    string link;
+    i64 content_length;
+    DownloadStatus status;
+    DownloadProtocol protocol;
+    string? server_etag;
+    i64 date_added;
+    i64? start_time;
+    i64? complete_time;
+    u32? preferred_connections;
+    i64 speed_limit;
+};
+
+dictionary NewDownloadProps {
+    string name;
+    string folder;
+    string link;
+    DownloadProtocol protocol;
+    u32? preferred_connections;
+    i64 speed_limit;
+    DuplicateStrategy on_duplicate;
+};
+
+// ─── Engine Interface ───────────────────────────────────────────────────────
+
+interface XetonEngine {
+    constructor(string data_dir, DownloadSettings settings);
+
+    [Async] void boot();
+    [Async] i64 add_download(NewDownloadProps props);
+    [Async] void resume(i64 id);
+    [Async] void pause(i64 id);
+    [Async] void reset(i64 id);
+    [Async] void delete_download(i64 id, boolean remove_file);
+    
+    [Async] sequence<DownloadItem> get_download_list();
+    
+    [Async] void set_global_speed_limit(i64 bytes_per_second);
+    [Async] void reload_settings(DownloadSettings settings);
+    [Async] void set_proxy(ProxyConfig proxy);
+
+    [Async] ManagerEvent next_event();
+};
