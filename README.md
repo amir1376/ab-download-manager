@@ -1,94 +1,79 @@
 <div align="center">
-  <a href="https://abdownloadmanager.com" target="_blank">
-    <img width="180" src="assets/logo/app_logo_with_background.svg" alt="AB Download Manager Logo">
-  </a>
-</div>
-<h1 align="center">AB Download Manager</h1>
-<p align="center">
-    <a href="https://github.com/amir1376/ab-download-manager/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/amir1376/ab-download-manager?color=greenlight&label=latest%20release"></a>
-    <a href="https://abdownloadmanager.com"><img alt="AB Download Manager Website" src="https://img.shields.io/badge/project-website-purple?&labelColor=gray"></a>
-    <a href="https://t.me/abdownloadmanager_discussion"><img alt="Telegram Group" src="https://img.shields.io/badge/Telegram-Group-blue?logo=telegram&labelColor=gray"></a>
-    <a href="https://t.me/abdownloadmanager"><img alt="Telegram Channel" src="https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram&labelColor=gray"></a>
-    <a href="https://crowdin.com/project/ab-download-manager"><img alt="Crowdin" src="https://badges.crowdin.net/ab-download-manager/localized.svg"></a>
-</p>
-
-<a href="https://abdownloadmanager.com" target="_blank">
-    <img alt="AB Download Manager Banner" src="assets/banners/app_banner.png"/>
+<a href="https://xeton.app" target="_blank">
+    <img width="160" src="assets/logo/app_logo_with_background.svg" alt="Xeton Logo">
 </a>
 
+# Xeton
 
-## Description
+**High-performance download management for the modern desktop.**
 
-[AB Download Manager](https://abdownloadmanager.com) is a desktop app that helps you manage and organize your downloads more efficiently than ever before.
+[![GitHub Release](https://img.shields.io/github/v/release/amir1376/xeton-download-manager?color=greenlight&label=latest%20release)](https://github.com/amir1376/xeton-download-manager/releases/latest)
+[![Xeton Website](https://img.shields.io/badge/project-website-purple?&labelColor=gray)](https://xeton.app)
+[![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram&labelColor=gray)](https://t.me/xeton_app)
+[![Crowdin](https://badges.crowdin.net/xeton-download-manager/localized.svg)](https://crowdin.com/project/xeton-download-manager)
+<a href="https://xeton.app" target="_blank">
+    <img alt="Xeton Banner" src="assets/banners/app_banner.png"/>
+</a>
+</div>
 
-## Features
+## 📖 Description
 
-- ⚡️ Faster Download Speed
-- ⏰ Queues and Schedulers
-- 🌐 Browser Extensions
-- 💻 Multiplatform (Android / Windows / Linux / Mac)
-- 🌙 Multiple Themes (Dark/Light/Black and more) with modern UI
-- ❤️ Free and Open Source
+[Xeton](https://xeton.app) is a high-performance desktop application designed to help you manage and organize your downloads with maximum efficiency.
 
-Please visit [Project Website](https://abdownloadmanager.com) for more info.
+## 🛠️ Built With
 
-## Installation
+Xeton is built using modern cross-platform technologies to ensure performance and native feel:
+- **[Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/):** For a beautiful, reactive UI.
+- **[Kotlin](https://kotlinlang.org/):** The primary language for robust and safe code.
+- **[Gradle](https://gradle.org/):** Reliable build automation.
 
-### Download and Install the App
+## ✨ Features
 
-<a href="https://abdownloadmanager.com"><img src="https://img.shields.io/badge/Official%20Website-897BFF?logo=abdownloadmanager&logoColor=fff&style=flat-square" alt="Official Website" height="32" /></a>
-<a href="https://github.com/amir1376/ab-download-manager/releases/latest"><img src="https://img.shields.io/badge/GitHub%20Releases-2a2f36?logo=github&logoColor=fff&style=flat-square" alt="GitHub Releases" height="32" /></a>
+- ⚡ **Faster Download Speed:** Optimize your bandwidth with multi-part downloading.
+- 📅 **Queues & Schedulers:** Plan your downloads for the most convenient times.
+- 🌐 **Browser Extensions:** Seamless integration with your favorite browsers.
+- 💻 **Multiplatform:** Support for Windows, Linux, and macOS.
+- 🎨 **Modern UI:** Multiple themes (Dark, Light, Black) with a sleek, intuitive interface.
+- ❤️ **Open Source:** Completely free and open for community contribution.
 
-#### Installation script (Linux)
+## 🚀 Installation
 
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/ab-download-manager/master/scripts/install.sh)
-```
+### 📦 Desktop Application
 
-#### Winget or Scoop (for Windows)
-
-**winget**:
-
-```bash
-winget install amir1376.ABDownloadManager
-```
-
-**scoop**:
-
-```bash
-scoop install extras/abdownloadmanager
-```
-
-#### Homebrew (for macOS & Linux)
-
-```bash
-brew tap amir1376/tap && brew install --cask ab-download-manager
-```
+| Platform | Method | Command |
+| :--- | :--- | :--- |
+| **Linux** | Shell Script | `bash <(curl -fsSL https://raw.githubusercontent.com/amir1376/xeton-download-manager/master/scripts/install.sh)` |
+| **Windows** | Winget | `winget install amir1376.Xeton` |
+| **Windows** | Scoop | `scoop install extras/xeton-download-manager` |
+| **macOS / Linux** | Homebrew | `brew tap amir1376/tap && brew install --cask xeton-download-manager` |
 
 > ⚠️ **Warning:** This software is NOT on Google Play or other app stores unless listed here. Any version **claiming to be or related to this project** should be considered SCAM and UNSAFE.
 
-For alternative installation methods, uninstallation instructions, and more details, please refer to the [wiki](https://github.com/amir1376/ab-download-manager/wiki/) page.
+For alternative installation methods and uninstallation instructions, please refer to our Wiki.
 
-### Browser Extensions
+### 🌐 Browser Extensions
 
-You can download the browser extension to integrate the app with your browser.
+Integrate Xeton directly into your browsing experience.
 
-<p align="left">
-<a href="https://addons.mozilla.org/firefox/addon/ab-download-manager/">
+<div align="center">
+
+<a href="https://addons.mozilla.org/firefox/addon/xeton-download-manager/">
     <picture>
-        <img alt="Chrome Extension" src="./assets/banners/firefox-extension.png" height="48">
+        <img alt="Firefox Extension" src="./assets/banners/firefox-extension.png" height="42">
     </picture>
 </a>
+&nbsp;
 <a href="https://chromewebstore.google.com/detail/bbobopahenonfdgjgaleledndnnfhooj">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png" height="48">
-        <source media="(prefers-color-scheme: light)" srcset="./assets/banners/chrome-extension_light.png" height="48">
-        <img alt="Chrome Extension" src="./assets/banners/chrome-extension_light.png" height="48">
+        <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png" height="42">
+        <source media="(prefers-color-scheme: light)" srcset="./assets/banners/chrome-extension_light.png" height="42">
+        <img alt="Chrome Extension" src="./assets/banners/chrome-extension_light.png" height="42">
     </picture>
 </a>
-</p>
 
-## Screenshots
+</div>
+
+## 🖼️ Screenshots
 
 <div align="center">
 <picture>
@@ -104,78 +89,60 @@ You can download the browser extension to integrate the app with your browser.
 </picture>
 </div>
 
-## Project Status & Feedback
+## 🤝 Support & Feedback
 
-Please keep in mind that this project is in the beginning of its journey.
-**Lots of features** are on the way!
+Xeton is in active development. Your feedback helps us grow!
 
-**But**, in the meantime you may face **Bugs or Problems**. If you do, please report them to me via the [Community chat](#community) or through `GitHub Issues`, and I'll do my best to fix them ASAP.
+*   **Report Issues:** Use `GitHub Issues` for bug reports and feature requests.
+*   **Community:** Chat with us and get support in our Telegram Discussion Group.
 
-## Community
+## 📚 Project Structure
 
-You can join our [Telegram Group](https://t.me/abdownloadmanager_discussion) to:
-
-- Report problems
-- Suggest features
-- Get help with the app
-
-## Repositories And Source Code
-
-There are multiple repositories related to the **AB Download Manager** project:
+The Xeton project is composed of several repositories:
 
 | Repository                                                                                 | Description                                                                   |
 |--------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| [Main Application](https://github.com/amir1376/ab-download-manager) (You are here)         | Contains the  **Application** that runs on your  **device**                   |
-| [Browser Integration](https://github.com/amir1376/ab-download-manager-browser-integration) | Contains the **Browser Extension** to be installed on your  **browser**       |
-| [Website](https://github.com/amir1376/ab-download-manager-website)                         | Contains the **AB Download Manager** [website](https://abdownloadmanager.com) |
+| [Main Application](https://github.com/amir1376/xeton-download-manager) (You are here)         | Contains the **Application** that runs on your **device**                   |
+| [Browser Integration](https://github.com/amir1376/xeton-download-manager-browser-integration) | Contains the **Browser Extension** to be installed on your **browser**       |
+| [Website](https://github.com/amir1376/xeton-download-manager-website)                         | Contains the **Xeton** [website](https://xeton.app) |
 
-I've spent a lot of time to create this project.
+## 🏗️ Build From Source
 
-If you like my work, please consider giving it a ⭐ — thanks! ❤️
+To compile and test the desktop app on your local machine, follow these steps:
 
-## Bug Report
-
-If you notice any bugs in the source code, please report them via the `GitHub Issues` section.
-
-## Build From Source
-
-To compile and test the desktop app on your local machine,
-follow these steps:
-
-1. Clone the project.
-2. Download and extract the [JBR](https://github.com/JetBrains/JetBrainsRuntime/releases), and make it available by either:
-    
-    - Adding it to your `PATH`, or
-    - Setting the `JAVA_HOME` environment variable to its installation path.
-  
-3. Navigate to the project directory, open your terminal and execute the following command:
+1. **Clone the project.**
+2. **Configure JBR:** Download the JetBrains Runtime (JBR) and:
+    - Add it to your `PATH`, or
+    - Set `JAVA_HOME` to its path.
+3.  Navigate to the project directory, open your terminal and execute the following command:
 
     ```bash
     ./gradlew createReleaseFolderForCi
     ```
 
-4. The output will be available at:
+4.  The output will be available at:
 
     ```
     <project_dir>/build/ci-release
     ```
 
-> **Note**. This project is compiled and published by GitHub actions [here](./.github/workflows/publish.yml), so if you
-> faced any problem you can check that too.
+> [!TIP]
+> This project is automatically published via [GitHub Actions](./.github/workflows/publish.yml). Refer to the workflow file for CI-specific environment details.
 
-## Translations
+## 🌐 Translations
 
-If you’d like to help translate AB Download Manager into another language, or improve existing translations, you can do
-so on Crowdin. Here’s how:
+If you’d like to help translate Xeton into another language, or improve existing translations, you can do so on Crowdin:
 
-- Visit the project in [Crowdin](https://crowdin.com/project/ab-download-manager)
-- Please DO NOT submit translations via pull requests.
-- If you want to add a new language, please see [this](https://github.com/amir1376/ab-download-manager/issues/144).
+*   Visit the project on [Crowdin](https://crowdin.com/project/xeton-download-manager).
+*   Please **DO NOT** submit translations via pull requests.
+*   If you want to add a new language, please see [this issue](https://github.com/amir1376/xeton-download-manager/issues/144).
 
-## Contribution
+## 💡 Contributing
 
-If you want to contribute to this project, please read [Contributing Guide](CONTRIBUTING.md) first.
+Contributions are welcome! Please check our [Contributing Guide](CONTRIBUTING.md) before getting started.
 
-## Support the Project
+## ❤️ Support
 
-If you'd like to support the project, you can find details on how to donate in the [DONATE.md](DONATE.md) file.
+If you find Xeton useful, please consider:
+- Giving this repository a ⭐
+- Supporting the project financially via [DONATE.md](DONATE.md).
