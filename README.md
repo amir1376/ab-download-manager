@@ -1,19 +1,7 @@
 <div align="center">
-<a href="https://xeton.app" target="_blank">
-    <img width="160" src="assets/logo/app_logo_with_background.svg" alt="Xeton Logo">
-</a>
-
 # Xeton
 
 **High-performance download management for the modern desktop.**
-
-[![GitHub Release](https://img.shields.io/github/v/release/amir1376/xeton-download-manager?color=greenlight&label=latest%20release)](https://github.com/amir1376/xeton-download-manager/releases/latest)
-[![Xeton Website](https://img.shields.io/badge/project-website-purple?&labelColor=gray)](https://xeton.app)
-[![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram&labelColor=gray)](https://t.me/xeton_app)
-[![Crowdin](https://badges.crowdin.net/xeton-download-manager/localized.svg)](https://crowdin.com/project/xeton-download-manager)
-<a href="https://xeton.app" target="_blank">
-    <img alt="Xeton Banner" src="assets/banners/app_banner.png"/>
-</a>
 </div>
 
 ## 📖 Description
@@ -53,41 +41,10 @@ For alternative installation methods and uninstallation instructions, please ref
 
 ### 🌐 Browser Extensions
 
-Integrate Xeton directly into your browsing experience.
+Integrate Xeton directly into your browsing experience:
 
-<div align="center">
-
-<a href="https://addons.mozilla.org/firefox/addon/xeton-download-manager/">
-    <picture>
-        <img alt="Firefox Extension" src="./assets/banners/firefox-extension.png" height="42">
-    </picture>
-</a>
-&nbsp;
-<a href="https://chromewebstore.google.com/detail/bbobopahenonfdgjgaleledndnnfhooj">
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./assets/banners/chrome-extension_dark.png" height="42">
-        <source media="(prefers-color-scheme: light)" srcset="./assets/banners/chrome-extension_light.png" height="42">
-        <img alt="Chrome Extension" src="./assets/banners/chrome-extension_light.png" height="42">
-    </picture>
-</a>
-
-</div>
-
-## 🖼️ Screenshots
-
-<div align="center">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/screenshots/app-home_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/screenshots/app-home_light.png">
-  <img alt="App Home Section" src="./assets/screenshots/app-home_dark.png">
-</picture>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/screenshots/app-download_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./assets/screenshots/app-download_light.png">
-  <img alt="App Download Section" src="./assets/screenshots/app-download_dark.png">
-</picture>
-</div>
+*   [Firefox Extension](https://addons.mozilla.org/firefox/addon/xeton-download-manager/)
+*   [Chrome Extension](https://chromewebstore.google.com/detail/bbobopahenonfdgjgaleledndnnfhooj)
 
 ## 🤝 Support & Feedback
 
