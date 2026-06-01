@@ -4,7 +4,18 @@
 
 ### Added
 
+- **Rust Core Engine (`xeton_core`):** Replaced the JVM-based multi-part downloader backend with a native, highly concurrent Rust backend using Tokio.
+- **Embedded SurrealDB v3:** Transitioned persistence layer to SurrealDB using the pure-Rust `surrealkv` embedded storage engine for high-speed, transactional download state tracking.
+- **Extreme Concurrency:** Supported scaling up to 256 concurrent download connections per task with zero OS thread bloat.
+- **Multi-Protocol Native Engines:** Built native, parallel download engine components for HTTP/HTTPS, FTP/FTPS, and BitTorrent (P2P with magnet/torrent files, DHT, and peer exchange).
+- **Platform Resolver Pipeline:** Integrated native extractors for resolving direct media URLs from platforms like YouTube, SoundCloud, Spotify, Instagram, and TikTok (via direct API scraping and `yt-dlp` subprocess invocation).
+- **Lossless Transcoding Engine:** Added in-memory audio extraction and video container conversion using FFmpeg, avoiding temporary intermediate files on disk.
+- **UniFFI Integration:** Generated type-safe Kotlin FFI bindings to bridge Compose Multiplatform UI with the new Rust core.
+
 ### Changed
+
+- Replaced JVM `OkHttp` and `Okio` download routines with Tokio-powered async Rust streams.
+- Ported DownloadQueue and DownloadManager schedulers to Rust for robust, centralized lifecycle orchestration.
 
 ### Deprecated
 

@@ -17,14 +17,26 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+// ── Feature flag ─────────────────────────────────────────────────────────────
+//
+// Set to `true` to render all tabs with GeckoView (Mozilla Firefox engine).
+// Set to `false` to fall back to the system WebView (Chromium-based).
+//
+// GeckoView is preferred on Android because mobile browsers do not support extensions,
+// meaning download detection must happen inside the app's own rendering engine.
+// GeckoView supports modern web standards natively without needing an extension.
+//
+private const val USE_GECKO = true
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 class WebViewRegistry(
     private val scope: CoroutineScope,
     private val browserComponent: BrowserComponent,
 ) : WebViewFactory {
     val viewHolders = mutableMapOf<ABDMBrowserTabId, WebViewHolder>()
-    fun onTabsUpdated(
-        webViewStates: ABDMTabs,
-    ) {
+
+    fun onTabsUpdated(webViewStates: ABDMTabs) {
         val webViewStateIds = webViewStates.tabs.map { it.tabId }.toSet()
         for (viewHolderKey in viewHolders.keys.toList()) {
             if (viewHolderKey !in webViewStateIds) {
@@ -33,19 +45,18 @@ class WebViewRegistry(
         }
     }
 
-    fun getWebViewHolder(
-        tab: ABDMBrowserTab
-    ): WebViewHolder {
-        return viewHolders.getOrPut(tab.tabId, {
+    fun getWebViewHolder(tab: ABDMBrowserTab): WebViewHolder {
+        return viewHolders.getOrPut(tab.tabId) {
             WebViewHolder(
                 tab = tab,
+                geckoTabState = if (USE_GECKO) tab.geckoTabState else null,
                 navigator = WebViewNavigator(scope),
                 webView = null,
                 client = ABDMWebViewClient(browserComponent.downloadInterceptor, scope),
                 chromeClient = ABDMChromeClient(browserComponent, ::getWebViewHolder),
                 webViewFactory = this,
             )
-        })
+        }
     }
 
     fun removeViewHolder(id: String) {
@@ -53,16 +64,11 @@ class WebViewRegistry(
     }
 
     fun disposeAll() {
-        viewHolders.forEach { (_, holder) ->
-            holder.release()
-        }
+        viewHolders.forEach { (_, holder) -> holder.release() }
         viewHolders.clear()
     }
 
-    override fun createWebView(
-        context: Context,
-        tab: ABDMBrowserTab,
-    ): ABDMWebView {
+    override fun createWebView(context: Context, tab: ABDMBrowserTab): ABDMWebView {
         return ABDMWebView(context).apply {
             val webView = this
             webView.settings.javaScriptEnabled = true
@@ -74,16 +80,11 @@ class WebViewRegistry(
             webView.isLongClickable = true
             webView.setOnLongClickListener {
                 val hit = webView.hitTestResult
-
                 if (hit.type == WebView.HitTestResult.SRC_ANCHOR_TYPE ||
                     hit.type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
                 ) {
                     val url = hit.extra ?: return@setOnLongClickListener false
-
-                    browserComponent.onLinkSelected(
-                        url,
-                        tab,
-                    )
+                    browserComponent.onLinkSelected(url, tab)
                     true
                 } else {
                     false
@@ -105,23 +106,41 @@ class WebViewRegistry(
             webView.tabId = tab.tabId
         }
     }
-
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 data class WebViewHolder(
     val tab: ABDMBrowserTab,
+    /**
+     * Non-null when GeckoView mode is active. The composable layer checks this to decide which
+     * renderer to use.
+     */
+    val geckoTabState: GeckoTabState?,
     var webView: ABDMWebView? = null,
     val navigator: WebViewNavigator,
     val client: ABDMWebViewClient,
     val chromeClient: ABDMChromeClient,
     private val webViewFactory: WebViewFactory,
 ) {
+    val isGeckoMode: Boolean get() = geckoTabState != null
 
-    fun activate(context: Context): ABDMWebView {
+    /**
+     * For the Gecko path: opens the [GeckoSession] against the process-wide runtime.
+     * For the WebView path: inflates or resumes the [ABDMWebView].
+     *
+     * Must be called from the main thread.
+     */
+    fun activate(context: Context): ABDMWebView? {
+        if (isGeckoMode) {
+            // Ensure the Gecko session is open and attached to the runtime. The composable
+            // GeckoWebView will bind the session to a GeckoView surface separately.
+            val runtime = GeckoEngineProvider.getOrCreate(context)
+            geckoTabState!!.open(runtime)
+            return null // GeckoWebView composable manages the native view
+        }
         return if (webView != null) {
-            (webView!!).also {
-                it.onResume()
-            }
+            webView!!.also { it.onResume() }
         } else {
             webViewFactory.createWebView(context, tab).also { webView = it }
         }
@@ -129,36 +148,44 @@ data class WebViewHolder(
 
     fun deactivate() {
         webView?.onPause()
-        // prevent reloading after activated again
+        // Prevent reload after re-activation.
         tab.tabState.content = WebContent.NavigatorOnly
+        // GeckoView sessions stay open; the GeckoWebView composable handles surface detach.
     }
 
     fun release() {
         webView?.onPause()
         webView?.destroy()
         webView = null
+        // GeckoSession lifetime is managed by BrowserComponent.closeTab / disposeAll.
+        // We intentionally do NOT close it here so that registry cleanup doesn't race with
+        // BrowserComponent's own close() call.
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface WebViewFactory {
-    fun createWebView(
-        context: Context,
-        tab: ABDMBrowserTab,
-    ): ABDMWebView
+    fun createWebView(context: Context, tab: ABDMBrowserTab): ABDMWebView
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 class ABDMWebViewClient(
     private val requestInterceptor: DownloadInterceptor,
     private val scope: CoroutineScope,
 ) : AccompanistWebViewClient() {
-    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+    override fun shouldInterceptRequest(
+        view: WebView?,
+        request: WebResourceRequest?,
+    ): WebResourceResponse? {
         if (request != null) {
             scope.launch(Dispatchers.Main) {
                 requestInterceptor.interceptRequest(
                     ABDMWebRequest(
                         url = request.url.toString(),
                         headers = request.requestHeaders,
-                        page = view?.originalUrl ?: view?.url
+                        page = view?.originalUrl ?: view?.url,
                     )
                 )
             }
@@ -166,52 +193,39 @@ class ABDMWebViewClient(
         return super.shouldInterceptRequest(view, request)
     }
 
-    override fun shouldOverrideUrlLoading(
-        view: WebView,
-        request: WebResourceRequest
-    ): Boolean {
-
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url.toString()
-
-        // Let WebView load normal web pages
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-            return false
-        }
-
-        // Handle intent:// URIs
+        // Let WebView load normal web pages.
+        if (url.startsWith("http://") || url.startsWith("https://")) return false
+        // Handle intent:// URIs.
         if (url.startsWith("intent://")) {
             try {
                 val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
                 val pm = view.context.packageManager
-
                 if (intent.resolveActivity(pm) != null) {
                     view.context.startActivity(intent)
                 } else {
-                    intent.getStringExtra("browser_fallback_url")?.let {
-                        view.loadUrl(it)
-                    }
+                    intent.getStringExtra("browser_fallback_url")?.let { view.loadUrl(it) }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
             return true
         }
-
-        // Handle ALL other schemes (deep links)
+        // Handle all other schemes (deep links).
         try {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            val pm = view.context.packageManager
-
-            if (intent.resolveActivity(pm) != null) {
+            if (intent.resolveActivity(view.context.packageManager) != null) {
                 view.context.startActivity(intent)
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         return true
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 class ABDMChromeClient(
     private val browserComponent: BrowserComponent,
@@ -221,7 +235,7 @@ class ABDMChromeClient(
         view: WebView?,
         isDialog: Boolean,
         isUserGesture: Boolean,
-        resultMsg: Message?
+        resultMsg: Message?,
     ): Boolean {
         if (view == null) return false
         val transport = (resultMsg?.obj as? WebView.WebViewTransport) ?: return false
@@ -229,9 +243,9 @@ class ABDMChromeClient(
             id = UUID.randomUUID().toString(),
             switch = true,
             url = null,
-            openedBy = (view as? ABDMWebView)?.tabId
+            openedBy = (view as? ABDMWebView)?.tabId,
         )
-        val newWebView = createWebViewHolder(newTab).activate(view.context)
+        val newWebView = createWebViewHolder(newTab).activate(view.context) ?: return false
         newWebView.openedBy = view.originalUrl ?: view.url
         transport.webView = newWebView
         resultMsg.sendToTarget()
@@ -239,9 +253,9 @@ class ABDMChromeClient(
     }
 }
 
-class ABDMWebView(
-    context: Context,
-) : WebView(context) {
+// ─────────────────────────────────────────────────────────────────────────────
+
+class ABDMWebView(context: Context) : WebView(context) {
     var openedBy: String? = null
     var tabId: String? = null
 }

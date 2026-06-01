@@ -107,10 +107,21 @@ class BrowserComponent(
         id: String = UUID.randomUUID().toString(),
         openedBy: ABDMBrowserTabId? = null,
     ): ABDMBrowserTab {
-        val browserTab = ABDMBrowserTab(
+        // Build a temporary placeholder tab so GeckoTabState has a stable reference.
+        // The real browserTab below shares the same tabId and tabState.
+        val placeholderTab = ABDMBrowserTab(
             tabId = id,
             tabState = WebViewState(WebContent.fromNullableUrl(url)),
         )
+        val geckoTabState = GeckoTabState(
+            downloadInterceptor = downloadInterceptor,
+            tab = placeholderTab,
+            onNewTabRequested = { newUrl, parentId ->
+                newTab(url = newUrl, switch = true, openedBy = parentId)
+            },
+            initialUrl = url,
+        )
+        val browserTab = placeholderTab.copy(geckoTabState = geckoTabState)
         tabs.update { currentTabState ->
             val newTabPosition = openedBy?.let {
                 // index of openedBy + 1 or null if not found
@@ -138,6 +149,9 @@ class BrowserComponent(
 
     fun closeTab(tabId: ABDMBrowserTabId) {
         tabs.update {
+            val closedTab = it.tabs.firstOrNull { tab -> tab.tabId == tabId }
+            // Release the GeckoSession for the closed tab to free Gecko engine resources.
+            closedTab?.geckoTabState?.close()
             val newItems = it.tabs.filterNot { it.tabId == tabId }
             it.copy(
                 tabs = newItems,
@@ -390,6 +404,11 @@ typealias ABDMBrowserTabId = String
 data class ABDMBrowserTab(
     val tabId: ABDMBrowserTabId,
     val tabState: WebViewState,
+    /**
+     * Non-null when GeckoView is the active rendering engine.
+     * Null when falling back to the system WebView.
+     */
+    val geckoTabState: GeckoTabState? = null,
 ) {
     companion object {
         fun createDefaultTab(

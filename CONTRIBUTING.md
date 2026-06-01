@@ -1,47 +1,72 @@
-# Contributing to AB Download Manager
+# Contributing to Xeton
 
-> ❌ **Important Notice:** The entire codebase is being completely rewritten. Pull requests are **not accepted** at this
-> time, as incoming changes may be lost or conflict heavily with ongoing refactoring. Please wait until the refactor is
-> complete before submitting any PRs.
+Thank you for your interest in contributing to Xeton! We appreciate your help in making this the fastest and most elegant desktop download manager.
 
-Thank you for your interest in contributing to AB Download Manager! I appreciate any help you can offer.
+Since Xeton is built with a **Kotlin Compose Multiplatform frontend** and a **Rust core backend (`xeton_core`)** linked via **UniFFI**, please read the guidelines below to ensure a smooth contribution process.
 
-## What Contributions Are Accepted?
+---
 
-I welcome the following types of contributions:
+## 🗺️ Project Architecture overview
 
-- **Bug Reports**: If you find a bug, please report it by opening an issue with details about the problem.
+Before writing code, it's important to understand where changes belong:
 
-- **Feature Requests**: Have an idea for a new feature? Let me know by opening an issue or starting a discussion.
+- **UI & Presentation (`desktop/`, `android/`, `shared/`):** Written in Kotlin using Compose Multiplatform. Contains view models, pages, themes, localizations, and platform-specific service wrappers.
+- **Download Engine Core (`rust/xeton_core/`):** Written in Rust using Tokio, reqwest, suppaftp, and librqbit. Handles database persistence, download jobs, part splitting, speed limiting, P2P BitTorrent, platform extractors, and transcoding.
+- **FFI Boundary (`rust/xeton_core/src/xeton_core.udl`):** Defines the bridge between Kotlin and Rust. UniFFI compiles the Rust types into a shared library (`cdylib` / `staticlib`) and generates Kotlin bindings.
 
-- **Translations**: You can translate AB Download Manager into other languages on Crowdin. See the Translations section
-  below for more information.
+---
 
-- **Pull Requests**: If you’d like to contribute code, feel free to submit a pull request. Just make sure to read the guidelines below before you start.
+## 🛠️ Developer Setup
 
-## Translations
+To build and test the project locally, you need:
+1. **JDK 17+** (JetBrains Runtime recommended).
+2. **Rust Toolchain** (latest stable `rustc` and `cargo` installed via [rustup](https://rustup.rs/)).
+3. **FFmpeg** installed and accessible in your system path (required for audio extraction/transcoding features).
 
-If you’d like to help translate AB Download Manager into another language, or improve existing translations, you can do
-so on Crowdin. Here’s how:
+To verify the Rust core compiles:
+```bash
+cd rust/xeton_core
+cargo check --all-targets
+cargo test
+```
 
-- Visit the project in [Crowdin](https://crowdin.com/project/ab-download-manager)
-- Please DO NOT submit translations via pull requests.
-- If you want to add a new language, please see [here](https://github.com/amir1376/ab-download-manager/issues/144)
+To build the FFI bindings and compile the shared libraries:
+```bash
+./gradlew buildRustCore
+```
 
-## Pull Requests
+---
 
-If you're ready to contribute code, that's awesome! Before you start, here’s what you need to know about creating a pull request (PR):
+## 🤝 How to Contribute
 
-- **Discuss First**: Before you start working on a PR, please open an issue or discussion to explain what you want to do. This helps me understand your idea and make sure it's something that can be merged. It also saves time if changes are needed.
+### 1. Bug Reports & Feature Requests
+- Check existing Issues and Discussions to ensure the topic hasn't already been addressed.
+- Use the templates provided when opening a new issue, and include system details (OS, version, logs) and reproduction steps where applicable.
 
-- **Fork the Repo**: Fork this repository to your own GitHub account. This creates your own copy where you can make changes.
+### 2. Translations
+- All translations are managed via **Crowdin**.
+- **Please DO NOT submit translations via GitHub Pull Requests.** PRs with translation updates will be closed.
+- Translate or review languages on the [Xeton Crowdin Project](https://crowdin.com/project/xeton-download-manager).
 
-- **Create a Branch**: In your forked repository, create a new branch for your changes. Give it a descriptive name, like feature/add-some-feature or fix/some-error.
+### 3. Pull Requests (PRs)
+- **Discuss First:** For any non-trivial changes, please open an issue or discussion first so we can align on design choices.
+- **Branch Naming:** Use descriptive branch names: `feature/your-feature` or `fix/your-fix`.
+- **Formatting & Linting:**
+  - **Rust:** Run `cargo fmt` and `cargo clippy --all-targets` before committing.
+  - **Kotlin:** Ensure code adheres to standard Kotlin style guidelines.
 
-- **Make Your Changes**: Now you can start coding! Make sure your changes follow the project’s coding standards.
+---
 
-- **Submit the PR**: Once you're happy with your changes, push your branch to your fork and submit a pull request. In the PR description, explain what changes you made and why.
+## 🔒 Code Guidelines
 
-- **Review & Feedback**: I’ll review your PR as soon as I can. There might be some feedback or requests for changes, so be ready to make adjustments if needed.
+### Rust Core (`xeton_core`)
+- **No Blocking Operations on Tokio Threads:** Use `tokio::fs` or delegate heavy blocking disk tasks to the actor channel (`DiskActor` in `destination/mod.rs`).
+- **Database Schema & Serialization:** Persistence is handled by **SurrealDB v3** with **Surrealkv**. Make sure structs stored in the database implement `serde::Serialize`, `serde::Deserialize`, and derive `surrealdb::SurrealValue`.
+- **Updating the FFI:** If you need to expose new functions, enums, or structs to the Kotlin UI:
+  1. Add them to `rust/xeton_core/src/xeton_core.udl`.
+  2. Implement/wrap them in `rust/xeton_core/src/uniffi_api.rs`.
+  3. Run `./gradlew buildRustCore` to regenerate the Kotlin FFI classes.
 
-- **Merging**: If everything looks good, I’ll merge your PR into the master branch.
+### Kotlin UI
+- Maintain unidirectional data flow. UI components should react to state flows emitted by the view models and backend engine.
+- Keep UI components reusable and avoid platform-specific logic directly in common composables; use expect/actual declarations when needed.

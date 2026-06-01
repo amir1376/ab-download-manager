@@ -102,13 +102,29 @@ fun BrowserPage(
             viewRegistry.getWebViewHolder(it)
         }
     }
+    val geckoCanGoBack by (tabWebViewHolder
+        ?.geckoTabState
+        ?.canGoBackFlow
+        ?: kotlinx.coroutines.flow.MutableStateFlow(false)
+    ).collectAsState()
+    val hardwareBackEnabled = if (tabWebViewHolder?.isGeckoMode == true) {
+        geckoCanGoBack
+    } else {
+        tabWebViewHolder?.navigator?.canGoBack ?: false
+    }
+
     BackHandler(tabs.tabsSize > 1) {
         tab?.let {
             browserComponent.closeTab(tab.tabId)
         }
     }
-    BackHandler(tabWebViewHolder?.navigator?.canGoBack ?: false) {
-        tabWebViewHolder?.webView?.goBack()
+    BackHandler(hardwareBackEnabled) {
+        val holder = tabWebViewHolder ?: return@BackHandler
+        if (holder.isGeckoMode) {
+            holder.geckoTabState?.goBack()
+        } else {
+            holder.webView?.goBack()
+        }
     }
     LaunchedEffect(tabs) {
         viewRegistry.onTabsUpdated(tabs)
@@ -160,6 +176,25 @@ fun BrowserPage(
                                         .background(myColors.info),
                                 )
                             }
+                        }
+                    }
+                    // Gecko progress bar — shown when GeckoView is the active engine.
+                    val geckoProgress by (tabWebViewHolder
+                        ?.geckoTabState
+                        ?.progressFlow
+                        ?: kotlinx.coroutines.flow.MutableStateFlow(null)
+                    ).collectAsState()
+                    geckoProgress?.let { progress ->
+                        Box(
+                            Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Box(
+                                Modifier
+                                    .height(1.dp)
+                                    .fillMaxWidth(progress)
+                                    .background(myColors.info),
+                            )
                         }
                     }
                     WithContentColor(myColors.onSurface) {
@@ -216,10 +251,12 @@ fun BrowserPage(
         onBookmarkClick = {
             browserComponent.setShowBookmarkList(false)
             val newLink = browserComponent.createNewUrlFor(it.url)
-            tabWebViewHolder
-                ?.navigator
-                ?.loadUrl(newLink)
-                ?: browserComponent.newTab(newLink)
+            val geckoState = tabWebViewHolder?.geckoTabState
+            if (geckoState != null) {
+                geckoState.loadUrl(newLink)
+            } else {
+                tabWebViewHolder?.navigator?.loadUrl(newLink) ?: browserComponent.newTab(newLink)
+            }
         },
         bookmarks = browserComponent.bookmarks.collectAsState().value,
         onRequestEditBookmark = browserComponent::promptEditBookmark,
@@ -305,12 +342,29 @@ fun AddressBar(
     tabs: ABDMTabs,
     modifier: Modifier,
 ) {
+    val gecko = currentWebViewHolder?.geckoTabState
+
+    // ── URL / title ────────────────────────────────────────────────────────
+    val geckoUrl by (gecko?.urlFlow
+        ?: kotlinx.coroutines.flow.MutableStateFlow(null)).collectAsState()
+    val geckoTitle by (gecko?.titleFlow
+        ?: kotlinx.coroutines.flow.MutableStateFlow(null)).collectAsState()
+    val geckoCanGoBack by (gecko?.canGoBackFlow
+        ?: kotlinx.coroutines.flow.MutableStateFlow(false)).collectAsState()
+    val geckoCanGoForward by (gecko?.canGoForwardFlow
+        ?: kotlinx.coroutines.flow.MutableStateFlow(false)).collectAsState()
+    val geckoIsLoading by (gecko?.isLoadingFlow
+        ?: kotlinx.coroutines.flow.MutableStateFlow(false)).collectAsState()
+
     val webViewState = currentWebViewHolder?.tab?.tabState
     val navigator = currentWebViewHolder?.navigator
-    val canGoBack = navigator?.canGoBack ?: false
-    val canGoForward = navigator?.canGoForward ?: false
-    val currentURL = webViewState?.lastLoadedUrl
-    val currentTitle = webViewState?.pageTitle
+
+    // Prefer Gecko state when available, fall back to WebViewState.
+    val canGoBack = if (gecko != null) geckoCanGoBack else (navigator?.canGoBack ?: false)
+    val canGoForward = if (gecko != null) geckoCanGoForward else (navigator?.canGoForward ?: false)
+    val currentURL = if (gecko != null) geckoUrl else webViewState?.lastLoadedUrl
+    val currentTitle = if (gecko != null) geckoTitle else webViewState?.pageTitle
+    val isLoading = if (gecko != null) geckoIsLoading else (webViewState?.isLoading ?: false)
     var isTabListVisible by remember { mutableStateOf(false) }
 
     Column(
@@ -327,9 +381,11 @@ fun AddressBar(
             onNewPageRequested = {
                 it?.let { text ->
                     val newLink = browserComponent.createNewUrlFor(text)
-                    navigator
-                        ?.loadUrl(newLink)
-                        ?: browserComponent.newTab(newLink)
+                    if (gecko != null) {
+                        gecko.loadUrl(newLink)
+                    } else {
+                        navigator?.loadUrl(newLink) ?: browserComponent.newTab(newLink)
+                    }
                 }
             }
         )
@@ -340,30 +396,24 @@ fun AddressBar(
                 icon = MyIcons.back,
                 contentDescription = Res.string.back.asStringSource()
             ) {
-                navigator?.navigateBack()
+                if (gecko != null) gecko.goBack() else navigator?.navigateBack()
             }
             TransparentIconActionButton(
                 enabled = canGoForward,
                 icon = MyIcons.next,
                 contentDescription = Res.string.next.asStringSource()
             ) {
-                navigator?.navigateForward()
+                if (gecko != null) gecko.goForward() else navigator?.navigateForward()
             }
             Spacer(Modifier.width(16.dp))
-            webViewState?.let {
-                TransparentIconActionButton(
-                    icon = if (webViewState.isLoading) {
-                        MyIcons.close
-                    } else {
-                        MyIcons.refresh
-                    },
-                    contentDescription = Res.string.next.asStringSource()
-                ) {
-                    if (webViewState.isLoading) {
-                        navigator?.stopLoading()
-                    } else {
-                        navigator?.reload()
-                    }
+            TransparentIconActionButton(
+                icon = if (isLoading) MyIcons.close else MyIcons.refresh,
+                contentDescription = Res.string.next.asStringSource()
+            ) {
+                if (gecko != null) {
+                    if (isLoading) gecko.stopLoading() else gecko.reload()
+                } else if (webViewState != null) {
+                    if (webViewState.isLoading) navigator?.stopLoading() else navigator?.reload()
                 }
             }
             Spacer(Modifier.weight(1f))
