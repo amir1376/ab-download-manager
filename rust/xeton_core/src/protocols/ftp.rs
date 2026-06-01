@@ -78,6 +78,11 @@ impl FtpJob {
 
     /// Resume the FTP download.
     async fn connect_control(ftp_url: &FtpUrl) -> anyhow::Result<AsyncRustlsFtpStream> {
+        static INIT_CRYPTO: std::sync::Once = std::sync::Once::new();
+        INIT_CRYPTO.call_once(|| {
+            let _ = suppaftp::rustls::crypto::ring::default_provider().install_default();
+        });
+
         let mut control = AsyncRustlsFtpStream::connect(format!("{}:{}", ftp_url.host, ftp_url.port))
             .await
             .map_err(|e| anyhow::anyhow!("FTP connect failed: {}", e))?;
