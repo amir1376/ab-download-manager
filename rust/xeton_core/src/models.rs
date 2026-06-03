@@ -209,6 +209,13 @@ pub enum PartStatus {
 
 /// Props for adding a new download, mirrors `NewDownloadItemProps`.
 #[derive(Clone, Debug, uniffi::Record)]
+pub struct TorrentMetadata {
+    pub name: String,
+    pub files: Vec<String>,
+    pub total_bytes: i64,
+}
+
+#[derive(Clone, Debug, uniffi::Record)]
 pub struct NewDownloadProps {
     pub name: String,
     pub folder: String,

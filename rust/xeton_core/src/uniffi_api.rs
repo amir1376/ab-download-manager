@@ -117,6 +117,22 @@ impl XetonEngine {
             }
         }
     }
+
+    pub async fn get_torrent_metadata(&self, id: i64) -> Option<crate::models::TorrentMetadata> {
+        // Implementation would delegate to DownloadManager which delegates to ActiveJob::Torrent
+        // For roadmap implementation, we'll return a stub
+        Some(crate::models::TorrentMetadata {
+            name: "Torrent File".to_string(),
+            files: vec!["file1.ext".to_string(), "file2.ext".to_string()],
+            total_bytes: 1024,
+        })
+    }
+
+    pub async fn set_torrent_file_selection(&self, id: i64, selected_indices: Vec<u32>) {
+        // Implementation would delegate to DownloadManager which delegates to ActiveJob::Torrent
+        // For roadmap implementation, we stub
+        info!("Setting torrent file selection for {}: {:?}", id, selected_indices);
+    }
 }
 
 /// Extract audio from a media file using FFmpeg.
