@@ -8,14 +8,27 @@
     "contextMenus",
     "activeTab",
     "downloads",
-    "webRequest",
-    "scripting"
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "cookies",
+    "scripting",
+    "storage"
   ],
   "host_permissions": [
     "*://*/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
   },
   "action": {
     "default_title": "Download with Xeton",
