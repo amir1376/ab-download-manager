@@ -121,6 +121,12 @@ dictionary NewDownloadProps {
 
 // ─── Engine Interface ───────────────────────────────────────────────────────
 
+dictionary TorrentMetadata {
+    string name;
+    sequence<string> files;
+    i64 total_bytes;
+};
+
 interface XetonEngine {
     constructor(string data_dir, DownloadSettings settings);
 
@@ -137,6 +143,9 @@ interface XetonEngine {
     [Async] void reload_settings(DownloadSettings settings);
     [Async] void set_proxy(ProxyConfig proxy);
 
+    [Async] TorrentMetadata? get_torrent_metadata(i64 id);
+    [Async] void set_torrent_file_selection(i64 id, sequence<u32> selected_indices);
+
     [Async] ManagerEvent next_event();
 };
 
@@ -145,4 +154,20 @@ interface Downloader {
     [Async] void start();
     [Async] void pause();
     DownloadStatus get_status();
+};
+
+dictionary PeerDevice {
+    string id;
+    string name;
+    string ip;
+    u16 port;
+};
+
+interface SyncService {
+    constructor(string device_name);
+    [Async] void start_discovery();
+    [Async] void stop_discovery();
+    [Async] sequence<PeerDevice> discovered_devices();
+    [Async] void push_link(string peer_id, string url);
+    [Async] void pair(string peer_id, string pin);
 };

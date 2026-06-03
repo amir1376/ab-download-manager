@@ -126,6 +126,7 @@ impl DiskActor {
                         }
                         #[cfg(not(unix))]
                         {
+                            use std::io::SeekFrom;
                             if let Err(e) = file.seek(SeekFrom::Start(offset)).await {
                                 error!("Seek error at offset {}: {}", offset, e);
                                 continue;

@@ -19,7 +19,7 @@ use tracing::{debug, info};
 
 use crate::connection::{HttpClient, DEFAULT_USER_AGENT};
 use crate::connection::proxy::ProxyConfig;
-use crate::db::{DownloadDb, PartDb};
+use crate::db::{DownloadDb, PartDb, ProgressBatcher};
 use crate::destination::{atomic_rename, DiskActor, IncompleteFileUtil};
 use crate::models::*;
 use crate::part::{split_to_ranges, PartRunner, SplitGuard};
@@ -39,7 +39,7 @@ pub struct HttpJob {
     /// Disk writer actor.
     disk: Mutex<Option<DiskActor>>,
     /// Part runners keyed by `part.from`.
-    runners: Mutex<Vec<Arc<PartRunner>>>,
+    runners: Arc<Mutex<Vec<Arc<PartRunner>>>>,
     /// Dynamic part split guard.
     split_guard: Arc<SplitGuard>,
     /// Download settings.
@@ -51,6 +51,8 @@ pub struct HttpJob {
     job_throttler: Arc<Throttler>,
     /// Global throttler.
     global_throttler: Arc<Throttler>,
+    /// Progress batcher.
+    batcher: ProgressBatcher,
 
     // ── Runtime state ───────────────────────────────────────────────────
     /// Job status broadcast.
@@ -83,6 +85,7 @@ impl HttpJob {
         dl_db: Arc<dyn DownloadDb>,
         part_db: Arc<dyn PartDb>,
         global_throttler: Arc<Throttler>,
+        batcher: ProgressBatcher,
         data_dir: PathBuf,
         proxy: &ProxyConfig,
     ) -> Result<Arc<Self>, crate::connection::ConnectionError> {
@@ -95,13 +98,14 @@ impl HttpJob {
             parts: Arc::new(Mutex::new(Vec::new())),
             client,
             disk: Mutex::new(None),
-            runners: Mutex::new(Vec::new()),
+            runners: Arc::new(Mutex::new(Vec::new())),
             split_guard: Arc::new(SplitGuard::new()),
             settings,
             dl_db,
             part_db,
             job_throttler,
             global_throttler,
+            batcher,
             status_tx,
             status_rx,
             supports_concurrent: Mutex::new(None),
@@ -468,8 +472,7 @@ impl HttpJob {
     /// Start the periodic auto-saver (every 1 second).
     async fn start_auto_saver(&self) {
         let parts = self.parts.clone();
-        let part_db = self.part_db.clone();
-        let dl_db = self.dl_db.clone();
+        let batcher = self.batcher.clone();
         let item = self.item.clone();
 
         let handle = tokio::spawn(async move {
@@ -479,8 +482,10 @@ impl HttpJob {
                 let id = item.read().await.numeric_id;
                 let item_data = item.read().await.clone();
                 let parts_data: Vec<RangedPart> = parts.lock().await.clone();
-                let _ = dl_db.update(&item_data).await;
-                let _ = part_db.set_parts(id, &parts_data).await;
+                
+                // Send debounced updates through the batcher instead of hitting the DB directly
+                let _ = batcher.update_item(item_data).await;
+                let _ = batcher.update_parts(id, parts_data).await;
             }
         });
 
@@ -637,10 +642,10 @@ impl HttpJob {
     /// Save current state to the database.
     pub async fn save_state(&self) -> anyhow::Result<()> {
         let item = self.item.read().await;
-        self.dl_db.update(&item).await?;
+        self.batcher.update_item(item.clone()).await?;
 
         let parts = self.parts.lock().await;
-        self.part_db.set_parts(item.numeric_id, &parts).await?;
+        self.batcher.update_parts(item.numeric_id, parts.clone()).await?;
         Ok(())
     }
 

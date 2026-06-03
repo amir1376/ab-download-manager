@@ -99,18 +99,23 @@ sha1 = { version = "0.10", features = ["oid"], optional = true }
 # FFmpeg bindings (audio transcoder — optional feature)
 ffmpeg-next = { version = "7", optional = true }
 
+# mDNS discovery and HTTP server for local sync
+mdns-sd = { version = "0.13", optional = true }
+axum = { version = "0.7", optional = true }
+
 # ─────────────────────────────────────────────────────────────────────────────
 [build-dependencies]
 uniffi = { version = "0.28", features = ["build"] }
 
 # ─────────────────────────────────────────────────────────────────────────────
 [features]
-default    = ["ftp", "hls", "torrent", "extractors"]
+default    = ["ftp", "hls", "torrent", "extractors", "sync"]
 ftp        = ["suppaftp"]
 hls        = ["m3u8-rs", "sha1"]
 torrent    = ["librqbit"]
 extractors = []
 transcoder = ["ffmpeg-next"]
+sync       = ["mdns-sd", "axum"]
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.52", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_IO"] }

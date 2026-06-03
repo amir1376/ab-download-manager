@@ -12,11 +12,65 @@ use tokio::sync::{broadcast, RwLock};
 use tracing::{debug, info, warn};
 
 use crate::connection::proxy::ProxyConfig;
-use crate::db::{DownloadDb, PartDb, SurrealStore};
+use crate::db::{DownloadDb, PartDb, ProgressBatcher, SurrealStore};
 use crate::http::job::HttpJob;
 use crate::models::*;
 use crate::queue::manager::QueueManager;
 use crate::throttle::Throttler;
+#[derive(Clone)]
+pub enum ActiveJob {
+    Http(Arc<HttpJob>),
+    #[cfg(feature = "torrent")]
+    Torrent(Arc<crate::protocols::torrent::TorrentJob>),
+}
+
+impl ActiveJob {
+    pub async fn resume(&self) -> anyhow::Result<()> {
+        match self {
+            Self::Http(job) => job.resume().await,
+            #[cfg(feature = "torrent")]
+            Self::Torrent(job) => job.resume().await,
+        }
+    }
+
+    pub async fn pause(&self) -> anyhow::Result<()> {
+        match self {
+            Self::Http(job) => job.pause().await,
+            #[cfg(feature = "torrent")]
+            Self::Torrent(job) => job.pause().await,
+        }
+    }
+
+    pub async fn reset(&self) -> anyhow::Result<()> {
+        match self {
+            Self::Http(job) => job.reset().await,
+            #[cfg(feature = "torrent")]
+            Self::Torrent(job) => {
+                // Not fully implemented yet, but we'll add stub
+                // job.reset().await
+                Ok(())
+            }
+        }
+    }
+
+    pub async fn remove_output_files(&self) {
+        match self {
+            Self::Http(job) => job.remove_output_files().await,
+            #[cfg(feature = "torrent")]
+            Self::Torrent(job) => {
+                // stub
+            }
+        }
+    }
+
+    pub fn status_rx(&self) -> tokio::sync::watch::Receiver<JobStatus> {
+        match self {
+            Self::Http(job) => job.status_rx.clone(),
+            #[cfg(feature = "torrent")]
+            Self::Torrent(job) => job.status_rx.clone(),
+        }
+    }
+}
 
 /// The top-level download manager.
 ///
@@ -28,7 +82,7 @@ pub struct DownloadManager {
     /// Download settings.
     pub settings: Arc<RwLock<DownloadSettings>>,
     /// Active download jobs keyed by download ID.
-    jobs: DashMap<i64, Arc<HttpJob>>,
+    jobs: DashMap<i64, ActiveJob>,
     /// Event broadcast channel.
     event_tx: broadcast::Sender<ManagerEvent>,
     /// Public event receiver (clone for each subscriber).
@@ -37,6 +91,8 @@ pub struct DownloadManager {
     pub global_throttler: Arc<Throttler>,
     /// Queue manager.
     pub queue_manager: Arc<QueueManager>,
+    /// Progress batcher.
+    progress_batcher: ProgressBatcher,
     /// Proxy configuration.
     proxy: RwLock<ProxyConfig>,
     /// Data directory.
@@ -55,6 +111,7 @@ impl DownloadManager {
         let (event_tx, event_rx) = broadcast::channel(256);
         let global_throttler = Arc::new(Throttler::new(settings.global_speed_limit));
         let queue_manager = Arc::new(QueueManager::new(store.clone()));
+        let progress_batcher = ProgressBatcher::new(store.clone(), std::time::Duration::from_millis(500));
 
         let manager = Arc::new(Self {
             store,
@@ -64,6 +121,7 @@ impl DownloadManager {
             event_rx,
             global_throttler,
             queue_manager,
+            progress_batcher,
             proxy: RwLock::new(ProxyConfig::System),
             data_dir,
         });
@@ -234,7 +292,7 @@ impl DownloadManager {
     pub fn get_job_status(&self, id: i64) -> Option<JobStatus> {
         self.jobs
             .get(&id)
-            .map(|job| job.status_rx.borrow().clone())
+            .map(|job| job.status_rx().borrow().clone())
     }
 
     /// Get the number of active downloads.
@@ -243,8 +301,8 @@ impl DownloadManager {
             .iter()
             .filter(|entry| {
                 matches!(
-                    *entry.value().status_rx.borrow(),
-                    JobStatus::Downloading | JobStatus::Resuming
+                    *entry.value().status_rx().borrow(),
+                    JobStatus::Downloading | JobStatus::PreparingFile { .. } | JobStatus::Resuming
                 )
             })
             .count()
@@ -287,25 +345,41 @@ impl DownloadManager {
     // ── Internal ────────────────────────────────────────────────────────
 
     /// Create a job for a download item and add it to the registry.
-    async fn create_job(&self, item: DownloadItem) -> anyhow::Result<Arc<HttpJob>> {
+    async fn create_job(&self, item: DownloadItem) -> anyhow::Result<ActiveJob> {
         let id = item.numeric_id;
         let proxy = self.proxy.read().await;
 
-        let job = HttpJob::new(
-            item,
-            self.settings.clone(),
-            self.store.clone(),
-            self.store.clone(),
-            self.global_throttler.clone(),
-            self.data_dir.clone(),
-            &proxy,
-        )?;
+        let active_job = match item.protocol {
+            #[cfg(feature = "torrent")]
+            DownloadProtocol::Torrent => {
+                let job = crate::protocols::torrent::TorrentJob::new(
+                    item,
+                    self.settings.clone(),
+                    self.store.clone(),
+                    self.data_dir.clone(),
+                );
+                job.boot().await?;
+                ActiveJob::Torrent(job)
+            }
+            _ => {
+                let job = HttpJob::new(
+                    item,
+                    self.settings.clone(),
+                    self.store.clone(),
+                    self.store.clone(),
+                    self.global_throttler.clone(),
+                    self.progress_batcher.clone(),
+                    self.data_dir.clone(),
+                    &proxy,
+                )?;
+                job.boot().await?;
+                ActiveJob::Http(job)
+            }
+        };
 
-        job.boot().await?;
-        self.jobs.insert(id, job.clone());
-
+        self.jobs.insert(id, active_job.clone());
         debug!("Created job #{}", id);
-        Ok(job)
+        Ok(active_job)
     }
 
     /// Emit a manager event.

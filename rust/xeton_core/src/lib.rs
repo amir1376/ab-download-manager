@@ -20,5 +20,7 @@ pub mod downloader;
 
 pub use uniffi_api::{extract_audio, merge_video_audio, extract_media_info};
 
-uniffi::setup_scaffolding!();
+#[cfg(feature = "sync")]
+pub mod sync;
 
+uniffi::setup_scaffolding!();

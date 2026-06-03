@@ -220,6 +220,51 @@ install_app() {
     # Create a .desktop file in ~/.local/share/applications
     generate_desktop_file
 
+    # --- Setup Native Messaging Host for Browsers
+    logger "Setting up Native Messaging Host for browsers..."
+    NATIVE_HOST_PATH="$HOME/.local/bin/xeton_native_host"
+    
+    # We copy the native host binary if it's available (assuming it gets packed into bin/)
+    if [ -f "$APP_PATH/bin/xeton_native_host" ]; then
+        ln -sf "$APP_PATH/bin/xeton_native_host" "$NATIVE_HOST_PATH"
+    fi
+
+    # The extension ID will be provided later, using a placeholder for now or if known
+    MANIFEST_CONTENT='{
+  "name": "com.xeton.integration",
+  "description": "Xeton Download Manager Native Messaging Host",
+  "path": "'"$NATIVE_HOST_PATH"'",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://YOUR_EXTENSION_ID_HERE/"
+  ]
+}'
+
+    # Chrome
+    mkdir -p "$HOME/.config/google-chrome/NativeMessagingHosts"
+    echo "$MANIFEST_CONTENT" > "$HOME/.config/google-chrome/NativeMessagingHosts/com.xeton.integration.json"
+    
+    # Chromium
+    mkdir -p "$HOME/.config/chromium/NativeMessagingHosts"
+    echo "$MANIFEST_CONTENT" > "$HOME/.config/chromium/NativeMessagingHosts/com.xeton.integration.json"
+    
+    # Edge
+    mkdir -p "$HOME/.config/microsoft-edge/NativeMessagingHosts"
+    echo "$MANIFEST_CONTENT" > "$HOME/.config/microsoft-edge/NativeMessagingHosts/com.xeton.integration.json"
+
+    # Firefox (requires different allowed_origins array, using extension ID)
+    FIREFOX_MANIFEST_CONTENT='{
+  "name": "com.xeton.integration",
+  "description": "Xeton Download Manager Native Messaging Host",
+  "path": "'"$NATIVE_HOST_PATH"'",
+  "type": "stdio",
+  "allowed_extensions": [
+    "xeton-integration@example.com"
+  ]
+}'
+    mkdir -p "$HOME/.mozilla/native-messaging-hosts"
+    echo "$FIREFOX_MANIFEST_CONTENT" > "$HOME/.mozilla/native-messaging-hosts/com.xeton.integration.json"
+
     logger "AB Download Manager installed successfully"
     logger "it can be found in Applications menu or run '$APP_NAME' in terminal"
     logger "Make sure $HOME/.local/bin exists in PATH"

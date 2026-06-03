@@ -7,13 +7,19 @@
     "nativeMessaging",
     "contextMenus",
     "activeTab",
-    "downloads"
+    "downloads",
+    "webRequest",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Download with Xeton"
+    "default_title": "Download with Xeton",
+    "default_popup": "popup.html"
   },
   "icons": {
     "48": "icon.png",
