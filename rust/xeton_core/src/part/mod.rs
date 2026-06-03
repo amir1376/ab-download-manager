@@ -12,8 +12,9 @@
 //   - Stop signal via `Arc<AtomicBool>`.
 //   - Dynamic part splitting via `SplitGuard` (shared mutex).
 
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Arc;
+use std::time::Instant;
 
 use thiserror::Error;
 use tokio::sync::{watch, Mutex};
@@ -25,6 +26,79 @@ use crate::connection::{ConnectionError, HttpClient};
 use crate::destination::PartWriter;
 use crate::models::{PartStatus, RangedPart};
 use crate::throttle::ThrottleChain;
+
+// ─── SpeedTracker ───────────────────────────────────────────────────────────
+
+/// Sliding-window speed tracker for a single part runner.
+///
+/// Records cumulative bytes downloaded and computes bytes/sec over the
+/// most recent measurement window (default 2 seconds). This is used by
+/// the dynamic re-segmenting monitor to identify the slowest active segment.
+pub struct SpeedTracker {
+    /// Cumulative bytes downloaded by this part since the current attempt started.
+    bytes_total: AtomicU64,
+    /// Snapshot of `bytes_total` at the last measurement tick.
+    bytes_at_last_tick: AtomicU64,
+    /// Wall-clock instant of the last measurement tick.
+    last_tick: Mutex<Instant>,
+    /// Computed speed in bytes per second (smoothed).
+    speed_bps: AtomicU64,
+}
+
+impl SpeedTracker {
+    pub fn new() -> Self {
+        Self {
+            bytes_total: AtomicU64::new(0),
+            bytes_at_last_tick: AtomicU64::new(0),
+            last_tick: Mutex::new(Instant::now()),
+            speed_bps: AtomicU64::new(0),
+        }
+    }
+
+    /// Record that `n` bytes were just received.
+    #[inline]
+    pub fn record(&self, n: u64) {
+        self.bytes_total.fetch_add(n, Ordering::Relaxed);
+    }
+
+    /// Recompute the speed measurement. Called periodically by the monitor task.
+    pub async fn tick(&self) {
+        let now = Instant::now();
+        let mut last = self.last_tick.lock().await;
+        let elapsed = now.duration_since(*last);
+        if elapsed.is_zero() {
+            return;
+        }
+
+        let current = self.bytes_total.load(Ordering::Relaxed);
+        let prev = self.bytes_at_last_tick.swap(current, Ordering::Relaxed);
+        let delta = current.saturating_sub(prev);
+
+        let bps = (delta as f64 / elapsed.as_secs_f64()) as u64;
+        self.speed_bps.store(bps, Ordering::Relaxed);
+        *last = now;
+    }
+
+    /// Current speed in bytes per second.
+    #[inline]
+    pub fn speed_bps(&self) -> u64 {
+        self.speed_bps.load(Ordering::Relaxed)
+    }
+
+    /// Reset all counters (on retry).
+    pub async fn reset(&self) {
+        self.bytes_total.store(0, Ordering::Relaxed);
+        self.bytes_at_last_tick.store(0, Ordering::Relaxed);
+        self.speed_bps.store(0, Ordering::Relaxed);
+        *self.last_tick.lock().await = Instant::now();
+    }
+}
+
+impl Default for SpeedTracker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Maximum retries per part before declaring failure.
 pub const PART_MAX_TRIES: u32 = 10;
@@ -83,6 +157,8 @@ pub struct PartRunner {
     pub active: Arc<AtomicBool>,
     /// Callback invoked when the part encounters too many errors.
     on_too_many_errors: Option<Box<dyn Fn(PartError) + Send + Sync>>,
+    /// Real-time throughput tracker for dynamic re-segmenting decisions.
+    pub speed_tracker: Arc<SpeedTracker>,
 }
 
 impl PartRunner {
@@ -96,7 +172,28 @@ impl PartRunner {
             stop: Arc::new(AtomicBool::new(false)),
             active: Arc::new(AtomicBool::new(false)),
             on_too_many_errors: None,
+            speed_tracker: Arc::new(SpeedTracker::new()),
         }
+    }
+
+    /// Current download speed in bytes per second for this part.
+    pub fn speed_bps(&self) -> u64 {
+        self.speed_tracker.speed_bps()
+    }
+
+    /// Estimated time remaining for this part, based on current speed.
+    /// Returns `None` if speed is zero or the part has unknown remaining size.
+    pub async fn estimated_eta(&self) -> Option<Duration> {
+        let part = self.part.lock().await;
+        let remaining = part.remaining()?;
+        if remaining <= 0 {
+            return Some(Duration::ZERO);
+        }
+        let speed = self.speed_bps();
+        if speed == 0 {
+            return None; // Cannot estimate — will be treated as "infinitely slow"
+        }
+        Some(Duration::from_secs(remaining as u64 / speed))
     }
 
     /// Set the callback for when too many errors occur.
@@ -169,6 +266,7 @@ impl PartRunner {
                 if tries > 0 {
                     let delay = Self::retry_delay(tries);
                     debug!("Part retry #{} after {}ms", tries, delay.as_millis());
+                    runner.speed_tracker.reset().await;
                     sleep(delay).await;
                 }
 
@@ -272,6 +370,9 @@ impl PartRunner {
 
             // Rate limiting
             throttle.acquire(chunk.len() as u32).await;
+
+            // Record bytes for speed tracking (before write to include I/O wait)
+            self.speed_tracker.record(chunk_len as u64);
 
             // Write to disk
             writer

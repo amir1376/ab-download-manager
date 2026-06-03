@@ -66,6 +66,8 @@ pub struct HttpJob {
     cancel: Mutex<Option<CancellationToken>>,
     /// Auto-saver task handle.
     auto_saver: Mutex<Option<JoinHandle<()>>>,
+    /// Dynamic re-segmenting monitor task handle.
+    split_monitor: Mutex<Option<JoinHandle<()>>>,
     /// Retry state.
     failed_tries: Mutex<u32>,
     downloaded_before_retry: Mutex<i64>,
@@ -107,6 +109,7 @@ impl HttpJob {
             strict_mode: Mutex::new(true),
             cancel: Mutex::new(None),
             auto_saver: Mutex::new(None),
+            split_monitor: Mutex::new(None),
             failed_tries: Mutex::new(0),
             downloaded_before_retry: Mutex::new(0),
             data_dir,
@@ -185,6 +188,9 @@ impl HttpJob {
 
         // Start auto-saver
         self.start_auto_saver().await;
+
+        // Start dynamic re-segmenting monitor
+        self.start_split_monitor().await;
 
         // Update status
         {
@@ -456,6 +462,7 @@ impl HttpJob {
             cancel.cancel();
         }
         self.stop_auto_saver().await;
+        self.stop_split_monitor().await;
     }
 
     /// Start the periodic auto-saver (every 1 second).
@@ -485,6 +492,146 @@ impl HttpJob {
         if let Some(handle) = self.auto_saver.lock().await.take() {
             handle.abort();
         }
+    }
+
+    /// Stop the split monitor.
+    async fn stop_split_monitor(&self) {
+        if let Some(handle) = self.split_monitor.lock().await.take() {
+            handle.abort();
+        }
+    }
+
+    /// Start the dynamic re-segmenting monitor.
+    ///
+    /// Every 2 seconds, this task:
+    ///   1. Ticks all speed trackers to refresh throughput measurements.
+    ///   2. Checks if any runner has finished its segment.
+    ///   3. Finds the slowest active segment by ETA.
+    ///   4. Splits it in half if large enough, spawning a new runner.
+    ///
+    /// This implements the mathematical formalization from the roadmap:
+    ///   s = argmax_j(R_j / v_j) ; split at offset + ⌊R_s / 2⌋
+    async fn start_split_monitor(&self) {
+        let parts = self.parts.clone();
+        let runners = self.runners.clone();
+        let split_guard = self.split_guard.clone();
+        let settings = self.settings.clone();
+        let client = self.client.clone();
+        let item = self.item.clone();
+        let global_throttler = self.global_throttler.clone();
+        let job_throttler = self.job_throttler.clone();
+        // Clone the DiskActor handle — this is cheap (just an mpsc::Sender clone).
+        let disk = self.disk.lock().await.as_ref().cloned();
+        let strict_mode = *self.strict_mode.lock().await;
+
+        let handle = tokio::spawn(async move {
+            let mut ticker = interval(Duration::from_secs(2));
+            loop {
+                ticker.tick().await;
+
+                // Need a disk actor to create writers for new segments
+                let disk = match disk.as_ref() {
+                    Some(d) => d,
+                    None => continue,
+                };
+
+                // 1. Tick all speed trackers
+                let current_runners = runners.lock().await;
+                for runner in current_runners.iter() {
+                    runner.speed_tracker.tick().await;
+                }
+
+                // 2. Check settings
+                let s = settings.read().await;
+                if !s.dynamic_part_creation {
+                    drop(current_runners);
+                    continue;
+                }
+                let min_part_size = s.min_part_size;
+                drop(s);
+
+                // 3. Check if any runner has finished
+                let has_finished = current_runners.iter().any(|r| !r.is_active());
+                if !has_finished {
+                    drop(current_runners);
+                    continue;
+                }
+
+                // 4. Find the slowest active segment by ETA
+                let mut slowest_idx: Option<usize> = None;
+                let mut slowest_eta = Duration::ZERO;
+
+                for (i, runner) in current_runners.iter().enumerate() {
+                    if !runner.is_active() {
+                        continue;
+                    }
+                    // None ETA = speed is 0 = infinitely slow → always the worst candidate
+                    let eta = runner.estimated_eta().await.unwrap_or(Duration::from_secs(u64::MAX));
+                    if eta > slowest_eta {
+                        slowest_eta = eta;
+                        slowest_idx = Some(i);
+                    }
+                }
+
+                let target_idx = match slowest_idx {
+                    Some(idx) => idx,
+                    None => {
+                        drop(current_runners);
+                        continue;
+                    }
+                };
+
+                // 5. Try to split the slowest segment
+                let target_runner = &current_runners[target_idx];
+                let new_part = split_guard.try_split(&target_runner.part, min_part_size).await;
+
+                drop(current_runners);
+
+                if let Some(new_part) = new_part {
+                    debug!(
+                        "Dynamic re-segment: split slowest part, new sub-segment [{}, {:?}] starts at offset {}",
+                        new_part.from, new_part.to, new_part.current
+                    );
+
+                    // Add the new part to the parts list
+                    {
+                        let mut p = parts.lock().await;
+                        p.push(new_part.clone());
+                    }
+
+                    // Create a PartWriter at the new part's starting offset
+                    let writer = disk.writer_for(new_part.current as u64);
+
+                    // Build the new runner
+                    let runner = Arc::new(PartRunner::new(new_part));
+
+                    let i = item.read().await;
+                    let url = i.link.clone();
+                    drop(i);
+
+                    let headers = HeaderMap::new();
+                    let throttle = Arc::new(ThrottleChain::new(vec![
+                        global_throttler.clone(),
+                        job_throttler.clone(),
+                    ]));
+
+                    // Spawn the runner task
+                    let _handle = runner.clone().start(
+                        client.clone(),
+                        url,
+                        headers,
+                        writer,
+                        throttle,
+                        strict_mode,
+                    );
+
+                    // Register the runner so the auto-saver and future splits can see it
+                    runners.lock().await.push(runner);
+                }
+            }
+        });
+
+        *self.split_monitor.lock().await = Some(handle);
     }
 
     /// Save current state to the database.

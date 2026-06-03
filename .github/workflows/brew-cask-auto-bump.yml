@@ -10,9 +10,9 @@ jobs:
     runs-on: macos-latest
     env:
       HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
-      CASK_NAME: ab-download-manager
-      TAP_NAME: amir1376/tap
-      GH_REPO: amir1376/homebrew-tap
+      CASK_NAME: xeton-download-manager
+      TAP_NAME: FaezBarghasa/tap
+      GH_REPO: FaezBarghasa/homebrew-tap
 
     steps:
       - name: Tap homebrew cask repo

@@ -14,9 +14,9 @@ use std::path::{Path, PathBuf};
 use bytes::Bytes;
 use thiserror::Error;
 use tokio::fs::{self, File, OpenOptions};
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncSeekExt, AsyncWriteExt};
 use tokio::sync::{mpsc, oneshot};
-use tracing::{debug, error};
+use tracing::{debug, error, warn};
 
 // ─── Errors ─────────────────────────────────────────────────────────────────
 
@@ -69,6 +69,10 @@ pub enum WriteCmd {
 ///
 /// This replaces the Kotlin `DestWriter` + `SimpleDownloadDestination` pattern
 /// which used `synchronized(this)` blocks around `FileHandle` operations.
+///
+/// `Clone` is cheap: it only clones the `mpsc::Sender` handle and the path.
+/// All clones share the same background actor task and file handle.
+#[derive(Clone)]
 pub struct DiskActor {
     tx: mpsc::Sender<WriteCmd>,
     path: PathBuf,
@@ -152,6 +156,7 @@ impl DiskActor {
                     }
                     #[cfg(not(unix))]
                     {
+                        use std::io::SeekFrom;
                         let _ = file.seek(SeekFrom::Start(offset)).await;
                         let _ = file.write_all(&data).await;
                     }
@@ -197,22 +202,53 @@ impl DiskActor {
     async fn preallocate(file: &File, size: u64) -> Result<(), DestinationError> {
         use std::os::unix::io::AsRawFd;
         let fd = file.as_raw_fd();
-        // Use ftruncate to set the file size. The kernel creates a sparse file
-        // on filesystems that support it (ext4, btrfs, xfs).
-        let result = unsafe { libc::ftruncate(fd, size as libc::off_t) };
+        // posix_fallocate actually allocates space and prevents out-of-space errors later.
+        let result = unsafe { libc::posix_fallocate(fd, 0, size as libc::off_t) };
         if result != 0 {
-            return Err(DestinationError::Io(std::io::Error::last_os_error()));
+            // Fallback to ftruncate if posix_fallocate fails (e.g. unsupported filesystem
+            // like FAT32 on Android SD cards or tmpfs)
+            warn!(
+                "posix_fallocate returned {}, falling back to ftruncate for {} bytes",
+                result, size
+            );
+            let fall_back_result = unsafe { libc::ftruncate(fd, size as libc::off_t) };
+            if fall_back_result != 0 {
+                return Err(DestinationError::Io(std::io::Error::last_os_error()));
+            }
+            debug!("Pre-allocated {} bytes via ftruncate fallback", size);
+        } else {
+            debug!("Pre-allocated {} bytes via posix_fallocate", size);
         }
-        debug!("Pre-allocated {} bytes (sparse)", size);
         Ok(())
     }
 
     #[cfg(target_os = "windows")]
     async fn preallocate(file: &File, size: u64) -> Result<(), DestinationError> {
-        // On Windows, use SetEndOfFile to extend the file size.
-        // Windows NTFS automatically creates sparse regions.
-        file.set_len(size).await?;
-        debug!("Pre-allocated {} bytes", size);
+        // On Windows, use SetFileInformationByHandle with FileAllocationInfo.
+        // This extends the file allocation instantaneously.
+        use std::os::windows::io::AsRawHandle;
+        use windows_sys::Win32::Storage::FileSystem::{SetFileInformationByHandle, FileAllocationInfo, FILE_ALLOCATION_INFO};
+
+        let handle = file.as_raw_handle() as isize;
+        let info = FILE_ALLOCATION_INFO {
+            AllocationSize: size as i64,
+        };
+
+        let result = unsafe {
+            SetFileInformationByHandle(
+                handle,
+                FileAllocationInfo,
+                &info as *const _ as *const _,
+                std::mem::size_of::<FILE_ALLOCATION_INFO>() as u32,
+            )
+        };
+
+        if result == 0 {
+            return Err(DestinationError::Io(std::io::Error::last_os_error()));
+        }
+        
+        file.set_len(size).await?; // Set logical size as well
+        debug!("Pre-allocated {} bytes using SetFileInformationByHandle", size);
         Ok(())
     }
 

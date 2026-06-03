@@ -7520,6 +7520,7 @@ dependencies = [
  "uniffi_bindgen",
  "urlencoding",
  "webpki-roots 0.26.11",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

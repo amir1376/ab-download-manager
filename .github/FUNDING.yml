@@ -12,4 +12,4 @@ lfx_crowdfunding: # Replace with a single LFX Crowdfunding project-name e.g., cl
 polar: # Replace with a single Polar username
 buy_me_a_coffee: # Replace with a single Buy Me a Coffee username
 thanks_dev: # Replace with a single thanks.dev username
-custom: ["https://github.com/amir1376/ab-download-manager/blob/master/DONATE.md"] # Replace with up to 4 custom sponsorship URLs e.g., ['link1', 'link2']
+custom: ["https://github.com/FaezBarghasa/xeton-download-manager/blob/master/DONATE.md"] # Replace with up to 4 custom sponsorship URLs e.g., ['link1', 'link2']

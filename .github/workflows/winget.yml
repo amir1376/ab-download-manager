@@ -10,5 +10,5 @@ jobs:
     steps:
       - uses: vedantmgoyal9/winget-releaser@main
         with:
-          identifier: amir1376.ABDownloadManager
+          identifier: FaezBarghasa.Xeton
           token: ${{ secrets.WINGET_TOKEN }}

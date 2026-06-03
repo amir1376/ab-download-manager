@@ -44,24 +44,11 @@ class HttpPartDownloader(
         from: Long,
         to: Long?,
     ): Connection<HttpResponseInfo> {
-        val connect = client.connect(credentials, from, to)
-        // make sure this is a 2xx response
-        kotlin.runCatching {
-            connect.responseInfo.expectSuccess()
-        }
-            .onFailure {
-                // close connection before throwing exception
-                kotlin.runCatching {
-                    connect.close()
-                }
-            }
-            .getOrThrow()
-        val source = speedLimiters.fold<Throttler, Source>(connect.source) { acc, throttler ->
-            throttler.source(acc)
-        }
-        return connect.copy(
-            source = source
-        )
+        // [DELEGATED TO RUST]
+        // In Phase 1, we bypass OkHttp and use the Rust core `Downloader`.
+        // The actual connection logic is now handled internally by xeton_core/http/job.rs
+        // This is a placeholder for the actual integration point where Kotlin hands off to Rust.
+        throw UnsupportedOperationException("Delegated to Rust XetonCore Downloader")
     }
 
     override fun onFinish() {

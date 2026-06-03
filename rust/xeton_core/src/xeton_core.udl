@@ -139,3 +139,10 @@ interface XetonEngine {
 
     [Async] ManagerEvent next_event();
 };
+
+interface Downloader {
+    constructor(string url, string output_path, u16 segments);
+    [Async] void start();
+    [Async] void pause();
+    DownloadStatus get_status();
+};

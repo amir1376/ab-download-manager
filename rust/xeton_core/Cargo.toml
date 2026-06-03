@@ -111,3 +111,6 @@ hls        = ["m3u8-rs", "sha1"]
 torrent    = ["librqbit"]
 extractors = []
 transcoder = ["ffmpeg-next"]
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.52", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_IO"] }

@@ -23,20 +23,10 @@ actual object SparseFile : ISparseFile {
         .toSet()
 
     override fun createSparseFile(file: File): Boolean {
-        if (!file.exists()) {
-            val options = arrayOf<OpenOption>(
-                StandardOpenOption.WRITE,
-                StandardOpenOption.CREATE_NEW,
-                StandardOpenOption.SPARSE
-            )
-            return runCatching {
-                Files.newByteChannel(
-                    file.toPath(),
-                    *options,
-                ).use {}
-                true
-            }.getOrElse { false }
-        }
+        // [DELEGATED TO RUST]
+        // Zero-copy sparse allocation is now handled natively via Rust core
+        // (xeton_core/src/destination/mod.rs) using OS specific syscalls
+        // (posix_fallocate, SetFileInformationByHandle, fcntl).
         return false
     }
 
