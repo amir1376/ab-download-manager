@@ -250,6 +250,9 @@ tasks.register(CiUtils.getCreateBinaryFolderForCiTaskName()) {
         dependsOn(installerPlugin.createInstallerTask)
         inputs.dir(installerPlugin.outputFolder)
     }
+    if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
+        dependsOn("packageReleaseDeb")
+    }
     dependsOn(createDistributableAppArchive)
     inputs.property("appVersion", getAppVersionString())
     inputs.dir(distributableAppArchiveDir)
@@ -270,6 +273,17 @@ tasks.register(CiUtils.getCreateBinaryFolderForCiTaskName()) {
                 )
             }
             logger.lifecycle("app packages for '${targets.joinToString(", ") { it.name }}' written in $output using the installer plugin")
+        }
+        if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
+            val debDir = layout.buildDirectory.dir("compose/binaries/main-release/deb").get().asFile
+            CiUtils.movePackagedAndCreateSignature(
+                appVersion = getAppVersion(),
+                packageName = packageName,
+                target = InstallerTargetFormat.Deb,
+                basePackagedAppsDir = debDir,
+                outputDir = output,
+            )
+            logger.lifecycle("deb package written in $output")
         }
         val appArchiveDistributableDir = distributableAppArchiveDir.get().asFile
         CiUtils.copyAndHashToDestination(

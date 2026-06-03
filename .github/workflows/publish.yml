@@ -67,6 +67,16 @@ jobs:
         run: |
           ./gradlew createReleaseFolderForCi
 
+      - name: Build and Package Extension
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          cd extension
+          zip -r ../xeton-extension.zip *
+          cd ..
+          mkdir -p build/ci-release/binaries
+          mv xeton-extension.zip build/ci-release/binaries/xeton-extension.zip
+
       - name: Release Gradle to unlock cache files
         shell: bash
         run: |
