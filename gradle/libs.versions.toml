@@ -1,33 +1,32 @@
 [versions]
 fastscrollerCore = "0.3.2"
-kotlin = "2.3.21"
-ksp = "2.3.3"
-compose = "1.11.0"
+kotlin = "2.4.0"
+ksp = "2.3.9"
+compose = "1.11.1"
 kotlin-serialization = "1.11.0"
 okhttp = "5.3.2"
 okio = "3.16.4"
-coroutines = "1.10.2"
+coroutines = "1.11.0"
 koin = "4.2.1"
 koinAnnotation = "4.2.1"
 decompose = "3.5.0"
 essenty = "2.5.0"
-logback = "1.5.32"
-buildConfig = "6.0.9"
+buildConfig = "6.0.10"
 changelog = "2.5.0"
-http4k = "6.47.0.0"
-arrow = "2.2.1.1"
+http4k = "6.51.0.0"
+arrow = "2.2.3"
 datastore = "1.2.1"
-aboutLibraries = "14.0.1"
-jna = "5.18.1"
-datetime = "0.7.1"
+aboutLibraries = "14.2.1"
+jna = "5.19.0"
+datetime = "0.8.0"
 fileKit = "0.8.8"
 reorderable = "3.0.0"
 semver = "3.0.0"
 jgit = "7.3.0.202506031305-r"
 osThemeDetector = "3.9.1"
 kotlinFileWatcher = "1.4.0"
-markdownRenderer = "0.40.2"
-proxyVole = "2.0.0"
+markdownRenderer = "0.41.0"
+proxyVole = "2.0.1"
 jbrApi = "1.10.1"
 gradleVersions = "0.53.0"
 handlebars = "4.5.0"
@@ -73,8 +72,6 @@ composeFileKit = { module = "io.github.vinceglb:filekit-compose", version.ref = 
 
 fastscroller-core = { module = "io.github.oikvpqya.compose.fastscroller:fastscroller-core", version.ref = "fastscrollerCore" }
 
-loggers-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "logback" }
-loggers-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 autoService-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoServiceKsp" }
