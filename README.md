@@ -12,6 +12,10 @@
     <a href="https://crowdin.com/project/ab-download-manager"><img alt="Crowdin" src="https://badges.crowdin.net/ab-download-manager/localized.svg"></a>
 </p>
 
+<p align="center">
+  <a href="https://trendshift.io/repositories/13372" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13372" alt="amir1376%2Fab-download-manager | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</p>
+
 <a href="https://abdownloadmanager.com" target="_blank">
     <img alt="AB Download Manager Banner" src="assets/banners/app_banner.png"/>
 </a>
