@@ -20,6 +20,9 @@ abstract class DefinedPaths(
     val categoriesDir: Path = downloadDbDir.resolve("categories")
     val categoriesFile: Path = categoriesDir.resolve("categories.json")
 
+    val lastSavedLocationFile = pagesStateDir.resolve("lastSavedLocation.json")
+    val selectQueueSettingsFile = pagesStateDir.resolve("selectQueue.json")
+
     val partsDir: Path = downloadDbDir.resolve("parts")
     val updateDownloadLocation: Path = updateDir.resolve("downloads")
 

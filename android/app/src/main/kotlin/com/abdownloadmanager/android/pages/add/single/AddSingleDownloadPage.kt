@@ -211,13 +211,8 @@ fun ResponsiveDialogScope.AddSingleDownloadPage(
                 MainActionButtons(component)
                 ShowSolutionsOnDuplicateDownload(component)
                 ShowAddToQueueDialog(
-                    isOpened = component.shouldShowAddToQueue,
-                    queueList = component.queues.collectAsState().value,
-                    onClose = { component.shouldShowAddToQueue = false },
-                    onQueueSelected = { queue, startQueue ->
-                        component.onRequestAddToQueue(queue, startQueue)
-                    },
-                    newQueueAction = component.newQueuesAction
+                    queueComponent = component.selectQueueComponent,
+                    onRequestAddNewQueue = component.newQueuesAction
                 )
                 ExtraConfig(
                     isOpened = component.showMoreSettings,
@@ -418,17 +413,6 @@ fun RenderResumeSupport(
 }
 
 @Composable
-private fun MainConfigActionButton(
-    text: String,
-    modifier: Modifier,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-) {
-    ActionButton(text, modifier, enabled, onClick)
-}
-
-
-@Composable
 fun ConfigActionsButtons(component: AndroidAddSingleDownloadComponent) {
     val responseInfo by component.linkResponseInfo.collectAsState()
     Row {
@@ -467,14 +451,14 @@ private fun MainActionButtons(component: AndroidAddSingleDownloadComponent) {
     if (canAddResult is CanAddResult.DownloadAlreadyExists && onDuplicateStrategy == null) {
         Row {
             val buttonModifier = Modifier.weight(1f)
-            MainConfigActionButton(
+            ActionButton(
                 text = myStringResource(Res.string.show_solutions),
                 modifier = buttonModifier,
                 onClick = { component.showSolutionsOnDuplicateDownloadUi = true },
             )
             if (component.shouldShowOpenFile.collectAsState().value) {
                 Spacer(Modifier.width(8.dp))
-                MainConfigActionButton(
+                ActionButton(
                     text = myStringResource(Res.string.open_file),
                     modifier = buttonModifier,
                     onClick = { component.openExistingFile() },
@@ -485,7 +469,7 @@ private fun MainActionButtons(component: AndroidAddSingleDownloadComponent) {
         val canAddToDownloads by component.canAddToDownloads.collectAsState()
         Column {
             if (onDuplicateStrategy != null) {
-                MainConfigActionButton(
+                ActionButton(
                     text = myStringResource(Res.string.change_solution),
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { component.showSolutionsOnDuplicateDownloadUi = true },
@@ -495,7 +479,7 @@ private fun MainActionButtons(component: AndroidAddSingleDownloadComponent) {
             val isWebPage by component.isWebPage.collectAsState()
             if (isWebPage) {
                 Row {
-                    MainConfigActionButton(
+                    ActionButton(
                         text = myStringResource(Res.string.open_in_browser),
                         modifier = Modifier.fillMaxWidth(),
                         enabled = canAddToDownloads,
@@ -507,13 +491,16 @@ private fun MainActionButtons(component: AndroidAddSingleDownloadComponent) {
             } else {
                 Row {
                     val buttonModifier = Modifier.weight(1f)
-                    MainConfigActionButton(
+                    ActionButton(
                         text = myStringResource(Res.string.add),
                         modifier = buttonModifier,
                         enabled = canAddToDownloads,
                         onClick = {
-                            component.shouldShowAddToQueue = true
+                            component.selectQueueComponent.openAddToQueueDialog()
                         },
+                        onLongClick = {
+                            component.selectQueueComponent.fastConfirm()
+                        }
                     )
                     Spacer(Modifier.width(8.dp))
                     PrimaryMainActionButton(

@@ -15,6 +15,7 @@ import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -59,9 +60,16 @@ abstract class BaseAddMultiDownloadComponent(
     val fileIconProvider: FileIconProvider,
     private val categoryManager: CategoryManager,
     val downloaderInUiRegistry: DownloaderInUiRegistry,
-    protected val queueManager: QueueManager,
+    queueManager: QueueManager,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
-) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage) {
+    selectQueueStorage: ISelectQueueStorage,
+) : AddDownloadComponent(
+    ctx = ctx,
+    id = id,
+    lastSavedLocationsStorage = lastSavedLocationsStorage,
+    queueManager = queueManager,
+    selectQueueStorage = selectQueueStorage
+) {
     override val shouldShowWindow: StateFlow<Boolean> = MutableStateFlow(true)
 
     private val _folder = MutableStateFlow(appRepository.saveLocation.value)
@@ -259,7 +267,11 @@ abstract class BaseAddMultiDownloadComponent(
         }
     }
 
-    fun requestAddDownloads(
+    override fun onRequestAddToQueue(queueId: Long?, startQueue: Boolean) {
+        requestAddDownloads(queueId, startQueue)
+    }
+
+    private fun requestAddDownloads(
         queueId: Long?, startQueue: Boolean,
     ) {
 
@@ -314,9 +326,6 @@ abstract class BaseAddMultiDownloadComponent(
         }
     }
 
-    var showAddToQueue by mutableStateOf(false)
-        private set
-
     fun getIdOf(item: TANewDownloadInputs): Int {
         return item.getUniqueId()
     }
@@ -330,14 +339,6 @@ abstract class BaseAddMultiDownloadComponent(
     }
 
     val currentDownloadConfigurableList: MutableStateFlow<List<Configurable<*>>?> = MutableStateFlow(null)
-
-    fun openAddToQueueDialog() {
-        showAddToQueue = true
-    }
-
-    fun closeAddToQueue() {
-        showAddToQueue = false
-    }
 
     fun requestClose() {
         onRequestClose()

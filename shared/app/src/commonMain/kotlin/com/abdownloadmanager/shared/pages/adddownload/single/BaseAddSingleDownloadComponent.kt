@@ -16,29 +16,25 @@ import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.downloader.utils.orDefault
 import ir.amirab.util.flow.*
 import kotlinx.coroutines.flow.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.CategoryItem
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
-import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.util.perhostsettings.getSettingsForURL
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
-import org.koin.core.component.inject
-import kotlin.getValue
+import kotlin.time.Duration.Companion.seconds
 
 abstract class BaseAddSingleDownloadComponent(
     ctx: ComponentContext,
@@ -56,12 +52,19 @@ abstract class BaseAddSingleDownloadComponent(
     protected val categoryManager: CategoryManager,
     val downloadSystem: DownloadSystem,
     val iconProvider: FileIconProvider,
-    protected val queueManager: QueueManager,
+    selectQueueStorage: ISelectQueueStorage,
+    queueManager: QueueManager,
     importOptions: ImportOptions,
     id: String,
     downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *, *>,
     initialCredentials: AddDownloadCredentialsInUiProps,
-) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage),
+) : AddDownloadComponent(
+    ctx = ctx,
+    id = id,
+    lastSavedLocationsStorage = lastSavedLocationsStorage,
+    queueManager = queueManager,
+    selectQueueStorage = selectQueueStorage
+),
     ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects() {
     private val _shouldShowWindow = MutableStateFlow(importOptions.silentImport == null)
     override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
@@ -275,7 +278,7 @@ abstract class BaseAddSingleDownloadComponent(
     }
 
 
-    fun onRequestAddToQueue(
+    override fun onRequestAddToQueue(
         queueId: Long?,
         startQueue: Boolean,
     ) {
@@ -323,8 +326,6 @@ abstract class BaseAddSingleDownloadComponent(
 
     var showSolutionsOnDuplicateDownloadUi by mutableStateOf(false)
 
-    var shouldShowAddToQueue by mutableStateOf(false)
-
     val shouldShowOpenFile = combine(
         onDuplicateStrategy, canAddResult,
     ) { onDuplicateStrategy, result ->
@@ -360,7 +361,7 @@ abstract class BaseAddSingleDownloadComponent(
     fun handleSilentImport(silentImport: SilentImportOptions) {
         scope.launch {
             try {
-                withTimeout(2_000) {
+                withTimeout(2.seconds) {
                     // ensure all values are set!
                     credentials.map { it.link }.first { it.isNotEmpty() }
                     folder.first { it.isNotEmpty() }
@@ -374,15 +375,12 @@ abstract class BaseAddSingleDownloadComponent(
                 try {
                     // although we don't need timeout, but I add this timeout here maybe there is a bug
                     // and I don't want this coroutine to be halted infinitely
-                    withTimeout(10_000) {
+                    withTimeout(10.seconds) {
                         canAddToDownloads.first { it }
                         if (silentImport.silentDownload) {
                             onRequestDownload()
                         } else {
-                            onRequestAddToQueue(
-                                DefaultQueueInfo.ID,
-                                false,
-                            )
+                            selectQueueComponent.fastConfirm()
                         }
                     }
                     false

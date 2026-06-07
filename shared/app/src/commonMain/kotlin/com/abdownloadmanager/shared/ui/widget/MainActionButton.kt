@@ -12,6 +12,7 @@ fun PrimaryMainActionButton(
     text: String,
     modifier: Modifier,
     enabled: Boolean = true,
+    onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     val backgroundColor = Brush.horizontalGradient(
@@ -32,6 +33,7 @@ fun PrimaryMainActionButton(
         modifier = modifier,
         enabled = enabled,
         onClick = onClick,
+        onLongClick = onLongClick,
         backgroundColor = backgroundColor,
         disabledBackgroundColor = backgroundColor,
         borderColor = borderColor,

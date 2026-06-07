@@ -20,6 +20,7 @@ import com.abdownloadmanager.shared.pages.adddownload.AddDownloadConfig
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.OnFullyDismissed
@@ -42,6 +43,7 @@ class AddSingleDownloadActivity : ABDMActivity() {
     private val downloadItemOpener: AndroidDownloadItemOpener by inject()
     private val downloaderInUiRegistry: DownloaderInUiRegistry by inject()
     private val lastSavedLocationsStorage: ILastSavedLocationsStorage by inject()
+    private val selectQueueStorage: ISelectQueueStorage by inject()
     private val queueManager: QueueManager by inject()
     private val categoryManager: CategoryManager by inject()
     private val iconProvider: FileIconProvider by inject()
@@ -105,6 +107,7 @@ class AddSingleDownloadActivity : ABDMActivity() {
                 },
                 downloadItemOpener = downloadItemOpener,
                 lastSavedLocationsStorage = lastSavedLocationsStorage,
+                selectQueueStorage = selectQueueStorage,
                 importOptions = config.importOptions,
                 id = config.id,
                 downloaderInUi = downloaderInUiRegistry.getDownloaderOf(config.newDownload.credentials)!!,

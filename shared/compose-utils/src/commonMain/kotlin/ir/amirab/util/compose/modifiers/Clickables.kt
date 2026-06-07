@@ -12,10 +12,12 @@ fun Modifier.hijackClick(): Modifier {
 }
 
 fun Modifier.silentClickable(
+    enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     onClick: () -> Unit
 ): Modifier {
     return clickable(
+        enabled = enabled,
         interactionSource = interactionSource,
         indication = null,
         onClick = onClick,

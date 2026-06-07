@@ -47,9 +47,12 @@ import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.storage.PerHostSettingsDatastoreStorage
 import com.abdownloadmanager.shared.storage.ProxyDatastoreStorage
+import com.abdownloadmanager.shared.storage.SelectQueueSettings
 import com.abdownloadmanager.shared.storage.impl.LastSavedLocationStorage
+import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.ui.theme.ThemeSettingsStorage
 import com.abdownloadmanager.shared.ui.widget.NotificationManager
 import com.abdownloadmanager.shared.updater.UpdateDownloaderViaDownloadSystem
@@ -562,6 +565,16 @@ fun getAppModule(context: ABDMApp) = module {
                 definedPaths.lastSavedLocationFile.toFile(),
                 get(),
                 ::emptyList,
+            )
+        )
+    }
+    single<ISelectQueueStorage> {
+        val definedPaths = get<AndroidDefinedPaths>()
+        SelectQueueStorage(
+            kotlinxSerializationDataStore<SelectQueueSettings>(
+                definedPaths.selectQueueSettingsFile.toFile(),
+                get(),
+                ::SelectQueueSettings,
             )
         )
     }

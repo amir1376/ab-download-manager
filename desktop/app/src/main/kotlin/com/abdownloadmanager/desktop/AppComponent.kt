@@ -63,6 +63,7 @@ import com.abdownloadmanager.shared.pagemanager.SettingsPageManager
 import com.abdownloadmanager.shared.pagemanager.TranslatorsPageManager
 import com.abdownloadmanager.shared.pages.updater.UpdateComponent
 import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.BaseComponent
 import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
@@ -323,6 +324,7 @@ class AppComponent(
         }
     ).subscribeAsStateFlow()
     private val pageStatesStorage: PageStatesStorage by inject()
+    private val selectQueueStorage: ISelectQueueStorage by inject()
 
     val downloadSystem: DownloadSystem by inject()
     private val fileIconProvider: FileIconProvider by inject()
@@ -382,6 +384,7 @@ class AppComponent(
                             downloaderInUiRegistry.getDownloaderOf(config.newDownload.credentials)
                         ),
                         lastSavedLocationsStorage = pageStatesStorage,
+                        selectQueueStorage = selectQueueStorage,
                         appScope = applicationScope,
                         appSettings = appSettings,
                         appRepository = appRepository,
@@ -406,6 +409,7 @@ class AppComponent(
                             )
                         },
                         lastSavedLocationsStorage = pageStatesStorage,
+                        selectQueueStorage = selectQueueStorage,
                         perHostSettingsManager = perHostSettingsManager,
                         downloadSystem = downloadSystem,
                         fileIconProvider = fileIconProvider,

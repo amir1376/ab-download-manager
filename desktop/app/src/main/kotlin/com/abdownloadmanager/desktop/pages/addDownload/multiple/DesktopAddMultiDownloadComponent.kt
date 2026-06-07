@@ -8,6 +8,7 @@ import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
 import com.abdownloadmanager.shared.pages.adddownload.multiple.BaseAddMultiDownloadComponent
 import com.abdownloadmanager.shared.pages.adddownload.multiple.OnRequestAdd
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
@@ -21,6 +22,7 @@ class DesktopAddMultiDownloadComponent(
     onRequestAdd: OnRequestAdd,
     private val categoryDialogManager: CategoryDialogManager,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
+    selectQueueStorage: ISelectQueueStorage,
     perHostSettingsManager: PerHostSettingsManager, downloadSystem: DownloadSystem,
     fileIconProvider: FileIconProvider,
     appRepository: AppRepository,
@@ -31,6 +33,7 @@ class DesktopAddMultiDownloadComponent(
     ctx = ctx,
     id = id,
     lastSavedLocationsStorage = lastSavedLocationsStorage,
+    selectQueueStorage = selectQueueStorage,
     onRequestAdd = onRequestAdd,
     onRequestClose = onRequestClose,
     perHostSettingsManager = perHostSettingsManager,
