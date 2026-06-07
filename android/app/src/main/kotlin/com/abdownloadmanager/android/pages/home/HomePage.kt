@@ -218,7 +218,6 @@ fun HomePage(component: HomeComponent) {
                         .background(myColors.background),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    val filterMode by component.filterMode
                     DownloadList(
                         downloadList = downloadList,
                         selectionList = selectionList,
