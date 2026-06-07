@@ -14,6 +14,13 @@
 
 <p align="center">
   <a href="https://trendshift.io/repositories/13372" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13372" alt="amir1376%2Fab-download-manager | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+  <a href="https://hellogithub.com/repository/amir1376/ab-download-manager" target="_blank">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=ed035ce95345465c813490be631f1917&claim_uid=RTjPbAI9LNG6mnJ&theme=dark" height="55">
+        <source media="(prefers-color-scheme: light)" srcset="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=ed035ce95345465c813490be631f1917&claim_uid=RTjPbAI9LNG6mnJ&theme=neutral" height="55">
+        <img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=ed035ce95345465c813490be631f1917&claim_uid=RTjPbAI9LNG6mnJ&theme=neutral" alt="Featured｜HelloGitHub" style="width: 250px; height: 55px;" width="250" height="55" />
+    </picture>
+</a>
 </p>
 
 <a href="https://abdownloadmanager.com" target="_blank">
