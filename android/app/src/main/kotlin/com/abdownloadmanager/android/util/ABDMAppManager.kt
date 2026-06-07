@@ -323,6 +323,21 @@ class ABDMAppManager(
             }
         }
     }
+    fun startNewDownloads(
+        items: List<NewDownloadItemProps>,
+        categorySelectionMode: CategorySelectionMode?,
+    ): Deferred<List<Long>> {
+        return scope.launchWithDeferred {
+            downloadSystem.addDownload(
+                newItemsToAdd = items,
+                categorySelectionMode = categorySelectionMode,
+            ).also {
+                it.forEach {
+                    downloadSystem.userManualResume(it)
+                }
+            }
+        }
+    }
 
     fun addDownload(
         item: NewDownloadItemProps,

@@ -121,15 +121,19 @@ fun Footer(
                             onClick = {
                                 component.selectQueueComponent.openAddToQueueDialog()
                             },
+                            onLongClick = {
+                                component.selectQueueComponent.fastConfirm()
+                            },
                             enabled = component.canClickAdd,
                             modifier = Modifier,
                         )
                         Spacer(Modifier.width(8.dp))
                         ActionButton(
-                            text = myStringResource(Res.string.cancel),
+                            text = myStringResource(Res.string.download),
                             onClick = {
-                                component.requestClose()
+                                component.requestDownloadAll()
                             },
+                            enabled = component.canClickAdd,
                             modifier = Modifier,
                         )
                     }

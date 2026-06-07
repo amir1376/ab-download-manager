@@ -3,7 +3,6 @@ package com.abdownloadmanager.android.pages.add.multiple
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import com.abdownloadmanager.android.pages.category.CategorySheet
 import com.abdownloadmanager.android.pages.newqueue.NewQueueSheet
@@ -18,13 +17,9 @@ import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
-import com.abdownloadmanager.shared.util.OnFullyDismissed
-import com.abdownloadmanager.shared.util.ResponsiveDialog
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.rememberChild
-import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
 import ir.amirab.downloader.queue.QueueManager
-import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import org.koin.core.component.inject
 
@@ -55,11 +50,17 @@ class AddMultiDownloadActivity : ABDMActivity() {
                 queueManager = queueManager,
                 categoryManager = categoryManager,
                 downloadSystem = downloadSystem,
-                onRequestAdd = { items, queueId, categorySelectionMode ->
+                onRequestAddMultipleItem = { items, queueId, categorySelectionMode ->
                     appManager.addDownloads(
                         items = items,
                         categorySelectionMode = categorySelectionMode,
                         queueId = queueId,
+                    )
+                },
+                onRequestDownloadMultipleItem = { items, categorySelectionMode ->
+                    appManager.startNewDownloads(
+                        items = items,
+                        categorySelectionMode = categorySelectionMode,
                     )
                 },
                 perHostSettingsManager = perHostSettingsManager,
