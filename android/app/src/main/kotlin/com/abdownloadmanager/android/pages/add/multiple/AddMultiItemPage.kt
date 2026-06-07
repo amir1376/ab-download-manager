@@ -196,13 +196,15 @@ fun Footer(
                     enabled = component.canClickAdd,
                     modifier = buttonModifier,
                 )
-//                ActionButton(
-//                    text = myStringResource(Res.string.cancel),
-//                    onClick = {
-//                        component.requestClose()
-//                    },
-//                    modifier = buttonModifier,
-//                )
+                Spacer(Modifier.width(8.dp))
+                ActionButton(
+                    text = myStringResource(Res.string.download),
+                    onClick = {
+                        component.requestDownloadAll()
+                    },
+                    enabled = component.canClickAdd,
+                    modifier = buttonModifier,
+                )
             }
         }
     }

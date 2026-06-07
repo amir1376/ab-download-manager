@@ -53,7 +53,8 @@ abstract class BaseAddMultiDownloadComponent(
     ctx: ComponentContext,
     id: String,
     private val onRequestClose: () -> Unit,
-    private val onRequestAdd: OnRequestAdd,
+    private val onRequestAddMultipleItem: OnRequestAddMultipleItem,
+    private val onRequestDownloadMultipleItem: OnRequestDownloadMultipleItem,
     private val appRepository: BaseAppRepository,
     private val perHostSettingsManager: PerHostSettingsManager,
     val downloadSystem: DownloadSystem,
@@ -270,18 +271,17 @@ abstract class BaseAddMultiDownloadComponent(
     override fun onRequestAddToQueue(queueId: Long?, startQueue: Boolean) {
         requestAddDownloads(queueId, startQueue)
     }
-
-    private fun requestAddDownloads(
-        queueId: Long?, startQueue: Boolean,
-    ) {
-
-        val categorySelectionMode = when {
+    fun getCategorySelectionMode(): CategorySelectionMode? {
+        return when {
             alsoAutoCategorize.value -> CategorySelectionMode.Auto
             else -> selectedCategory.value?.let {
                 CategorySelectionMode.Fixed(it.id)
             }
         }
-        val itemsToAdd = totalList
+    }
+
+    fun getItemsToAdd(categorySelectionMode: CategorySelectionMode?): List<NewDownloadItemProps> {
+        return totalList
             .filter { it.getUniqueId() in selectionList }
             .filter {
                 val checker = it.downloadUiChecker
@@ -306,8 +306,32 @@ abstract class BaseAddMultiDownloadComponent(
                     context = EmptyContext,
                 )
             }
+    }
+
+    fun requestDownloadAll() {
+        val categorySelectionMode = getCategorySelectionMode()
+        val itemsToAdd = getItemsToAdd(categorySelectionMode)
         consumeDialog {
-            onRequestAdd(
+            onRequestDownloadMultipleItem(
+                items = itemsToAdd,
+                categorySelectionMode = categorySelectionMode
+            ).invokeOnCompletion {
+                val folder = folder.value
+                if (allInSameLocation.value) {
+                    addToLastUsedLocations(folder)
+                }
+            }
+            requestClose()
+        }
+    }
+
+    private fun requestAddDownloads(
+        queueId: Long?, startQueue: Boolean,
+    ) {
+        val categorySelectionMode = getCategorySelectionMode()
+        val itemsToAdd = getItemsToAdd(categorySelectionMode)
+        consumeDialog {
+            onRequestAddMultipleItem(
                 items = itemsToAdd,
                 queueId = queueId,
                 categorySelectionMode = categorySelectionMode

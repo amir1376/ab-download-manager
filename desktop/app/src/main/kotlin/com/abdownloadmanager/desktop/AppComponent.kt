@@ -401,10 +401,16 @@ class AppComponent(
                         ctx = ctx,
                         id = config.id,
                         onRequestClose = { closeAddDownloadDialog(config.id) },
-                        onRequestAdd = { items, queueId, categorySelectionMode ->
+                        onRequestAddMultipleItem = { items, queueId, categorySelectionMode ->
                             addDownloads(
                                 items = items,
                                 queueId = queueId,
+                                categorySelectionMode = categorySelectionMode
+                            )
+                        },
+                        onRequestDownloadMultipleItem = { items, categorySelectionMode ->
+                            startNewDownloads(
+                                items = items,
                                 categorySelectionMode = categorySelectionMode
                             )
                         },
@@ -936,6 +942,22 @@ class AppComponent(
                 categoryId = categoryId,
             ).also {
                 downloadSystem.userManualResume(it)
+            }
+        }
+    }
+    fun startNewDownloads(
+        items: List<NewDownloadItemProps>,
+        categorySelectionMode: CategorySelectionMode??,
+    ): Deferred<List<Long>> {
+        return scope.launchWithDeferred {
+            downloadSystem.addDownload(
+                newItemsToAdd = items,
+                queueId = DefaultQueueInfo.ID,
+                categorySelectionMode = categorySelectionMode,
+            ).also {
+                it.forEach {
+                    downloadSystem.userManualResume(it)
+                }
             }
         }
     }
