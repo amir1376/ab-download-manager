@@ -432,7 +432,7 @@ private fun prettifyStatus(status: PartDownloadStatus): StringSource {
         is PartDownloadStatus.Canceled -> Res.string.disconnected
         PartDownloadStatus.IDLE -> Res.string.idle
         PartDownloadStatus.Completed -> Res.string.finished
-        PartDownloadStatus.ReceivingData -> Res.string.receiving_data
+        PartDownloadStatus.ReceivingData -> Res.string.downloading
         PartDownloadStatus.Connecting -> Res.string.connecting
     }.asStringSource()
 }
