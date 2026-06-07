@@ -100,17 +100,17 @@ fun AddMultiItemPage(
         )
     }
     ShowAddToQueueDialog(
-        queueList = addMultiDownloadComponent.queueList.collectAsState().value,
-        onQueueSelected = { queue, startQueue ->
+        queueComponent = addMultiDownloadComponent.selectQueueComponent,
+        onConfirm = { params ->
             addMultiDownloadComponent.requestAddDownloads(
-                queue, startQueue
+                params.queue, params.startQueue
             )
         },
         onClose = {
             addMultiDownloadComponent.closeAddToQueue()
         },
-        isOpened = addMultiDownloadComponent.showAddToQueue,
-        newQueueAction = addMultiDownloadComponent.newQueueAction,
+        isOpened = addMultiDownloadComponent.shouldShowAddToQueue,
+        onRequestAddNewQueue = addMultiDownloadComponent.newQueueAction,
     )
 }
 

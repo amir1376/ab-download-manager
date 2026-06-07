@@ -59,9 +59,9 @@ abstract class BaseAddMultiDownloadComponent(
     val fileIconProvider: FileIconProvider,
     private val categoryManager: CategoryManager,
     val downloaderInUiRegistry: DownloaderInUiRegistry,
-    protected val queueManager: QueueManager,
+    queueManager: QueueManager,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
-) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage) {
+) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage, queueManager) {
     override val shouldShowWindow: StateFlow<Boolean> = MutableStateFlow(true)
 
     private val _folder = MutableStateFlow(appRepository.saveLocation.value)
@@ -314,9 +314,6 @@ abstract class BaseAddMultiDownloadComponent(
         }
     }
 
-    var showAddToQueue by mutableStateOf(false)
-        private set
-
     fun getIdOf(item: TANewDownloadInputs): Int {
         return item.getUniqueId()
     }
@@ -330,14 +327,6 @@ abstract class BaseAddMultiDownloadComponent(
     }
 
     val currentDownloadConfigurableList: MutableStateFlow<List<Configurable<*>>?> = MutableStateFlow(null)
-
-    fun openAddToQueueDialog() {
-        showAddToQueue = true
-    }
-
-    fun closeAddToQueue() {
-        showAddToQueue = false
-    }
 
     fun requestClose() {
         onRequestClose()

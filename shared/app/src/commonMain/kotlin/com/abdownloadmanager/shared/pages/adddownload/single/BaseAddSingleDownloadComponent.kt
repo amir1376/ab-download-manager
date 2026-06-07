@@ -16,14 +16,11 @@ import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.downloader.utils.orDefault
 import ir.amirab.util.flow.*
 import kotlinx.coroutines.flow.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.CategoryItem
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
-import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
@@ -37,8 +34,6 @@ import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
-import org.koin.core.component.inject
-import kotlin.getValue
 
 abstract class BaseAddSingleDownloadComponent(
     ctx: ComponentContext,
@@ -56,12 +51,12 @@ abstract class BaseAddSingleDownloadComponent(
     protected val categoryManager: CategoryManager,
     val downloadSystem: DownloadSystem,
     val iconProvider: FileIconProvider,
-    protected val queueManager: QueueManager,
+    queueManager: QueueManager,
     importOptions: ImportOptions,
     id: String,
     downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *, *>,
     initialCredentials: AddDownloadCredentialsInUiProps,
-) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage),
+) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage, queueManager),
     ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects() {
     private val _shouldShowWindow = MutableStateFlow(importOptions.silentImport == null)
     override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
@@ -322,8 +317,6 @@ abstract class BaseAddSingleDownloadComponent(
     }
 
     var showSolutionsOnDuplicateDownloadUi by mutableStateOf(false)
-
-    var shouldShowAddToQueue by mutableStateOf(false)
 
     val shouldShowOpenFile = combine(
         onDuplicateStrategy, canAddResult,

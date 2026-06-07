@@ -1,38 +1,47 @@
 package com.abdownloadmanager.desktop.pages.addDownload.single
 
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import com.abdownloadmanager.shared.util.ui.WithContentColor
-import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.window.moveSafe
 import androidx.compose.animation.*
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.window.WindowDraggableArea
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.rememberDialogState
 import arrow.core.Some
-import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.*
-import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
+import com.abdownloadmanager.desktop.window.moveSafe
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.util.compose.resources.myStringResource
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.resources.myStringResource
 import java.awt.MouseInfo
 
 @Composable
@@ -74,8 +83,7 @@ fun AddDownloadPage(
             },
             modifier = Modifier
         )
-        Row(
-        ) {
+        Row {
             val canAddResult by component.canAddResult.collectAsState()
             Column(Modifier.weight(1f)) {
                 val useCategory by component.useCategory.collectAsState()
@@ -172,11 +180,12 @@ fun AddDownloadPage(
             ShowSolutionsOnDuplicateDownload(component)
         }
         if (component.shouldShowAddToQueue) {
+            val addToQueueComponent = component.selectQueueComponent
             ShowAddToQueueDialog(
-                queueList = component.queues.collectAsState().value,
+                queueComponent = addToQueueComponent,
                 onClose = { component.shouldShowAddToQueue = false },
-                onQueueSelected = { queue, startQueue ->
-                    component.onRequestAddToQueue(queue, startQueue)
+                onConfirm = { params ->
+                    component.onRequestAddToQueue(params.queue, params.startQueue)
                 }
             )
         }

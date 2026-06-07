@@ -211,13 +211,13 @@ fun ResponsiveDialogScope.AddSingleDownloadPage(
                 MainActionButtons(component)
                 ShowSolutionsOnDuplicateDownload(component)
                 ShowAddToQueueDialog(
+                    queueComponent = component.selectQueueComponent,
                     isOpened = component.shouldShowAddToQueue,
-                    queueList = component.queues.collectAsState().value,
                     onClose = { component.shouldShowAddToQueue = false },
-                    onQueueSelected = { queue, startQueue ->
-                        component.onRequestAddToQueue(queue, startQueue)
+                    onConfirm = { params ->
+                        component.onRequestAddToQueue(params.queue, params.startQueue)
                     },
-                    newQueueAction = component.newQueuesAction
+                    onRequestAddNewQueue = component.newQueuesAction
                 )
                 ExtraConfig(
                     isOpened = component.showMoreSettings,
