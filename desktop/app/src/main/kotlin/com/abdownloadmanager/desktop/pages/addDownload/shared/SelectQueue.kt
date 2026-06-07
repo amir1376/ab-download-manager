@@ -38,28 +38,20 @@ import java.awt.MouseInfo
 @Composable
 fun ShowAddToQueueDialog(
     queueComponent: SelectQueueComponent,
-    onClose: () -> Unit,
-    onConfirm: (SelectQueueComponent.OnConfirmParams) -> Unit,
 ) {
-    ShowAddToQueueDialog(
-        queueList = queueComponent.queueList.collectAsState().value,
-        selectedQueue = queueComponent.selectedQueue.collectAsState().value,
-        onQueueSelected = queueComponent::setSelectedQueue,
-        startQueue = queueComponent.startQueue.collectAsState().value,
-        setStartQueue = queueComponent::setStartQueue,
-        rememberThisChoice = queueComponent.rememberThisChoice.collectAsState().value,
-        setRememberThisChoice = queueComponent::setRememberThisChoice,
-        onClose = onClose,
-        onConfirm = {
-            queueComponent.saveSettingsIfNecessary()
-            onConfirm(
-                SelectQueueComponent.OnConfirmParams(
-                    queue = queueComponent.selectedQueue.value,
-                    startQueue = queueComponent.startQueue.value,
-                )
-            )
-        },
-    )
+    if (queueComponent.shouldShowAddToQueue) {
+        ShowAddToQueueDialog(
+            queueList = queueComponent.queueList.collectAsState().value,
+            selectedQueue = queueComponent.selectedQueue.collectAsState().value,
+            onQueueSelected = queueComponent::setSelectedQueue,
+            startQueue = queueComponent.startQueue.collectAsState().value,
+            setStartQueue = queueComponent::setStartQueue,
+            rememberThisChoice = queueComponent.rememberThisChoice.collectAsState().value,
+            setRememberThisChoice = queueComponent::setRememberThisChoice,
+            onClose = queueComponent::closeAddToQueue,
+            onConfirm = queueComponent::onConfirm,
+        )
+    }
 }
 
 @Composable
@@ -198,7 +190,7 @@ private fun ShowAddToQueueDialog(
                                     modifier = Modifier,
                                     value = rememberThisChoice,
                                     onValueChange = setRememberThisChoice,
-                                    description = myStringResource(Res.string.remember_this_choice),
+                                    description = myStringResource(Res.string.remember_this),
                                 )
                             }
                             Spacer(Modifier.height(8.dp))

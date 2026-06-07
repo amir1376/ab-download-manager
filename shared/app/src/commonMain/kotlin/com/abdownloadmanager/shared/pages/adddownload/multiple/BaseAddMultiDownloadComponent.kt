@@ -16,7 +16,6 @@ import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUi
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
-import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -268,7 +267,11 @@ abstract class BaseAddMultiDownloadComponent(
         }
     }
 
-    fun requestAddDownloads(
+    override fun onRequestAddToQueue(queueId: Long?, startQueue: Boolean) {
+        requestAddDownloads(queueId, startQueue)
+    }
+
+    private fun requestAddDownloads(
         queueId: Long?, startQueue: Boolean,
     ) {
 

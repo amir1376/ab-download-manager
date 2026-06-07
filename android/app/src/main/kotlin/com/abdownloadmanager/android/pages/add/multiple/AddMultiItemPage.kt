@@ -101,15 +101,6 @@ fun AddMultiItemPage(
     }
     ShowAddToQueueDialog(
         queueComponent = addMultiDownloadComponent.selectQueueComponent,
-        onConfirm = { params ->
-            addMultiDownloadComponent.requestAddDownloads(
-                params.queue, params.startQueue
-            )
-        },
-        onClose = {
-            addMultiDownloadComponent.closeAddToQueue()
-        },
-        isOpened = addMultiDownloadComponent.shouldShowAddToQueue,
         onRequestAddNewQueue = addMultiDownloadComponent.newQueueAction,
     )
 }
@@ -197,7 +188,10 @@ fun Footer(
                 PrimaryMainActionButton(
                     text = myStringResource(Res.string.add),
                     onClick = {
-                        component.openAddToQueueDialog()
+                        component.selectQueueComponent.openAddToQueueDialog()
+                    },
+                    onLongClick = {
+                        component.selectQueueComponent.fastConfirm()
                     },
                     enabled = component.canClickAdd,
                     modifier = buttonModifier,

@@ -62,20 +62,9 @@ fun AddMultiItemPage(
             configurables = it
         )
     }
-    if (addMultiDownloadComponent.shouldShowAddToQueue) {
-        val addToQueueComponent = addMultiDownloadComponent.selectQueueComponent
-        ShowAddToQueueDialog(
-            queueComponent = addToQueueComponent,
-            onConfirm = { params ->
-                addMultiDownloadComponent.requestAddDownloads(
-                    params.queue, params.startQueue
-                )
-            },
-            onClose = {
-                addMultiDownloadComponent.closeAddToQueue()
-            }
-        )
-    }
+    ShowAddToQueueDialog(
+        queueComponent = addMultiDownloadComponent.selectQueueComponent,
+    )
 }
 
 @Composable
@@ -130,7 +119,7 @@ fun Footer(
                         PrimaryMainActionButton(
                             text = myStringResource(Res.string.add),
                             onClick = {
-                                component.openAddToQueueDialog()
+                                component.selectQueueComponent.openAddToQueueDialog()
                             },
                             enabled = component.canClickAdd,
                             modifier = Modifier,

@@ -25,17 +25,16 @@ import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
-import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.util.perhostsettings.getSettingsForURL
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
+import kotlin.time.Duration.Companion.seconds
 
 abstract class BaseAddSingleDownloadComponent(
     ctx: ComponentContext,
@@ -279,7 +278,7 @@ abstract class BaseAddSingleDownloadComponent(
     }
 
 
-    fun onRequestAddToQueue(
+    override fun onRequestAddToQueue(
         queueId: Long?,
         startQueue: Boolean,
     ) {
@@ -362,7 +361,7 @@ abstract class BaseAddSingleDownloadComponent(
     fun handleSilentImport(silentImport: SilentImportOptions) {
         scope.launch {
             try {
-                withTimeout(2_000) {
+                withTimeout(2.seconds) {
                     // ensure all values are set!
                     credentials.map { it.link }.first { it.isNotEmpty() }
                     folder.first { it.isNotEmpty() }
@@ -376,15 +375,12 @@ abstract class BaseAddSingleDownloadComponent(
                 try {
                     // although we don't need timeout, but I add this timeout here maybe there is a bug
                     // and I don't want this coroutine to be halted infinitely
-                    withTimeout(10_000) {
+                    withTimeout(10.seconds) {
                         canAddToDownloads.first { it }
                         if (silentImport.silentDownload) {
                             onRequestDownload()
                         } else {
-                            onRequestAddToQueue(
-                                DefaultQueueInfo.ID,
-                                false,
-                            )
+                            selectQueueComponent.fastConfirm()
                         }
                     }
                     false

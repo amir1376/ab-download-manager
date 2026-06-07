@@ -1,5 +1,8 @@
 package com.abdownloadmanager.shared.pages.adddownload.addToQueue
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.storage.SelectQueueSettings
 import com.abdownloadmanager.shared.util.BaseComponent
@@ -14,6 +17,7 @@ class SelectQueueComponent(
     private val ctx: ComponentContext,
     private val queueManager: QueueManager,
     private val selectQueueStorage: ISelectQueueStorage,
+    private val onRequestAddToQueue: (SelectQueueSettings) -> Unit,
 ) : BaseComponent(ctx) {
     val queueList = queueManager.queues
     val lastSettings get() = selectQueueStorage.selectQueueSettings.value
@@ -50,6 +54,29 @@ class SelectQueueComponent(
         _rememberThisChoice.value = value
     }
 
+    fun onConfirm() {
+        saveSettingsIfNecessary()
+        onRequestAddToQueue(
+            SelectQueueSettings(
+                queue = selectedQueue.value,
+                startQueue = _startQueue.value
+            )
+        )
+    }
+
+    fun fastConfirm() {
+        onRequestAddToQueue(lastSettings)
+    }
+
+    var shouldShowAddToQueue by mutableStateOf(false)
+    fun openAddToQueueDialog() {
+        shouldShowAddToQueue = true
+    }
+
+    fun closeAddToQueue() {
+        shouldShowAddToQueue = false
+    }
+
     fun saveSettingsIfNecessary() {
         if (rememberThisChoice.value) {
             selectQueueStorage.selectQueueSettings.value = SelectQueueSettings(
@@ -58,9 +85,4 @@ class SelectQueueComponent(
             )
         }
     }
-
-    data class OnConfirmParams(
-        val queue: Long?,
-        val startQueue: Boolean,
-    )
 }

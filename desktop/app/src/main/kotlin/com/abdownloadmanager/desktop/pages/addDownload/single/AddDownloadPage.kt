@@ -179,16 +179,9 @@ fun AddDownloadPage(
         if (component.showSolutionsOnDuplicateDownloadUi) {
             ShowSolutionsOnDuplicateDownload(component)
         }
-        if (component.shouldShowAddToQueue) {
-            val addToQueueComponent = component.selectQueueComponent
-            ShowAddToQueueDialog(
-                queueComponent = addToQueueComponent,
-                onClose = { component.shouldShowAddToQueue = false },
-                onConfirm = { params ->
-                    component.onRequestAddToQueue(params.queue, params.startQueue)
-                }
-            )
-        }
+        ShowAddToQueueDialog(
+            queueComponent = component.selectQueueComponent,
+        )
         if (component.showMoreSettings) {
             ExtraConfig(
                 onDismiss = { component.showMoreSettings = false },
@@ -408,16 +401,6 @@ fun RenderResumeSupport(component: BaseAddSingleDownloadComponent) {
     }
 }
 
-@Composable
-private fun MainConfigActionButton(
-    text: String,
-    modifier: Modifier,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-) {
-    ActionButton(text, modifier, enabled, onClick)
-}
-
 
 @Composable
 fun ConfigActionsButtons(component: BaseAddSingleDownloadComponent) {
@@ -444,14 +427,14 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
         val onDuplicateStrategy by component.onDuplicateStrategy.collectAsState()
         val canAddResult by component.canAddResult.collectAsState()
         if (canAddResult is CanAddResult.DownloadAlreadyExists && onDuplicateStrategy == null) {
-            MainConfigActionButton(
+            ActionButton(
                 text = myStringResource(Res.string.show_solutions),
                 modifier = Modifier,
                 onClick = { component.showSolutionsOnDuplicateDownloadUi = true },
             )
             if (component.shouldShowOpenFile.collectAsState().value) {
                 Spacer(Modifier.width(8.dp))
-                MainConfigActionButton(
+                ActionButton(
                     text = myStringResource(Res.string.open_file),
                     modifier = Modifier,
                     onClick = { component.openExistingFile() },
@@ -459,13 +442,17 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
             }
         } else {
             val canAddToDownloads by component.canAddToDownloads.collectAsState()
-            MainConfigActionButton(
+            ActionButton(
                 text = myStringResource(Res.string.add),
                 modifier = Modifier,
                 enabled = canAddToDownloads,
                 onClick = {
-                    component.shouldShowAddToQueue = true
+                    component.selectQueueComponent.openAddToQueueDialog()
                 },
+                onLongClick = {
+                    component.selectQueueComponent.fastConfirm()
+                }
+
             )
             Spacer(Modifier.width(8.dp))
             PrimaryMainActionButton(
@@ -478,7 +465,7 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
             )
             if (onDuplicateStrategy != null) {
                 Spacer(Modifier.width(8.dp))
-                MainConfigActionButton(
+                ActionButton(
                     text = myStringResource(Res.string.change_solution),
                     modifier = Modifier,
                     onClick = { component.showSolutionsOnDuplicateDownloadUi = true },
@@ -489,7 +476,7 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
         //        Spacer(Modifier.weight(1f))
         Spacer(Modifier.weight(1f))
 
-        MainConfigActionButton(
+        ActionButton(
             text = myStringResource(Res.string.cancel),
             modifier = Modifier,
             onClick = {

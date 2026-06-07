@@ -59,20 +59,19 @@ abstract class AddDownloadComponent(
         }
     }
 
+    abstract fun onRequestAddToQueue(
+        queueId: Long?,
+        startQueue: Boolean,
+    )
+
     val selectQueueComponent = SelectQueueComponent(
         ctx = childContext("showAddToQueueComponent"),
         queueManager = queueManager,
         selectQueueStorage = selectQueueStorage,
+        onRequestAddToQueue = {
+            onRequestAddToQueue(it.queue, it.startQueue)
+        }
     )
-
-    var shouldShowAddToQueue by mutableStateOf(false)
-    fun openAddToQueueDialog() {
-        shouldShowAddToQueue = true
-    }
-
-    fun closeAddToQueue() {
-        shouldShowAddToQueue = false
-    }
 
     abstract val shouldShowWindow: StateFlow<Boolean>
 }

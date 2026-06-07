@@ -31,10 +31,7 @@ import ir.amirab.util.ifThen
 @Composable
 fun ShowAddToQueueDialog(
     queueComponent: SelectQueueComponent,
-    isOpened: Boolean,
     onRequestAddNewQueue: () -> Unit,
-    onClose: () -> Unit,
-    onConfirm: (SelectQueueComponent.OnConfirmParams) -> Unit,
 ) {
     ShowAddToQueueDialog(
         queueList = queueComponent.queueList.collectAsState().value,
@@ -44,17 +41,9 @@ fun ShowAddToQueueDialog(
         setStartQueue = queueComponent::setStartQueue,
         rememberThisChoice = queueComponent.rememberThisChoice.collectAsState().value,
         setRememberThisChoice = queueComponent::setRememberThisChoice,
-        onClose = onClose,
-        onConfirm = {
-            queueComponent.saveSettingsIfNecessary()
-            onConfirm(
-                SelectQueueComponent.OnConfirmParams(
-                    queue = queueComponent.selectedQueue.value,
-                    startQueue = queueComponent.startQueue.value,
-                )
-            )
-        },
-        isOpened = isOpened,
+        onClose = queueComponent::closeAddToQueue,
+        onConfirm = queueComponent::onConfirm,
+        isOpened = queueComponent.shouldShowAddToQueue,
         newQueueAction = onRequestAddNewQueue
     )
 }
@@ -170,7 +159,7 @@ private fun ShowAddToQueueDialog(
                                     modifier = Modifier,
                                     value = rememberThisChoice,
                                     onValueChange = setRememberThisChoice,
-                                    description = myStringResource(Res.string.remember_this_choice),
+                                    description = myStringResource(Res.string.remember_this),
                                 )
                             }
                             Row(
