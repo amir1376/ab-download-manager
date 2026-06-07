@@ -40,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.singledownloadpage.createStatusString
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
@@ -54,12 +53,12 @@ import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.util.convertTimeRemainingToHumanReadable
 import com.abdownloadmanager.shared.util.div
-import com.abdownloadmanager.shared.util.formatTime
 import com.abdownloadmanager.shared.util.prettifyRelativeTime
 import com.abdownloadmanager.shared.util.ui.LocalContentAlpha
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.LocalTextStyle
 import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
@@ -71,8 +70,6 @@ import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.isFinished
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.utils.ExceptionUtils
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.TimeZone
@@ -80,6 +77,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.periodUntil
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -238,7 +236,7 @@ private fun RenderAddedTime(itemState: IDownloadItemState, modifier: Modifier) {
                 val period = now.periodUntil(instant, TimeZone.UTC)
                 val relativeTime = prettifyRelativeTime(period)
                 dateAddedString = relativeTime
-                delay(1000)
+                delay(1000.milliseconds)
             }
         } else {
             val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -315,7 +313,20 @@ fun RenderLeftSubText(itemState: IDownloadItemState, modifier: Modifier) {
             }
         }
     }
-    Text(text, modifier = modifier)
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (itemState is ProcessingDownloadItemState && itemState.supportResume == false) {
+            MyIcon(
+                MyIcons.pause,
+                contentDescription = null,
+                modifier = Modifier.size(12.dp),
+                tint = myColors.error,
+            )
+        }
+        Text(text)
+    }
 }
 
 
