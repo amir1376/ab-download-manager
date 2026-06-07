@@ -13,6 +13,9 @@ import com.abdownloadmanager.shared.pages.category.CategoryComponent
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
+import com.abdownloadmanager.shared.storage.impl.LastSavedLocationStorage
+import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -43,6 +46,7 @@ class AndroidAddSingleDownloadComponent(
     updateExistingDownloadCredentials: (Long, IDownloadCredentials, DownloadJobExtraConfig?) -> Unit,
     downloadItemOpener: DownloadItemOpener,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
+    selectQueueStorage: ISelectQueueStorage,
     queueManager: QueueManager,
     categoryManager: CategoryManager,
     downloadSystem: DownloadSystem,
@@ -64,6 +68,7 @@ class AndroidAddSingleDownloadComponent(
     updateExistingDownloadCredentials = updateExistingDownloadCredentials,
     downloadItemOpener = downloadItemOpener,
     lastSavedLocationsStorage = lastSavedLocationsStorage,
+    selectQueueStorage = selectQueueStorage,
     importOptions = importOptions,
     id = id,
     downloaderInUi = downloaderInUi,

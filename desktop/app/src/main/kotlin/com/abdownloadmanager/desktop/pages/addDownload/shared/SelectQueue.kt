@@ -51,6 +51,7 @@ fun ShowAddToQueueDialog(
         setRememberThisChoice = queueComponent::setRememberThisChoice,
         onClose = onClose,
         onConfirm = {
+            queueComponent.saveSettingsIfNecessary()
             onConfirm(
                 SelectQueueComponent.OnConfirmParams(
                     queue = queueComponent.selectedQueue.value,

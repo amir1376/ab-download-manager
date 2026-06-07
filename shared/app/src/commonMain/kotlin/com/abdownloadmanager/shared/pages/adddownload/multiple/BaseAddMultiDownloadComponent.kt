@@ -15,6 +15,8 @@ import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
+import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -61,7 +63,14 @@ abstract class BaseAddMultiDownloadComponent(
     val downloaderInUiRegistry: DownloaderInUiRegistry,
     queueManager: QueueManager,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
-) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage, queueManager) {
+    selectQueueStorage: ISelectQueueStorage,
+) : AddDownloadComponent(
+    ctx = ctx,
+    id = id,
+    lastSavedLocationsStorage = lastSavedLocationsStorage,
+    queueManager = queueManager,
+    selectQueueStorage = selectQueueStorage
+) {
     override val shouldShowWindow: StateFlow<Boolean> = MutableStateFlow(true)
 
     private val _folder = MutableStateFlow(appRepository.saveLocation.value)

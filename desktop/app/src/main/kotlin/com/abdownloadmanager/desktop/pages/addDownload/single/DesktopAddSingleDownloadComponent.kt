@@ -13,6 +13,7 @@ import com.abdownloadmanager.shared.pages.category.CategoryComponent
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -38,6 +39,7 @@ class DesktopAddSingleDownloadComponent(
     updateExistingDownloadCredentials: (Long, IDownloadCredentials, DownloadJobExtraConfig?) -> Unit,
     downloadItemOpener: DownloadItemOpener,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
+    selectQueueStorage: ISelectQueueStorage,
     queueManager: QueueManager,
     categoryManager: CategoryManager,
     downloadSystem: DownloadSystem,
@@ -60,6 +62,7 @@ class DesktopAddSingleDownloadComponent(
     updateExistingDownloadCredentials = updateExistingDownloadCredentials,
     downloadItemOpener = downloadItemOpener,
     lastSavedLocationsStorage = lastSavedLocationsStorage,
+    selectQueueStorage = selectQueueStorage,
     importOptions = importOptions,
     id = id,
     downloaderInUi = downloaderInUi,

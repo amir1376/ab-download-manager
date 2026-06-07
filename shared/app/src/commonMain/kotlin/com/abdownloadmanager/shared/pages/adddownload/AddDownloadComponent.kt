@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
 import com.abdownloadmanager.shared.pages.adddownload.addToQueue.SelectQueueComponent
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.BaseComponent
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
@@ -19,6 +20,7 @@ abstract class AddDownloadComponent(
     val id: String,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
     protected val queueManager: QueueManager,
+    private val selectQueueStorage: ISelectQueueStorage,
 ) : BaseComponent(ctx) {
     companion object {
         const val lastLocationsCacheSize = 4
@@ -57,7 +59,11 @@ abstract class AddDownloadComponent(
         }
     }
 
-    val selectQueueComponent = SelectQueueComponent(childContext("showAddToQueueComponent"), queueManager)
+    val selectQueueComponent = SelectQueueComponent(
+        ctx = childContext("showAddToQueueComponent"),
+        queueManager = queueManager,
+        selectQueueStorage = selectQueueStorage,
+    )
 
     var shouldShowAddToQueue by mutableStateOf(false)
     fun openAddToQueueDialog() {

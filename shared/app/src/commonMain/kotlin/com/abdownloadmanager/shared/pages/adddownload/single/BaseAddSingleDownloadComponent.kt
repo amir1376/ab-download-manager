@@ -24,6 +24,8 @@ import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
+import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.util.perhostsettings.getSettingsForURL
 import ir.amirab.downloader.NewDownloadItemProps
@@ -51,12 +53,19 @@ abstract class BaseAddSingleDownloadComponent(
     protected val categoryManager: CategoryManager,
     val downloadSystem: DownloadSystem,
     val iconProvider: FileIconProvider,
+    selectQueueStorage: ISelectQueueStorage,
     queueManager: QueueManager,
     importOptions: ImportOptions,
     id: String,
     downloaderInUi: DownloaderInUi<IDownloadCredentials, *, *, *, *, *, *, *, *, *>,
     initialCredentials: AddDownloadCredentialsInUiProps,
-) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage, queueManager),
+) : AddDownloadComponent(
+    ctx = ctx,
+    id = id,
+    lastSavedLocationsStorage = lastSavedLocationsStorage,
+    queueManager = queueManager,
+    selectQueueStorage = selectQueueStorage
+),
     ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects() {
     private val _shouldShowWindow = MutableStateFlow(importOptions.silentImport == null)
     override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
