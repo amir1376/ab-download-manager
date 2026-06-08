@@ -24,19 +24,7 @@ import com.abdownloadmanager.android.util.ABDMAppManager
 import com.abdownloadmanager.android.util.pagemanager.IBrowserPageManager
 import com.abdownloadmanager.android.util.pagemanager.PermissionsPageManager
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
-import com.abdownloadmanager.shared.pagemanager.AboutPageManager
-import com.abdownloadmanager.shared.pagemanager.AddDownloadDialogManager
-import com.abdownloadmanager.shared.pagemanager.BatchDownloadPageManager
-import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
-import com.abdownloadmanager.shared.pagemanager.DownloadDialogManager
-import com.abdownloadmanager.shared.pagemanager.EditDownloadDialogManager
-import com.abdownloadmanager.shared.pagemanager.FileChecksumDialogManager
-import com.abdownloadmanager.shared.pagemanager.NotificationSender
-import com.abdownloadmanager.shared.pagemanager.OpenSourceLibrariesPageManager
-import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
-import com.abdownloadmanager.shared.pagemanager.QueuePageManager
-import com.abdownloadmanager.shared.pagemanager.SettingsPageManager
-import com.abdownloadmanager.shared.pagemanager.TranslatorsPageManager
+import com.abdownloadmanager.shared.pagemanager.*
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadConfig
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
@@ -170,6 +158,7 @@ class MainComponent(
     val onBoardingStorage: AndroidOnBoardingStorage,
     val homePageStorage: HomePageStorage,
     private val json: Json,
+    private val downloadErrorDialogManager: DownloadErrorDialogManager,
 ) : BaseComponent(ctx),
     DownloadDialogManager,
     EditDownloadDialogManager,
@@ -281,6 +270,7 @@ class MainComponent(
                 downloadSystem = downloadSystem,
                 downloaderInUiRegistry = downloaderInUiRegistry,
                 iconProvider = fileIconProvider,
+                downloadErrorDialogManager = downloadErrorDialogManager,
             )
         },
         serializer = null,
@@ -394,7 +384,7 @@ class MainComponent(
                 }
 
                 ScreenConfig.InitialSetup -> {
-                    Screen.InitialSetup(
+                    InitialSetup(
                         InitialSetupComponent(
                             ctx = ctx,
                             languageManager = languageManager,
@@ -407,7 +397,7 @@ class MainComponent(
                 }
 
                 is ScreenConfig.Permissions -> {
-                    Screen.Permissions(
+                    Permissions(
                         PermissionComponent(
                             componentContext = ctx,
                             permissionManager = permissionManager,
@@ -738,7 +728,7 @@ class MainComponent(
             stack.value.items
                 .lastOrNull()
                 ?.let {
-                    (it.instance as? Screen.Home)?.component?.revealItem(downloadId)
+                    (it.instance as? Home)?.component?.revealItem(downloadId)
                 }
         }
     }

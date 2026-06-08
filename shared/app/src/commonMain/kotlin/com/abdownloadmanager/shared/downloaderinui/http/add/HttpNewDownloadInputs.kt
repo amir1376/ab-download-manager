@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class HttpNewDownloadInputs(
-    downloadUiChecker: HttpDownloadUiChecker,
+    downloadUiChecker: HttpNewDownloadUiChecker,
     scope: CoroutineScope,
     private val sizeAndSpeedUnitProvider: SizeAndSpeedUnitProvider
 ) : NewDownloadInputs<

@@ -1,37 +1,52 @@
 package com.abdownloadmanager.desktop
 
 import com.abdownloadmanager.UpdateManager
-import ir.amirab.util.desktop.poweraction.PowerActionConfig
-import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
-import com.abdownloadmanager.shared.pages.adddownload.AddDownloadConfig
-import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
-import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.DesktopAddMultiDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.single.DesktopAddSingleDownloadComponent
 import com.abdownloadmanager.desktop.pages.batchdownload.DesktopBatchDownloadComponent
-import com.abdownloadmanager.shared.pages.category.CategoryComponent
 import com.abdownloadmanager.desktop.pages.category.DesktopCategoryDialogManager
+import com.abdownloadmanager.desktop.pages.checksum.DesktopFileChecksumComponent
 import com.abdownloadmanager.desktop.pages.editdownload.DesktopEditDownloadComponent
 import com.abdownloadmanager.desktop.pages.enterurl.DesktopEnterNewURLComponent
-import com.abdownloadmanager.desktop.pages.checksum.DesktopFileChecksumComponent
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
 import com.abdownloadmanager.desktop.pages.perhostsettings.DesktopPerHostSettingsComponent
+import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
 import com.abdownloadmanager.desktop.pages.settings.DesktopSettingsComponent
-import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.DesktopSingleDownloadComponent
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.DesktopExtraDownloadItemSettings
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.desktop.ui.widget.MessageDialogModel
+import com.abdownloadmanager.desktop.utils.IntegrationPortBroadcaster
+import com.abdownloadmanager.integration.Integration
+import com.abdownloadmanager.integration.IntegrationResult
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
+import com.abdownloadmanager.shared.downloaderror.DownloadErrorComponent
+import com.abdownloadmanager.shared.pagemanager.*
+import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
+import com.abdownloadmanager.shared.pages.adddownload.AddDownloadConfig
+import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
+import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
+import com.abdownloadmanager.shared.pages.category.CategoryComponent
+import com.abdownloadmanager.shared.pages.updater.UpdateComponent
+import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.ui.widget.MessageDialogType
 import com.abdownloadmanager.shared.ui.widget.NotificationModel
 import com.abdownloadmanager.shared.ui.widget.NotificationType
-import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.shared.util.*
+import com.abdownloadmanager.shared.util.category.CategoryManager
+import com.abdownloadmanager.shared.util.category.CategorySelectionMode
+import com.abdownloadmanager.shared.util.category.DefaultCategories
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
+import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.router.children.ChildNavState
 import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
@@ -39,61 +54,24 @@ import com.arkivanov.decompose.router.pages.childPages
 import com.arkivanov.decompose.router.pages.navigate
 import com.arkivanov.decompose.router.slot.*
 import ir.amirab.downloader.DownloadManagerEvents
-import ir.amirab.downloader.downloaditem.contexts.ResumedBy
-import ir.amirab.downloader.downloaditem.contexts.User
-import ir.amirab.downloader.queue.DefaultQueueInfo
-import ir.amirab.downloader.utils.ExceptionUtils
-import com.abdownloadmanager.integration.Integration
-import com.abdownloadmanager.integration.IntegrationResult
-import com.abdownloadmanager.resources.*
-import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
-import com.abdownloadmanager.shared.pagemanager.AboutPageManager
-import com.abdownloadmanager.shared.pagemanager.AddDownloadDialogManager
-import com.abdownloadmanager.shared.pagemanager.BatchDownloadPageManager
-import com.abdownloadmanager.shared.pagemanager.DownloadDialogManager
-import com.abdownloadmanager.shared.pagemanager.EditDownloadDialogManager
-import com.abdownloadmanager.shared.pagemanager.EnterNewURLDialogManager
-import com.abdownloadmanager.shared.pagemanager.ExitApplicationRequestManager
-import com.abdownloadmanager.shared.pagemanager.FileChecksumDialogManager
-import com.abdownloadmanager.shared.pagemanager.NotificationSender
-import com.abdownloadmanager.shared.pagemanager.OpenSourceLibrariesPageManager
-import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
-import com.abdownloadmanager.shared.pagemanager.QueuePageManager
-import com.abdownloadmanager.shared.pagemanager.SettingsPageManager
-import com.abdownloadmanager.shared.pagemanager.TranslatorsPageManager
-import com.abdownloadmanager.shared.pages.updater.UpdateComponent
-import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
-import com.abdownloadmanager.shared.storage.ISelectQueueStorage
-import com.abdownloadmanager.shared.util.BaseComponent
-import com.abdownloadmanager.shared.util.DownloadItemOpener
-import com.abdownloadmanager.shared.util.DownloadSystem
-import com.abdownloadmanager.shared.util.FileIconProvider
-import com.abdownloadmanager.shared.util.category.CategoryManager
-import com.abdownloadmanager.shared.util.category.CategorySelectionMode
-import com.abdownloadmanager.shared.util.category.DefaultCategories
-import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
-import com.abdownloadmanager.shared.util.subscribeAsStateFlow
-import com.arkivanov.decompose.childContext
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.destination.IncompleteFileUtil
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.downloaditem.IDownloadItem
-import ir.amirab.downloader.exception.TooManyErrorException
+import ir.amirab.downloader.downloaditem.contexts.ResumedBy
+import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
+import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.util.compose.IIconResolver
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.coroutines.launchWithDeferred
+import ir.amirab.util.desktop.poweraction.PowerActionConfig
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -111,6 +89,7 @@ class AppComponent(
 ) : BaseComponent(ctx),
     DesktopDownloadDialogManager,
     DesktopAddDownloadDialogManager,
+    DownloadErrorDialogManager,
     DesktopCategoryDialogManager,
     EditDownloadDialogManager,
     FileChecksumDialogManager,
@@ -273,6 +252,7 @@ class AppComponent(
                 downloadSystem = downloadSystem,
                 downloaderInUiRegistry = downloaderInUiRegistry,
                 iconProvider = fileIconProvider,
+                downloadErrorDialogManager = this,
             )
         }
     ).subscribeAsStateFlow()
@@ -393,6 +373,7 @@ class AppComponent(
                         iconProvider = fileIconProvider,
                         categoryManager = categoryManager,
                         queueManager = queueManager,
+                        downloadErrorDialogManager = this,
                     )
                 }
 
@@ -451,6 +432,7 @@ class AppComponent(
             DesktopSingleDownloadComponent(
                 ctx = ctx,
                 downloadItemOpener = this,
+                downloadErrorDialogManager = this,
                 onDismiss = {
                     closeDownloadDialog(listOf(cfg.id))
                 },
@@ -539,6 +521,7 @@ class AppComponent(
             }
         }
     }
+
     override fun closeCategoryDialog() {
         scope.launch {
             categoryPageControl.navigate {
@@ -641,29 +624,13 @@ class AppComponent(
 ////                    }
 //                }
         if (it is DownloadManagerEvents.OnJobCanceled) {
-            val exception = it.e
-            if (ExceptionUtils.isNormalCancellation(exception)) {
-                return
-            }
-            var isMaxTryReachedError = false
-            val actualCause = if (exception is TooManyErrorException) {
-                isMaxTryReachedError = true
-                exception.findActualDownloadErrorCause()
-            } else exception
-            if (ExceptionUtils.isNormalCancellation(actualCause)) {
-                return
-            }
-            val prefix = if (isMaxTryReachedError) {
-                "Too Many Error: "
-            } else {
-                "Error: "
-            }.asStringSource()
-            val reason = actualCause.message?.asStringSource() ?: Res.string.unknown.asStringSource()
-            sendNotification(
-                "downloadId=${it.downloadItem.id}",
-                title = it.downloadItem.name.asStringSource(),
-                description = listOf(prefix, reason).combineStringSources(),
-                type = NotificationType.Error,
+            val reason = downloadSystem.errorMapperRegistry
+                .getReason(it.e) ?: return
+
+            showDownloadErrorToUser(
+                it.downloadItem,
+                reason,
+                false,
             )
         }
         if (it is DownloadManagerEvents.OnJobCompleted) {
@@ -683,6 +650,60 @@ class AppComponent(
             }
         }
     }
+
+    fun showDownloadErrorToUser(
+        downloadItem: IDownloadItem,
+        reason: DownloadErrorReason,
+        userRequested: Boolean,
+    ) {
+        val downloadProgressIsAlreadyOpen = openedDownloadDialogs.value.find {
+            it.downloadId == downloadItem.id
+        } != null
+        val autoShowDownloadErrorDialog =
+            !downloadProgressIsAlreadyOpen && appSettings.showDownloadCompletionDialog.value
+        if (userRequested || autoShowDownloadErrorDialog) {
+            openDownloadErrorDialog(
+                downloadItem,
+                reason,
+            )
+        } else {
+            sendNotification(
+                "downloadId=${downloadItem.id}",
+                title = downloadItem.name.asStringSource(),
+                description = reason.title.asStringSource(),
+                type = NotificationType.Error,
+            )
+        }
+    }
+
+    private val downloadErrorDialogNavigation = SlotNavigation<DownloadErrorComponent.DownloadErrorConfig>()
+    val downloadErrorDialogSlot = childSlot(
+        source = downloadErrorDialogNavigation,
+        serializer = DownloadErrorComponent.DownloadErrorConfig.serializer(),
+        childFactory = { cfg, cmp ->
+            DownloadErrorComponent(
+                ctx, cfg, ::closeDownloadErrorDialog,
+            )
+        }
+    ).subscribeAsStateFlow()
+
+    override fun openDownloadErrorDialog(downloadItem: IDownloadItem, reason: DownloadErrorReason) {
+        scope.launch {
+            downloadErrorDialogNavigation.activate(
+                DownloadErrorComponent.DownloadErrorConfig(
+                    downloadItem = downloadItem,
+                    errorReason = reason
+                )
+            )
+        }
+    }
+
+    override fun closeDownloadErrorDialog() {
+        scope.launch {
+            downloadErrorDialogNavigation.dismiss()
+        }
+    }
+
 
     override suspend fun openDownloadItem(id: Long) {
         val item = downloadSystem.getDownloadItemById(id)
@@ -818,6 +839,7 @@ class AppComponent(
             }
         }
     }
+
     override fun closeAddDownloadDialog() {
         scope.launch {
             addDownloadPageControl.navigate {
@@ -945,6 +967,7 @@ class AppComponent(
             }
         }
     }
+
     fun startNewDownloads(
         items: List<NewDownloadItemProps>,
         categorySelectionMode: CategorySelectionMode??,

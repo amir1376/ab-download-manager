@@ -2,17 +2,19 @@ package com.abdownloadmanager.android.pages.singledownload
 
 import com.abdownloadmanager.android.storage.AndroidExtraDownloadItemSettings
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.singledownloadpage.BaseSingleDownloadComponent
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
-import com.abdownloadmanager.shared.util.*
+import com.abdownloadmanager.shared.util.DownloadItemOpener
+import com.abdownloadmanager.shared.util.DownloadSystem
+import com.abdownloadmanager.shared.util.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
-import kotlin.getValue
 
 class AndroidSingleDownloadComponent(
     ctx: ComponentContext,
@@ -26,6 +28,7 @@ class AndroidSingleDownloadComponent(
     applicationScope: CoroutineScope,
     fileIconProvider: FileIconProvider,
     val comesFromExternalApplication: Boolean,
+    downloadErrorDialogManager: DownloadErrorDialogManager,
 ) : BaseSingleDownloadComponent<AndroidExtraDownloadItemSettings>(
     ctx = ctx,
     downloadItemOpener = downloadItemOpener,
@@ -37,6 +40,7 @@ class AndroidSingleDownloadComponent(
     appRepository = appRepository,
     applicationScope = applicationScope,
     fileIconProvider = fileIconProvider,
+    downloadErrorDialogManager = downloadErrorDialogManager,
 ) {
     override val defaultShowPartInfo: Boolean = false
 //    private val singleDownloadPageStateToPersist by lazy {
@@ -51,8 +55,7 @@ class AndroidSingleDownloadComponent(
 //        }
 //    }
 
-    sealed interface Effects : BaseSingleDownloadComponent.Effects.Platform {
-    }
+    sealed interface Effects : BaseSingleDownloadComponent.Effects.Platform
 
     val onCompletion by lazy {
         listOf(

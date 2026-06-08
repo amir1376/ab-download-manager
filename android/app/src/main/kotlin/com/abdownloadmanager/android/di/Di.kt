@@ -80,6 +80,10 @@ import ir.amirab.util.AppVersionTracker
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.util.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.shared.util.category.*
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegistryFactory
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.IFailedDownloadErrorStorage
 import com.abdownloadmanager.shared.util.ondownloadcompletion.NoOpOnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionRunner
@@ -288,6 +292,9 @@ val downloadSystemModule = module {
 
     single {
         DownloadSystem(
+            get(),
+            get(),
+            get(),
             get(),
             get(),
             get(),
@@ -590,6 +597,20 @@ fun getAppModule(context: ABDMApp) = module {
     }
     single {
         PerHostSettingsManager(get())
+    }
+    single {
+        DownloadErrorMapperRegistryFactory().createRegistry()
+    }
+    single<IFailedDownloadErrorStorage> {
+        FailedDownloadErrorStorageInMemory()
+    }
+    single {
+        FailedDownloads(
+            get(),
+            get(),
+            get(),
+            get(),
+        )
     }
     single { context }.apply {
         bind<ABDMApp>()

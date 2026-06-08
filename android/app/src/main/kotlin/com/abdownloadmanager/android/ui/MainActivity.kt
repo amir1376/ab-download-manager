@@ -6,13 +6,14 @@ import android.os.Bundle
 import com.abdownloadmanager.UpdateManager
 import com.abdownloadmanager.android.pages.onboarding.permissions.PermissionManager
 import com.abdownloadmanager.android.util.activity.ABDMActivity
+import com.abdownloadmanager.android.util.activity.RetainedComponentContainer
+import com.abdownloadmanager.android.util.pagemanager.AndroidDownloadErrorPageManager
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.DefaultCategories
-import com.arkivanov.decompose.retainedComponent
 import ir.amirab.downloader.queue.QueueManager
 import kotlinx.serialization.json.Json
 import org.koin.core.component.inject
@@ -29,9 +30,16 @@ class MainActivity : ABDMActivity() {
     private val json: Json by inject()
     private val updateManager: UpdateManager by inject()
     private val permissionManager: PermissionManager by inject()
-    val mainComponent by lazy {
-        retainedComponent {
+    val retainedComponentContainer by lazy {
+        myRetainedComponent {
             // make sure to not pass any activity to retained component
+            val downloadErrorPageManager = AndroidDownloadErrorPageManager(
+                openIntent = {
+                    sendEffect(RetainedComponentContainer.Effects.StartActivity(it))
+                },
+                json = json,
+                context = applicationContext,
+            )
             MainComponent(
                 ctx = it,
                 context = applicationContext,
@@ -53,6 +61,7 @@ class MainActivity : ABDMActivity() {
                 abdmAppManager = abdmAppManager,
                 onBoardingStorage = onBoardingStorage,
                 homePageStorage = homePageStorage,
+                downloadErrorDialogManager = downloadErrorPageManager,
             )
         }
     }
@@ -61,7 +70,7 @@ class MainActivity : ABDMActivity() {
         super.onCreate(savedInstanceState)
         setABDMContent {
             MainContent(
-                mainComponent = mainComponent,
+                mainComponent = retainedComponentContainer.component,
             )
         }
     }
@@ -70,7 +79,7 @@ class MainActivity : ABDMActivity() {
         if (intent.action == ACTION_REVEAL_DOWNLOAD_IN_LIST) {
             val downloadId = intent.getLongExtra(DOWNLOAD_ID_KEY, -1)
                 .takeIf { it >= 0 } ?: return
-            mainComponent.revealDownload(downloadId)
+            retainedComponentContainer.component.revealDownload(downloadId)
         }
     }
 

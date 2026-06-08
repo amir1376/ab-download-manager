@@ -3,6 +3,7 @@ package com.abdownloadmanager.shared.downloaderinui
 import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.util.HttpUrlUtils
+import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,8 +24,11 @@ abstract class LinkChecker<
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
-    private val _responseInfo = MutableStateFlow<ResponseInfo?>(null)
-    val responseInfo = _responseInfo.asStateFlow()
+    private val _responseResult = MutableStateFlow<Result<ResponseInfo>?>(null)
+    val responseResult = _responseResult.asStateFlow()
+    val responseInfo = _responseResult.mapStateFlow {
+        it?.getOrNull()
+    }
 
     private val _isValid = MutableStateFlow(false)
     private val isValid = _isValid.asStateFlow()
@@ -38,9 +42,10 @@ abstract class LinkChecker<
         }.getOrElse { false }
     }
 
-    private fun setInfo(responseInfo: ResponseInfo?) {
-        _responseInfo.update { responseInfo }
-        infoUpdated(responseInfo)
+    private fun setResult(responseResult: Result<ResponseInfo>?) {
+        _responseResult.update { responseResult }
+        // update only on success
+        infoUpdated(responseResult?.getOrNull())
         validate()
     }
 
@@ -53,15 +58,15 @@ abstract class LinkChecker<
         val downloadCredentials = credentials.value
         val link = downloadCredentials.link
         val isValidUrl = HttpUrlUtils.isValidUrl(link)
-        setInfo(null)
+        setResult(null)
         if (link.isBlank() || !isValidUrl) {
             return
         }
         _isLoading.update { true }
-        val info = runCatching {
+        val result = runCatching {
             actualCheck(downloadCredentials)
-        }.getOrNull()
+        }
         _isLoading.update { false }
-        setInfo(info)
+        setResult(result)
     }
 }

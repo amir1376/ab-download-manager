@@ -1,65 +1,41 @@
 package com.abdownloadmanager.shared.singledownloadpage
 
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraDownloadItemSettings
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
-import com.abdownloadmanager.shared.util.BaseComponent
-import com.abdownloadmanager.shared.util.DownloadItemOpener
-import com.abdownloadmanager.shared.util.DownloadSystem
-import com.abdownloadmanager.shared.util.FileIconProvider
-import com.abdownloadmanager.shared.util.ThreadCountLimitation
-import com.abdownloadmanager.shared.util.TimeNames
-import com.abdownloadmanager.shared.util.convertDurationToHumanReadable
-import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
-import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
-import com.abdownloadmanager.shared.util.convertTimeRemainingToHumanReadable
+import com.abdownloadmanager.shared.util.*
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
-import ir.amirab.downloader.monitor.CompletedDownloadItemState
-import ir.amirab.downloader.monitor.DurationBasedProcessingDownloadItemState
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.IDownloadMonitor
-import ir.amirab.downloader.monitor.ProcessingDownloadItemState
+import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.createMutableStateFlowFromFlow
+import ir.amirab.util.ifThen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
-import kotlin.getValue
+import kotlin.time.Duration.Companion.milliseconds
 
 abstract class BaseSingleDownloadComponent<
         TExtraDownloadItemSettings : IExtraDownloadItemSettings
         >(
     ctx: ComponentContext,
     val downloadItemOpener: DownloadItemOpener,
+    val downloadErrorDialogManager: DownloadErrorDialogManager,
     private val extraDownloadSettingsStorage: ExtraDownloadSettingsStorage<TExtraDownloadItemSettings>,
     private val onDismiss: () -> Unit,
     val downloadId: Long,
@@ -103,6 +79,26 @@ abstract class BaseSingleDownloadComponent<
         scope,
     )
 
+    val lastError = downloadSystem.downloadErrorsFlow.map {
+        it[downloadId]
+    }.stateIn(scope, started = SharingStarted.Eagerly, null)
+
+    fun openDownloadErrorPage() {
+        scope.launch {
+            val downloadItem = downloadSystem.getDownloadItemById(
+                downloadId,
+            )
+            downloadItem?.let { downloadItem ->
+                lastError.value?.let { errorReason ->
+                    downloadErrorDialogManager.openDownloadErrorDialog(
+                        downloadItem,
+                        errorReason,
+                    )
+                }
+            }
+        }
+
+    }
 
     private fun shouldShowCompletionDialog(): Boolean {
         return shouldShowCompletionDialog.value
@@ -129,7 +125,7 @@ abstract class BaseSingleDownloadComponent<
                         // app component tries to create this component if user want to auto open completion dialog and this component is not created yet
                         // so we keep this component active a while to prevent create new component
                         // this prevents opening this window if global [appSettings.showDownloadCompletionDialog] is true but user explicitly tells that he don't want to open completion dialog for this item
-                        delay(100)
+                        delay(100.milliseconds)
                         close()
                     }
                 } else {
@@ -145,6 +141,7 @@ abstract class BaseSingleDownloadComponent<
     val showPartInfo by lazy {
         _showPartInfo.asStateFlow()
     }
+
     open fun setShowPartInfo(value: Boolean) {
         _showPartInfo.value = value
     }
@@ -155,7 +152,20 @@ abstract class BaseSingleDownloadComponent<
         .map {
             buildList {
                 add(SingleDownloadPagePropertyItem(Res.string.name.asStringSource(), it.name.asStringSource()))
-                add(SingleDownloadPagePropertyItem(Res.string.status.asStringSource(), createStatusString(it)))
+                val errorReason = lastError.value
+                add(
+                    SingleDownloadPagePropertyItem(
+                        Res.string.status.asStringSource(), createStatusString(it).ifThen(
+                            it.status is DownloadJobStatus.Canceled && errorReason != null
+                        ) {
+                            StringSource.CombinedStringSource(
+                                listOf(
+                                    this,
+                                    errorReason.title.asStringSource(),
+                                ), " - "
+                            )
+                        })
+                )
                 if (it is DurationBasedProcessingDownloadItemState) {
                     add(
                         SingleDownloadPagePropertyItem(
@@ -218,7 +228,6 @@ abstract class BaseSingleDownloadComponent<
                 )
             }
         }.stateIn(scope, SharingStarted.Eagerly, emptyList())
-
 
 
     fun openFolder() {
@@ -324,7 +333,7 @@ abstract class BaseSingleDownloadComponent<
 
         threadCount
             .drop(1)
-            .debounce(500)
+            .debounce(500.milliseconds)
             .onEach { count ->
                 downloadManager.updateDownloadItem(
                     id = downloadId,
@@ -335,7 +344,7 @@ abstract class BaseSingleDownloadComponent<
             }.launchIn(scope)
         speedLimit
             .drop(1)
-            .debounce(500)
+            .debounce(500.milliseconds)
             .onEach { limit ->
                 downloadManager.updateDownloadItem(
                     id = downloadId,

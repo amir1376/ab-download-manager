@@ -362,6 +362,7 @@ fun HomePage(component: HomeComponent) {
                         fileIconProvider = component.fileIconProvider,
                         categoryManager = component.categoryManager,
                         lazyListState = lazyListState,
+                        failedDownloadReasons = component.failedDownloads.collectAsState().value,
                     )
                     Spacer(
                         Modifier

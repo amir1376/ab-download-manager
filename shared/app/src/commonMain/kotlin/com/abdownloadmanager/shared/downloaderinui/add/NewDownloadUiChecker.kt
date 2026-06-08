@@ -1,15 +1,28 @@
-package com.abdownloadmanager.shared.downloaderinui
+package com.abdownloadmanager.shared.downloaderinui.add
 
-import com.abdownloadmanager.shared.downloaderinui.add.AddDownloadChecker
+import arrow.core.identity
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
+import com.abdownloadmanager.shared.downloaderinui.LinkChecker
+import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
 import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.util.flow.onEachLatest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
-abstract class DownloadUiChecker<
+abstract class NewDownloadUiChecker<
         TCredentials : IDownloadCredentials,
         TResponseInfoType : IResponseInfo,
         TDownloadSize : DownloadSize,
@@ -27,7 +40,7 @@ abstract class DownloadUiChecker<
     val folder = MutableStateFlow(initialFolder)
 
     protected val linkChecker = linkCheckerFactory.createLinkChecker(credentials.value)
-    protected val addDownloadChecker = AddDownloadChecker(
+    protected val newDownloadChecker = NewDownloadChecker(
         linkChecker = linkChecker,
         initialName = name.value,
         initialFolder = folder.value,
@@ -37,11 +50,21 @@ abstract class DownloadUiChecker<
     val downloadSize: StateFlow<TDownloadSize?> = linkChecker.downloadSize
 
     val gettingResponseInfo = linkChecker.isLoading
+    val responseResult = linkChecker.responseResult
     val responseInfo = linkChecker.responseInfo
+    val lastErrorReason = responseResult.map { result ->
+        result
+            ?.fold(
+                onSuccess = { it.unsuccessFullException },
+                onFailure = ::identity
+            )
+            ?.let(downloadSystem.errorMapperRegistry::getReason)
 
-    val canAddToDownloadResult = addDownloadChecker.canAddResult
-    val canAdd = addDownloadChecker.canAdd
-    val isDuplicate = addDownloadChecker.isDuplicate
+    }.stateIn(scope, started = SharingStarted.Eagerly, null)
+
+    val canAddToDownloadResult = newDownloadChecker.canAddResult
+    val canAdd = newDownloadChecker.canAdd
+    val isDuplicate = newDownloadChecker.isDuplicate
 
     private val refreshResponseInfoImmediately = MutableSharedFlow<Unit>(
         replay = 1,
@@ -80,7 +103,7 @@ abstract class DownloadUiChecker<
             scheduleRecheckAddToDownloadIsPossible,
 //            ...
         ).onEachLatest {
-            addDownloadChecker.check()
+            newDownloadChecker.check()
         }.launchIn(scope)
 
 
@@ -98,14 +121,14 @@ abstract class DownloadUiChecker<
             scheduleRefresh(alsoRecheckLink = true)
         }.launchIn(scope)
         name.onEach { name ->
-            if (addDownloadChecker.name.value != name) {
-                addDownloadChecker.name.update { name }
+            if (newDownloadChecker.name.value != name) {
+                newDownloadChecker.name.update { name }
                 scheduleRefresh(alsoRecheckLink = false)
             }
         }.launchIn(scope)
         folder.onEach { folder ->
-            if (addDownloadChecker.folder.value != folder) {
-                addDownloadChecker.folder.update { folder }
+            if (newDownloadChecker.folder.value != folder) {
+                newDownloadChecker.folder.update { folder }
                 scheduleRefresh(alsoRecheckLink = false)
             }
         }.launchIn(scope)

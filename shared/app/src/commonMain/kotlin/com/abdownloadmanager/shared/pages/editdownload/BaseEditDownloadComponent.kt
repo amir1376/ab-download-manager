@@ -1,22 +1,24 @@
 package com.abdownloadmanager.shared.pages.editdownload
 
+import arrow.core.identity
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadInputs
+import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.util.BaseComponent
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 open class BaseEditDownloadComponent(
     ctx: ComponentContext,
+    private val downloadErrorDialogManager: DownloadErrorDialogManager,
     private val downloaderInUiRegistry: DownloaderInUiRegistry,
     val iconProvider: FileIconProvider,
     val downloadSystem: DownloadSystem,
@@ -26,8 +28,11 @@ open class BaseEditDownloadComponent(
     private val onEdited: ((IDownloadItem) -> Unit, DownloadJobExtraConfig?) -> Unit,
 ) : BaseComponent(ctx) {
 
-    val editDownloadUiChecker =
+    val editDownloadInputsFlow =
         MutableStateFlow(null as EditDownloadInputs<IDownloadItem, IDownloadCredentials, *, *, *, *>?)
+
+    private val _lastErrorReason = MutableStateFlow<DownloadErrorReason?>(null)
+    val lastErrorReason = _lastErrorReason.asStateFlow()
 
     init {
         scope.launch {
@@ -39,7 +44,7 @@ open class BaseEditDownloadComponent(
     private val _credentialsImportedFromExternal = MutableStateFlow(false)
     val credentialsImportedFromExternal = _credentialsImportedFromExternal.asStateFlow()
     fun importCredential(credentials: IDownloadCredentials) {
-        editDownloadUiChecker.value?.let {
+        editDownloadInputsFlow.value?.let {
             it.importCredentials(credentials)
         } ?: run {
             pendingCredential = credentials
@@ -60,25 +65,39 @@ open class BaseEditDownloadComponent(
             println("downloader for id $id not found")
             return
         }
-        val httpEditDownloadInputs = downloader.createEditDownloadInputs(
+        val editDownloadInputs = downloader.createEditDownloadInputs(
             currentDownloadItem = MutableStateFlow(downloadItem),
             editedDownloadItem = MutableStateFlow(downloadItem),
             conflictDetector = DownloadConflictDetector(downloadSystem),
             scope = scope,
         )
-        editDownloadUiChecker.value = httpEditDownloadInputs
+        editDownloadInputsFlow.value = editDownloadInputs
         pendingCredential?.let { credentials ->
-            httpEditDownloadInputs.importCredentials(credentials)
+            editDownloadInputs.importCredentials(credentials)
             pendingCredential = null
         }
+        editDownloadInputs.responseResult.onEach { result ->
+            _lastErrorReason.value = result?.fold(
+                onSuccess = { it.unsuccessFullException },
+                onFailure = ::identity
+            )?.let(downloadSystem.errorMapperRegistry::getReason)
+        }.launchIn(scope)
     }
 
+    fun openDownloadErrorDialog() {
+        val editedDownloadItem = editDownloadInputsFlow.value?.editedDownloadItem?.value ?: return
+        val lastError = lastErrorReason.value ?: return
+        downloadErrorDialogManager.openDownloadErrorDialog(
+            downloadItem = editedDownloadItem,
+            reason = lastError,
+        )
+    }
 
     fun onRequestEdit() {
         if (!acceptEdit.value) {
             return
         }
-        editDownloadUiChecker.value?.let { editDownloadUiChecker ->
+        editDownloadInputsFlow.value?.let { editDownloadUiChecker ->
             onEdited(editDownloadUiChecker::applyEditedItemTo, editDownloadUiChecker.downloadJobConfig.value)
         }
     }

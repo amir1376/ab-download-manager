@@ -178,30 +178,15 @@ class ABDMAppManager(
             return
         }
         if (it is DownloadManagerEvents.OnJobCanceled) {
-            val exception = it.e
-            if (ExceptionUtils.isNormalCancellation(exception)) {
-                return
+            val reason = downloadSystem.errorMapperRegistry.getReason(it.e)
+            reason?.let { reason ->
+                sendNotification(
+                    "downloadId=${it.downloadItem.id}",
+                    description = it.downloadItem.name.asStringSource(),
+                    title = reason.title.asStringSource(),
+                    type = NotificationType.Error,
+                )
             }
-            var isMaxTryReachedError = false
-            val actualCause = if (exception is TooManyErrorException) {
-                isMaxTryReachedError = true
-                exception.findActualDownloadErrorCause()
-            } else exception
-            if (ExceptionUtils.isNormalCancellation(actualCause)) {
-                return
-            }
-            val prefix = if (isMaxTryReachedError) {
-                "Too Many Error: "
-            } else {
-                "Error: "
-            }.asStringSource()
-            val reason = actualCause.message?.asStringSource() ?: Res.string.unknown.asStringSource()
-            sendNotification(
-                "downloadId=${it.downloadItem.id}",
-                description = it.downloadItem.name.asStringSource(),
-                title = listOf(prefix, reason).combineStringSources(),
-                type = NotificationType.Error,
-            )
         }
         if (it is DownloadManagerEvents.OnJobCompleted) {
             sendNotification(
