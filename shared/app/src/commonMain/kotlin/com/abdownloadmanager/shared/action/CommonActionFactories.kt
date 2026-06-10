@@ -1,27 +1,15 @@
 package com.abdownloadmanager.shared.action
 
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.pagemanager.AboutPageManager
-import com.abdownloadmanager.shared.pagemanager.AddDownloadDialogManager
-import com.abdownloadmanager.shared.pagemanager.BatchDownloadPageManager
-import com.abdownloadmanager.shared.pagemanager.EnterNewURLDialogManager
-import com.abdownloadmanager.shared.pagemanager.ExitApplicationRequestManager
-import com.abdownloadmanager.shared.pagemanager.NewQueuePageManager
-import com.abdownloadmanager.shared.pagemanager.OpenSourceLibrariesPageManager
-import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
-import com.abdownloadmanager.shared.pagemanager.QueuePageManager
-import com.abdownloadmanager.shared.pagemanager.SettingsPageManager
-import com.abdownloadmanager.shared.pagemanager.TranslatorsPageManager
+import com.abdownloadmanager.shared.pagemanager.*
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.updater.UpdateComponent
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.SharedConstants
 import com.abdownloadmanager.shared.util.category.Category
-import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialFromStringExtractor
-import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialsFromCurl
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DefaultDownloadCredentialsExtractor
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.queue.inactiveQueuesFlow
@@ -50,6 +38,7 @@ fun createNewDownloadAction(
         enterNewURLDialogManager.openEnterNewURLWindow()
     }
 }
+
 fun createDownloadFromClipboardAction(
     addDownloadDialogManager: AddDownloadDialogManager,
 ): AnAction {
@@ -61,24 +50,17 @@ fun createDownloadFromClipboardAction(
         if (contentsInClipboard.isNullOrEmpty()) {
             return@simpleAction
         }
-        val curlItems = DownloadCredentialsFromCurl.extract(contentsInClipboard)
-        if (curlItems.isNotEmpty()) {
+
+        val items = DefaultDownloadCredentialsExtractor
+            .extract(contentsInClipboard)
+
+        if (items.isNotEmpty()) {
             addDownloadDialogManager.openAddDownloadDialog(
-                curlItems.map {
+                items.map {
                     AddDownloadCredentialsInUiProps(it)
                 }
             )
-            return@simpleAction
         }
-        val items: List<IDownloadCredentials> = DownloadCredentialFromStringExtractor
-            .extract(contentsInClipboard)
-            .distinctBy { it.link }
-        if (items.isEmpty()) {
-            return@simpleAction
-        }
-        addDownloadDialogManager.openAddDownloadDialog(items.map {
-            AddDownloadCredentialsInUiProps(it)
-        })
     }
 }
 
@@ -111,6 +93,7 @@ fun createStopQueueGroupAction(
             }.launchIn(scope)
     }
 }
+
 fun createStartQueueGroupAction(
     scope: CoroutineScope,
     queueManager: QueueManager,
@@ -321,6 +304,7 @@ fun createNewQueueAction(
         }
     }
 }
+
 fun createStopAllAction(
     scope: CoroutineScope,
     downloadSystem: DownloadSystem,

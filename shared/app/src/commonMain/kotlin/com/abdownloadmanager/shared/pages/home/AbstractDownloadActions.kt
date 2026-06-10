@@ -11,6 +11,7 @@ import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialsFromCurl
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialsFromJson
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
@@ -23,6 +24,7 @@ import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.simpleAction
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.isNotNull
@@ -182,7 +184,11 @@ abstract class AbstractDownloadActions(
     )
 
     val copyDownloadCredentialsAsCurlAction = simpleAction(
-        title = Res.string.copy_as_curl.asStringSource(),
+        title = Res.string.copy_as_x.asStringSourceWithARgs(
+            Res.string.copy_as_x_createArgs(
+                name = "cURL"
+            )
+        ),
         icon = MyIcons.copy,
         checkEnable = selections.mapStateFlow { it.isNotEmpty() },
         onActionPerformed = {
@@ -192,6 +198,25 @@ abstract class AbstractDownloadActions(
                     .filterIsInstance<HttpDownloadItem>()
                     .map { HttpDownloadCredentials.from(it) }
                 ClipboardUtil.copy(DownloadCredentialsFromCurl.generateCurlCommands(credentialsList).joinToString("\n"))
+            }
+        }
+    )
+
+    val copyDownloadCredentialsAsJsonAction = simpleAction(
+        title = Res.string.copy_as_x.asStringSourceWithARgs(
+            Res.string.copy_as_x_createArgs(
+                name = "json"
+            )
+        ),
+        icon = MyIcons.copy,
+        checkEnable = selections.mapStateFlow { it.isNotEmpty() },
+        onActionPerformed = {
+            scope.launch {
+                val credentialsList = selections.value
+                    .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
+                    .filterIsInstance<HttpDownloadItem>()
+                    .map { HttpDownloadCredentials.from(it) }
+                ClipboardUtil.copy(DownloadCredentialsFromJson.asJson(credentialsList))
             }
         }
     )
