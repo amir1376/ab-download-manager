@@ -22,6 +22,7 @@
 - User-friendly error messages for download errors (#1252)
 - An option to remember the last selected queue and quickly add downloads to it by long-clicking the `Add` button (
   #1246)
+- An option to import/export downloads using JSON format
 - A `Download` button on the multi-download page for cases where users do not want to start downloads without queue
   processing (#1247)
 - The app now includes a logger that can be enabled using a command-line flag (#1226)
