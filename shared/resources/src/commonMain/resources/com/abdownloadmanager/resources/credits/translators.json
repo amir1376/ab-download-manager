@@ -43,7 +43,17 @@
       "link": "https://crowdin.com/profile/halbast"
     }
   ],
+  "cs": [
+    {
+      "name": "KK_zone (kolikkulda)",
+      "link": "https://crowdin.com/profile/kolikkulda"
+    }
+  ],
   "de": [
+    {
+      "name": "Theodoros Asimakopoulos (theoasima)",
+      "link": "https://crowdin.com/profile/theoasima"
+    },
     {
       "name": "u!^DEV (uDEV)",
       "link": "https://crowdin.com/profile/uDEV"
@@ -121,16 +131,24 @@
       "link": "https://crowdin.com/profile/crse"
     },
     {
+      "name": "Muhammad Asyrafi Hidayatullah (4syr)",
+      "link": "https://crowdin.com/profile/4syr"
+    },
+    {
+      "name": "Lieba Natur Brilian (naturbrilian)",
+      "link": "https://crowdin.com/profile/naturbrilian"
+    },
+    {
+      "name": "exodius",
+      "link": "https://crowdin.com/profile/exodius"
+    },
+    {
       "name": "kuydukuy (hilmy2nd)",
       "link": "https://crowdin.com/profile/hilmy2nd"
     },
     {
       "name": "andybr",
       "link": "https://crowdin.com/profile/andybr"
-    },
-    {
-      "name": "exodius",
-      "link": "https://crowdin.com/profile/exodius"
     }
   ],
   "it": [
@@ -149,6 +167,10 @@
   ],
   "ja": [
     {
+      "name": "wany-oh",
+      "link": "https://crowdin.com/profile/wany-oh"
+    },
+    {
       "name": "ユタ (dsi3020)",
       "link": "https://crowdin.com/profile/dsi3020"
     }
@@ -161,12 +183,12 @@
   ],
   "ko": [
     {
-      "name": "doda (ddarkr)",
-      "link": "https://crowdin.com/profile/ddarkr"
-    },
-    {
       "name": "VenusGirl",
       "link": "https://crowdin.com/profile/VenusGirl"
+    },
+    {
+      "name": "doda (ddarkr)",
+      "link": "https://crowdin.com/profile/ddarkr"
     }
   ],
   "lt": [
@@ -183,7 +205,11 @@
   ],
   "pt-BR": [
     {
-      "name": "Guilherme (whatahelll)",
+      "name": "igorruckert",
+      "link": "https://crowdin.com/profile/igorruckert"
+    },
+    {
+      "name": "whata (whatahelll)",
       "link": "https://crowdin.com/profile/whatahelll"
     },
     {
@@ -193,14 +219,6 @@
     {
       "name": "Davy J. (deaveipslon)",
       "link": "https://crowdin.com/profile/deaveipslon"
-    },
-    {
-      "name": "Juliano Eduardo (zerocoolroot)",
-      "link": "https://crowdin.com/profile/zerocoolroot"
-    },
-    {
-      "name": "John Peter Sá (johnppetersa)",
-      "link": "https://crowdin.com/profile/johnppetersa"
     }
   ],
   "ru": [
@@ -231,17 +249,17 @@
       "link": "https://crowdin.com/profile/mikropsoft"
     },
     {
-      "name": "Nightmare837 gaming (mutlupide)",
-      "link": "https://crowdin.com/profile/mutlupide"
+      "name": "ArdaWien",
+      "link": "https://crowdin.com/profile/ArdaWien"
     }
   ],
   "uk": [
     {
-      "name": "YALdysse",
-      "link": "https://crowdin.com/profile/YALdysse"
+      "name": "YALdysse_",
+      "link": "https://crowdin.com/profile/YALdysse_"
     },
     {
-      "name": "Misha Dyshlenko (lony_official)",
+      "name": "Mikhail Dyshlenko (lony_official)",
       "link": "https://crowdin.com/profile/lony_official"
     }
   ],
@@ -261,8 +279,12 @@
   ],
   "zh-CN": [
     {
-      "name": "Ipmlosion",
+      "name": "玄枵 (Ipmlosion)",
       "link": "https://crowdin.com/profile/Ipmlosion"
+    },
+    {
+      "name": "Aira_Nadih",
+      "link": "https://crowdin.com/profile/Aira_Nadih"
     },
     {
       "name": "Pylogmon (pylogmon)",
@@ -271,10 +293,6 @@
     {
       "name": "Pesy Wu (GamerNoTitle)",
       "link": "https://crowdin.com/profile/GamerNoTitle"
-    },
-    {
-      "name": "Aira_Nadih",
-      "link": "https://crowdin.com/profile/Aira_Nadih"
     },
     {
       "name": "Sendevia",
@@ -299,24 +317,28 @@
       "link": "https://crowdin.com/profile/notlin4"
     },
     {
-      "name": "塔可努丨TechNoob (TN_TechNoob)",
-      "link": "https://crowdin.com/profile/TN_TechNoob"
+      "name": "遠藤文祈 (superalpha2008)",
+      "link": "https://crowdin.com/profile/superalpha2008"
     },
     {
-      "name": "none2003",
-      "link": "https://crowdin.com/profile/none2003"
+      "name": "塔可努丨TechNoob (TN_TechNoob)",
+      "link": "https://crowdin.com/profile/TN_TechNoob"
     },
     {
       "name": "jrthsr700tmax",
       "link": "https://crowdin.com/profile/jrthsr700tmax"
     },
     {
-      "name": "abc0922001",
-      "link": "https://crowdin.com/profile/abc0922001"
+      "name": "陳義昇（ㄚ昇） (love80312)",
+      "link": "https://crowdin.com/profile/love80312"
     },
     {
-      "name": "Gholts",
-      "link": "https://crowdin.com/profile/Gholts"
+      "name": "none2003",
+      "link": "https://crowdin.com/profile/none2003"
+    },
+    {
+      "name": "abc0922001",
+      "link": "https://crowdin.com/profile/abc0922001"
     }
   ]
 }
