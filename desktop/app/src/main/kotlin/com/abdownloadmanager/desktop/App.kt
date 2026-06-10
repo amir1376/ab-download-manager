@@ -19,8 +19,6 @@ import ir.amirab.util.logger.AppLogger
 import ir.amirab.util.logger.appLogger
 import ir.amirab.util.writeText
 import kotlinx.coroutines.runBlocking
-import okio.FileSystem
-import okio.Path.Companion.toPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.system.exitProcess
