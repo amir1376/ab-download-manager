@@ -77,6 +77,7 @@ class AndroidDownloadActions(
         separator()
         subMenu(Res.string.copy.asStringSource(), MyIcons.copy) {
             +(copyDownloadLinkAction)
+            +(copyDownloadCredentialsAsJsonAction)
             +(copyDownloadCredentialsAsCurlAction)
         }
         +editDownloadAction

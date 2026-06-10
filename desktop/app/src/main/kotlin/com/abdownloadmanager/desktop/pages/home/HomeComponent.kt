@@ -31,12 +31,12 @@ import com.abdownloadmanager.shared.util.*
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.DefaultCategories
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DefaultDownloadCredentialsExtractor
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapTwoWayStateFlow
-import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialFromStringExtractor
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.util.AppVersionTracker
 import ir.amirab.util.compose.asStringSource
@@ -308,7 +308,7 @@ class HomeComponent(
 
 
     private fun parseLinks(v: String): List<IDownloadCredentials> {
-        return DownloadCredentialFromStringExtractor.extract(v)
+        return DefaultDownloadCredentialsExtractor.extract(v)
             .distinctBy { it.link }
     }
 
