@@ -108,6 +108,7 @@ fun main(args: Array<String>) {
         appLogger.e(throwable = e) { "Fail to start the ${AppInfo.displayName} app because:" }
         System.err.println("Fail to start the ${AppInfo.displayName} app because:")
         e.printStackTrace()
+        AppInfo.definedPaths.crashLogFile.writeText(e.stackTraceToString())
         exitProcess(-1)
     }
 }

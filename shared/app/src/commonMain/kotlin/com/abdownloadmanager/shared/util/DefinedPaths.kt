@@ -11,6 +11,7 @@ abstract class DefinedPaths(
     val systemDir: Path = dataDir.resolve("system")
     val updateDir: Path = systemDir.resolve("update")
     val logDir: Path = systemDir.resolve("log")
+    val crashLogFile: Path = logDir.resolve("crash.log")
     val pagesStateDir: Path = configDir.resolve("pages")
     val optionsDir: Path = configDir.resolve("options")
     val downloadDbDir: Path = configDir.resolve("download_db")
