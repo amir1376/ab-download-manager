@@ -12,3 +12,4 @@ jobs:
         with:
           identifier: amir1376.ABDownloadManager
           token: ${{ secrets.WINGET_TOKEN }}
+          replace-version: 1
