@@ -32,7 +32,7 @@ data class AppSettingsModel(
     override val useRelativeDateTime: Boolean = true,
     val useSystemTray: Boolean = true,
     override val threadCount: Int = 8,
-    override val maxConcurrentDownloads: Int = 0,
+    override val maxConcurrentDownloads: Int = 3,
     override val maxDownloadRetryCount: Int = 3,
     override val dynamicPartCreation: Boolean = true,
     override val useServerLastModifiedTime: Boolean = false,
