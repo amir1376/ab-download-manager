@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import java.io.File
 
-class AddDownloadChecker<
+class NewDownloadChecker<
         Credentials : IDownloadCredentials,
         ResponseInfo : IResponseInfo,
         TDownloadSize : DownloadSize,

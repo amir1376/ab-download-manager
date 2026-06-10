@@ -2,20 +2,20 @@ package com.abdownloadmanager.shared.downloaderinui.http.add
 
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.util.DownloadSystem
-import com.abdownloadmanager.shared.downloaderinui.DownloadUiChecker
+import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadUiChecker
 import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
 import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import kotlinx.coroutines.CoroutineScope
 
-class HttpDownloadUiChecker(
+class HttpNewDownloadUiChecker(
     initialCredentials: HttpDownloadCredentials = HttpDownloadCredentials.Companion.empty(),
     linkCheckerFactory: LinkCheckerFactory<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker>,
     initialFolder: String,
     initialName: String = "",
     downloadSystem: DownloadSystem,
     scope: CoroutineScope,
-) : DownloadUiChecker<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker>(
+) : NewDownloadUiChecker<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker>(
     initialCredentials, linkCheckerFactory, initialFolder, initialName, downloadSystem, scope
 ) {
 }

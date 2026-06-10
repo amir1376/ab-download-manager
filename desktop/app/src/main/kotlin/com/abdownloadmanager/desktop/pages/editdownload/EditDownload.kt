@@ -1,16 +1,10 @@
 package com.abdownloadmanager.desktop.pages.editdownload
 
-import androidx.compose.runtime.Composable
-
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,33 +13,44 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
-import com.abdownloadmanager.shared.ui.widget.*
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
-import ir.amirab.util.ifThen
-import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditDownloadResult
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditWarnings
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadInputs
 import com.abdownloadmanager.shared.downloaderinui.edit.TAEditDownloadInputs
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.FileIconProvider
-import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.util.URLOpener
-import ir.amirab.util.compose.resources.myStringResource
+import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.screen.applyUiScale
+import ir.amirab.util.ifThen
 
 @Composable
 fun EditDownloadWindow(
@@ -78,7 +83,7 @@ fun EditDownloadPage(
     component: DesktopEditDownloadComponent,
 ) {
     WindowTitle(myStringResource(Res.string.edit_download_title))
-    component.editDownloadUiChecker.collectAsState().value?.let { editDownloadUiChecker ->
+    component.editDownloadInputsFlow.collectAsState().value?.let { editDownloadUiChecker ->
         Column(
             Modifier
                 .padding(horizontal = 32.dp)
@@ -137,7 +142,7 @@ fun EditDownloadPage(
                 ) {
                     RenderFileTypeAndSize(component.iconProvider, editDownloadUiChecker)
                     RenderResumeSupport(editDownloadUiChecker)
-                    ConfigActionsButtons(editDownloadUiChecker)
+                    ConfigActionsButtons(editDownloadUiChecker, component)
                 }
             }
             Spacer(Modifier.weight(1f))
@@ -208,7 +213,8 @@ fun BrowserImportButton(
 private fun RenderResumeSupport(
     editDownloadUiChecker: TAEditDownloadInputs,
 ) {
-    val fileInfo by editDownloadUiChecker.responseInfo.collectAsState()
+    val result by editDownloadUiChecker.responseResult.collectAsState()
+    val fileInfo = result?.getOrNull()?.takeIf { it.isSuccessFul }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.height(16.dp)
@@ -261,9 +267,13 @@ private fun MainConfigActionButton(
 @Composable
 fun ConfigActionsButtons(
     editDownloadUiChecker: TAEditDownloadInputs,
+    component: DesktopEditDownloadComponent,
 ) {
     val showMoreSettings by editDownloadUiChecker.showMoreSettings.collectAsState()
-    val requiresAuth = editDownloadUiChecker.responseInfo.collectAsState().value?.requireBasicAuth ?: false
+    val checkResult by editDownloadUiChecker.responseResult.collectAsState()
+    val lastErrorReason by component.lastErrorReason.collectAsState()
+    val responseInfo = checkResult?.getOrNull()
+
     Row {
         IconActionButton(MyIcons.refresh, Res.string.refresh.asStringSource()) {
             editDownloadUiChecker.refresh()
@@ -273,10 +283,41 @@ fun ConfigActionsButtons(
             MyIcons.settings,
             Res.string.settings.asStringSource(),
             indicateActive = showMoreSettings,
-            requiresAttention = requiresAuth
+            requiresAttention = responseInfo?.requireBasicAuth ?: false
         ) {
             editDownloadUiChecker.setShowMoreSettings(true)
         }
+        lastErrorReason?.let { lastErrorReason ->
+            Spacer(Modifier.width(6.dp))
+            DownloadErrorInfoButton(
+                onClick = component::openDownloadErrorDialog,
+                reason = lastErrorReason,
+                responseInfo = responseInfo,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DownloadErrorInfoButton(
+    onClick: () -> Unit,
+    reason: DownloadErrorReason,
+    responseInfo: IResponseInfo?,
+) {
+    val tooltipStringSource = reason.title.asStringSource()
+    Tooltip(tooltipStringSource) {
+        IconActionButton(
+            onClick = {
+                onClick()
+            },
+            contentDescription = tooltipStringSource,
+            icon = if (responseInfo?.requireBasicAuth == true) {
+                MyIcons.lock
+            } else {
+                MyIcons.question
+            },
+            contentColor = myColors.error,
+        )
     }
 }
 
@@ -397,7 +438,8 @@ private fun RenderFileTypeAndSize(
     editDownloadUiChecker: TAEditDownloadInputs,
 ) {
     val isLinkLoading by editDownloadUiChecker.isLinkLoading.collectAsState()
-    val fileInfo by editDownloadUiChecker.responseInfo.collectAsState()
+    val checkResult by editDownloadUiChecker.responseResult.collectAsState()
+    val fileInfo = checkResult?.getOrNull()
     val iconModifier = Modifier.size(16.dp)
     Box(Modifier.padding(top = 16.dp)) {
         AnimatedContent(
@@ -418,14 +460,6 @@ private fun RenderFileTypeAndSize(
                     ) {
                         WithContentAlpha(1f) {
                             if (fileInfo != null) {
-                                if (fileInfo.requiresAuth) {
-                                    MyIcon(
-                                        MyIcons.lock,
-                                        null,
-                                        iconModifier,
-                                        tint = myColors.error
-                                    )
-                                }
                                 MyIcon(
                                     icon,
                                     null,
@@ -458,15 +492,16 @@ private fun MyTextFieldIcon(
     icon: IconSource,
     onClick: (() -> Unit)? = null,
 ) {
-    MyIcon(icon, null, Modifier
-        .fillMaxHeight()
-        .ifThen(onClick != null) {
-            pointerHoverIcon(PointerIcon.Default)
-                .clickable { onClick?.invoke() }
-        }
-        .wrapContentHeight()
-        .padding(horizontal = 8.dp)
-        .size(16.dp))
+    MyIcon(
+        icon, null, Modifier
+            .fillMaxHeight()
+            .ifThen(onClick != null) {
+                pointerHoverIcon(PointerIcon.Default)
+                    .clickable { onClick.invoke() }
+            }
+            .wrapContentHeight()
+            .padding(horizontal = 8.dp)
+            .size(16.dp))
 }
 
 

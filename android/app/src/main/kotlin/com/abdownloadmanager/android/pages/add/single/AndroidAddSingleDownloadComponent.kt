@@ -3,6 +3,7 @@ package com.abdownloadmanager.android.pages.add.single
 import com.abdownloadmanager.shared.action.createNewQueueAction
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
+import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.pagemanager.NewQueuePageManager
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
@@ -14,8 +15,6 @@ import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
-import com.abdownloadmanager.shared.storage.impl.LastSavedLocationStorage
-import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -45,6 +44,7 @@ class AndroidAddSingleDownloadComponent(
     openExistingDownload: (Long) -> Unit,
     updateExistingDownloadCredentials: (Long, IDownloadCredentials, DownloadJobExtraConfig?) -> Unit,
     downloadItemOpener: DownloadItemOpener,
+    downloadErrorDialogManager: DownloadErrorDialogManager,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
     selectQueueStorage: ISelectQueueStorage,
     queueManager: QueueManager,
@@ -67,6 +67,7 @@ class AndroidAddSingleDownloadComponent(
     openExistingDownload = openExistingDownload,
     updateExistingDownloadCredentials = updateExistingDownloadCredentials,
     downloadItemOpener = downloadItemOpener,
+    downloadErrorDialogManager = downloadErrorDialogManager,
     lastSavedLocationsStorage = lastSavedLocationsStorage,
     selectQueueStorage = selectQueueStorage,
     importOptions = importOptions,

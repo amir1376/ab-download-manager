@@ -41,6 +41,12 @@
                 android:windowSoftInputMode="adjustResize"
         />
         <activity
+                android:name=".pages.downloaderror.DownloadErrorActivity"
+                android:exported="true"
+                android:theme="@style/Theme.ABDownloadManager.Transparent"
+                android:windowSoftInputMode="adjustResize"
+        />
+        <activity
                 android:name=".pages.browser.BrowserActivity"
                 android:label="@string/app_browser"
                 android:exported="true"

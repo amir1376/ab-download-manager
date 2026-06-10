@@ -235,6 +235,7 @@ fun HomePage(component: HomeComponent) {
                         modifier = Modifier
                             .weight(1f),
                         contentPadding = params.paddingValues,
+                        downloadErrorReasons = component.failedDownloads.collectAsState().value,
                     )
                 }
                 AnimatedVisibility(

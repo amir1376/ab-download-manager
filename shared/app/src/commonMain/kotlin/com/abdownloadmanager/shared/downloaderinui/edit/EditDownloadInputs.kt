@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.update
 
 typealias TAEditDownloadInputs = EditDownloadInputs<*, *, *, *, *, *>
 
+// if I make it like NewDownloadInputs it becomes more usable and simpler to use
 abstract class EditDownloadInputs<
         TDownloadItem : IDownloadItem,
         TCredentials : IDownloadCredentials,
@@ -94,7 +95,7 @@ abstract class EditDownloadInputs<
     }
 
     protected val linkChecker = linkCheckerFactory.createLinkChecker(credentials.value)
-    private val httpEditDownloadChecker = editDownloadCheckerFactory.createEditDownloadChecker(
+    private val editDownloadChecker = editDownloadCheckerFactory.createEditDownloadChecker(
         currentDownloadItem = currentDownloadItem,
         editedDownloadItem = editedDownloadItem,
         linkChecker = linkChecker,
@@ -105,11 +106,12 @@ abstract class EditDownloadInputs<
     val isLinkLoading = linkChecker.isLoading
 
     val gettingResponseInfo = linkChecker.isLoading
+    val responseResult = linkChecker.responseResult
     val responseInfo = linkChecker.responseInfo
 
 
-    val canEditDownloadResult = httpEditDownloadChecker.canEditResult
-    val canEdit = httpEditDownloadChecker.canEdit
+    val canEditDownloadResult = editDownloadChecker.canEditResult
+    val canEdit = editDownloadChecker.canEdit
 
     private val refreshResponseInfoImmediately = MutableSharedFlow<Unit>(
         replay = 1,
@@ -148,7 +150,7 @@ abstract class EditDownloadInputs<
             scheduleRecheckEditDownloadIsPossible.debounce(500),
 //            ...
         ).onEachLatest {
-            httpEditDownloadChecker.check()
+            editDownloadChecker.check()
         }.launchIn(scope)
 
         credentials.onEach { credentials ->

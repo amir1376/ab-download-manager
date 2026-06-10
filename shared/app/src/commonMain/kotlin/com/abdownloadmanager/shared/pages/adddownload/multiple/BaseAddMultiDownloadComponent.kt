@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.pages.adddownload.multiple
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,7 @@ import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.CategoryItem
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.CategorySelectionMode
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.util.perhostsettings.getSettingsForURL
 import com.arkivanov.decompose.ComponentContext
@@ -160,7 +162,7 @@ abstract class BaseAddMultiDownloadComponent(
 
     init {
         checkList.onEach {
-            it.downloadUiChecker.refresh()
+            it.newDownloadUiChecker.refresh()
         }
             .launchIn(scope)
     }
@@ -284,7 +286,7 @@ abstract class BaseAddMultiDownloadComponent(
         return totalList
             .filter { it.getUniqueId() in selectionList }
             .filter {
-                val checker = it.downloadUiChecker
+                val checker = it.newDownloadUiChecker
                 checker.canAdd.value
                         || checker.isDuplicate.value // we add numbered file strategy
             }
@@ -418,15 +420,17 @@ abstract class BaseAddMultiDownloadComponent(
         return combine(
             name,
             credentials,
-            downloadUiChecker.downloadSize,
+            newDownloadUiChecker.downloadSize,
             lengthStringFlow,
-        ) { name, credentials, downloadSize, lengthString ->
+            newDownloadUiChecker.lastErrorReason,
+        ) { name, credentials, downloadSize, lengthString, lastErrorReason ->
             NewMultiDownloadState(
                 id = id,
                 name = name,
                 size = downloadSize,
                 sizeString = lengthString,
                 link = credentials.link,
+                lastErrorReason = lastErrorReason,
             )
         }
     }
@@ -436,10 +440,12 @@ abstract class BaseAddMultiDownloadComponent(
 /**
  * this is used to represent multiple download list table
  */
+@Immutable
 data class NewMultiDownloadState(
     val id: NewDownloadInputsUniqueIdType,
     val name: String,
     val size: DownloadSize?,
     val sizeString: StringSource,
     val link: String,
+    val lastErrorReason: DownloadErrorReason?,
 )

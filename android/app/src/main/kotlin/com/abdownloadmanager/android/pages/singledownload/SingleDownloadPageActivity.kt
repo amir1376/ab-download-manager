@@ -8,13 +8,17 @@ import com.abdownloadmanager.android.ui.MainActivity
 import com.abdownloadmanager.android.util.AndroidDownloadItemOpener
 import com.abdownloadmanager.android.util.activity.ABDMActivity
 import com.abdownloadmanager.android.util.activity.HandleActivityEffects
+import com.abdownloadmanager.android.util.activity.RetainedComponentContainer
+import com.abdownloadmanager.android.util.pagemanager.AndroidDownloadErrorPageManager
 import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
+import kotlinx.serialization.json.Json
 import org.koin.core.component.inject
 
 class SingleDownloadPageActivity : ABDMActivity() {
     private val downloadSystem: DownloadSystem by inject()
+    private val json: Json by inject()
     private val downloadItemOpener: AndroidDownloadItemOpener by inject()
     private val iconProvider: FileIconProvider by inject()
     private val extraDownloadSettingsStorage: ExtraDownloadSettingsStorage<AndroidExtraDownloadItemSettings> by inject()
@@ -26,6 +30,13 @@ class SingleDownloadPageActivity : ABDMActivity() {
             val closeAddDownloadDialog = {
                 this@myRetainedComponent.finishActivityAction()
             }
+            val downloadErrorPageManager = AndroidDownloadErrorPageManager(
+                openIntent = {
+                    sendEffect(RetainedComponentContainer.Effects.StartActivity(it))
+                },
+                json = json,
+                context = applicationContext,
+            )
             AndroidSingleDownloadComponent(
                 ctx = it,
                 onDismiss = closeAddDownloadDialog,
@@ -38,6 +49,7 @@ class SingleDownloadPageActivity : ABDMActivity() {
                 fileIconProvider = iconProvider,
                 applicationScope = applicationScope,
                 comesFromExternalApplication = isComingFromOutside,
+                downloadErrorDialogManager = downloadErrorPageManager,
             )
         }
         val singleDownloadComponent = myRetainedComponent.component

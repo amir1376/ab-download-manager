@@ -1,38 +1,44 @@
 package com.abdownloadmanager.shared.pages.adddownload.single
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
+import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
+import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
-import androidx.compose.runtime.*
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
 import com.abdownloadmanager.shared.pages.adddownload.SilentImportOptions
-import com.abdownloadmanager.shared.util.mvi.ContainsEffects
-import com.abdownloadmanager.shared.util.mvi.supportEffects
-import com.abdownloadmanager.shared.util.*
-import com.abdownloadmanager.shared.util.FileIconProvider
-import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.DownloadStatus
-import ir.amirab.downloader.queue.QueueManager
-import ir.amirab.downloader.utils.OnDuplicateStrategy
-import ir.amirab.downloader.utils.orDefault
-import ir.amirab.util.flow.*
-import kotlinx.coroutines.flow.*
-import com.abdownloadmanager.shared.util.category.Category
-import com.abdownloadmanager.shared.util.category.CategoryItem
-import com.abdownloadmanager.shared.util.category.CategoryManager
-import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
-import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
+import com.abdownloadmanager.shared.util.DownloadItemOpener
+import com.abdownloadmanager.shared.util.DownloadSystem
+import com.abdownloadmanager.shared.util.FileIconProvider
+import com.abdownloadmanager.shared.util.category.Category
+import com.abdownloadmanager.shared.util.category.CategoryItem
+import com.abdownloadmanager.shared.util.category.CategoryManager
+import com.abdownloadmanager.shared.util.mvi.ContainsEffects
+import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.util.perhostsettings.getSettingsForURL
+import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
+import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import ir.amirab.downloader.queue.QueueManager
+import ir.amirab.downloader.utils.OnDuplicateStrategy
+import ir.amirab.downloader.utils.orDefault
 import ir.amirab.util.compose.StringSource
+import ir.amirab.util.flow.combineStateFlows
+import ir.amirab.util.flow.mapStateFlow
+import ir.amirab.util.flow.onEachLatest
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
 import kotlin.time.Duration.Companion.seconds
 
@@ -44,6 +50,7 @@ abstract class BaseAddSingleDownloadComponent(
     val openExistingDownload: (Long) -> Unit,
     val updateExistingDownloadCredentials: (Long, IDownloadCredentials, DownloadJobExtraConfig?) -> Unit,
     protected val downloadItemOpener: DownloadItemOpener,
+    protected val downloadErrorDialogManager: DownloadErrorDialogManager,
     protected val lastSavedLocationsStorage: ILastSavedLocationsStorage,
     protected val appScope: CoroutineScope,
     protected val appSettings: BaseAppSettingsStorage,
@@ -75,7 +82,7 @@ abstract class BaseAddSingleDownloadComponent(
         scope = scope,
         initialCredentials = initialCredentials.credentials,
     )
-    val downloadChecker = downloadInputsComponent.downloadUiChecker
+    val downloadChecker = downloadInputsComponent.newDownloadUiChecker
 
     val categories = categoryManager.categoriesFlow
     private val _selectedCategory: MutableStateFlow<Category?> = MutableStateFlow(categories.value.firstOrNull())
@@ -93,6 +100,16 @@ abstract class BaseAddSingleDownloadComponent(
         } else {
             useDefaultFolder()
         }
+    }
+
+    fun openDownloadErrorDialog() {
+        downloadChecker.lastErrorReason.value
+            ?.let { reason ->
+                downloadErrorDialogManager.openDownloadErrorDialog(
+                    downloadItem.value,
+                    reason,
+                )
+            }
     }
 
     private fun useCategoryFolder(
@@ -200,7 +217,8 @@ abstract class BaseAddSingleDownloadComponent(
     private val isDuplicate = downloadChecker.isDuplicate
 
     val isLinkLoading = downloadChecker.gettingResponseInfo
-    val linkResponseInfo = downloadChecker.responseInfo
+    val checkResponseResult = downloadChecker.responseResult
+    val lastError = downloadChecker.lastErrorReason
 
     val canAddToDownloads = combineStateFlows(
         canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading
@@ -444,6 +462,7 @@ abstract class BaseAddSingleDownloadComponent(
             }
         }
     }
+
     sealed interface Effects {
         sealed interface Common : Effects {
             data class SuggestUrl(val link: String) : Common

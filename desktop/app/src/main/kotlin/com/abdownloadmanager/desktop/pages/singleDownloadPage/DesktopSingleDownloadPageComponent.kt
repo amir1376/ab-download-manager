@@ -4,6 +4,7 @@ import arrow.optics.copy
 import com.abdownloadmanager.desktop.storage.DesktopExtraDownloadItemSettings
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.singledownloadpage.BaseSingleDownloadComponent
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
@@ -22,6 +23,7 @@ import kotlin.getValue
 class DesktopSingleDownloadComponent(
     ctx: ComponentContext,
     downloadItemOpener: DownloadItemOpener,
+    downloadErrorDialogManager: DownloadErrorDialogManager,
     onDismiss: () -> Unit,
     downloadId: Long,
     extraDownloadSettingsStorage: ExtraDownloadSettingsStorage<DesktopExtraDownloadItemSettings>,
@@ -33,6 +35,7 @@ class DesktopSingleDownloadComponent(
 ) : BaseSingleDownloadComponent<DesktopExtraDownloadItemSettings>(
     ctx = ctx,
     downloadItemOpener = downloadItemOpener,
+    downloadErrorDialogManager = downloadErrorDialogManager,
     onDismiss = onDismiss,
     downloadId = downloadId,
     extraDownloadSettingsStorage = extraDownloadSettingsStorage,

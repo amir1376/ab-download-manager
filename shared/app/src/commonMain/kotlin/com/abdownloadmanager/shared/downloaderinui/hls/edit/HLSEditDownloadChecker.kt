@@ -7,7 +7,7 @@ import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import com.abdownloadmanager.shared.downloaderinui.hls.HLSLinkChecker
 import ir.amirab.downloader.downloaditem.hls.HLSResponseInfo
-import com.abdownloadmanager.shared.downloaderinui.http.edit.EditDownloadChecker
+import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadChecker
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadItem
 import ir.amirab.util.FileNameValidator
 import ir.amirab.util.HttpUrlUtils

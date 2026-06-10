@@ -70,6 +70,7 @@ abstract class BaseHomeComponent(
     ContainsEffects<BaseHomeComponent.Effects> by supportEffects() {
     protected abstract val enterNewURLDialogManager: EnterNewURLDialogManager
     val filterState = FilterState()
+    val failedDownloads = downloadSystem.downloadErrorsFlow
 
     protected fun requestDelete(
         downloadList: List<Long>,

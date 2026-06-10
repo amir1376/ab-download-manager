@@ -2,7 +2,6 @@ package com.abdownloadmanager.shared.downloaderinui.edit
 
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
-import com.abdownloadmanager.shared.downloaderinui.http.edit.EditDownloadChecker
 import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem

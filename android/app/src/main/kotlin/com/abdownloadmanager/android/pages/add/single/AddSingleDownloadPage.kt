@@ -1,55 +1,43 @@
 package com.abdownloadmanager.android.pages.add.single
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+
+import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import arrow.core.Some
-import com.abdownloadmanager.android.pages.add.shared.CategoryAddButton
-import com.abdownloadmanager.android.pages.add.shared.CategorySelect
-import com.abdownloadmanager.android.pages.add.shared.ExtraConfig
-import com.abdownloadmanager.android.pages.add.shared.LocationTextField
-import com.abdownloadmanager.android.pages.add.shared.ShowAddToQueueDialog
+import com.abdownloadmanager.android.pages.add.shared.*
 import com.abdownloadmanager.android.ui.SheetHeader
 import com.abdownloadmanager.android.ui.SheetTitle
 import com.abdownloadmanager.android.ui.SheetTitleWithDescription
 import com.abdownloadmanager.android.ui.SheetUI
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.ui.widget.ActionButton
-import com.abdownloadmanager.shared.ui.widget.IconActionButton
-import com.abdownloadmanager.shared.ui.widget.MyTextFieldWithIcons
-import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.util.ResponsiveDialog
-import com.abdownloadmanager.shared.util.mvi.HandleEffects
-import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.util.compose.resources.myStringResource
-
-
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import androidx.compose.animation.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.*
-import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
-import com.abdownloadmanager.shared.util.ClipboardUtil
-import com.abdownloadmanager.shared.util.OnFullyDismissed
-import com.abdownloadmanager.shared.util.ResponsiveDialogScope
-import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.ui.widget.*
+import com.abdownloadmanager.shared.util.*
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun ResponsiveDialogScope.AddSingleDownloadPage(
@@ -367,7 +355,8 @@ fun RenderResumeSupport(
     component: AndroidAddSingleDownloadComponent,
     modifier: Modifier,
 ) {
-    val fileInfo by component.linkResponseInfo.collectAsState()
+    val checkResult by component.checkResponseResult.collectAsState()
+    val fileInfo = checkResult?.getOrNull()?.takeIf { it.isSuccessFul }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -414,7 +403,9 @@ fun RenderResumeSupport(
 
 @Composable
 fun ConfigActionsButtons(component: AndroidAddSingleDownloadComponent) {
-    val responseInfo by component.linkResponseInfo.collectAsState()
+    val responseResult by component.checkResponseResult.collectAsState()
+    val downloadErrorReason by component.lastError.collectAsState()
+    val responseInfo = responseResult?.getOrNull()
     Row {
         IconActionButton(MyIcons.refresh, Res.string.refresh.asStringSource()) {
             component.refresh()
@@ -439,6 +430,14 @@ fun ConfigActionsButtons(component: AndroidAddSingleDownloadComponent) {
             requiresAttention = responseInfo?.requireBasicAuth ?: false
         ) {
             component.showMoreSettings = true
+        }
+        Spacer(Modifier.width(6.dp))
+        downloadErrorReason?.let { downloadErrorReason ->
+            DownloadErrorInfoButton(
+                onClick = component::openDownloadErrorDialog,
+                responseInfo = responseInfo,
+                downloadErrorReason = downloadErrorReason,
+            )
         }
     }
 }
@@ -524,7 +523,7 @@ fun RenderFileTypeAndSize(
     component: AndroidAddSingleDownloadComponent,
 ) {
     val isLinkLoading by component.isLinkLoading.collectAsState()
-    val fileInfo by component.linkResponseInfo.collectAsState()
+    val linkCheckResult by component.checkResponseResult.collectAsState()
     val fileIconProvider = component.iconProvider
     val iconModifier = Modifier.size(mySpacings.iconSize)
     Box(
@@ -543,44 +542,63 @@ fun RenderFileTypeAndSize(
                 val downloadItem by component.downloadItem.collectAsState()
                 val icon = fileIconProvider.rememberIcon(downloadItem.name)
                 AnimatedContent(
-                    fileInfo,
-                ) { fileInfo ->
+                    linkCheckResult,
+                ) { linkCheckResult ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         WithContentAlpha(1f) {
-                            if (fileInfo != null) {
-                                if (fileInfo.requiresAuth) {
+                            when (linkCheckResult) {
+                                null -> {
                                     MyIcon(
-                                        MyIcons.lock,
-                                        null,
-                                        iconModifier,
-                                        tint = myColors.error
+                                        icon = MyIcons.question,
+                                        contentDescription = null,
+                                        modifier = iconModifier,
                                     )
                                 }
-                                MyIcon(
-                                    icon,
-                                    null,
-                                    iconModifier
-                                )
-                                val size = component.getLengthString()
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    size.rememberString(),
-                                    fontSize = myTextSizes.sm,
-                                )
-                            } else {
-                                MyIcon(
-                                    icon = MyIcons.question,
-                                    contentDescription = null,
-                                    modifier = iconModifier,
-                                )
+
+                                else -> {
+                                    MyIcon(
+                                        icon,
+                                        null,
+                                        iconModifier
+                                    )
+                                    val size = component.getLengthString()
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        size.rememberString(),
+                                        fontSize = myTextSizes.sm,
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DownloadErrorInfoButton(
+    onClick: () -> Unit,
+    downloadErrorReason: DownloadErrorReason,
+    responseInfo: IResponseInfo?,
+) {
+    val description = downloadErrorReason.title.asStringSource()
+    Tooltip(description) {
+        IconActionButton(
+            onClick = {
+                onClick()
+            },
+            contentDescription = description,
+            icon = if (responseInfo?.requireBasicAuth == true) {
+                MyIcons.lock
+            } else {
+                MyIcons.question
+            },
+            contentColor = myColors.error,
+        )
     }
 }
 

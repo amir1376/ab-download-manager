@@ -2,6 +2,7 @@ package com.abdownloadmanager.shared.downloaderinui
 
 import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadInputs
 import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadInputsFactory
+import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadUiChecker
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadCheckerFactory
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadInputs
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadInputsFactory
@@ -47,7 +48,7 @@ abstract class DownloaderInUi<
         initialName: String,
         downloadSystem: DownloadSystem,
         scope: CoroutineScope,
-    ): DownloadUiChecker<TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>
+    ): NewDownloadUiChecker<TCredentials, TResponseInfo, TDownloadSize, TLinkChecker>
 
 
     abstract fun acceptDownloadCredentials(item: IDownloadCredentials): Boolean

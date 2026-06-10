@@ -31,14 +31,17 @@ import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownlo
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
@@ -358,7 +361,8 @@ private fun Divider() {
 
 @Composable
 fun RenderResumeSupport(component: BaseAddSingleDownloadComponent) {
-    val fileInfo by component.linkResponseInfo.collectAsState()
+    val responseResult by component.checkResponseResult.collectAsState()
+    val fileInfo = responseResult?.getOrNull()?.takeIf { it.isSuccessFul }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.height(16.dp)
@@ -373,25 +377,23 @@ fun RenderResumeSupport(component: BaseAddSingleDownloadComponent) {
             visible = canAddToDownloads && fileInfo != null,
         ) {
             fileInfo?.let { fileInfo ->
+                val iconModifier = Modifier
+                    .padding(horizontal = 2.dp)
+                    .size(10.dp)
                 if (fileInfo.resumeSupport) {
-                    val iconModifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .size(10.dp)
-                    if (fileInfo.resumeSupport) {
-                        MyIcon(
-                            icon = MyIcons.check,
-                            contentDescription = null,
-                            modifier = iconModifier,
-                            tint = myColors.success
-                        )
-                    } else {
-                        MyIcon(
-                            icon = MyIcons.clear,
-                            contentDescription = null,
-                            modifier = iconModifier,
-                            tint = myColors.error,
-                        )
-                    }
+                    MyIcon(
+                        icon = MyIcons.check,
+                        contentDescription = null,
+                        modifier = iconModifier,
+                        tint = myColors.success
+                    )
+                } else {
+                    MyIcon(
+                        icon = MyIcons.clear,
+                        contentDescription = null,
+                        modifier = iconModifier,
+                        tint = myColors.error,
+                    )
                 }
             }
         }
@@ -404,7 +406,7 @@ fun RenderResumeSupport(component: BaseAddSingleDownloadComponent) {
 
 @Composable
 fun ConfigActionsButtons(component: BaseAddSingleDownloadComponent) {
-    val responseInfo by component.linkResponseInfo.collectAsState()
+    val responseResult by component.checkResponseResult.collectAsState()
     Row {
         IconActionButton(MyIcons.refresh, Res.string.refresh.asStringSource()) {
             component.refresh()
@@ -414,9 +416,17 @@ fun ConfigActionsButtons(component: BaseAddSingleDownloadComponent) {
             MyIcons.settings,
             Res.string.settings.asStringSource(),
             indicateActive = component.showMoreSettings,
-            requiresAttention = responseInfo?.requireBasicAuth ?: false
+            requiresAttention = responseResult?.getOrNull()?.requireBasicAuth ?: false
         ) {
             component.showMoreSettings = true
+        }
+        Spacer(Modifier.width(6.dp))
+        component.lastError.collectAsState().value?.let { downloadErrorReason ->
+            DownloadErrorInfoButton(
+                onClick = component::openDownloadErrorDialog,
+                responseInfo = responseResult?.getOrNull(),
+                reason = downloadErrorReason,
+            )
         }
     }
 }
@@ -491,9 +501,9 @@ fun RenderFileTypeAndSize(
     component: BaseAddSingleDownloadComponent,
 ) {
     val isLinkLoading by component.isLinkLoading.collectAsState()
-    val fileInfo by component.linkResponseInfo.collectAsState()
+    val linkCheckResult by component.checkResponseResult.collectAsState()
     val fileIconProvider = component.iconProvider
-    val iconModifier = Modifier.size(16.dp)
+    val iconModifier = Modifier.size(mySpacings.iconSize)
     Box(Modifier.padding(top = 16.dp)) {
         AnimatedContent(
             targetState = isLinkLoading,
@@ -511,38 +521,34 @@ fun RenderFileTypeAndSize(
 //                val bitmap = FileIconProvider.getIconOfFileExtension(extension)
 
                 AnimatedContent(
-                    fileInfo,
-                ) { fileInfo ->
+                    linkCheckResult,
+                ) { linkCheckResult ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         WithContentAlpha(1f) {
-                            if (fileInfo != null) {
-                                if (fileInfo.requiresAuth) {
+                            when (linkCheckResult) {
+                                null -> {
                                     MyIcon(
-                                        MyIcons.lock,
-                                        null,
-                                        iconModifier,
-                                        tint = myColors.error
+                                        icon = MyIcons.question,
+                                        contentDescription = null,
+                                        modifier = iconModifier,
                                     )
                                 }
-                                MyIcon(
-                                    icon,
-                                    null,
-                                    iconModifier
-                                )
-                                val size = component.getLengthString()
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    size.rememberString(),
-                                    fontSize = myTextSizes.sm,
-                                )
-                            } else {
-                                MyIcon(
-                                    icon = MyIcons.question,
-                                    contentDescription = null,
-                                    modifier = iconModifier,
-                                )
+
+                                else -> {
+                                    MyIcon(
+                                        icon,
+                                        null,
+                                        iconModifier
+                                    )
+                                    val size = component.getLengthString()
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        size.rememberString(),
+                                        fontSize = myTextSizes.sm,
+                                    )
+                                }
                             }
                         }
                     }
@@ -558,6 +564,29 @@ fun getExtension(s: String): String? {
         .takeIf { it.isNotBlank() }
 }
 
+
+@Composable
+private fun DownloadErrorInfoButton(
+    onClick: () -> Unit,
+    reason: DownloadErrorReason,
+    responseInfo: IResponseInfo?,
+) {
+    val tooltipStringSource = reason.title.asStringSource()
+    Tooltip(tooltipStringSource) {
+        IconActionButton(
+            onClick = {
+                onClick()
+            },
+            contentDescription = tooltipStringSource,
+            icon = if (responseInfo?.requireBasicAuth == true) {
+                MyIcons.lock
+            } else {
+                MyIcons.question
+            },
+            contentColor = myColors.error,
+        )
+    }
+}
 
 @Composable
 private fun UrlTextField(

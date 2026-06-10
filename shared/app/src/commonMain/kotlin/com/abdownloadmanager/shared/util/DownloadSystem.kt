@@ -5,6 +5,10 @@ import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.util.category.CategoryItemWithId
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.CategorySelectionMode
+import com.abdownloadmanager.shared.util.downloaderror.IDownloadErrorMapperRegistry
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.IFailedDownloadErrorStorage
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionRunner
 import com.abdownloadmanager.shared.util.onqueuecompletion.OnQueueEventActionRunner
 import ir.amirab.downloader.DownloadManager
@@ -22,6 +26,7 @@ import ir.amirab.downloader.monitor.isDownloadActiveFlow
 import ir.amirab.downloader.queue.ManualDownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
+import ir.amirab.util.suspendGuardedEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -40,26 +45,30 @@ class DownloadSystem(
     val downloadMonitor: IDownloadMonitor,
     val onDownloadCompletionActionRunner: OnDownloadCompletionActionRunner,
     val onQueueEventActionRunner: OnQueueEventActionRunner,
+    val errorMapperRegistry: IDownloadErrorMapperRegistry,
+    private val failedDownloads: FailedDownloads,
     private val scope: CoroutineScope,
     private val downloadListDB: IDownloadListDb,
     private val extraQueueSettingsStorage: IExtraQueueSettingsStorage<*>,
     private val extraDownloadSettingsStorage: IExtraDownloadSettingsStorage<*>,
+    private val failedDownloadErrorStorage: IFailedDownloadErrorStorage,
     private val foldersRegistry: DownloadFoldersRegistry,
 ) {
-    private val booted = MutableStateFlow(false)
+    private val booted = suspendGuardedEntry()
 
     val downloadEvents = downloadManager.listOfJobsEvents
 
     suspend fun boot() {
-        if (booted.value) return
-        foldersRegistry.boot()
-        queueManager.boot()
-        downloadManager.boot()
-        categoryManager.boot()
-        manualDownloadQueue.boot()
-        onDownloadCompletionActionRunner.startListening()
-        onQueueEventActionRunner.startListening()
-        booted.update { true }
+        booted.action {
+            foldersRegistry.boot()
+            queueManager.boot()
+            downloadManager.boot()
+            categoryManager.boot()
+            manualDownloadQueue.boot()
+            failedDownloads.boot()
+            onDownloadCompletionActionRunner.startListening()
+            onQueueEventActionRunner.startListening()
+        }
     }
 
     suspend fun addDownload(
@@ -321,4 +330,6 @@ class DownloadSystem(
         queueManager.deleteQueue(queueId)
         extraQueueSettingsStorage.deleteExtraQueueSettings(queueId)
     }
+
+    val downloadErrorsFlow = failedDownloadErrorStorage.reasons
 }
