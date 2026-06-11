@@ -3,12 +3,9 @@ package com.abdownloadmanager.desktop.pages.settings
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.ui.configurable.platform.item.FontConfigurable
-import com.abdownloadmanager.desktop.utils.NotificationSoundEvent
-import com.abdownloadmanager.desktop.utils.NotificationSoundPlayer
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.ui.configurable.item.SoundFileConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
@@ -106,39 +103,4 @@ object DesktopSettings {
         )
     }
 
-    fun downloadCompletedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
-        return SoundFileConfigurable(
-            title = Res.string.settings_download_completed_sound.asStringSource(),
-            description = Res.string.settings_notification_sound_file_description.asStringSource(),
-            backedBy = appSettings.downloadCompletedSoundPath,
-            onPreview = { NotificationSoundPlayer().preview(NotificationSoundEvent.DownloadCompleted) },
-        )
-    }
-
-    fun downloadErrorSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
-        return SoundFileConfigurable(
-            title = Res.string.settings_download_error_sound.asStringSource(),
-            description = Res.string.settings_notification_sound_file_description.asStringSource(),
-            backedBy = appSettings.downloadErrorSoundPath,
-            onPreview = { NotificationSoundPlayer().preview(NotificationSoundEvent.DownloadError) },
-        )
-    }
-
-    fun queueStartedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
-        return SoundFileConfigurable(
-            title = Res.string.settings_queue_started_sound.asStringSource(),
-            description = Res.string.settings_notification_sound_file_description.asStringSource(),
-            backedBy = appSettings.queueStartedSoundPath,
-            onPreview = { NotificationSoundPlayer().preview(NotificationSoundEvent.QueueStarted) },
-        )
-    }
-
-    fun queueEndedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
-        return SoundFileConfigurable(
-            title = Res.string.settings_queue_ended_sound.asStringSource(),
-            description = Res.string.settings_notification_sound_file_description.asStringSource(),
-            backedBy = appSettings.queueEndedSoundPath,
-            onPreview = { NotificationSoundPlayer().preview(NotificationSoundEvent.QueueEnded) },
-        )
-    }
 }

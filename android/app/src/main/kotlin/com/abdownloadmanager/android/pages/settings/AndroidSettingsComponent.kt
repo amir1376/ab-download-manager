@@ -61,10 +61,10 @@ class AndroidSettingsComponent(
             ),
             ConfigurableGroup(
                 nestedConfigurable = listOf(
-                    AndroidSettings.downloadCompletedSound(appSettings),
-                    AndroidSettings.downloadErrorSound(appSettings),
-                    AndroidSettings.queueStartedSound(appSettings),
-                    AndroidSettings.queueEndedSound(appSettings),
+                    CommonSettings.downloadCompletedSound(appSettings),
+                    CommonSettings.downloadErrorSound(appSettings),
+                    CommonSettings.queueStartedSound(appSettings),
+                    CommonSettings.queueEndedSound(appSettings),
                 )
             ),
             ConfigurableGroup(

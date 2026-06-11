@@ -7,44 +7,11 @@ import com.abdownloadmanager.android.util.pagemanager.PermissionsPageManager
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.SoundFileConfigurable
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
 object AndroidSettings {
-    fun downloadCompletedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
-        return SoundFileConfigurable(
-            title = Res.string.settings_download_completed_sound.asStringSource(),
-            description = Res.string.settings_notification_sound_file_description.asStringSource(),
-            backedBy = appSettings.downloadCompletedSoundPath,
-        )
-    }
-
-    fun downloadErrorSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
-        return SoundFileConfigurable(
-            title = Res.string.settings_download_error_sound.asStringSource(),
-            description = Res.string.settings_notification_sound_file_description.asStringSource(),
-            backedBy = appSettings.downloadErrorSoundPath,
-        )
-    }
-
-    fun queueStartedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
-        return SoundFileConfigurable(
-            title = Res.string.settings_queue_started_sound.asStringSource(),
-            description = Res.string.settings_notification_sound_file_description.asStringSource(),
-            backedBy = appSettings.queueStartedSoundPath,
-        )
-    }
-
-    fun queueEndedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
-        return SoundFileConfigurable(
-            title = Res.string.settings_queue_ended_sound.asStringSource(),
-            description = Res.string.settings_notification_sound_file_description.asStringSource(),
-            backedBy = appSettings.queueEndedSoundPath,
-        )
-    }
-
     fun permissionSettings(
         permissionsPageManager: PermissionsPageManager
     ): NavigatableConfigurable {

@@ -8,6 +8,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
+import com.abdownloadmanager.desktop.utils.NotificationSoundEvent
+import com.abdownloadmanager.desktop.utils.NotificationSoundPlayer
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
@@ -89,10 +91,18 @@ class DesktopSettingsComponent(
                     ),
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
-                            DesktopSettings.downloadCompletedSound(appSettings),
-                            DesktopSettings.downloadErrorSound(appSettings),
-                            DesktopSettings.queueStartedSound(appSettings),
-                            DesktopSettings.queueEndedSound(appSettings),
+                            CommonSettings.downloadCompletedSound(appSettings) {
+                                NotificationSoundPlayer().preview(NotificationSoundEvent.DownloadCompleted)
+                            },
+                            CommonSettings.downloadErrorSound(appSettings) {
+                                NotificationSoundPlayer().preview(NotificationSoundEvent.DownloadError)
+                            },
+                            CommonSettings.queueStartedSound(appSettings) {
+                                NotificationSoundPlayer().preview(NotificationSoundEvent.QueueStarted)
+                            },
+                            CommonSettings.queueEndedSound(appSettings) {
+                                NotificationSoundPlayer().preview(NotificationSoundEvent.QueueEnded)
+                            },
                         )
                     ),
                     ConfigurableGroup(

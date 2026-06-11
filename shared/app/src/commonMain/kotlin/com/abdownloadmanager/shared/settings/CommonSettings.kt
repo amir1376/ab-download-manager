@@ -10,6 +10,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.FolderConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SoundFileConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
@@ -587,6 +588,54 @@ object CommonSettings {
                     Res.string.disabled.asStringSource()
                 }
             }
+        )
+    }
+
+    fun downloadCompletedSound(
+        appSettings: BaseAppSettingsStorage,
+        onPreview: (() -> Unit)? = null,
+    ): SoundFileConfigurable {
+        return SoundFileConfigurable(
+            title = Res.string.settings_download_completed_sound.asStringSource(),
+            description = Res.string.settings_notification_sound_file_description.asStringSource(),
+            backedBy = appSettings.downloadCompletedSoundPath,
+            onPreview = onPreview,
+        )
+    }
+
+    fun downloadErrorSound(
+        appSettings: BaseAppSettingsStorage,
+        onPreview: (() -> Unit)? = null,
+    ): SoundFileConfigurable {
+        return SoundFileConfigurable(
+            title = Res.string.settings_download_error_sound.asStringSource(),
+            description = Res.string.settings_notification_sound_file_description.asStringSource(),
+            backedBy = appSettings.downloadErrorSoundPath,
+            onPreview = onPreview,
+        )
+    }
+
+    fun queueStartedSound(
+        appSettings: BaseAppSettingsStorage,
+        onPreview: (() -> Unit)? = null,
+    ): SoundFileConfigurable {
+        return SoundFileConfigurable(
+            title = Res.string.settings_queue_started_sound.asStringSource(),
+            description = Res.string.settings_notification_sound_file_description.asStringSource(),
+            backedBy = appSettings.queueStartedSoundPath,
+            onPreview = onPreview,
+        )
+    }
+
+    fun queueEndedSound(
+        appSettings: BaseAppSettingsStorage,
+        onPreview: (() -> Unit)? = null,
+    ): SoundFileConfigurable {
+        return SoundFileConfigurable(
+            title = Res.string.settings_queue_ended_sound.asStringSource(),
+            description = Res.string.settings_notification_sound_file_description.asStringSource(),
+            backedBy = appSettings.queueEndedSoundPath,
+            onPreview = onPreview,
         )
     }
 
