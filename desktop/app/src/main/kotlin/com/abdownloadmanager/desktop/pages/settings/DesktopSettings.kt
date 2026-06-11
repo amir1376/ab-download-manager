@@ -8,7 +8,7 @@ import com.abdownloadmanager.desktop.utils.NotificationSoundPlayer
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.ui.configurable.item.FileConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SoundFileConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
@@ -118,8 +118,8 @@ object DesktopSettings {
         )
     }
 
-    fun downloadCompletedSound(appSettings: AppSettingsStorage): FileConfigurable {
-        return FileConfigurable(
+    fun downloadCompletedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
+        return SoundFileConfigurable(
             title = Res.string.settings_download_completed_sound.asStringSource(),
             description = Res.string.settings_notification_sound_file_description.asStringSource(),
             backedBy = appSettings.downloadCompletedSoundPath,
@@ -129,8 +129,8 @@ object DesktopSettings {
         )
     }
 
-    fun downloadErrorSound(appSettings: AppSettingsStorage): FileConfigurable {
-        return FileConfigurable(
+    fun downloadErrorSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
+        return SoundFileConfigurable(
             title = Res.string.settings_download_error_sound.asStringSource(),
             description = Res.string.settings_notification_sound_file_description.asStringSource(),
             backedBy = appSettings.downloadErrorSoundPath,
@@ -140,8 +140,8 @@ object DesktopSettings {
         )
     }
 
-    fun queueStartedSound(appSettings: AppSettingsStorage): FileConfigurable {
-        return FileConfigurable(
+    fun queueStartedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
+        return SoundFileConfigurable(
             title = Res.string.settings_queue_started_sound.asStringSource(),
             description = Res.string.settings_notification_sound_file_description.asStringSource(),
             backedBy = appSettings.queueStartedSoundPath,
@@ -151,8 +151,8 @@ object DesktopSettings {
         )
     }
 
-    fun queueEndedSound(appSettings: AppSettingsStorage): FileConfigurable {
-        return FileConfigurable(
+    fun queueEndedSound(appSettings: AppSettingsStorage): SoundFileConfigurable {
+        return SoundFileConfigurable(
             title = Res.string.settings_queue_ended_sound.asStringSource(),
             description = Res.string.settings_notification_sound_file_description.asStringSource(),
             backedBy = appSettings.queueEndedSoundPath,
