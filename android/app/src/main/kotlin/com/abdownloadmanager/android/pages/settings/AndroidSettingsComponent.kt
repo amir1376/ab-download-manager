@@ -61,6 +61,14 @@ class AndroidSettingsComponent(
             ),
             ConfigurableGroup(
                 nestedConfigurable = listOf(
+                    AndroidSettings.downloadCompletedSound(appSettings),
+                    AndroidSettings.downloadErrorSound(appSettings),
+                    AndroidSettings.queueStartedSound(appSettings),
+                    AndroidSettings.queueEndedSound(appSettings),
+                )
+            ),
+            ConfigurableGroup(
+                nestedConfigurable = listOf(
                     CommonSettings.autoStartConfig(appSettings),
 //                            DesktopSettings.useSystemTray(appSettings),
                 )

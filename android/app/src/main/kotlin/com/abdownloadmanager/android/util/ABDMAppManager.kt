@@ -106,6 +106,14 @@ class ABDMAppManager(
         shouldShowToastsNotifications.value = !shownInUi
     }
 
+    private fun getSoundPathForNotificationType(type: NotificationType): String {
+        return when (type) {
+            NotificationType.Success -> appSettingsStorage.downloadCompletedSoundPath.value
+            NotificationType.Error -> appSettingsStorage.downloadErrorSoundPath.value
+            else -> ""
+        }
+    }
+
     private fun registerAsFallbackNotification(): () -> Unit {
         val context = context
         var lastNotificationSound = 0L
@@ -141,7 +149,10 @@ class ABDMAppManager(
                                 // don't repeatedly play notification!
                                 if (sinceLastSoundMillis > 5_000) {
                                     runCatching {
-                                        playNotificationSoundIfAllowed(context)
+                                        playNotificationSoundIfAllowed(
+                                            context,
+                                            customSoundPath = getSoundPathForNotificationType(notification.notificationType),
+                                        )
                                         lastNotificationSound = now
                                     }.onFailure {
                                         it.printStackTrace()
