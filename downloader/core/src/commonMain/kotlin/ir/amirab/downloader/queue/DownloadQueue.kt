@@ -48,8 +48,6 @@ class DownloadQueue(
     private val _queueActiveFlow = MutableStateFlow(false)
     val activeFlow = _queueActiveFlow.asStateFlow()
     val isQueueActive: Boolean get() = activeFlow.value
-    private var endingByEmpty = false
-
     fun onEvent(event: QueueEvent) {
         this.onQueueEvent(event)
     }
@@ -110,7 +108,6 @@ class DownloadQueue(
         trimmedItems.clear()
         ensureBooted()
         setActive(true)
-        endingByEmpty = false
         onEvent(QueueEvent.OnQueueStarted(id))
 //        println("starting")
         shake(
@@ -144,7 +141,6 @@ class DownloadQueue(
             !isQueueActive -> false
             activeItems.isEmpty() && (getDownloadableItemFromQueue() == null) -> {
                 if (stopQueueOnEmpty) {
-                    endingByEmpty = true
                     stop()
                 }
                 if (itemChangeHappened) {
@@ -283,10 +279,9 @@ class DownloadQueue(
 //            it.printStackTrace()
         }
         stopping = false
-        if (wasActive && !endingByEmpty) {
+        if (wasActive) {
             onEvent(QueueEvent.OnQueueStopped(id))
         }
-        endingByEmpty = false
     }
 
 
