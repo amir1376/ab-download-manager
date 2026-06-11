@@ -23,7 +23,13 @@ fun playNotificationSoundIfAllowed(
     // Try custom path first if provided
     if (customSoundPath.isNotBlank()) {
         runCatching {
-            val customUri = Uri.fromFile(File(customSoundPath))
+            val customUri = if (customSoundPath.startsWith("content://", ignoreCase = true)
+                || customSoundPath.startsWith("android.resource://", ignoreCase = true)
+            ) {
+                Uri.parse(customSoundPath)
+            } else {
+                Uri.fromFile(File(customSoundPath))
+            }
             val ringtone = RingtoneManager.getRingtone(context, customUri)
             if (ringtone != null) {
                 ringtone.audioAttributes = AudioAttributes.Builder()
