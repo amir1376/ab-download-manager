@@ -1,22 +1,19 @@
 package com.abdownloadmanager.desktop.utils
 
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
-import com.abdownloadmanager.resources.ResourceUtil
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.ByteArrayInputStream
+import java.awt.Toolkit
 import java.io.File
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.LineEvent
 
-enum class NotificationSoundEvent(
-    val bundledResourcePath: String,
-) {
-    DownloadCompleted("com/abdownloadmanager/resources/sounds/download-completed.wav"),
-    DownloadError("com/abdownloadmanager/resources/sounds/download-error.wav"),
-    QueueStarted("com/abdownloadmanager/resources/sounds/queue-started.wav"),
-    QueueEnded("com/abdownloadmanager/resources/sounds/queue-ended.wav"),
+enum class NotificationSoundEvent {
+    DownloadCompleted,
+    DownloadError,
+    QueueStarted,
+    QueueEnded,
 }
 
 class NotificationSoundPlayer : KoinComponent {
@@ -38,7 +35,7 @@ class NotificationSoundPlayer : KoinComponent {
         if (!customPath.isNullOrBlank() && playFile(customPath)) {
             return
         }
-        playBundled(event)
+        playSystemDefault()
     }
 
     private fun customPathFor(event: NotificationSoundEvent): String {
@@ -62,15 +59,10 @@ class NotificationSoundPlayer : KoinComponent {
         }.getOrDefault(false)
     }
 
-    private fun playBundled(event: NotificationSoundEvent): Boolean {
-        return runCatching {
-            val bytes = ResourceUtil.readResourceAsByteArray(event.bundledResourcePath)
-            ByteArrayInputStream(bytes).use { byteStream ->
-                AudioSystem.getAudioInputStream(byteStream).use { inputStream ->
-                    playInputStream(inputStream)
-                }
-            }
-        }.getOrDefault(false)
+    private fun playSystemDefault() {
+        runCatching {
+            Toolkit.getDefaultToolkit().beep()
+        }
     }
 
     private fun playInputStream(inputStream: AudioInputStream): Boolean {

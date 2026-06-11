@@ -76,7 +76,5 @@ class NotificationSoundOnQueueEvent(
 
     override suspend fun onQueueEndTimeReached(queueId: Long) = Unit
 
-    override suspend fun onQueueStopped(queueId: Long) {
-        notificationSoundPlayer.play(NotificationSoundEvent.QueueEnded)
-    }
+    override suspend fun onQueueStopped(queueId: Long) = Unit
 }
