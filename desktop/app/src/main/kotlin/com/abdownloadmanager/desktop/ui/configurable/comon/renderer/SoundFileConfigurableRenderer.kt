@@ -20,7 +20,7 @@ import com.abdownloadmanager.desktop.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.desktop.ui.util.rememberMyFilePickerLauncher
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRenderer
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
-import com.abdownloadmanager.shared.ui.configurable.item.FileConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SoundFileConfigurable
 import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
@@ -28,14 +28,14 @@ import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.compose.asStringSource
 import java.io.File
 
-object FileConfigurableRenderer : ConfigurableRenderer<FileConfigurable> {
+object SoundFileConfigurableRenderer : ConfigurableRenderer<SoundFileConfigurable> {
     @Composable
-    override fun RenderConfigurable(configurable: FileConfigurable, configurableUiProps: ConfigurableUiProps) {
-        RenderFileConfig(configurable, configurableUiProps)
+    override fun RenderConfigurable(configurable: SoundFileConfigurable, configurableUiProps: ConfigurableUiProps) {
+        RenderSoundFileConfig(configurable, configurableUiProps)
     }
 
     @Composable
-    private fun RenderFileConfig(cfg: FileConfigurable, configurableUiProps: ConfigurableUiProps) {
+    private fun RenderSoundFileConfig(cfg: SoundFileConfigurable, configurableUiProps: ConfigurableUiProps) {
         val value by cfg.stateFlow.collectAsState()
         val setValue = cfg::set
 
