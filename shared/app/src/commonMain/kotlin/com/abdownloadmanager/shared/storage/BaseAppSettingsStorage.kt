@@ -26,6 +26,10 @@ interface IAppSettingsModel {
     val speedLimit: Long
     val autoStartOnBoot: Boolean
     val notificationSound: Boolean
+    val downloadCompletedSoundPath: String
+    val downloadErrorSoundPath: String
+    val queueStartedSoundPath: String
+    val queueEndedSoundPath: String
     val defaultDownloadFolder: String
     val browserIntegrationEnabled: Boolean
     val browserIntegrationPort: Int
@@ -63,6 +67,10 @@ interface BaseAppSettingsStorage :
     val speedLimit: MutableStateFlow<Long>
     val autoStartOnBoot: MutableStateFlow<Boolean>
     val notificationSound: MutableStateFlow<Boolean>
+    val downloadCompletedSoundPath: MutableStateFlow<String>
+    val downloadErrorSoundPath: MutableStateFlow<String>
+    val queueStartedSoundPath: MutableStateFlow<String>
+    val queueEndedSoundPath: MutableStateFlow<String>
     val defaultDownloadFolder: MutableStateFlow<String>
     val browserIntegrationEnabled: MutableStateFlow<Boolean>
     val browserIntegrationPort: MutableStateFlow<Int>
