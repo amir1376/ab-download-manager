@@ -10,6 +10,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.FolderConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SoundConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
@@ -17,6 +18,7 @@ import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.MaximumDownloadRetriesLimitation
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
+import com.abdownloadmanager.shared.util.notification.INotificationSound
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
 import com.abdownloadmanager.shared.util.ui.theme.DEFAULT_UI_SCALE
@@ -587,6 +589,50 @@ object CommonSettings {
                     Res.string.disabled.asStringSource()
                 }
             }
+        )
+    }
+    fun generalNotificationSound(appSettings: BaseAppSettingsStorage): SoundConfigurable {
+        return SoundConfigurable(
+            title = Res.string.settings_notification_sound_general.asStringSource(),
+            description = Res.string.settings_notification_sound_general_description.asStringSource(),
+            backedBy = appSettings.generalNotificationSound,
+            describe = {
+                if (it == INotificationSound.DEFAULT_VALUE) {
+                    Res.string.default.asStringSource()
+                } else {
+                    it.asStringSource()
+                }
+            },
+        )
+    }
+
+    fun errorNotificationSound(appSettings: BaseAppSettingsStorage): SoundConfigurable {
+        return SoundConfigurable(
+            title = Res.string.settings_notification_sound_error.asStringSource(),
+            description = Res.string.settings_notification_sound_error_description.asStringSource(),
+            backedBy = appSettings.errorNotificationSound,
+            describe = {
+                if (it == INotificationSound.DEFAULT_VALUE) {
+                    Res.string.default.asStringSource()
+                } else {
+                    it.asStringSource()
+                }
+            },
+        )
+    }
+
+    fun successNotificationSound(appSettings: BaseAppSettingsStorage): SoundConfigurable {
+        return SoundConfigurable(
+            title = Res.string.settings_notification_sound_success.asStringSource(),
+            description = Res.string.settings_notification_sound_success_description.asStringSource(),
+            backedBy = appSettings.successNotificationSound,
+            describe = {
+                if (it == INotificationSound.DEFAULT_VALUE) {
+                    Res.string.default.asStringSource()
+                } else {
+                    it.asStringSource()
+                }
+            },
         )
     }
 

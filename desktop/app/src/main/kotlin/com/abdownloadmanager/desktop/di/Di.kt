@@ -94,6 +94,7 @@ import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegist
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.IFailedDownloadErrorStorage
+import com.abdownloadmanager.shared.util.notification.INotificationSettingsStorage
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionRunner
 import com.abdownloadmanager.shared.util.onqueuecompletion.OnQueueEventActionRunner
@@ -553,6 +554,7 @@ val appModule = module {
         bind<BaseAppSettingsStorage>()
         bind<LanguageStorage>()
         bind<ThemeSettingsStorage>()
+        bind<INotificationSettingsStorage>()
     }
     single {
         val definedPaths = get<DesktopDefinedPaths>()

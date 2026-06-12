@@ -84,6 +84,7 @@ import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegist
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.IFailedDownloadErrorStorage
+import com.abdownloadmanager.shared.util.notification.INotificationSettingsStorage
 import com.abdownloadmanager.shared.util.ondownloadcompletion.NoOpOnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionRunner
@@ -511,6 +512,7 @@ fun getAppModule(context: ABDMApp) = module {
         bind<BaseAppSettingsStorage>()
         bind<LanguageStorage>()
         bind<ThemeSettingsStorage>()
+        bind<INotificationSettingsStorage>()
     }
     single {
         RemovedDownloadsFromDiskTracker(

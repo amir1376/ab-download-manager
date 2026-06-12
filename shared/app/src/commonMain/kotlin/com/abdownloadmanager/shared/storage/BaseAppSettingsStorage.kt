@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.storage
 
 import com.abdownloadmanager.shared.ui.theme.ThemeSettingsStorage
+import com.abdownloadmanager.shared.util.notification.INotificationSettingsStorage
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -26,6 +27,9 @@ interface IAppSettingsModel {
     val speedLimit: Long
     val autoStartOnBoot: Boolean
     val notificationSound: Boolean
+    val generalNotificationSound: String
+    val errorNotificationSound: String
+    val successNotificationSound: String
     val defaultDownloadFolder: String
     val browserIntegrationEnabled: Boolean
     val browserIntegrationPort: Int
@@ -41,7 +45,8 @@ interface IAppSettingsModel {
 
 interface BaseAppSettingsStorage :
     LanguageStorage,
-    ThemeSettingsStorage {
+    ThemeSettingsStorage,
+    INotificationSettingsStorage {
     override val theme: MutableStateFlow<String>
     override val defaultDarkTheme: MutableStateFlow<String>
     override val defaultLightTheme: MutableStateFlow<String>
@@ -62,7 +67,10 @@ interface BaseAppSettingsStorage :
     val showDownloadCompletionDialog: MutableStateFlow<Boolean>
     val speedLimit: MutableStateFlow<Long>
     val autoStartOnBoot: MutableStateFlow<Boolean>
-    val notificationSound: MutableStateFlow<Boolean>
+    override val notificationSound: MutableStateFlow<Boolean>
+    override val generalNotificationSound: MutableStateFlow<String>
+    override val errorNotificationSound: MutableStateFlow<String>
+    override val successNotificationSound: MutableStateFlow<String>
     val defaultDownloadFolder: MutableStateFlow<String>
     val browserIntegrationEnabled: MutableStateFlow<Boolean>
     val browserIntegrationPort: MutableStateFlow<Int>

@@ -14,6 +14,7 @@ import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.StringConfig
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.ThemeConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.TimeConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.ProxyConfigurableRenderer
+import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.SoundConfigurableRenderer
 import com.abdownloadmanager.shared.ui.configurable.CommonConfigurableRenderers
 
 val CommonConfigurableRenderersForDesktop = CommonConfigurableRenderers(
@@ -31,4 +32,5 @@ val CommonConfigurableRenderersForDesktop = CommonConfigurableRenderers(
     themeConfigurableRenderer = ThemeConfigurableRenderer,
     timeConfigurableRenderer = TimeConfigurableRenderer,
     proxyConfigurableRenderer = ProxyConfigurableRenderer,
+    soundConfigurableRenderer = SoundConfigurableRenderer,
 )

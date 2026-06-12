@@ -10,6 +10,7 @@ import com.abdownloadmanager.android.ui.configurable.comon.renderer.IntConfigura
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.LongConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.NavigatableConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.ProxyConfigurableRenderer
+import com.abdownloadmanager.android.ui.configurable.comon.renderer.SoundConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.SpeedLimitConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.StringConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.ThemeConfigurableRenderer
@@ -31,4 +32,5 @@ val CommonConfigurableRenderersForAndroid = CommonConfigurableRenderers(
     themeConfigurableRenderer = ThemeConfigurableRenderer,
     timeConfigurableRenderer = TimeConfigurableRenderer,
     proxyConfigurableRenderer = ProxyConfigurableRenderer,
+    soundConfigurableRenderer = SoundConfigurableRenderer,
 )
