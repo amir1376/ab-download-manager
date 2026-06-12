@@ -22,6 +22,7 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 
@@ -116,6 +117,15 @@ fun Footer(
                     Row(
                         horizontalArrangement = Arrangement.End,
                     ) {
+                        IconActionButton(
+                            icon = MyIcons.download,
+                            contentDescription = Res.string.download.asStringSource(),
+                            onClick = {
+                                component.requestDownloadAll()
+                            },
+                            enabled = component.canClickAdd,
+                        )
+                        Spacer(Modifier.width(8.dp))
                         PrimaryMainActionButton(
                             text = myStringResource(Res.string.add),
                             onClick = {
@@ -129,11 +139,10 @@ fun Footer(
                         )
                         Spacer(Modifier.width(8.dp))
                         ActionButton(
-                            text = myStringResource(Res.string.download),
+                            text = myStringResource(Res.string.cancel),
                             onClick = {
-                                component.requestDownloadAll()
+                                component.requestClose()
                             },
-                            enabled = component.canClickAdd,
                             modifier = Modifier,
                         )
                     }
