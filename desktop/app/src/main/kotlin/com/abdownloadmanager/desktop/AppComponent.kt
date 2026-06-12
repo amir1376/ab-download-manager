@@ -44,6 +44,7 @@ import com.abdownloadmanager.shared.util.category.DefaultCategories
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
+import com.abdownloadmanager.shared.util.notification.platformNotificationSound
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
@@ -75,7 +76,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.awt.Toolkit
 import kotlin.system.exitProcess
 
 sealed interface AppEffects {
@@ -539,7 +539,7 @@ class AppComponent(
     }
 
     override fun sendNotification(tag: Any, title: StringSource, description: StringSource, type: NotificationType) {
-        beep()
+        beep(type)
         showNotification(tag = tag, title = title, description = description, type = type)
     }
 
@@ -548,14 +548,14 @@ class AppComponent(
         description: StringSource,
         type: MessageDialogType,
     ) {
-        beep()
+        beep(type.toNotificationType())
         newDialogMessage(MessageDialogModel(title = title, description = description, type = type))
     }
 
-    private fun beep() {
-        if (appSettings.notificationSound.value) {
-            Toolkit.getDefaultToolkit().beep()
-        }
+    private fun beep(
+        type: NotificationType,
+    ) {
+        platformNotificationSound().play(type = type)
     }
 
     private fun showNotification(

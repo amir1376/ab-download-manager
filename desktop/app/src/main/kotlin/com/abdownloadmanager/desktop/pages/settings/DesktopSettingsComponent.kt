@@ -1,22 +1,24 @@
 package com.abdownloadmanager.desktop.pages.settings
 
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.settings.SettingSection.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
-import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.shared.settings.BaseSettingsComponent
 import com.abdownloadmanager.shared.settings.CommonSettings
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.*
+import ir.amirab.util.compose.IconSource
+import ir.amirab.util.compose.StringSource
+import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
@@ -84,7 +86,6 @@ class DesktopSettingsComponent(
                             DesktopSettings.mergeTopBarWithTitleBarConfig(appSettings),
                             CommonSettings.showIconLabels(appSettings),
                             CommonSettings.useRelativeDateTime(appSettings),
-                            CommonSettings.playSoundNotification(appSettings),
                         )
                     ),
                     ConfigurableGroup(
@@ -98,6 +99,15 @@ class DesktopSettingsComponent(
                             CommonSettings.sizeUnit(appRepository, scope),
                             CommonSettings.speedUnit(appRepository, scope),
                             CommonSettings.useAverageSpeedConfig(appRepository),
+                        )
+                    ),
+                    ConfigurableGroup(
+                        mainConfigurable = CommonSettings.playSoundNotification(appSettings),
+                        nestedVisible = appSettings.notificationSound,
+                        nestedConfigurable = listOf(
+                            CommonSettings.generalNotificationSound(appSettings),
+                            CommonSettings.errorNotificationSound(appSettings),
+                            CommonSettings.successNotificationSound(appSettings),
                         )
                     ),
                     ConfigurableGroup(
