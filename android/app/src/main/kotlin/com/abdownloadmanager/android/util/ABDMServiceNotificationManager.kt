@@ -1,5 +1,6 @@
 package com.abdownloadmanager.android.util
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,24 +9,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.abdownloadmanager.android.ui.MainActivity
-import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.asStringSource
 import com.abdownloadmanager.android.R
 import com.abdownloadmanager.android.pages.singledownload.SingleDownloadPageActivity
 import com.abdownloadmanager.android.service.KeepAliveServiceReason
+import com.abdownloadmanager.android.ui.MainActivity
+import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.TimeNames
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
@@ -34,10 +26,13 @@ import ir.amirab.downloader.DownloadManagerMinimalControl
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
+import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
+import kotlin.time.Duration.Companion.milliseconds
 
 class ABDMServiceNotificationManager(
     private val context: Context,
@@ -231,8 +226,9 @@ class ABDMServiceNotificationManager(
             .setContentText(statusString)
             .setSubText(percent)
             .setProgress(100, downloadItemState.percent ?: 0, downloadItemState.percent == null)
+            .setCategory(Notification.CATEGORY_PROGRESS)
             .setSmallIcon(R.drawable.ic_monochrome)
-            .setGroup(DOWNLOAD_GROUP_NAME)
+//            .setGroup(DOWNLOAD_GROUP_NAME)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
@@ -281,7 +277,12 @@ class ABDMServiceNotificationManager(
     fun RenderNotifications(
         downloadMonitor: IDownloadMonitor
     ) {
-        val notFinishedDownloads by downloadMonitor.activeDownloadListFlow.collectAsState()
+        val activeDownloadListFlow = remember(downloadMonitor) {
+            downloadMonitor.activeDownloadListFlow
+                // don't hit notification rate limit
+                .sample(500.milliseconds)
+        }
+        val notFinishedDownloads by activeDownloadListFlow.collectAsState(emptyList())
         val keepAliveServiceReason by _keepAliveServiceReason.collectAsState()
         val notifyUpdate by notificationUpdateSignal.collectAsState()
         CompositionLocalProvider(
@@ -307,10 +308,15 @@ class ABDMServiceNotificationManager(
     ) {
         val statusString = reason?.rememberReasonString()
         LaunchedEffect(reason, statusString, LocalNotificationUpdateSignal.current) {
-            notificationManagerCompat.notify(
-                AndroidConstants.SERVICE_NOTIFICATION_ID,
-                createMainNotification(reason, statusString)
-            )
+            @SuppressLint("MissingPermission")
+            runCatching {
+                notificationManagerCompat.notify(
+                    AndroidConstants.SERVICE_NOTIFICATION_ID,
+                    createMainNotification(reason, statusString)
+                )
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
         DisposableEffect(Unit) {
             onDispose {
@@ -337,10 +343,15 @@ class ABDMServiceNotificationManager(
         iDownloadItemState: ProcessingDownloadItemState
     ) {
         LaunchedEffect(iDownloadItemState, LocalNotificationUpdateSignal.current) {
-            notificationManagerCompat.notify(
-                getNotificationIdForDownloadItem(iDownloadItemState.id),
-                createDownloadItemNotification(iDownloadItemState)
-            )
+            @SuppressLint("MissingPermission")
+            runCatching {
+                notificationManagerCompat.notify(
+                    getNotificationIdForDownloadItem(iDownloadItemState.id),
+                    createDownloadItemNotification(iDownloadItemState)
+                )
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
         DisposableEffect(iDownloadItemState.id) {
             onDispose {
