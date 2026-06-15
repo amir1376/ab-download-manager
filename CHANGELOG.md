@@ -14,6 +14,21 @@
 
 ### Security
 
+## 1.9.1
+
+### Added
+
+- An option to customize notification sounds (#1259)
+
+### Fixed
+
+- Ongoing notification was laggy on Samsung One UI devices (#1269)
+
+### Improved
+
+- Updated Translations
+- Minor UI/UX improvements
+
 ## 1.9.0
 
 ### Added
