@@ -1,0 +1,83 @@
+package com.abdownloadmanager.desktop.pages.home
+
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.utils.AppInfo
+import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
+import com.abdownloadmanager.shared.util.LocalShortCutManager
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import java.awt.Dimension
+
+@Composable
+fun HomeWindow(
+    homeComponent: HomeComponent,
+    onCLoseRequest: () -> Unit,
+) {
+    val size by homeComponent.windowSize.collectAsState()
+    val isMaximized by homeComponent.isMaximized.collectAsState()
+    val windowState = rememberWindowState(
+        size = size,
+        position = WindowPosition.Aligned(Alignment.Center),
+        placement = if (isMaximized) {
+            WindowPlacement.Maximized
+        } else {
+            WindowPlacement.Floating
+        }
+    )
+    val onCloseRequest = onCLoseRequest
+    val windowIcon = MyIcons.appIcon
+    val windowController = rememberWindowController(
+        AppInfo.displayName,
+        windowIcon.rememberPainter(),
+    )
+
+    CompositionLocalProvider(
+        LocalShortCutManager provides homeComponent.shortcutManager
+    ) {
+        CustomWindow(
+            state = windowState,
+            onCloseRequest = onCloseRequest,
+            windowController = windowController,
+            onKeyEvent = {
+                homeComponent.shortcutManager.handle(it)
+            }
+        ) {
+            LaunchedEffect(windowState.size) {
+                if (!windowState.isMinimized && windowState.placement == WindowPlacement.Floating) {
+                    homeComponent.setWindowSize(windowState.size)
+                }
+            }
+            LaunchedEffect(windowState) {
+                snapshotFlow { windowState.placement }
+                    .onEach {
+                        homeComponent.setIsMaximized(windowState.placement == WindowPlacement.Maximized)
+                    }.launchIn(this)
+            }
+            window.minimumSize = Dimension(
+                400, 400
+            )
+            HandleEffects(homeComponent) {
+                when (it) {
+                    HomeComponent.Effects.BringToFront -> {
+                        windowState.isMinimized = false
+                        window.toFront()
+                    }
+
+                    else -> {}
+                }
+            }
+            BoxWithConstraints {
+                HomePage(homeComponent)
+            }
+        }
+    }
+}
