@@ -15,6 +15,20 @@ I welcome the following types of contributions:
 
 - **Pull Requests**: If you’d like to contribute code, feel free to submit a pull request. Just make sure to read the guidelines below before you start.
 
+## Bug Reports
+
+#### Before opening an issue:
+
+- Make sure you are using the [latest version](https://github.com/amir1376/ab-download-manager/releases/latest).
+- Search existing issues.
+- Include steps to reproduce the problem.
+- Include logs when applicable.
+
+#### After opening an issue:
+
+- If you find the cause of the issue, share it before closing the issue. Documenting solutions helps other users,
+  reduces duplicate reports, and saves everyone time.
+
 ## Translations
 
 If you’d like to help translate AB Download Manager into another language, or improve existing translations, you can do
