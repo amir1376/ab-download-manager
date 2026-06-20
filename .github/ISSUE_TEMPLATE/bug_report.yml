@@ -7,7 +7,9 @@ body:
     attributes:
       value: |
         Thank you for taking the time to report a bug!
-        **Before submitting, please [search the existing issues](./issues) to make sure this is not a duplicate.**
+        ### Before submitting
+        - Search the existing [issues](./issues) to check whether this has already been reported.
+        - Read the [Contributing guidelines](./CONTRIBUTING.md#bug-reports) for bug reporting requirements.
   - type: textarea
     id: description
     attributes:
