@@ -14,6 +14,24 @@
 
 ### Security
 
+## 1.9.2
+
+### Added
+
+- New Twilight theme (#1292)
+- Optional download completion notifications on Android (#1290)
+
+### Fixed
+
+- Fixed a crash on some older CPUs on Windows
+- Fixed oversized system tray icon on macOS
+
+### Improved
+
+- Updated translations
+- Prevented Android devices from sleeping while downloads are active (#1291)
+- Various UI and UX improvements
+
 ## 1.9.1
 
 ### Added
