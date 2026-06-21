@@ -15,6 +15,7 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import ir.amirab.util.flow.onEachLatest
+import ir.amirab.util.toSingleLine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -72,7 +73,9 @@ abstract class EditDownloadInputs<
     abstract val configurableList: List<Configurable<*>>
     abstract fun applyEditedItemTo(item: TDownloadItem)
     fun setName(name: String) {
-        this.name.value = name
+        val refinedName = name
+            .toSingleLine()
+        this.name.value = refinedName
     }
 
     val link = credentials.mapTwoWayStateFlow(
