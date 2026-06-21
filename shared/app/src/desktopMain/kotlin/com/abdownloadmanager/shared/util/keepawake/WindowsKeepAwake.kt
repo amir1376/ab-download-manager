@@ -1,4 +1,4 @@
-package ir.amirab.util.desktop.keepawake
+package com.abdownloadmanager.shared.util.keepawake
 
 import com.sun.jna.platform.win32.Kernel32
 import kotlin.concurrent.thread

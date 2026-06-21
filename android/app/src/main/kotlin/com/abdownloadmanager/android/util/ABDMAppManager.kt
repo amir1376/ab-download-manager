@@ -21,6 +21,7 @@ import com.abdownloadmanager.shared.ui.widget.NotificationManager
 import com.abdownloadmanager.shared.ui.widget.NotificationType
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.category.CategorySelectionMode
+import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
 import com.abdownloadmanager.shared.util.notification.platformNotificationSound
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.NewDownloadItemProps
@@ -44,6 +45,7 @@ class ABDMAppManager(
     private val context: Context,
     private val scope: CoroutineScope,
     val downloadSystem: DownloadSystem,
+    val keepAwakeManager: KeepAwakeManager,
     val permissionManager: PermissionManager,
     val notificationManager: NotificationManager,
     val serviceNotificationManager: ABDMServiceNotificationManager,
@@ -76,6 +78,7 @@ class ABDMAppManager(
     suspend fun startDownloadSystem() {
         downloadSystemBooted.action {
             downloadSystem.boot()
+            keepAwakeManager.boot()
             registerReceivers()
             registerDownloadEventNotifications()
         }

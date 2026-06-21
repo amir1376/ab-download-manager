@@ -1,4 +1,4 @@
-package ir.amirab.util.desktop.keepawake
+package com.abdownloadmanager.shared.util.keepawake
 
 class MacKeepAwake : KeepAwake {
     var process: Process? = null
