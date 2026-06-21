@@ -27,8 +27,8 @@ private fun MyPointerHoverIcon.toDesktopIcon(): PointerIcon {
 }
 
 private object MyDesktopCursors {
-    val horizontalResize = pointerIconFromCursorInt(Cursor.S_RESIZE_CURSOR)
-    val verticalResize = pointerIconFromCursorInt(Cursor.E_RESIZE_CURSOR)
+    val horizontalResize = pointerIconFromCursorInt(Cursor.E_RESIZE_CURSOR)
+    val verticalResize = pointerIconFromCursorInt(Cursor.S_RESIZE_CURSOR)
 
     private fun pointerIconFromCursorInt(
         cursorInt: Int
