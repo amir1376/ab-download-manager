@@ -632,7 +632,7 @@ fun getAppModule(context: ABDMApp) = module {
         ABDMAppManager(get(), get(), get(), get(), get(), get(), get(), get())
     }
     single {
-        ABDMServiceNotificationManager(get(), get(), get(), get(), get())
+        ABDMServiceNotificationManager(get(), get(), get(), get(), get(), get())
     }
     single {
         AndroidDownloadItemOpener(get())

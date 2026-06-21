@@ -16,22 +16,33 @@ import androidx.core.content.ContextCompat
 import com.abdownloadmanager.android.R
 import com.abdownloadmanager.android.pages.singledownload.SingleDownloadPageActivity
 import com.abdownloadmanager.android.service.KeepAliveServiceReason
+import com.abdownloadmanager.android.storage.AppSettingsStorage
 import com.abdownloadmanager.android.ui.MainActivity
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.TimeNames
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.util.convertTimeRemainingToHumanReadable
+import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.DownloadManagerMinimalControl
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
+import ir.amirab.downloader.downloaditem.IDownloadItem
+import ir.amirab.downloader.downloaditem.contexts.ResumedBy
+import ir.amirab.downloader.downloaditem.contexts.StoppedBy
+import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.downloader.monitor.IDownloadMonitor
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 class ABDMServiceNotificationManager(
@@ -40,6 +51,7 @@ class ABDMServiceNotificationManager(
     private val scope: CoroutineScope,
     private val downloadEvents: DownloadManagerMinimalControl,
     private val sizeAndSpeedUnitProvider: SizeAndSpeedUnitProvider,
+    private val appSettingsStorage: AppSettingsStorage,
 ) {
     private val _keepAliveServiceReason: MutableStateFlow<KeepAliveServiceReason?> = MutableStateFlow(null)
 
@@ -106,9 +118,49 @@ class ABDMServiceNotificationManager(
     fun startUpdatingNotifications() {
         synchronized(this) {
             notificationUpdateJob?.cancel()
-            notificationUpdateJob = scope.headlessComposeRuntime {
-                RenderNotifications(downloadMonitor)
+            notificationUpdateJob = scope.launch {
+                launch {
+                    headlessComposeRuntime {
+                        RenderNotifications(downloadMonitor)
+                    }
+                }
+                launch {
+                    postSystemNotificationForFinishedDownloads()
+                }
             }
+
+        }
+    }
+
+    private fun shouldShowDownloadCompletionNotifications(event: DownloadManagerEvents.OnJobCompleted): Boolean {
+        val globallyEnabled = appSettingsStorage.showDownloadCompletionDialog.value
+        if (!globallyEnabled) {
+            return false
+        }
+        return event.context[ResumedBy]?.by == User
+    }
+
+    @SuppressLint("MissingPermission")
+    suspend fun postSystemNotificationForFinishedDownloads() {
+        coroutineScope {
+            downloadEvents.listOfJobsEvents.onEach { event ->
+                if (event is DownloadManagerEvents.OnJobCompleted) {
+                    if (shouldShowDownloadCompletionNotifications(event)) {
+                        launch {
+                            // wait a while until we make sure download progress notification not sending anymore
+                            delay(1000.milliseconds)
+                            runCatching {
+                                notificationManagerCompat.notify(
+                                    getNotificationIdForDownloadItem(event.downloadItem.id),
+                                    createFinishedDownloadItemNotification(event.downloadItem)
+                                )
+                            }.onFailure {
+                                it.printStackTrace()
+                            }
+                        }
+                    }
+                }
+            }.launchIn(this)
         }
     }
 
@@ -211,7 +263,7 @@ class ABDMServiceNotificationManager(
             .takeIf { it.isNotEmpty() }
 
 
-        val openMainActivityIntent = PendingIntent.getActivity(
+        val openSingleDownloadActivityIntent = PendingIntent.getActivity(
             context,
             AndroidConstants.SERVICE_NOTIFICATION_ID,
             SingleDownloadPageActivity.createIntent(
@@ -269,7 +321,43 @@ class ABDMServiceNotificationManager(
                     )
                 }
             }
-            .setContentIntent(openMainActivityIntent)
+            .setContentIntent(openSingleDownloadActivityIntent)
+            .build()
+    }
+
+    fun createFinishedDownloadItemNotification(
+        downloadItemState: IDownloadItem
+    ): Notification {
+        val flagOfPendingIntent = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+
+        val title = downloadItemState.name
+
+        val statusString = Res.string.download_page_download_completed.asStringSource().getString()
+        val openSingleDownloadActivityIntent = PendingIntent.getActivity(
+            context,
+            AndroidConstants.SERVICE_NOTIFICATION_ID,
+            SingleDownloadPageActivity.createIntent(
+                context, downloadItemState.id, true
+            ),
+            flagOfPendingIntent
+        )
+        return NotificationCompat
+            .Builder(context, AndroidConstants.NOTIFICATION_DOWNLOAD_CHANEL_ID)
+            .setContentTitle(title)
+            .setContentText(statusString)
+            .setCategory(Notification.CATEGORY_EVENT)
+            .setSmallIcon(R.drawable.ic_monochrome)
+            .setOngoing(false)
+            .setOnlyAlertOnce(true)
+            .setShowWhen(true)
+            .apply {
+                downloadItemState.completeTime?.let {
+                    setWhen(it)
+                }
+            }
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setContentIntent(openSingleDownloadActivityIntent)
+            .setAutoCancel(true)
             .build()
     }
 
