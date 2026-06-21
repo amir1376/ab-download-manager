@@ -15,6 +15,7 @@ import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
+import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
 import ir.amirab.util.logger.AppLogger
 import ir.amirab.util.logger.appLogger
 import ir.amirab.util.writeText

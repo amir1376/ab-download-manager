@@ -94,6 +94,8 @@ import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegist
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.IFailedDownloadErrorStorage
+import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
+import com.abdownloadmanager.shared.util.keepawake.platformKeepAwake
 import com.abdownloadmanager.shared.util.notification.INotificationSettingsStorage
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionRunner
@@ -128,7 +130,6 @@ import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.compose.localizationmanager.LanguageSourceProvider
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.datastore.kotlinxSerializationDataStore
-import ir.amirab.util.desktop.DesktopUtils
 import ir.amirab.util.startup.AbstractStartupManager
 import ir.amirab.util.startup.Startup
 import kotlinx.serialization.modules.SerializersModule
@@ -643,7 +644,7 @@ val appModule = module {
     }
     single {
         KeepAwakeManager(
-            DesktopUtils.keepAwakeService(),
+            platformKeepAwake(),
             get(),
             get(),
         )

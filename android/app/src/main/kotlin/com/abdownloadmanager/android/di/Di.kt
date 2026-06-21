@@ -84,6 +84,8 @@ import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegist
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.IFailedDownloadErrorStorage
+import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
+import com.abdownloadmanager.shared.util.keepawake.platformKeepAwake
 import com.abdownloadmanager.shared.util.notification.INotificationSettingsStorage
 import com.abdownloadmanager.shared.util.ondownloadcompletion.NoOpOnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionProvider
@@ -587,6 +589,13 @@ fun getAppModule(context: ABDMApp) = module {
             )
         )
     }
+    single {
+        KeepAwakeManager(
+            platformKeepAwake(),
+            get(),
+            get(),
+        )
+    }
     single<IPerHostSettingsStorage> {
         val definedPaths = get<DefinedPaths>()
         PerHostSettingsDatastoreStorage(
@@ -620,7 +629,7 @@ fun getAppModule(context: ABDMApp) = module {
         bind<Context>()
     }
     single {
-        ABDMAppManager(get(), get(), get(), get(), get(), get(), get())
+        ABDMAppManager(get(), get(), get(), get(), get(), get(), get(), get())
     }
     single {
         ABDMServiceNotificationManager(get(), get(), get(), get(), get())

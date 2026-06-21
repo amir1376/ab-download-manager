@@ -1,4 +1,6 @@
-package ir.amirab.util.desktop.keepawake
+package com.abdownloadmanager.shared.util.keepawake
+
+expect fun platformKeepAwake(): KeepAwake
 
 interface KeepAwake {
     /**
