@@ -37,6 +37,7 @@ import ir.amirab.util.compose.StringSource
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.onEachLatest
+import ir.amirab.util.toSingleLine
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
@@ -157,7 +158,9 @@ abstract class BaseAddSingleDownloadComponent(
     }
 
     fun setName(name: String) {
-        downloadChecker.name.update { name }
+        val refinedName = name
+            .toSingleLine()
+        downloadChecker.name.update { refinedName }
     }
 
     fun setOnDuplicateStrategy(onDuplicateStrategy: OnDuplicateStrategy) {
