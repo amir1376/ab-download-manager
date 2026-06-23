@@ -91,6 +91,7 @@ class DesktopSettingsComponent(
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
                             CommonSettings.autoStartConfig(appSettings),
+                            DesktopSettings.startMinimizedToTrayConfig(appSettings),
                             DesktopSettings.useSystemTray(appSettings),
                         )
                     ),

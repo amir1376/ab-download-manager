@@ -466,10 +466,16 @@ val updaterModule = module {
 }
 val startUpModule = module {
     single {
+        val appSettings = get<com.abdownloadmanager.desktop.storage.AppSettingsStorage>()
+        val startupArgs = if (appSettings.startMinimizedToTray.value) {
+            listOf(AppArguments.Args.BACKGROUND)
+        } else {
+            emptyList()
+        }
         Startup.getStartUpManagerForDesktop(
             name = AppInfo.displayName,
             path = AppInfo.exeFile,
-            args = listOf(AppArguments.Args.BACKGROUND),
+            args = startupArgs,
             packageName = AppInfo.packageName,
         )
     }.apply {

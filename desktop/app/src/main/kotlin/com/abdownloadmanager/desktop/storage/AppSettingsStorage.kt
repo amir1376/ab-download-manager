@@ -44,6 +44,7 @@ data class AppSettingsModel(
     override val showDownloadCompletionDialog: Boolean = true,
     override val speedLimit: Long = 0,
     override val autoStartOnBoot: Boolean = true,
+    override val startMinimizedToTray: Boolean = false,
     override val notificationSound: Boolean = true,
     override val generalNotificationSound: String = "",
     override val successNotificationSound: String = "",
@@ -91,6 +92,7 @@ data class AppSettingsModel(
             val showDownloadCompletionDialog = booleanKeyOf("showDownloadCompletionDialog")
             val speedLimit = longKeyOf("speedLimit")
             val autoStartOnBoot = booleanKeyOf("autoStartOnBoot")
+            val startMinimizedToTray = booleanKeyOf("startMinimizedToTray")
             val notificationSound = booleanKeyOf("notificationSound")
             val generalNotificationSound = stringKeyOf("generalNotificationSound")
             val errorNotificationSound = stringKeyOf("errorNotificationSound")
@@ -139,6 +141,7 @@ data class AppSettingsModel(
                     ?: default.showDownloadCompletionDialog,
                 speedLimit = source.get(Keys.speedLimit) ?: default.speedLimit,
                 autoStartOnBoot = source.get(Keys.autoStartOnBoot) ?: default.autoStartOnBoot,
+                startMinimizedToTray = source.get(Keys.startMinimizedToTray) ?: default.startMinimizedToTray,
                 notificationSound = source.get(Keys.notificationSound) ?: default.notificationSound,
                 generalNotificationSound = source.get(Keys.generalNotificationSound)
                     ?: default.generalNotificationSound,
@@ -185,6 +188,7 @@ data class AppSettingsModel(
                 put(Keys.showDownloadCompletionDialog, focus.showDownloadCompletionDialog)
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
+                put(Keys.startMinimizedToTray, focus.startMinimizedToTray)
                 put(Keys.notificationSound, focus.notificationSound)
                 put(Keys.generalNotificationSound, focus.generalNotificationSound)
                 put(Keys.errorNotificationSound, focus.errorNotificationSound)
@@ -262,6 +266,7 @@ class AppSettingsStorage(
     override val showDownloadCompletionDialog = from(AppSettingsModel.showDownloadCompletionDialog)
     override val speedLimit = from(AppSettingsModel.speedLimit)
     override val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)
+    override val startMinimizedToTray = from(AppSettingsModel.startMinimizedToTray)
     override val notificationSound = from(AppSettingsModel.notificationSound)
     override val generalNotificationSound = from(AppSettingsModel.generalNotificationSound)
     override val errorNotificationSound = from(AppSettingsModel.errorNotificationSound)

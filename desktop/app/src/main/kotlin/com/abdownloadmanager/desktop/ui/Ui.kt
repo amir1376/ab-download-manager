@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.AppArguments
+import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.AppEffects
 import com.abdownloadmanager.desktop.actions.gotoSettingsAction
@@ -81,7 +82,9 @@ object Ui : KoinComponent {
         themeManager.boot()
         fontManager.boot()
         languageManager.boot()
-        if (!appArguments.startSilent) {
+        val appSettings: AppSettingsStorage = get()
+        val shouldStartSilent = appArguments.startSilent || appSettings.startMinimizedToTray.value
+        if (!shouldStartSilent) {
             appComponent.openHome()
         }
         if (Platform.isMac()) {

@@ -26,6 +26,7 @@ interface IAppSettingsModel {
     val showDownloadCompletionDialog: Boolean
     val speedLimit: Long
     val autoStartOnBoot: Boolean
+    val startMinimizedToTray: Boolean
     val notificationSound: Boolean
     val generalNotificationSound: String
     val errorNotificationSound: String
@@ -67,6 +68,7 @@ interface BaseAppSettingsStorage :
     val showDownloadCompletionDialog: MutableStateFlow<Boolean>
     val speedLimit: MutableStateFlow<Long>
     val autoStartOnBoot: MutableStateFlow<Boolean>
+    val startMinimizedToTray: MutableStateFlow<Boolean>
     override val notificationSound: MutableStateFlow<Boolean>
     override val generalNotificationSound: MutableStateFlow<String>
     override val errorNotificationSound: MutableStateFlow<String>

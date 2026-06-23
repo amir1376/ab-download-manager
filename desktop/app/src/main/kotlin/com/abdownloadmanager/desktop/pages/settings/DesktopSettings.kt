@@ -86,6 +86,22 @@ object DesktopSettings {
         )
     }
 
+
+    fun startMinimizedToTrayConfig(appSettings: AppSettingsStorage): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = Res.string.settings_start_minimized_to_tray.asStringSource(),
+            description = Res.string.settings_start_minimized_to_tray_description.asStringSource(),
+            backedBy = appSettings.startMinimizedToTray,
+            describe = {
+                if (it) {
+                    Res.string.enabled.asStringSource()
+                } else {
+                    Res.string.disabled.asStringSource()
+                }
+            },
+        )
+    }
+
     fun renderApi(
         customRenderApi: CustomRenderApi,
     ): EnumConfigurable<RenderApi?> {

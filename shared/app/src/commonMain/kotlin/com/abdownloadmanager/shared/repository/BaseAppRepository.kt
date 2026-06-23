@@ -100,6 +100,14 @@ open class BaseAppRepository(
             .onEach { enabled ->
                 AutoStartManager.startOnBoot(enabled)
             }.launchIn(scope)
+        // Re-register startup entry when startMinimizedToTray changes so the
+        // Launch Agent / registry entry is updated with or without --background
+        appSettings.startMinimizedToTray
+            .debounce(500)
+            .onEach {
+                // Re-run autostart registration so the new args take effect
+                AutoStartManager.startOnBoot(appSettings.autoStartOnBoot.value)
+            }.launchIn(scope)
         speedLimiter
             .debounce(500)
             .onEach {
