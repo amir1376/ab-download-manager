@@ -113,12 +113,68 @@ class Integration(
                         json.decodeFromString<NewDownloadTask>(message)
                     }
                     itemsToAdd.onFailure { it.printStackTrace() }
-                    integrationHandler.addDownloadTask(itemsToAdd.getOrThrow())
+                    val id = integrationHandler.addDownloadTask(itemsToAdd.getOrThrow())
+                    MyResponse.Json("""{"id":$id}""")
                 }
-                MyResponse.Text("OK")
             }
             post("/ping") {
                 MyResponse.Text("pong")
+            }
+            get("/list") {
+                runBlocking {
+                    val downloads = integrationHandler.listDownloads()
+                    val jsonResponse = json.encodeToString(ListSerializer(ApiDownloadModel.serializer()), downloads)
+                    MyResponse.Text(jsonResponse)
+                }
+            }
+            post("/info") {
+                runBlocking {
+                    val request = kotlin.runCatching {
+                        val message = it.getBody().orEmpty()
+                        json.decodeFromString<IdRequest>(message)
+                    }
+                    request.onFailure { it.printStackTrace() }
+                    val download = integrationHandler.getDownloadInfo(request.getOrThrow().id)
+                    if (download != null) {
+                        val jsonResponse = json.encodeToString(ApiDownloadModel.serializer(), download)
+                        MyResponse.Text(jsonResponse)
+                    } else {
+                        MyResponse.Text("null")
+                    }
+                }
+            }
+            post("/pause") {
+                runBlocking {
+                    val request = kotlin.runCatching {
+                        val message = it.getBody().orEmpty()
+                        json.decodeFromString<IdsRequest>(message)
+                    }
+                    request.onFailure { it.printStackTrace() }
+                    integrationHandler.pauseDownloads(request.getOrThrow().ids)
+                    MyResponse.Text("OK")
+                }
+            }
+            post("/resume") {
+                runBlocking {
+                    val request = kotlin.runCatching {
+                        val message = it.getBody().orEmpty()
+                        json.decodeFromString<IdsRequest>(message)
+                    }
+                    request.onFailure { it.printStackTrace() }
+                    integrationHandler.resumeDownloads(request.getOrThrow().ids)
+                    MyResponse.Text("OK")
+                }
+            }
+            post("/remove") {
+                runBlocking {
+                    val request = kotlin.runCatching {
+                        val message = it.getBody().orEmpty()
+                        json.decodeFromString<RemoveRequest>(message)
+                    }
+                    request.onFailure { it.printStackTrace() }
+                    integrationHandler.removeDownloads(request.getOrThrow().ids, request.getOrThrow().keepFile)
+                    MyResponse.Text("OK")
+                }
             }
         }
         return MyHttp4KServer(port, handlers, debugMode)
