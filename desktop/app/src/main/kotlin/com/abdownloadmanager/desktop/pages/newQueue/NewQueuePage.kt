@@ -10,7 +10,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun NewQueue(

@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.util.downloadlocation
 
 import com.abdownloadmanager.shared.util.SystemDownloadLocationProvider
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.asDesktop
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.asDesktop
 
 actual fun getPlatformDownloadLocationProvider(): SystemDownloadLocationProvider {
     return when (Platform.asDesktop()) {

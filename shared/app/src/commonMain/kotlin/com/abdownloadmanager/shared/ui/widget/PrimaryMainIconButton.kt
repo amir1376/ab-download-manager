@@ -6,8 +6,8 @@ import androidx.compose.ui.graphics.Brush
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
 
 
 @Composable

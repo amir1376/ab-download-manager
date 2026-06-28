@@ -2,8 +2,8 @@ package com.abdownloadmanager.shared.util
 
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
-import ir.amirab.util.flow.mapTwoWayStateFlow
-import ir.amirab.util.config.MapConfig
+import com.xeton.util.flow.mapTwoWayStateFlow
+import com.xeton.util.config.MapConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking

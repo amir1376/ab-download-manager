@@ -23,9 +23,9 @@ import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
 
 @Immutable
 data class InputParams<T>(

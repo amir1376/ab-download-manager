@@ -41,10 +41,10 @@ import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.downloader.connection.IResponseInfo
-import ir.amirab.downloader.utils.OnDuplicateStrategy
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.downloader.utils.OnDuplicateStrategy
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
 import java.awt.MouseInfo
 
 @Composable

@@ -9,7 +9,7 @@ use surrealdb::types::SurrealValue;
 
 // ─── Download Status ────────────────────────────────────────────────────────
 
-/// Mirrors `ir.amirab.downloader.downloaditem.DownloadStatus`.
+/// Mirrors `com.xeton.downloader.downloaditem.DownloadStatus`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, uniffi::Enum, SurrealValue)]
 #[surreal(crate = "surrealdb::types")]
 pub enum DownloadStatus {
@@ -29,7 +29,7 @@ impl Default for DownloadStatus {
 // ─── Download Job Status ────────────────────────────────────────────────────
 
 /// Runtime status of a download job, not persisted.
-/// Mirrors `ir.amirab.downloader.downloaditem.DownloadJobStatus`.
+/// Mirrors `com.xeton.downloader.downloaditem.DownloadJobStatus`.
 #[derive(Clone, Debug, PartialEq, uniffi::Enum)]
 pub enum JobStatus {
     Idle,
@@ -68,7 +68,7 @@ impl Default for DownloadProtocol {
 // ─── Download Item ──────────────────────────────────────────────────────────
 
 /// Persistent download record.
-/// Mirrors `ir.amirab.downloader.downloaditem.http.HttpDownloadItem` (and HLS variant).
+/// Mirrors `com.xeton.downloader.downloaditem.http.HttpDownloadItem` (and HLS variant).
 #[derive(Clone, Debug, Serialize, Deserialize, uniffi::Record, SurrealValue)]
 #[surreal(crate = "surrealdb::types")]
 pub struct DownloadItem {
@@ -134,7 +134,7 @@ impl Default for DownloadItem {
 // ─── Ranged Part ────────────────────────────────────────────────────────────
 
 /// A byte-range segment of a download.
-/// Mirrors `ir.amirab.downloader.part.RangedPart`.
+/// Mirrors `com.xeton.downloader.part.RangedPart`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, SurrealValue)]
 #[surreal(crate = "surrealdb::types")]
 pub struct RangedPart {
@@ -195,7 +195,7 @@ impl RangedPart {
 // ─── Part Download Status ───────────────────────────────────────────────────
 
 /// Runtime status of a single part downloader.
-/// Mirrors `ir.amirab.downloader.part.PartDownloadStatus`.
+/// Mirrors `com.xeton.downloader.part.PartDownloadStatus`.
 #[derive(Clone, Debug, PartialEq)]
 pub enum PartStatus {
     Idle,
@@ -242,7 +242,7 @@ impl Default for DuplicateStrategy {
 // ─── Download Settings ──────────────────────────────────────────────────────
 
 /// Global settings for the download engine.
-/// Mirrors `ir.amirab.downloader.DownloadSettings`.
+/// Mirrors `com.xeton.downloader.DownloadSettings`.
 #[derive(Clone, Debug, Serialize, Deserialize, uniffi::Record, SurrealValue)]
 #[surreal(crate = "surrealdb::types")]
 pub struct DownloadSettings {
@@ -279,7 +279,7 @@ impl Default for DownloadSettings {
 // ─── Queue Model ────────────────────────────────────────────────────────────
 
 /// Persistent queue descriptor.
-/// Mirrors `ir.amirab.downloader.db.QueueModel`.
+/// Mirrors `com.xeton.downloader.db.QueueModel`.
 #[derive(Clone, Debug, Serialize, Deserialize, SurrealValue)]
 #[surreal(crate = "surrealdb::types")]
 pub struct QueueModel {
@@ -305,7 +305,7 @@ impl Default for QueueModel {
 }
 
 /// Scheduled start/stop times for a queue.
-/// Mirrors `ir.amirab.downloader.queue.ScheduleTimes`.
+/// Mirrors `com.xeton.downloader.queue.ScheduleTimes`.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, SurrealValue)]
 #[surreal(crate = "surrealdb::types")]
 pub struct ScheduleTimes {
@@ -357,7 +357,7 @@ pub struct ContentRange {
 // ─── HTTP Response Info ─────────────────────────────────────────────────────
 
 /// Information extracted from an HTTP response.
-/// Mirrors `ir.amirab.downloader.connection.response.HttpResponseInfo`.
+/// Mirrors `com.xeton.downloader.connection.response.HttpResponseInfo`.
 #[derive(Clone, Debug)]
 pub struct ResponseInfo {
     pub status: u16,

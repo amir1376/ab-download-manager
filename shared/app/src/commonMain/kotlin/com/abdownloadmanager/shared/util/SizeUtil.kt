@@ -1,17 +1,17 @@
 package com.abdownloadmanager.shared.util
 
-import ir.amirab.util.datasize.CommonSizeConvertConfigs
-import ir.amirab.util.datasize.ConvertSizeConfig
-import ir.amirab.util.datasize.SizeWithUnit
+import com.xeton.util.datasize.CommonSizeConvertConfigs
+import com.xeton.util.datasize.ConvertSizeConfig
+import com.xeton.util.datasize.SizeWithUnit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.datasize.*
-import ir.amirab.util.datasize.SizeWithUnit.Companion.DefaultFormat
-import ir.amirab.util.datasize.SizeWithUnit.Companion.SmallFormat
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.datasize.*
+import com.xeton.util.datasize.SizeWithUnit.Companion.DefaultFormat
+import com.xeton.util.datasize.SizeWithUnit.Companion.SmallFormat
 import java.text.NumberFormat
 
 val LocalSpeedUnit = compositionLocalOf {

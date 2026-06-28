@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.Tooltip
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 
 @Composable
 private fun SystemButtonTooltip(

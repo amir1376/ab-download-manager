@@ -1,6 +1,6 @@
 // xeton_core::connection::proxy — Proxy configuration types.
 //
-// Mirrors `ir.amirab.downloader.connection.proxy.*`.
+// Mirrors `com.xeton.downloader.connection.proxy.*`.
 
 use serde::{Deserialize, Serialize};
 

@@ -12,7 +12,7 @@ import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.shared.pages.checksum.BaseFileChecksumComponent
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.desktop.screen.applyUiScale
 
 @Composable
 fun FileChecksumWindow(

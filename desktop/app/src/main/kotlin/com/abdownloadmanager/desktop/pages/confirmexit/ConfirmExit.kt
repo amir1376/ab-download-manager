@@ -7,7 +7,7 @@ import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.ui.widget.ConfirmDialog
 import com.abdownloadmanager.desktop.ui.widget.ConfirmDialogType
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.asStringSource
 
 @Composable
 fun ConfirmExit(appComponent: AppComponent) {

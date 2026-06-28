@@ -7,8 +7,8 @@ import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.storage.SelectQueueSettings
 import com.abdownloadmanager.shared.util.BaseComponent
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.queue.DefaultQueueInfo
-import ir.amirab.downloader.queue.QueueManager
+import com.xeton.downloader.queue.DefaultQueueInfo
+import com.xeton.downloader.queue.QueueManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

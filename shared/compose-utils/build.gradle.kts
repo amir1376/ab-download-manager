@@ -9,7 +9,7 @@ kotlin {
     jvm("desktop")
     android {
         compileSdk = 36
-        namespace = "ir.amirab.util.compose"
+        namespace = "com.xeton.util.compose"
         minSdk = 26
     }
     sourceSets {

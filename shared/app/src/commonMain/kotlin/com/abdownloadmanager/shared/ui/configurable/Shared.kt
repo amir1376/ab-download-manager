@@ -6,7 +6,7 @@ import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically

@@ -32,10 +32,10 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.localizationmanager.WithLanguageDirection
-import ir.amirab.util.compose.modifiers.autoMirror
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.localizationmanager.WithLanguageDirection
+import com.xeton.util.compose.modifiers.autoMirror
 
 @Composable
 private fun RenderMenuInSinglePage(

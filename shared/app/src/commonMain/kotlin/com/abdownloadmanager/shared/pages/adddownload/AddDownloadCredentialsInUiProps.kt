@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.pages.adddownload
 
 import com.abdownloadmanager.shared.util.FilenameFixer
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadCredentials
 import kotlinx.serialization.Serializable
 
 @Serializable

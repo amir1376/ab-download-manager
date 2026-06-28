@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util.keepawake
 
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.asDesktop
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.asDesktop
 
 private val instance by lazy {
     when (Platform.asDesktop()) {

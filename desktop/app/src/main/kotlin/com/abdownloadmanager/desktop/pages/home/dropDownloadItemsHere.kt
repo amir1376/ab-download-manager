@@ -9,7 +9,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.awtTransferable
-import ir.amirab.downloader.monitor.IDownloadItemState
+import com.xeton.downloader.monitor.IDownloadItemState
 
 internal fun Modifier.dropDownloadItemsHere(
     onDragIn: () -> Unit,

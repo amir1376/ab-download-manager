@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.utils.proxy
 
 import com.github.markusbernhardt.proxy.ProxySearch
-import ir.amirab.downloader.connection.proxy.SystemProxySelectorProvider
+import com.xeton.downloader.connection.proxy.SystemProxySelectorProvider
 import java.net.ProxySelector
 
 class DesktopSystemProxySelectorProvider(

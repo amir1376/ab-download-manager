@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util.ui
 
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 
 interface IMyIcons {
     val appIcon: IconSource

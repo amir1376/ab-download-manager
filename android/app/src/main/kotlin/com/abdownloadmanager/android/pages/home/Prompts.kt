@@ -45,8 +45,8 @@ import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.compose.asStringSourceWithARgs
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.asStringSourceWithARgs
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun RenderPrompts(

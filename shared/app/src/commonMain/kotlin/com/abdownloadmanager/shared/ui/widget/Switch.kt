@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.ui.widget
 
 import com.abdownloadmanager.shared.util.ui.myColors
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 import com.abdownloadmanager.shared.util.div
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background

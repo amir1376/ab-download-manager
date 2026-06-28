@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.ui.widget
 
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
@@ -15,8 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.StringSource
+import com.xeton.util.ifThen
 
 
 @Composable

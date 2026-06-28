@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.actions.onevennts
 
 import com.abdownloadmanager.desktop.PowerActionManager
-import ir.amirab.util.desktop.poweraction.PowerActionConfig
+import com.xeton.util.desktop.poweraction.PowerActionConfig
 import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
 import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage

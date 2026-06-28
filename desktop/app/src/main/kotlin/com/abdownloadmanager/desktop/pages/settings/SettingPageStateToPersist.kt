@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.pages.settings
 
 import arrow.optics.Lens
 import com.abdownloadmanager.desktop.pages.home.HomePageStateToPersist
-import ir.amirab.util.config.*
+import com.xeton.util.config.*
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 

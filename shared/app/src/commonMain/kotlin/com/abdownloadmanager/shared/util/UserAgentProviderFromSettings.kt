@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util
 
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
-import ir.amirab.downloader.connection.UserAgentProvider
+import com.xeton.downloader.connection.UserAgentProvider
 
 class UserAgentProviderFromSettings(
     private val appSettingsStorage: BaseAppSettingsStorage

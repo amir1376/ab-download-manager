@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util.onqueuecompletion
 
-import ir.amirab.downloader.queue.QueueEvent
-import ir.amirab.downloader.queue.QueueManager
+import com.xeton.downloader.queue.QueueEvent
+import com.xeton.downloader.queue.QueueManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn

@@ -12,7 +12,7 @@ import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.asStringSource
 
 @Immutable
 data class QueueSelectedItemsMenuProps(

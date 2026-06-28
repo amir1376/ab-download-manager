@@ -6,9 +6,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.abdownloadmanager.shared.util.ui.LocalTitleBarDirection
-import ir.amirab.util.compose.localizationmanager.LanguageManager
-import ir.amirab.util.compose.localizationmanager.LocalLanguageManager
-import ir.amirab.util.compose.localizationmanager.LocaleLanguageDirection
+import com.xeton.util.compose.localizationmanager.LanguageManager
+import com.xeton.util.compose.localizationmanager.LocalLanguageManager
+import com.xeton.util.compose.localizationmanager.LocaleLanguageDirection
 
 @Composable
 fun ProvideLanguageManager(

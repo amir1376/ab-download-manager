@@ -4,7 +4,7 @@ import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 import com.abdownloadmanager.shared.util.div
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.modifiers.silentClickable
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.modifiers.silentClickable
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun CheckBox(

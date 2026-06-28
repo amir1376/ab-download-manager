@@ -6,7 +6,7 @@ import com.abdownloadmanager.android.pages.downloaderror.DownloadErrorActivity
 import com.abdownloadmanager.shared.downloaderror.DownloadErrorComponent
 import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
-import ir.amirab.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.downloaditem.IDownloadItem
 import kotlinx.serialization.json.Json
 
 class AndroidDownloadErrorPageManager(

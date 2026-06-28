@@ -3,7 +3,7 @@ package com.abdownloadmanager.desktop.pages.enterurl
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.pages.enterurl.BaseEnterNewURLComponent
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadCredentials
 
 class DesktopEnterNewURLComponent(
     ctx: ComponentContext,

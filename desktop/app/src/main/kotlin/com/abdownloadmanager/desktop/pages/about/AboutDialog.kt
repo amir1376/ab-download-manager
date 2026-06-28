@@ -14,8 +14,8 @@ import com.abdownloadmanager.desktop.window.custom.WindowIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.desktop.screen.applyUiScale
 
 @Composable
 fun ShowAboutDialog(appComponent: AppComponent) {

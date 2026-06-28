@@ -10,8 +10,8 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableRendererRegistry
 import com.abdownloadmanager.shared.ui.configurable.LocalConfigurationRendererRegistry
 import com.abdownloadmanager.shared.util.LocalUseRelativeDateTime
 import com.abdownloadmanager.shared.util.ProvideSizeAndSpeedUnit
-import ir.amirab.util.compose.IIconResolver
-import ir.amirab.util.compose.LocalIconFromUriResolver
+import com.xeton.util.compose.IIconResolver
+import com.xeton.util.compose.LocalIconFromUriResolver
 
 
 @Composable

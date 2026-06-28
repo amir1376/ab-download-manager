@@ -13,8 +13,8 @@ import com.abdownloadmanager.shared.pages.adddownload.AddDownloadConfig
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
 import com.abdownloadmanager.shared.util.extractors.linkextractor.DefaultDownloadCredentialsExtractor
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
 import kotlinx.serialization.json.Json
 import org.koin.core.component.inject
 

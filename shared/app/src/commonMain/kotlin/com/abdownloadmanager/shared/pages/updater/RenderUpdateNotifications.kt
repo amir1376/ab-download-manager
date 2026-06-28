@@ -10,9 +10,9 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.NotificationType
 import com.abdownloadmanager.shared.ui.widget.ShowNotification
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.StringSource.*
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.StringSource.*
+import com.xeton.util.compose.asStringSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

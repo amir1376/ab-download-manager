@@ -1,9 +1,9 @@
 package com.abdownloadmanager.shared.downloaderinui
 
-import ir.amirab.downloader.connection.IResponseInfo
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.util.HttpUrlUtils
-import ir.amirab.util.flow.mapStateFlow
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.util.HttpUrlUtils
+import com.xeton.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

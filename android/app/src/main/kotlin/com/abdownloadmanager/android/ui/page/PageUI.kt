@@ -33,7 +33,7 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.compose.pxToDp
+import com.xeton.util.compose.pxToDp
 
 @Immutable
 data class PageContentParams(

@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.storage
 
-import ir.amirab.util.datasize.CommonSizeConvertConfigs
-import ir.amirab.util.datasize.ConvertSizeConfig
+import com.xeton.util.datasize.CommonSizeConvertConfigs
+import com.xeton.util.datasize.ConvertSizeConfig
 
 enum class SupportedSizeUnits {
     BinaryBits,

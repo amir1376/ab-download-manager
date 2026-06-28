@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util.extractors.linkextractor
 
 import com.abdownloadmanager.shared.util.extractors.Extractor
-import ir.amirab.util.HttpUrlUtils
+import com.xeton.util.HttpUrlUtils
 
 object StringUrlExtractor : Extractor<String, List<String>> {
     private val urlRegex by lazy { Regex("""\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]""") }

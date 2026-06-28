@@ -22,8 +22,8 @@ import com.abdownloadmanager.android.ui.configurable.SheetInput
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
 
 @Immutable
 data class EditBookmarkState(

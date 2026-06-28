@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import com.abdownloadmanager.shared.pages.home.category.DefinedStatusCategories
 import com.abdownloadmanager.shared.pages.home.category.DownloadStatusCategoryFilter
 import com.abdownloadmanager.shared.util.category.Category
-import ir.amirab.downloader.db.QueueModel
+import com.xeton.downloader.db.QueueModel
 
 @Stable
 class FilterState {

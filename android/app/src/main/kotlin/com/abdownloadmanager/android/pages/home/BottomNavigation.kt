@@ -46,11 +46,11 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.downloader.db.QueueModel
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.downloader.db.QueueModel
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
 
 object BottomNavigationConstants {
     const val DEFAULT_ICON_SIZE = 20

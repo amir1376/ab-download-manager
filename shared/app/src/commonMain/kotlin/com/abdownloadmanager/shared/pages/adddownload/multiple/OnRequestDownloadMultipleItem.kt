@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.pages.adddownload.multiple
 
 import com.abdownloadmanager.shared.util.category.CategorySelectionMode
-import ir.amirab.downloader.NewDownloadItemProps
+import com.xeton.downloader.NewDownloadItemProps
 import kotlinx.coroutines.Deferred
 
 fun interface OnRequestDownloadMultipleItem {

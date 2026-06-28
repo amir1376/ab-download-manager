@@ -1,6 +1,6 @@
 // xeton_core::http::job — HTTP download job state machine.
 //
-// Direct port of `ir.amirab.downloader.downloaditem.http.HttpDownloadJob`.
+// Direct port of `com.xeton.downloader.downloaditem.http.HttpDownloadJob`.
 // State machine:
 //   Idle → Booting → FetchingInfo → PreparingFile → Downloading → Completed
 //                                                         ↕ Retrying

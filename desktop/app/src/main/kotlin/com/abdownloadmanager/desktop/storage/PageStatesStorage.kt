@@ -9,10 +9,10 @@ import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPage
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageStateToPersist
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.util.ConfigBaseSettingsByMapConfig
-import ir.amirab.util.config.getDecoded
-import ir.amirab.util.config.keyOfEncoded
-import ir.amirab.util.config.putEncoded
-import ir.amirab.util.config.MapConfig
+import com.xeton.util.config.getDecoded
+import com.xeton.util.config.keyOfEncoded
+import com.xeton.util.config.putEncoded
+import com.xeton.util.config.MapConfig
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent

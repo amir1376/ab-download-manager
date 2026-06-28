@@ -3,11 +3,11 @@ package com.abdownloadmanager.android.pages.home.sections.sort
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.sort.ComparatorProvider
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.statusOrFinished
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.downloader.monitor.IDownloadItemState
+import com.xeton.downloader.monitor.statusOrFinished
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

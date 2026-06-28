@@ -23,8 +23,8 @@ import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.modifiers.autoMirror
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.modifiers.autoMirror
 
 
 @Composable

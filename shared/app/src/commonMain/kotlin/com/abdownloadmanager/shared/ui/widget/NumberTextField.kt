@@ -2,7 +2,7 @@ package com.abdownloadmanager.shared.ui.widget
 
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 
 private val DefaultShape
     @Composable

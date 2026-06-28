@@ -28,10 +28,10 @@ import com.abdownloadmanager.shared.pages.credits.translators.TranslatorData
 import com.abdownloadmanager.shared.ui.widget.PrimaryMainActionButton
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import ir.amirab.util.URLOpener
-import ir.amirab.util.compose.localizationmanager.LanguageNameProvider
-import ir.amirab.util.compose.localizationmanager.MyLocale
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.URLOpener
+import com.xeton.util.compose.localizationmanager.LanguageNameProvider
+import com.xeton.util.compose.localizationmanager.MyLocale
+import com.xeton.util.compose.resources.myStringResource
 import kotlinx.serialization.json.Json
 import okio.FileSystem
 import okio.Path.Companion.toPath

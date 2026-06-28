@@ -30,8 +30,8 @@ import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 
 @Composable
 fun AddMultiDownloadTable(

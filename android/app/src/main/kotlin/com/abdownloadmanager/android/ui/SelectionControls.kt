@@ -28,10 +28,10 @@ import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.ifThen
 
 object SelectionControlsScope
 

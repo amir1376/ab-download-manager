@@ -1,6 +1,6 @@
 // xeton_core::manager — Download manager (engine hub).
 //
-// Port of `ir.amirab.downloader.DownloadManager`.
+// Port of `com.xeton.downloader.DownloadManager`.
 // Central coordinator: job registry, event bus, download lifecycle.
 
 use std::path::PathBuf;
@@ -74,7 +74,7 @@ impl ActiveJob {
 
 /// The top-level download manager.
 ///
-/// Mirrors `ir.amirab.downloader.DownloadManager`.
+/// Mirrors `com.xeton.downloader.DownloadManager`.
 /// Uses `DashMap` for lock-free concurrent reads of the job registry.
 pub struct DownloadManager {
     /// Database store (SurrealDB).

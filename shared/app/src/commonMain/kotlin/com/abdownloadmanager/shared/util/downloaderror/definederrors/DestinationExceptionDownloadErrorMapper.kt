@@ -4,9 +4,9 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapper
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapper.Companion.createErrorReason
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
-import ir.amirab.downloader.exception.PrepareDestinationFailedException
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
+import com.xeton.downloader.exception.PrepareDestinationFailedException
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.asStringSourceWithARgs
 
 object DestinationExceptionDownloadErrorMapper : DownloadErrorMapper {
     override fun accept(throwable: Throwable): Boolean {

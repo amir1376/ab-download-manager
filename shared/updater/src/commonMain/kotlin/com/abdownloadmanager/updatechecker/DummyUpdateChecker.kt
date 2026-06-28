@@ -2,8 +2,8 @@ package com.abdownloadmanager.updatechecker
 
 import com.abdownloadmanager.InstallableArch
 import io.github.z4kn4fein.semver.Version
-import ir.amirab.util.platform.Arch
-import ir.amirab.util.platform.Platform
+import com.xeton.util.platform.Arch
+import com.xeton.util.platform.Platform
 import kotlinx.coroutines.delay
 
 class DummyUpdateChecker(currentVersion: Version) : UpdateChecker(currentVersion) {

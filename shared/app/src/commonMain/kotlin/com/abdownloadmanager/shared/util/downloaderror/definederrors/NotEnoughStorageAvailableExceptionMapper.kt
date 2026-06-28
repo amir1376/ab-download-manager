@@ -6,9 +6,9 @@ import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapper
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapper.Companion.createErrorReason
-import ir.amirab.downloader.exception.NoSpaceInStorageException
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
+import com.xeton.downloader.exception.NoSpaceInStorageException
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.asStringSourceWithARgs
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

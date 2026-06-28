@@ -25,7 +25,7 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 import java.awt.MouseInfo
 

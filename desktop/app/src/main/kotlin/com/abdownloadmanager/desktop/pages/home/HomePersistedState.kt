@@ -2,12 +2,12 @@ package com.abdownloadmanager.desktop.pages.home
 
 import com.abdownloadmanager.shared.ui.widget.table.customtable.TableState
 import arrow.optics.Lens
-import ir.amirab.util.config.floatKeyOf
-import ir.amirab.util.config.getDecoded
-import ir.amirab.util.config.keyOfEncoded
-import ir.amirab.util.config.putEncodedNullable
-import ir.amirab.util.config.MapConfig
-import ir.amirab.util.config.booleanKeyOf
+import com.xeton.util.config.floatKeyOf
+import com.xeton.util.config.getDecoded
+import com.xeton.util.config.keyOfEncoded
+import com.xeton.util.config.putEncodedNullable
+import com.xeton.util.config.MapConfig
+import com.xeton.util.config.booleanKeyOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent

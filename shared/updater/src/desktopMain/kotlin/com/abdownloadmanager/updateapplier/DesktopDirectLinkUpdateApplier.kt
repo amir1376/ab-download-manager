@@ -2,8 +2,8 @@ package com.abdownloadmanager.updateapplier
 
 import com.abdownloadmanager.updatechecker.UpdateInfo
 import com.abdownloadmanager.updatechecker.UpdateSource
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isMac
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.isMac
 import java.io.File
 
 class DesktopDirectLinkUpdateApplier(

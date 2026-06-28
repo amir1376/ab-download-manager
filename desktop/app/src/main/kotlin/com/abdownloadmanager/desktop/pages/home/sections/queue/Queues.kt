@@ -63,12 +63,12 @@ import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.downloader.db.QueueModel
-import ir.amirab.downloader.queue.DownloadQueue
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.ifThen
+import com.xeton.downloader.db.QueueModel
+import com.xeton.downloader.queue.DownloadQueue
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.ifThen
 
 @Composable
 internal fun QueuesSection(

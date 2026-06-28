@@ -8,4 +8,4 @@ kotlin {
     jvm("desktop")
 }
 version=1
-group="ir.amirab.util"
+group="com.xeton.util"

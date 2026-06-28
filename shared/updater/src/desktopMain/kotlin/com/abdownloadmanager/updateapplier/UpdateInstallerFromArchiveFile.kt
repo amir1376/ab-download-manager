@@ -1,6 +1,6 @@
 package com.abdownloadmanager.updateapplier
 
-import ir.amirab.util.platform.Platform
+import com.xeton.util.platform.Platform
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer

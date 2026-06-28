@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.window.custom
 
 import com.abdownloadmanager.shared.util.ui.WithContentColor
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -41,10 +41,10 @@ import com.abdownloadmanager.shared.util.ui.theme.UiScaledContent
 import com.jetbrains.JBR
 import com.jetbrains.WindowDecorations
 import com.jetbrains.WindowMove
-import ir.amirab.util.desktop.LocalFrameWindowScope
+import com.xeton.util.desktop.LocalFrameWindowScope
 import com.abdownloadmanager.shared.ui.util.LocalWindow
-import ir.amirab.util.desktop.screen.applyUiScale
-import ir.amirab.util.ifThen
+import com.xeton.util.desktop.screen.applyUiScale
+import com.xeton.util.ifThen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive

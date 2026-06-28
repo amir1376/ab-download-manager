@@ -34,9 +34,9 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.layout.RelativeAlignment
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.layout.RelativeAlignment
 
 @Composable
 fun StartUpPageTemplate(

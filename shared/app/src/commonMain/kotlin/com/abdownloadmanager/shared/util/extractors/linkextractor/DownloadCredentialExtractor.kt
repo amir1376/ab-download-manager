@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util.extractors.linkextractor
 
 import com.abdownloadmanager.shared.util.extractors.Extractor
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadCredentials
 
 
 interface DownloadCredentialExtractor<T> : Extractor<T, List<IDownloadCredentials>> {

@@ -1,6 +1,6 @@
 package com.abdownloadmanager.github
 
-import ir.amirab.util.await
+import com.xeton.util.await
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

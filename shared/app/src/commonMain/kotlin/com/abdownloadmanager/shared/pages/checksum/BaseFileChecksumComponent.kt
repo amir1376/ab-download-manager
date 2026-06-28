@@ -12,9 +12,9 @@ import com.abdownloadmanager.shared.util.mvi.ContainsScreenState
 import com.abdownloadmanager.shared.util.mvi.SupportsScreenState
 import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.DownloadStatus
-import ir.amirab.downloader.downloaditem.IDownloadItem
-import ir.amirab.util.ifThen
+import com.xeton.downloader.downloaditem.DownloadStatus
+import com.xeton.downloader.downloaditem.IDownloadItem
+import com.xeton.util.ifThen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn

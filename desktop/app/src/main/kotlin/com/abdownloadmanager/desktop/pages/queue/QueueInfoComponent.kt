@@ -2,8 +2,8 @@ package com.abdownloadmanager.desktop.pages.queue
 
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.util.BaseComponent
-import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
-import ir.amirab.util.flow.mapStateFlow
+import com.xeton.util.flow.createMutableStateFlowFromStateFlow
+import com.xeton.util.flow.mapStateFlow
 import com.abdownloadmanager.shared.util.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
 import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
@@ -15,16 +15,16 @@ import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.TimeConfigurable
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.IDownloadMonitor
-import ir.amirab.downloader.queue.DownloadQueue
-import ir.amirab.downloader.queue.QueueManager
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
-import ir.amirab.util.desktop.poweraction.PowerActionConfig
-import ir.amirab.util.flow.combineStateFlows
-import ir.amirab.util.flow.createMutableStateFlowFromFlow
-import ir.amirab.util.flow.mapTwoWayStateFlow
+import com.xeton.downloader.monitor.IDownloadItemState
+import com.xeton.downloader.monitor.IDownloadMonitor
+import com.xeton.downloader.queue.DownloadQueue
+import com.xeton.downloader.queue.QueueManager
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.asStringSourceWithARgs
+import com.xeton.util.desktop.poweraction.PowerActionConfig
+import com.xeton.util.flow.combineStateFlows
+import com.xeton.util.flow.createMutableStateFlowFromFlow
+import com.xeton.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

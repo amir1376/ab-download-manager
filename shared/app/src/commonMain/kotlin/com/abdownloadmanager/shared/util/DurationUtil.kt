@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util
 
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 import kotlin.math.roundToInt
 
 /**

@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.window.custom.titlebar.linux
 
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background

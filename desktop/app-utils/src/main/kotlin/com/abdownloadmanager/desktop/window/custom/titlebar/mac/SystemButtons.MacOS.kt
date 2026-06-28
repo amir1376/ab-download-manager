@@ -26,7 +26,7 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 
 @Composable
 internal fun MacOSSystemButtons(

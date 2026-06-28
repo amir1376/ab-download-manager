@@ -1,12 +1,12 @@
 package com.abdownloadmanager.desktop.utils.renderapi
 
 import com.abdownloadmanager.shared.util.BaseStorage
-import ir.amirab.util.createParentDirectories
-import ir.amirab.util.deleteIfExists
-import ir.amirab.util.platform.Arch
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.readText
-import ir.amirab.util.writeText
+import com.xeton.util.createParentDirectories
+import com.xeton.util.deleteIfExists
+import com.xeton.util.platform.Arch
+import com.xeton.util.platform.Platform
+import com.xeton.util.readText
+import com.xeton.util.writeText
 import kotlinx.coroutines.flow.MutableStateFlow
 import okio.Path
 

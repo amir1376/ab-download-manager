@@ -18,8 +18,8 @@ dependencies{
     implementation(libs.pluginAboutLibraries)
     implementation(libs.pluginGradleVersions)
     implementation(libs.semver)
-    implementation("ir.amirab.util:platform:1")
-    implementation("ir.amirab.plugin:git-version-plugin:1")
-    implementation("ir.amirab.plugin:installer-plugin:1")
-    implementation("ir.amirab.plugin:common-android:1")
+    implementation("com.xeton.util:platform:1")
+    implementation("com.xeton.plugin:git-version-plugin:1")
+    implementation("com.xeton.plugin:installer-plugin:1")
+    implementation("com.xeton.plugin:common-android:1")
 }

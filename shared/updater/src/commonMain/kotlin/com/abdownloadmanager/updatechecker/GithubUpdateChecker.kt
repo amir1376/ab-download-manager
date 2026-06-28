@@ -3,8 +3,8 @@ package com.abdownloadmanager.updatechecker
 import com.abdownloadmanager.github.GithubApi
 import com.abdownloadmanager.ArtifactUtil
 import io.github.z4kn4fein.semver.Version
-import ir.amirab.util.platform.Arch
-import ir.amirab.util.platform.Platform
+import com.xeton.util.platform.Arch
+import com.xeton.util.platform.Platform
 
 class GithubUpdateChecker(
     currentVersion: Version,

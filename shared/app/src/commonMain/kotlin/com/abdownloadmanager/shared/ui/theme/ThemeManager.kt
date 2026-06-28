@@ -5,11 +5,11 @@ import androidx.compose.ui.graphics.Color
 import com.abdownloadmanager.shared.util.ui.theme.ISystemThemeDetector
 import com.abdownloadmanager.shared.util.ui.MyColors
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.flow.combineStateFlows
-import ir.amirab.util.flow.mapStateFlow
-import ir.amirab.util.guardedEntry
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.flow.combineStateFlows
+import com.xeton.util.flow.mapStateFlow
+import com.xeton.util.guardedEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*

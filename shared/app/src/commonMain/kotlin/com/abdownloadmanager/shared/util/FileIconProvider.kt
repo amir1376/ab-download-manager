@@ -8,8 +8,8 @@ import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.DefaultCategories
 import com.abdownloadmanager.shared.util.category.iconSource
 import com.abdownloadmanager.shared.util.ui.IMyIcons
-import ir.amirab.util.compose.IIconResolver
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IIconResolver
+import com.xeton.util.compose.IconSource
 
 
 interface FileIconProvider {

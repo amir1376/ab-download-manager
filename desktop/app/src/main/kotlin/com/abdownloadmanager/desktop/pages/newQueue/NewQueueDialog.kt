@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.desktop.screen.applyUiScale
 
 @Composable
 fun NewQueueDialog(

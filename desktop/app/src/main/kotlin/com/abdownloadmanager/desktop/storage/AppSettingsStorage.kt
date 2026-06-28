@@ -11,9 +11,9 @@ import com.abdownloadmanager.shared.util.downloadlocation.PlatformDownloadLocati
 import com.abdownloadmanager.shared.util.ConfigBaseSettingsByMapConfig
 import com.abdownloadmanager.shared.util.SystemDownloadLocationProvider
 import com.abdownloadmanager.shared.util.ui.theme.DEFAULT_UI_SCALE
-import ir.amirab.util.compose.localizationmanager.LanguageStorage
-import ir.amirab.util.config.*
-import ir.amirab.util.enumValueOrNull
+import com.xeton.util.compose.localizationmanager.LanguageStorage
+import com.xeton.util.config.*
+import com.xeton.util.enumValueOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent

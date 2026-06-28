@@ -1,11 +1,11 @@
 package com.abdownloadmanager.shared.util.proxy
 
-import ir.amirab.downloader.connection.proxy.Proxy
-import ir.amirab.downloader.connection.proxy.ProxyStrategy
-import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
-import ir.amirab.downloader.connection.proxy.ProxyType
-import ir.amirab.util.HttpUrlUtils
-import ir.amirab.util.wildcardMatch
+import com.xeton.downloader.connection.proxy.Proxy
+import com.xeton.downloader.connection.proxy.ProxyStrategy
+import com.xeton.downloader.connection.proxy.ProxyStrategyProvider
+import com.xeton.downloader.connection.proxy.ProxyType
+import com.xeton.util.HttpUrlUtils
+import com.xeton.util.wildcardMatch
 import java.net.Authenticator
 import java.net.PasswordAuthentication
 

@@ -10,7 +10,7 @@ import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.shared.pages.batchdownload.BaseBatchDownloadComponent
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.desktop.screen.applyUiScale
 
 @Composable
 fun BatchDownloadWindow(desktopBatchDownloadComponent: DesktopBatchDownloadComponent) {

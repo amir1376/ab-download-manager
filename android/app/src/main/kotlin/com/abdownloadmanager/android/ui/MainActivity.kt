@@ -14,7 +14,7 @@ import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.DefaultCategories
-import ir.amirab.downloader.queue.QueueManager
+import com.xeton.downloader.queue.QueueManager
 import kotlinx.serialization.json.Json
 import org.koin.core.component.inject
 

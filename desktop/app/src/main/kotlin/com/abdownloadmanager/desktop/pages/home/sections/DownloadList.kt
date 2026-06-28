@@ -10,7 +10,7 @@ import com.abdownloadmanager.shared.ui.widget.table.customtable.styled.MyStyledT
 import com.abdownloadmanager.shared.ui.widget.menu.custom.LocalMenuDisabledItemBehavior
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuDisabledItemBehavior
 import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInPopup
-import ir.amirab.util.compose.action.MenuItem
+import com.xeton.util.compose.action.MenuItem
 import androidx.compose.foundation.*
 import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -40,13 +40,13 @@ import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.rememberCategoryOf
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.downloader.monitor.*
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.desktop.isCtrlPressed
-import ir.amirab.util.desktop.isShiftPressed
-import ir.amirab.util.ifThen
+import com.xeton.downloader.monitor.*
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.desktop.isCtrlPressed
+import com.xeton.util.desktop.isShiftPressed
+import com.xeton.util.ifThen
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 

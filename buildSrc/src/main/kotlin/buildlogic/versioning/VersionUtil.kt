@@ -1,7 +1,7 @@
 package buildlogic.versioning
 
 import io.github.z4kn4fein.semver.Version
-import ir.amirab.util.platform.Platform
+import com.xeton.util.platform.Platform
 import org.gradle.api.Project
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 

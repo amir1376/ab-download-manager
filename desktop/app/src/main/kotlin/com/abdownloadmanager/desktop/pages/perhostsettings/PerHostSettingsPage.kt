@@ -35,9 +35,9 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.ifThen
 import kotlinx.coroutines.*
 
 @Composable

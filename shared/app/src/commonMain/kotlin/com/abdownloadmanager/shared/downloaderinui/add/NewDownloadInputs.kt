@@ -5,13 +5,13 @@ import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsItem
-import ir.amirab.downloader.connection.IResponseInfo
-import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.IDownloadItem
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.flow.mapStateFlow
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.downloader.downloaditem.DownloadJobExtraConfig
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadItem
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 

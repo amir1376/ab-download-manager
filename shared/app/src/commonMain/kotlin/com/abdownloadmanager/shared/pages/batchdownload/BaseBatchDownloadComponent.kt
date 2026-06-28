@@ -5,9 +5,9 @@ import com.abdownloadmanager.shared.util.BaseComponent
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.HttpUrlUtils
-import ir.amirab.util.flow.combineStateFlows
-import ir.amirab.util.flow.mapStateFlow
+import com.xeton.util.HttpUrlUtils
+import com.xeton.util.flow.combineStateFlows
+import com.xeton.util.flow.mapStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

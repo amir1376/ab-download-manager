@@ -3,10 +3,10 @@ package com.abdownloadmanager.shared.action
 import com.abdownloadmanager.shared.pagemanager.NotificationSender
 import com.abdownloadmanager.shared.ui.widget.MessageDialogType
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.util.compose.action.AnAction
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.action.simpleAction
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.action.AnAction
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.compose.action.simpleAction
+import com.xeton.util.compose.asStringSource
 
 
 fun createDummyExceptionAction(): AnAction {

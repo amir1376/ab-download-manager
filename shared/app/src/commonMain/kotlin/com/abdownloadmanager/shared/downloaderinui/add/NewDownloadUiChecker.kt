@@ -5,9 +5,9 @@ import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
 import com.abdownloadmanager.shared.util.DownloadSystem
-import ir.amirab.downloader.connection.IResponseInfo
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.util.flow.onEachLatest
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.util.flow.onEachLatest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow

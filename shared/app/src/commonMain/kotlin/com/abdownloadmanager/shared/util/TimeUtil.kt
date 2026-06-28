@@ -2,8 +2,8 @@ package com.abdownloadmanager.shared.util
 
 import androidx.compose.runtime.*
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSourceWithARgs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.DateTimePeriod

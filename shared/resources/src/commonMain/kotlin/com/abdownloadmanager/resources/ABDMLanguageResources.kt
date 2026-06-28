@@ -1,6 +1,6 @@
 package com.abdownloadmanager.resources
 
-import ir.amirab.resources.contracts.MyLanguageResource
+import com.xeton.resources.contracts.MyLanguageResource
 import okio.FileSystem
 import okio.Path.Companion.toPath
 

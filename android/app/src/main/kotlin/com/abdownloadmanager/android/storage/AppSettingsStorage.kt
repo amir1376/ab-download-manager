@@ -9,8 +9,8 @@ import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import com.abdownloadmanager.shared.util.downloadlocation.PlatformDownloadLocationProvider
 import com.abdownloadmanager.shared.util.ConfigBaseSettingsByMapConfig
 import com.abdownloadmanager.shared.util.ui.theme.DEFAULT_UI_SCALE
-import ir.amirab.util.config.*
-import ir.amirab.util.enumValueOrNull
+import com.xeton.util.config.*
+import com.xeton.util.enumValueOrNull
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 

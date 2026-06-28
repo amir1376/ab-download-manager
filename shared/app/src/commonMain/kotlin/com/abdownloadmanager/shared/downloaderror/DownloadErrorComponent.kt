@@ -4,7 +4,7 @@ import com.abdownloadmanager.shared.util.BaseComponent
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.downloaditem.IDownloadItem
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent

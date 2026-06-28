@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util.category
 
 import com.abdownloadmanager.shared.util.ui.IMyIcons
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 import java.io.File
 
 class DefaultCategories(

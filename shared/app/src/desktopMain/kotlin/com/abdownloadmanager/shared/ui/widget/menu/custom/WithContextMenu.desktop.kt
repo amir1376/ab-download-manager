@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.rememberCursorPositionProvider
-import ir.amirab.util.compose.action.MenuItem
+import com.xeton.util.compose.action.MenuItem
 
 @Composable
 actual fun WithContextMenu(

@@ -12,10 +12,10 @@ import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialog
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.downloader.monitor.CompletedDownloadItemState
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.ProcessingDownloadItemState
-import ir.amirab.util.compose.asStringSource
+import com.xeton.downloader.monitor.CompletedDownloadItemState
+import com.xeton.downloader.monitor.IDownloadItemState
+import com.xeton.downloader.monitor.ProcessingDownloadItemState
+import com.xeton.util.compose.asStringSource
 import kotlinx.coroutines.delay
 
 @Composable

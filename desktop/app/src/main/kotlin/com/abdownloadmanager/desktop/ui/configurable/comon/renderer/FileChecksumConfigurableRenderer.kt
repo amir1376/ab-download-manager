@@ -25,7 +25,7 @@ import com.abdownloadmanager.shared.ui.widget.MyTextField
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.FileChecksum
 import com.abdownloadmanager.shared.util.FileChecksumAlgorithm
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.resources.myStringResource
 
 object FileChecksumConfigurableRenderer : ConfigurableRenderer<FileChecksumConfigurable> {
     @Composable

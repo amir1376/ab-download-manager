@@ -2,8 +2,8 @@ package com.abdownloadmanager.android.util
 
 import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
-import ir.amirab.downloader.downloaditem.IDownloadItem
-import ir.amirab.util.osfileutil.FileUtils
+import com.xeton.downloader.downloaditem.IDownloadItem
+import com.xeton.util.osfileutil.FileUtils
 import java.io.File
 
 class AndroidDownloadItemOpener(

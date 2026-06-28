@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.ui.widget.sort
 
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 
 fun <ITEM, TComparatorProvider : ComparatorProvider<ITEM>> Sort<TComparatorProvider>.sorted(
     list: List<ITEM>

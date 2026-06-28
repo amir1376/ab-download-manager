@@ -11,11 +11,11 @@ import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
-import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isMac
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.asStringSourceWithARgs
+import com.xeton.util.flow.createMutableStateFlowFromStateFlow
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
 
 object DesktopSettings {

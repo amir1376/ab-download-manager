@@ -40,10 +40,10 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.dpToPx
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.dpToPx
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.ifThen
 
 
 @Composable

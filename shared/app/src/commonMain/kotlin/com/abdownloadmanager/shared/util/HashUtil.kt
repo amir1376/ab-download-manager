@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util
 
-import ir.amirab.downloader.utils.calcPercent
+import com.xeton.downloader.utils.calcPercent
 import java.io.File
 import java.io.InputStream
 import java.security.MessageDigest

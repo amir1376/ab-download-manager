@@ -3,7 +3,7 @@ package com.abdownloadmanager
 import com.abdownloadmanager.updateapplier.UpdateApplier
 import com.abdownloadmanager.updatechecker.UpdateChecker
 import com.abdownloadmanager.updatechecker.UpdateInfo
-import ir.amirab.util.AppVersionTracker
+import com.xeton.util.AppVersionTracker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

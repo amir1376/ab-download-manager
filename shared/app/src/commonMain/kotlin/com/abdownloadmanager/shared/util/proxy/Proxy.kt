@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.util.proxy
 
-import ir.amirab.downloader.connection.proxy.Proxy
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isAndroid
+import com.xeton.downloader.connection.proxy.Proxy
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.isAndroid
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

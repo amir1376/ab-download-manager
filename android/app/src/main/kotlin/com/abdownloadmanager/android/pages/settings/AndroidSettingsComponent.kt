@@ -10,8 +10,8 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.localizationmanager.LanguageManager
-import ir.amirab.util.flow.mapStateFlow
+import com.xeton.util.compose.localizationmanager.LanguageManager
+import com.xeton.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent

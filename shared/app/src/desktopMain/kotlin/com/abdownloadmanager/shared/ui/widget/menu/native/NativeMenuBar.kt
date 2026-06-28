@@ -17,8 +17,8 @@ import androidx.compose.ui.window.MenuScope
 import com.abdownloadmanager.shared.util.LocalShortCutManager
 import com.abdownloadmanager.shared.util.PlatformKeyStroke
 import com.abdownloadmanager.shared.util.ShortcutManager
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.action.MenuItem
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.action.MenuItem
 
 @Composable
 fun NativeMenuBar(

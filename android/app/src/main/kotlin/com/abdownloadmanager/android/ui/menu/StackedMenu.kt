@@ -13,8 +13,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.compose.asStringSource
 
 @Composable
 fun rememberMenuStack(

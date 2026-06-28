@@ -45,9 +45,9 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.modifiers.autoMirror
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.compose.modifiers.autoMirror
+import com.xeton.util.ifThen
 
 enum class MenuDisabledItemBehavior {
     Filter,

@@ -26,9 +26,9 @@ import com.abdownloadmanager.shared.ui.widget.ActionContainer
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 
 @Suppress("unused")

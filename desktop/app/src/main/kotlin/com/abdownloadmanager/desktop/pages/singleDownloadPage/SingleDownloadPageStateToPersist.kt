@@ -2,8 +2,8 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
 import arrow.optics.Lens
 import arrow.optics.optics
-import ir.amirab.util.config.MapConfig
-import ir.amirab.util.config.booleanKeyOf
+import com.xeton.util.config.MapConfig
+import com.xeton.util.config.booleanKeyOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent

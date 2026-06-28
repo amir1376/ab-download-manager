@@ -6,8 +6,8 @@ import com.abdownloadmanager.shared.ui.widget.table.customtable.TableCell
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.credits.translators.LanguageTranslationInfo
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 
 sealed interface TranslatorsCells : TableCell<LanguageTranslationInfo> {
     data object LanguageName : TranslatorsCells,

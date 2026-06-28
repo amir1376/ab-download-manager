@@ -5,11 +5,11 @@ import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuColumn
 import com.abdownloadmanager.shared.util.div
-import ir.amirab.util.flow.saved
+import com.xeton.util.flow.saved
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -35,8 +35,8 @@ import com.abdownloadmanager.shared.util.ui.MultiplatformHorizontalScrollbar
 import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
 import com.abdownloadmanager.shared.util.ui.needScroll
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.shifted
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.shifted
 import kotlinx.coroutines.flow.*
 import sh.calvin.reorderable.ReorderableColumn
 import sh.calvin.reorderable.ReorderableListItemScope

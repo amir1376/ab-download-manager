@@ -4,7 +4,7 @@ import android.app.Application
 import com.abdownloadmanager.android.BuildConfig
 import com.abdownloadmanager.shared.util.AppVersion
 import com.abdownloadmanager.shared.util.SharedConstants
-import ir.amirab.util.platform.Platform
+import com.xeton.util.platform.Platform
 import okio.Path.Companion.toOkioPath
 
 object AppInfo {

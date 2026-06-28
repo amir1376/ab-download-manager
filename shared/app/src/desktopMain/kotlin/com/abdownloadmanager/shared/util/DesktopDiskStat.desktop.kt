@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util
 
-import ir.amirab.downloader.utils.IDiskStat
+import com.xeton.downloader.utils.IDiskStat
 import java.io.File
 
 actual typealias PlatformDiskStat = DesktopDiskStat

@@ -9,7 +9,7 @@ kotlin {
     jvm("desktop")
     android {
         compileSdk = 36
-        namespace = "ir.amirab.downloader.core"
+        namespace = "com.xeton.downloader.core"
         minSdk = 26
     }
     sourceSets {

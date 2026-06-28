@@ -20,8 +20,8 @@ import com.abdownloadmanager.shared.ui.widget.ProvideNotificationManager
 import com.abdownloadmanager.shared.util.PopUpContainer
 import com.abdownloadmanager.shared.util.ResponsiveBox
 import com.abdownloadmanager.shared.util.ui.ProvideDebugInfo
-import ir.amirab.util.compose.IIconResolver
-import ir.amirab.util.compose.localizationmanager.LanguageManager
+import com.xeton.util.compose.IIconResolver
+import com.xeton.util.compose.localizationmanager.LanguageManager
 import kotlin.collections.component1
 import kotlin.collections.component2
 

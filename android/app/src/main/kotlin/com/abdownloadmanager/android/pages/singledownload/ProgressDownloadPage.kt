@@ -38,14 +38,14 @@ import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.downloader.downloaditem.DownloadJobStatus
-import ir.amirab.downloader.monitor.*
-import ir.amirab.downloader.part.PartDownloadStatus
-import ir.amirab.downloader.utils.ExceptionUtils
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.downloader.downloaditem.DownloadJobStatus
+import com.xeton.downloader.monitor.*
+import com.xeton.downloader.part.PartDownloadStatus
+import com.xeton.downloader.utils.ExceptionUtils
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
 
 enum class SingleDownloadPageSections(
     val title: StringSource,

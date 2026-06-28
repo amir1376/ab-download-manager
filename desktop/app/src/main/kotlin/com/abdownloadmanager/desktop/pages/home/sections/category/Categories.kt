@@ -49,8 +49,8 @@ import com.abdownloadmanager.shared.ui.widget.DelayedTooltipPopup
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.rememberIconPainter
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.ifThen
 import sh.calvin.reorderable.ReorderableColumn
 import sh.calvin.reorderable.ReorderableListItemScope
 

@@ -5,8 +5,8 @@ import androidx.compose.runtime.remember
 import com.abdownloadmanager.shared.util.LocalSizeUnit
 import com.abdownloadmanager.shared.util.convertDurationToHumanReadable
 import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.datasize.ConvertSizeConfig
+import com.xeton.util.compose.StringSource
+import com.xeton.util.datasize.ConvertSizeConfig
 
 sealed class DownloadSize : Comparable<DownloadSize> {
     abstract fun comparePriority(): Int

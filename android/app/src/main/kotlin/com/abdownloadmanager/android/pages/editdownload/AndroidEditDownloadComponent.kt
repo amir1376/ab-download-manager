@@ -8,8 +8,8 @@ import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
-import ir.amirab.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.downloaditem.DownloadJobExtraConfig
+import com.xeton.downloader.downloaditem.IDownloadItem
 import kotlinx.coroutines.flow.*
 
 class AndroidEditDownloadComponent(

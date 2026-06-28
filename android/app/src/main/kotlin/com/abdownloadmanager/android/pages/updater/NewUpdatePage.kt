@@ -34,7 +34,7 @@ import com.abdownloadmanager.shared.util.ui.VerticalScrollableContent
 import io.github.z4kn4fein.semver.Version
 import com.abdownloadmanager.updatechecker.UpdateInfo
 import com.mikepenz.markdown.compose.Markdown
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun ResponsiveDialogScope.NewUpdatePage(

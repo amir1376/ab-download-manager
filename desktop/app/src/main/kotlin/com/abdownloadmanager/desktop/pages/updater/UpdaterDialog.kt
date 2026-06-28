@@ -10,7 +10,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.pages.updater.RenderUpdateNotifications
 import com.abdownloadmanager.shared.pages.updater.UpdateComponent
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.desktop.screen.applyUiScale
 
 @Composable
 fun ShowUpdaterDialog(updaterComponent: UpdateComponent) {

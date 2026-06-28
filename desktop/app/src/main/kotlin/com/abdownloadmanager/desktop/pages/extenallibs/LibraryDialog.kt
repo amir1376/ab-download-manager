@@ -28,9 +28,9 @@ import com.mikepenz.aboutlibraries.entity.Developer
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.entity.License
 import com.mikepenz.aboutlibraries.entity.Organization
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 import kotlinx.collections.immutable.ImmutableSet
 
 @Composable

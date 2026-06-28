@@ -46,7 +46,7 @@ import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.resources.myStringResource
 import java.awt.MouseInfo
 
 @Composable

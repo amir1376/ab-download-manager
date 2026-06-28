@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util.extractors.linkextractor
 
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadCredentials
 
 
 object DefaultDownloadCredentialsExtractor :

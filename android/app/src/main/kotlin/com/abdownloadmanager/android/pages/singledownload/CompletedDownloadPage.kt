@@ -21,8 +21,8 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.downloader.monitor.CompletedDownloadItemState
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.downloader.monitor.CompletedDownloadItemState
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun CompletedDownloadPage(

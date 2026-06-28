@@ -20,8 +20,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
 
 data class AppPermission(
     val title: StringSource,

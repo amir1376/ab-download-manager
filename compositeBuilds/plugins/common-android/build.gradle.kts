@@ -6,7 +6,7 @@ repositories {
     google()
 }
 version = 1
-group = "ir.amirab.plugin"
+group = "com.xeton.plugin"
 dependencies {
     implementation(libs.pluginAndroidGradle)
     implementation(libs.handlebarsJava)

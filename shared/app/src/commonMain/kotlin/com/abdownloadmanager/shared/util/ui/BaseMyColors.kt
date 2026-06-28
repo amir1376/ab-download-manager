@@ -1,9 +1,9 @@
 package com.abdownloadmanager.shared.util.ui
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import ir.amirab.util.compose.IIconResolver
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.contants.ICON_PROTOCOL
+import com.xeton.util.compose.IIconResolver
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.contants.ICON_PROTOCOL
 
 abstract class BaseMyColors : IMyIcons, IIconResolver {
     val iconMap = mutableMapOf<String, IconSource>()

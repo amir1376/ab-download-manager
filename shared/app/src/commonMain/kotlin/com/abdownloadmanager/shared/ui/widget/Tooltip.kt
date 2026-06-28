@@ -23,7 +23,7 @@ import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.util.compose.StringSource
+import com.xeton.util.compose.StringSource
 import kotlinx.coroutines.delay
 
 private const val TooltipDelay = 500L

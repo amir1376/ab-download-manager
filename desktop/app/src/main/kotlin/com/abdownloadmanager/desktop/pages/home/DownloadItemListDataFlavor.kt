@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.pages.home
 
-import ir.amirab.downloader.monitor.IDownloadItemState
+import com.xeton.downloader.monitor.IDownloadItemState
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException

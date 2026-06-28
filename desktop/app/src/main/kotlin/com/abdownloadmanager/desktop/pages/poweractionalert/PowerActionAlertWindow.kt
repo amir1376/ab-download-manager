@@ -35,9 +35,9 @@ import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.desktop.screen.applyUiScale
 
 @Composable
 fun PowerActionAlert(appComponent: AppComponent) {

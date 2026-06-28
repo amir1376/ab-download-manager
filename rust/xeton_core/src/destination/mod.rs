@@ -1,7 +1,7 @@
 // xeton_core::destination — Zero-copy disk I/O via actor pattern.
 //
-// Replaces `ir.amirab.downloader.destination.SimpleDownloadDestination` and
-// `ir.amirab.downloader.destination.DestWriter` with a Tokio-based actor that
+// Replaces `com.xeton.downloader.destination.SimpleDownloadDestination` and
+// `com.xeton.downloader.destination.DestWriter` with a Tokio-based actor that
 // serializes all file writes through an mpsc channel.
 //
 // Key design:

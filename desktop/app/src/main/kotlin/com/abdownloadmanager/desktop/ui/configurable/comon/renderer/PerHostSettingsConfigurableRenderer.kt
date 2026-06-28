@@ -9,7 +9,7 @@ import com.abdownloadmanager.desktop.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
 import com.abdownloadmanager.shared.ui.widget.ActionButton
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.resources.myStringResource
 
 object PerHostSettingsConfigurableRenderer : ConfigurableRenderer<NavigatableConfigurable> {
     @Composable

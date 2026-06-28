@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.utils.singleInstance
 
-import ir.amirab.util.http4k.NanoHttp
+import com.xeton.util.http4k.NanoHttp
 import okio.*
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request

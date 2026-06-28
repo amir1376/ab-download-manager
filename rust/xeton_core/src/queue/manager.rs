@@ -1,6 +1,6 @@
 // xeton_core::queue::manager — Queue manager coordinating multiple queues.
 //
-// Port of `ir.amirab.downloader.queue.QueueManager`.
+// Port of `com.xeton.downloader.queue.QueueManager`.
 
 use std::sync::Arc;
 
@@ -13,7 +13,7 @@ use super::Queue;
 
 /// Manages all download queues.
 ///
-/// Mirrors `ir.amirab.downloader.queue.QueueManager`.
+/// Mirrors `com.xeton.downloader.queue.QueueManager`.
 pub struct QueueManager {
     queues: DashMap<i64, Arc<Queue>>,
     queue_db: Arc<dyn QueueDb>,

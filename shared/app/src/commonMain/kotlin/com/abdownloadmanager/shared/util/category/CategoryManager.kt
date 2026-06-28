@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.util.category
 
-import ir.amirab.util.ifThen
-import ir.amirab.util.shifted
-import ir.amirab.util.suspendGuardedEntry
+import com.xeton.util.ifThen
+import com.xeton.util.shifted
+import com.xeton.util.suspendGuardedEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview

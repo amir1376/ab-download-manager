@@ -11,7 +11,7 @@ val propertiesToKotlinTask = tasks.register<PropertiesToKotlinTask>("propertiesT
     outputDir.set(file("build/tasks/propertiesToKotlinTask"))
     generatedFileName.set("String.kt")
     packageName.set(ourPackageName)
-    myStringResourceClass.set("ir.amirab.resources.contracts.MyStringResource")
+    myStringResourceClass.set("com.xeton.resources.contracts.MyStringResource")
     propertyFiles.from("src/commonMain/resources/com/abdownloadmanager/resources/locales/en_US.properties")
 }
 val generateResourceMap = tasks.register<GenerateResourceMap>("generateResourceMap") {

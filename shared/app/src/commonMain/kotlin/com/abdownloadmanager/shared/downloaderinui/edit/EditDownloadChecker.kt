@@ -2,10 +2,10 @@ package com.abdownloadmanager.shared.downloaderinui.edit
 
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
-import ir.amirab.downloader.connection.IResponseInfo
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.IDownloadItem
-import ir.amirab.util.flow.mapStateFlow
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadItem
+import com.xeton.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

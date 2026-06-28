@@ -3,8 +3,8 @@ package com.abdownloadmanager.desktop.actions
 import com.abdownloadmanager.desktop.DesktopDownloadDialogManager
 import com.abdownloadmanager.shared.action.createStopAllAction
 import com.abdownloadmanager.shared.util.DownloadSystem
-import ir.amirab.downloader.queue.DownloadQueue
-import ir.amirab.util.compose.action.AnAction
+import com.xeton.downloader.queue.DownloadQueue
+import com.xeton.util.compose.action.AnAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 

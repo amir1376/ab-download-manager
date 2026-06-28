@@ -3,7 +3,7 @@ package com.abdownloadmanager.desktop.pages.settings
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
@@ -35,8 +35,8 @@ import com.abdownloadmanager.shared.util.ui.needScroll
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.ifThen
 
 @Composable
 private fun SideBar(

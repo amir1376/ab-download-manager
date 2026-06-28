@@ -8,7 +8,7 @@ import android.os.PowerManager
 import androidx.annotation.RequiresApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.asStringSource
 
 object ABDMPermissions {
     private fun getReadRightStorage(): AppPermission {

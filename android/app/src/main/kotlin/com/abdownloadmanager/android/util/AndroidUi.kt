@@ -1,8 +1,8 @@
 package com.abdownloadmanager.android.util
 
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
-import ir.amirab.util.compose.localizationmanager.LanguageManager
-import ir.amirab.util.guardedEntry
+import com.xeton.util.compose.localizationmanager.LanguageManager
+import com.xeton.util.guardedEntry
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

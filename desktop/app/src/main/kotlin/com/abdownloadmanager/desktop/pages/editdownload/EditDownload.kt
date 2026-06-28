@@ -44,13 +44,13 @@ import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.downloader.connection.IResponseInfo
-import ir.amirab.util.URLOpener
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.screen.applyUiScale
-import ir.amirab.util.ifThen
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.util.URLOpener
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.desktop.screen.applyUiScale
+import com.xeton.util.ifThen
 
 @Composable
 fun EditDownloadWindow(

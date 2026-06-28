@@ -26,10 +26,10 @@ import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.router.slot.dismiss
-import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.queue.QueueManager
-import ir.amirab.util.flow.mapStateFlow
+import com.xeton.downloader.downloaditem.DownloadJobExtraConfig
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.queue.QueueManager
+import com.xeton.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

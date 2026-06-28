@@ -5,7 +5,7 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.BaseComponent
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.localizationmanager.LanguageManager
+import com.xeton.util.compose.localizationmanager.LanguageManager
 
 class InitialSetupComponent(
     ctx: ComponentContext,

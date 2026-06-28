@@ -35,8 +35,8 @@ import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.ifThen
 import kotlinx.datetime.DayOfWeek
 
 object DayOfWeekConfigurableRenderer : ConfigurableRenderer<DayOfWeekConfigurable> {

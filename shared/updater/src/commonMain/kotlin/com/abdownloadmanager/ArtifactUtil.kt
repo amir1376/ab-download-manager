@@ -1,8 +1,8 @@
 package com.abdownloadmanager
 
 import io.github.z4kn4fein.semver.Version
-import ir.amirab.util.platform.Arch
-import ir.amirab.util.platform.Platform
+import com.xeton.util.platform.Arch
+import com.xeton.util.platform.Platform
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 

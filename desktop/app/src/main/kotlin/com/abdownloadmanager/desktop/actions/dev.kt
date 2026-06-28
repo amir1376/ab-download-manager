@@ -8,11 +8,11 @@ import com.abdownloadmanager.shared.ui.widget.MessageDialogType
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.action.createDummyExceptionAction
 import com.abdownloadmanager.shared.action.createDummyMessageAction
-import ir.amirab.util.compose.action.AnAction
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.action.simpleAction
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.desktop.poweraction.PowerActionConfig
+import com.xeton.util.compose.action.AnAction
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.compose.action.simpleAction
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.desktop.poweraction.PowerActionConfig
 import org.koin.core.component.get
 
 private val appComponent = Di.get<AppComponent>()

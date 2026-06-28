@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.Popup
 import com.abdownloadmanager.shared.ui.widget.rememberMyComponentRectPositionProvider
-import ir.amirab.util.compose.action.MenuItem
+import com.xeton.util.compose.action.MenuItem
 
 /**
  * TODO (KMP) implement it based on design

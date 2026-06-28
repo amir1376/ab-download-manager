@@ -24,8 +24,8 @@ import com.abdownloadmanager.android.pages.directorypicker.rememberAndroidDirect
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.compose.asStringSource
 import java.io.File
 
 @Composable

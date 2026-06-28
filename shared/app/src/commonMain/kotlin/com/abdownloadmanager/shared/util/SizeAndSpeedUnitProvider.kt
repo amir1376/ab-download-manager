@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util
 
-import ir.amirab.util.datasize.ConvertSizeConfig
+import com.xeton.util.datasize.ConvertSizeConfig
 import kotlinx.coroutines.flow.StateFlow
 
 interface SizeAndSpeedUnitProvider {

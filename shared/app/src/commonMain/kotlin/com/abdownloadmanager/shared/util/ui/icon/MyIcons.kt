@@ -3,7 +3,7 @@ package com.abdownloadmanager.shared.util.ui.icon
 import com.abdownloadmanager.resources.icons.ABDMIcons
 import com.abdownloadmanager.resources.icons.*
 import com.abdownloadmanager.shared.util.ui.BaseMyColors
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 
 object MyIcons : BaseMyColors() {
     override val appIcon = ABDMIcons.AppIcon.asIconSource("appIcon", false)

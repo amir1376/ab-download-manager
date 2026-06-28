@@ -1,6 +1,6 @@
 // xeton_core::connection — HTTP connection management.
 //
-// Replaces `ir.amirab.downloader.connection.OkHttpHttpDownloaderClient`
+// Replaces `com.xeton.downloader.connection.OkHttpHttpDownloaderClient`
 // with reqwest (HTTP/1.1 + HTTP/2, TLS, proxy, streaming).
 
 pub mod proxy;
@@ -217,7 +217,7 @@ impl HttpClient {
 // ─── PartConnection ─────────────────────────────────────────────────────────
 
 /// An active connection streaming bytes for a specific range.
-/// Mirrors `ir.amirab.downloader.connection.Connection<HttpResponseInfo>`.
+/// Mirrors `com.xeton.downloader.connection.Connection<HttpResponseInfo>`.
 pub struct PartConnection {
     pub info: ResponseInfo,
     pub content_length: i64,

@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.util.extractors.linkextractor
 
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
-import ir.amirab.util.logger.appLogger
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.util.logger.appLogger
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

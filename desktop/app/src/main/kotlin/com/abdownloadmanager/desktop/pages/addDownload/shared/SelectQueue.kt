@@ -28,11 +28,11 @@ import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.downloader.queue.DownloadQueue
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.screen.applyUiScale
-import ir.amirab.util.ifThen
+import com.xeton.downloader.queue.DownloadQueue
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.desktop.screen.applyUiScale
+import com.xeton.util.ifThen
 import java.awt.MouseInfo
 
 @Composable

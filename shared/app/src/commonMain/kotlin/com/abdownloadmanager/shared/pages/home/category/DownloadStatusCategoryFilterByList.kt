@@ -1,10 +1,10 @@
 package com.abdownloadmanager.shared.pages.home.category
 
-import ir.amirab.downloader.downloaditem.DownloadStatus
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.statusOrFinished
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
+import com.xeton.downloader.downloaditem.DownloadStatus
+import com.xeton.downloader.monitor.IDownloadItemState
+import com.xeton.downloader.monitor.statusOrFinished
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
 
 class DownloadStatusCategoryFilterByList(
     name: StringSource,

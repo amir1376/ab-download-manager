@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util
 
-import ir.amirab.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.downloaditem.IDownloadItem
 
 interface DownloadItemOpener {
     suspend fun openDownloadItem(id:Long)

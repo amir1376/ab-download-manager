@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.ui.IMyIcons
-import ir.amirab.util.compose.IconSource
+import com.xeton.util.compose.IconSource
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.swing.filechooser.FileSystemView

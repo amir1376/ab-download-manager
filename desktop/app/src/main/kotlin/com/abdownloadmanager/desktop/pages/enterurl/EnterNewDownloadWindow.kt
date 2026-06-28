@@ -13,8 +13,8 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.desktop.screen.applyUiScale
 
 @Composable
 fun EnterNewDownloadWindow(

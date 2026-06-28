@@ -3,8 +3,8 @@ package com.abdownloadmanager.android.pages.browser
 import android.webkit.CookieManager
 import com.abdownloadmanager.android.ui.widget.WebViewState
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
-import ir.amirab.util.HttpUrlUtils
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.util.HttpUrlUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

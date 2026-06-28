@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.storage
 
-import ir.amirab.downloader.queue.DefaultQueueInfo
+import com.xeton.downloader.queue.DefaultQueueInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 

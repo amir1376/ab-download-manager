@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util.ondownloadcompletion
 
-import ir.amirab.downloader.DownloadManagerEvents
-import ir.amirab.downloader.DownloadManagerMinimalControl
+import com.xeton.downloader.DownloadManagerEvents
+import com.xeton.downloader.DownloadManagerMinimalControl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel

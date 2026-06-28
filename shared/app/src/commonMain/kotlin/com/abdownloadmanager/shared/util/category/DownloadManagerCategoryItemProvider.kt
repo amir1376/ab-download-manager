@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util.category
 
-import ir.amirab.downloader.DownloadManager
+import com.xeton.downloader.DownloadManager
 
 class DownloadManagerCategoryItemProvider(
     private val dowManager: DownloadManager,

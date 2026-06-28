@@ -17,7 +17,7 @@ use async_trait::async_trait;
 // ─── Download DB trait ──────────────────────────────────────────────────────
 
 /// Trait abstracting the download items database.
-/// Mirrors `ir.amirab.downloader.db.IDownloadListDb`.
+/// Mirrors `com.xeton.downloader.db.IDownloadListDb`.
 #[async_trait]
 pub trait DownloadDb: Send + Sync {
     async fn get_all(&self) -> anyhow::Result<Vec<DownloadItem>>;
@@ -31,7 +31,7 @@ pub trait DownloadDb: Send + Sync {
 // ─── Part DB trait ──────────────────────────────────────────────────────────
 
 /// Trait abstracting the download parts database.
-/// Mirrors `ir.amirab.downloader.db.IDownloadPartListDb`.
+/// Mirrors `com.xeton.downloader.db.IDownloadPartListDb`.
 #[async_trait]
 pub trait PartDb: Send + Sync {
     async fn get_parts(&self, download_id: i64) -> anyhow::Result<Vec<RangedPart>>;
@@ -42,7 +42,7 @@ pub trait PartDb: Send + Sync {
 // ─── Queue DB trait ─────────────────────────────────────────────────────────
 
 /// Trait abstracting the queue persistence.
-/// Mirrors `ir.amirab.downloader.db.DownloadQueuePersistedDataAccess`.
+/// Mirrors `com.xeton.downloader.db.DownloadQueuePersistedDataAccess`.
 #[async_trait]
 pub trait QueueDb: Send + Sync {
     async fn get_all_queues(&self) -> anyhow::Result<Vec<QueueModel>>;

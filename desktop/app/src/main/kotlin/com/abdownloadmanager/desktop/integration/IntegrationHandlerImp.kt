@@ -15,12 +15,12 @@ import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
 import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
-import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
-import ir.amirab.downloader.NewDownloadItemProps
-import ir.amirab.downloader.downloaditem.EmptyContext
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
-import ir.amirab.downloader.queue.QueueManager
-import ir.amirab.downloader.utils.OnDuplicateStrategy
+import com.xeton.downloader.downloaditem.hls.HLSDownloadCredentials
+import com.xeton.downloader.NewDownloadItemProps
+import com.xeton.downloader.downloaditem.EmptyContext
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.downloader.queue.QueueManager
+import com.xeton.downloader.utils.OnDuplicateStrategy
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

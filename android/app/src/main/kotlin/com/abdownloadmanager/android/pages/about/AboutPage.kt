@@ -40,13 +40,13 @@ import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.AppVersion
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.URLOpener
-import ir.amirab.util.HttpUrlUtils
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.dpToPx
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.URLOpener
+import com.xeton.util.HttpUrlUtils
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.dpToPx
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun AboutPage(

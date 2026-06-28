@@ -17,7 +17,7 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableRenderer
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.myColors
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.asStringSource
 
 object PermissionConfigurableRenderer : ConfigurableRenderer<PermissionConfigurable> {
     @Composable

@@ -10,7 +10,7 @@ kotlin {
     jvm("desktop")
     android {
         compileSdk = 36
-        namespace = "ir.amirab.downloader.monitor"
+        namespace = "com.xeton.downloader.monitor"
         minSdk = 26
     }
     sourceSets {

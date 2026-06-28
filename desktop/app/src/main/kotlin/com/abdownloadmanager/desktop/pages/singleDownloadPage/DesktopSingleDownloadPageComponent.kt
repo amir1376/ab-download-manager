@@ -12,9 +12,9 @@ import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.util.*
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.desktop.poweraction.PowerActionConfig
-import ir.amirab.util.flow.mapTwoWayStateFlow
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.desktop.poweraction.PowerActionConfig
+import com.xeton.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 import org.koin.core.component.get

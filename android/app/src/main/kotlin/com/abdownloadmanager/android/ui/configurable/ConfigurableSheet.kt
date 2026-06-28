@@ -10,7 +10,7 @@ import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialog
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
-import ir.amirab.util.compose.StringSource
+import com.xeton.util.compose.StringSource
 
 @Composable
 fun ConfigurableSheet(

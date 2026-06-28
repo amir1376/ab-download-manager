@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.downloaderinui
 
-import ir.amirab.downloader.connection.IResponseInfo
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.downloader.downloaditem.IDownloadCredentials
 
 interface LinkCheckerFactory<
         TCredentials : IDownloadCredentials,

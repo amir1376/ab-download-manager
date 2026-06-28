@@ -9,7 +9,7 @@ import com.abdownloadmanager.android.util.AndroidIntentUtils
 import com.abdownloadmanager.android.util.activity.ABDMActivity
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.arkivanov.decompose.defaultComponentContext
-import ir.amirab.util.HttpUrlUtils
+import com.xeton.util.HttpUrlUtils
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

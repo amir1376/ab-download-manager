@@ -6,8 +6,8 @@ import com.abdownloadmanager.shared.ui.widget.table.customtable.TableCell
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.resources.Res
 import com.mikepenz.aboutlibraries.entity.Library
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 
 sealed interface LibraryCells : TableCell<Library> {
     data object Name : LibraryCells,

@@ -29,11 +29,11 @@ import com.abdownloadmanager.shared.ui.widget.DoubleTextField
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.LocalSpeedUnit
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.datasize.SizeConverter
-import ir.amirab.util.datasize.SizeFactors
-import ir.amirab.util.datasize.SizeUnit
-import ir.amirab.util.datasize.SizeWithUnit
-import ir.amirab.util.datasize.asConverterConfig
+import com.xeton.util.datasize.SizeConverter
+import com.xeton.util.datasize.SizeFactors
+import com.xeton.util.datasize.SizeUnit
+import com.xeton.util.datasize.SizeWithUnit
+import com.xeton.util.datasize.asConverterConfig
 
 object SpeedLimitConfigurableRenderer : ConfigurableRenderer<SpeedLimitConfigurable> {
     @Composable

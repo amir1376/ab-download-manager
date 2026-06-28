@@ -6,10 +6,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.window.ApplicationScope
 import com.kdroid.composetray.menu.api.TrayMenuBuilder
 import com.kdroid.composetray.tray.api.Tray
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.asDesktop
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.asDesktop
 
 @Composable
 fun ApplicationScope.Tray(

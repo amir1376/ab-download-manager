@@ -23,9 +23,9 @@ import com.abdownloadmanager.shared.pages.batchdownload.WildcardLength
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 
 @Composable
 fun BatchDownload(

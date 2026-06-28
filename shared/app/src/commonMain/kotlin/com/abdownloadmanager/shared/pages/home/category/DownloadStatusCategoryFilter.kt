@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.pages.home.category
 
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.StringSource
+import com.xeton.downloader.monitor.IDownloadItemState
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.StringSource
 
 abstract class DownloadStatusCategoryFilter(
     val name: StringSource,

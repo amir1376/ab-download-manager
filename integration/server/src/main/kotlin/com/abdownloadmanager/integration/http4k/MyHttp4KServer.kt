@@ -1,6 +1,6 @@
 package com.abdownloadmanager.integration.http4k
 
-import ir.amirab.util.http4k.NanoHttp
+import com.xeton.util.http4k.NanoHttp
 import com.abdownloadmanager.integration.HandlerMap
 import com.abdownloadmanager.integration.MyRequest
 import com.abdownloadmanager.integration.MyResponse

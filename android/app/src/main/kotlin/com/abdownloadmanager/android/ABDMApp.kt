@@ -9,7 +9,7 @@ import com.abdownloadmanager.android.util.AppInfo
 import com.abdownloadmanager.android.util.ApplicationBackgroundTracker
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
-import ir.amirab.util.logger.AppLogger
+import com.xeton.util.logger.AppLogger
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

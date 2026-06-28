@@ -1,9 +1,9 @@
 package com.abdownloadmanager.desktop.window
 
 import com.abdownloadmanager.shared.util.BrowserType
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.asDesktop
-import ir.amirab.util.toUpUntil
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.asDesktop
+import com.xeton.util.toUpUntil
 import java.io.File
 
 

@@ -1,6 +1,6 @@
 package com.abdownloadmanager.desktop.utils
 //
-//import ir.amirab.debugboard.core.plugin.watcher.RemoveWatch
+//import com.xeton.debugboard.core.plugin.watcher.RemoveWatch
 //import kotlinx.coroutines.CoroutineScope
 //import kotlinx.coroutines.job
 //

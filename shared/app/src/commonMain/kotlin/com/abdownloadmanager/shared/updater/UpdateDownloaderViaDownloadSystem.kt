@@ -4,10 +4,10 @@ import com.abdownloadmanager.UpdateDownloadLocationProvider
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.updateapplier.UpdateDownloader
 import com.abdownloadmanager.updatechecker.UpdateSource
-import ir.amirab.downloader.NewDownloadItemProps
-import ir.amirab.downloader.downloaditem.EmptyContext
-import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
-import ir.amirab.downloader.utils.OnDuplicateStrategy
+import com.xeton.downloader.NewDownloadItemProps
+import com.xeton.downloader.downloaditem.EmptyContext
+import com.xeton.downloader.downloaditem.http.HttpDownloadItem
+import com.xeton.downloader.utils.OnDuplicateStrategy
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import java.io.File

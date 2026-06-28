@@ -27,8 +27,8 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun AddMultiItemPage(

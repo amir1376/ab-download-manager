@@ -22,8 +22,8 @@ import com.abdownloadmanager.shared.util.ui.LocalTextStyle
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.util.HttpUrlUtils
-import ir.amirab.util.ifThen
+import com.xeton.util.HttpUrlUtils
+import com.xeton.util.ifThen
 
 
 @Composable

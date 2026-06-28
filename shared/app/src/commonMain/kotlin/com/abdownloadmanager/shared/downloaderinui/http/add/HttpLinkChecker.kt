@@ -3,11 +3,11 @@ package com.abdownloadmanager.shared.downloaderinui.http.add
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.util.FilenameFixer
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
-import ir.amirab.downloader.connection.HttpDownloaderClient
-import ir.amirab.downloader.connection.response.HttpResponseInfo
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
-import ir.amirab.util.HttpUrlUtils
-import ir.amirab.util.flow.mapStateFlow
+import com.xeton.downloader.connection.HttpDownloaderClient
+import com.xeton.downloader.connection.response.HttpResponseInfo
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.util.HttpUrlUtils
+import com.xeton.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

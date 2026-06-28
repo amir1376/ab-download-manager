@@ -9,7 +9,7 @@ kotlin {
     jvm("desktop")
     android {
         compileSdk = 36
-        namespace = "ir.amirab.util"
+        namespace = "com.xeton.util"
         minSdk = 26
     }
     sourceSets {
@@ -23,7 +23,7 @@ kotlin {
             api(libs.semver)
             api(libs.arrow.optics)
             api(libs.kermit)
-            api("ir.amirab.util:platform:1")
+            api("com.xeton.util:platform:1")
         }
         val desktopMain by getting
         desktopMain.dependencies {

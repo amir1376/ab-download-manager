@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.net.toUri
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 
 fun requestIgnoreBatteryOptimizationPermission(
     context: Context,

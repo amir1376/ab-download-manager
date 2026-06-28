@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.downloaderinui.edit
 
 import com.abdownloadmanager.shared.util.DownloadSystem
-import ir.amirab.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.downloaditem.IDownloadItem
 
 interface IDownloadConflictDetector<in TDownloadItem : IDownloadItem> {
     fun checkAlreadyExists(

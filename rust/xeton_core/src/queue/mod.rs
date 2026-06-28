@@ -1,6 +1,6 @@
 // xeton_core::queue — Download queue and queue manager.
 //
-// Port of `ir.amirab.downloader.queue.DownloadQueue` and `QueueManager`.
+// Port of `com.xeton.downloader.queue.DownloadQueue` and `QueueManager`.
 
 pub mod manager;
 
@@ -17,7 +17,7 @@ use crate::models::QueueModel;
 
 /// A download queue that manages concurrent download scheduling.
 ///
-/// Mirrors `ir.amirab.downloader.queue.DownloadQueue`.
+/// Mirrors `com.xeton.downloader.queue.DownloadQueue`.
 /// Uses the "shake" pattern: when state changes, the queue re-evaluates
 /// which items should be active and starts/stops them accordingly.
 pub struct Queue {

@@ -19,7 +19,7 @@ kotlin {
             api(libs.kotlin.coroutines.core)
             implementation(project(":shared:utils"))
             implementation(libs.semver)
-            implementation("ir.amirab.util:platform:1")
+            implementation("com.xeton.util:platform:1")
         }
         val desktopMain = sourceSets.getByName("desktopMain")
         desktopMain.dependencies {

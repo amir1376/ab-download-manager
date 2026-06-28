@@ -7,7 +7,7 @@ import com.abdownloadmanager.android.util.pagemanager.PermissionsPageManager
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.asStringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 
 

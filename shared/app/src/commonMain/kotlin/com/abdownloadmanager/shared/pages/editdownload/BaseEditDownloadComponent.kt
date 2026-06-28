@@ -10,9 +10,9 @@ import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.downloaditem.DownloadJobExtraConfig
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadItem
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

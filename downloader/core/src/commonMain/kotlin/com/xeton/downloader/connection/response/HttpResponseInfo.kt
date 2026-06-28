@@ -1,0 +1,102 @@
+package com.xeton.downloader.connection.response
+
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.downloader.connection.response.headers.getContentRange
+import com.xeton.downloader.connection.response.headers.extractFileNameFromContentDisposition
+import com.xeton.downloader.exception.UnSuccessfulResponseException
+import com.xeton.downloader.utils.FileNameUtil
+import com.xeton.downloader.utils.throwIf
+import com.xeton.util.HttpUrlUtils
+import com.xeton.util.ifThen
+
+data class HttpResponseInfo(
+    val statusCode: Int,
+    val message: String,
+    val requestUrl: String,
+    val requestHeaders: Map<String, String> = linkedMapOf(),
+    val responseHeaders: Map<String, String> = linkedMapOf(),
+) : IResponseInfo {
+
+    override val isSuccessFul by lazy {
+        statusCode in 200..299
+    }
+
+    val contentLength by lazy {
+        responseHeaders["content-length"]?.toLongOrNull()?.takeIf { it >= 0L }
+    }
+
+    val contentRange by lazy {
+        getContentRange()
+    }
+
+    //total length of whole file even if it is partial content
+    val totalLength by lazy {
+        val responseLength = contentLength ?: return@lazy null
+        // partial length only valid when we have content-length header
+        if (isPartial) {
+            contentRange?.fullSize ?: responseLength
+        } else responseLength
+    }
+    override val requiresAuth by lazy {
+        statusCode == 401
+    }
+
+    override val requireBasicAuth by lazy {
+        requiresAuth && (responseHeaders["www-authenticate"]?.contains("basic", true) ?: false)
+    }
+
+    val isPartial by lazy {
+        statusCode == 206
+    }
+
+    override val resumeSupport by lazy {
+        // maybe server does not give us content-length or content-range, so we ignore resume support
+        isPartial && contentLength != null && contentRange?.fullSize != null
+    }
+
+    override val isWebPage: Boolean by lazy {
+        responseHeaders["content-type"].orEmpty().contains("text/html", ignoreCase = true)
+    }
+
+    val fileName: String? by lazy {
+        run {
+            val nameFromHeader = responseHeaders["content-disposition"]?.let {
+                extractFileNameFromContentDisposition(it)
+            }
+            nameFromHeader ?: HttpUrlUtils.extractNameFromLink(requestUrl)
+        }
+            .orEmpty()
+            .ifThen(isWebPage) {
+                FileNameUtil.replaceExtension(
+                    this,
+                    "html",
+                    true
+                )
+            }
+            .takeIf { it.isNotEmpty() }
+    }
+
+    // It is good to use these properties to check file is valid
+    // for now we depend on size
+    val lastModified: String? by lazy {
+        responseHeaders["last-modified"]
+    }
+    val etag: String? by lazy {
+        responseHeaders["etag"]
+    }
+
+    override val unsuccessFullException: Throwable? by lazy {
+        if (!isSuccessFul) {
+            UnSuccessfulResponseException(statusCode, message)
+        } else {
+            null
+        }
+    }
+}
+
+
+fun HttpResponseInfo.expectSuccess() = apply {
+    unsuccessFullException?.let {
+        throw it
+    }
+}

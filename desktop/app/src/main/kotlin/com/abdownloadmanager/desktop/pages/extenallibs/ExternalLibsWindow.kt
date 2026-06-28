@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.resources.Res
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun ShowOpenSourceLibraries(appComponent: AppComponent){

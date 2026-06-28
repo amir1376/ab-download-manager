@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.util.downloaderror
 
-import ir.amirab.downloader.exception.TooManyErrorException
-import ir.amirab.downloader.utils.ExceptionUtils
-import ir.amirab.util.ifThen
+import com.xeton.downloader.exception.TooManyErrorException
+import com.xeton.downloader.utils.ExceptionUtils
+import com.xeton.util.ifThen
 
 
 class DownloadErrorMapperRegistry(

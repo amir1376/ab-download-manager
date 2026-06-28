@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.downloaderinui.http
 
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsItem
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
-import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.downloader.downloaditem.http.HttpDownloadItem
 
 fun PerHostSettingsItem.applyToHttpDownload(
     downloadCredentials: HttpDownloadCredentials

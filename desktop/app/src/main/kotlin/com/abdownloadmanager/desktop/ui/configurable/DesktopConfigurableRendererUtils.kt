@@ -25,7 +25,7 @@ import com.abdownloadmanager.shared.ui.configurable.isConfigEnabled
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 
 @Composable
 fun <T> TitleAndDescription(

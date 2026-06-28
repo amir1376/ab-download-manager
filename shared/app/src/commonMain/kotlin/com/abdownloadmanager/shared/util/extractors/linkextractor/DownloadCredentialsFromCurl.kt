@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util.extractors.linkextractor
 
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
 
 object DownloadCredentialsFromCurl : DownloadCredentialExtractor<String> {
     override fun extract(input: String): List<HttpDownloadCredentials> {

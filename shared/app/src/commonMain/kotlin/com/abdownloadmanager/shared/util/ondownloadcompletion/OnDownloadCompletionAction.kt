@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util.ondownloadcompletion
 
-import ir.amirab.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.downloaditem.IDownloadItem
 
 interface OnDownloadCompletionAction {
     suspend fun onDownloadCompleted(downloadItem: IDownloadItem)

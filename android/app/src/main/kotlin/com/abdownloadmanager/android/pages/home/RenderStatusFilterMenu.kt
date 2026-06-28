@@ -27,8 +27,8 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
-import ir.amirab.util.compose.modifiers.hijackClick
-import ir.amirab.util.compose.resources.myStringResource
+import com.xeton.util.compose.modifiers.hijackClick
+import com.xeton.util.compose.resources.myStringResource
 
 @Composable
 fun RenderStatusFilterMenu(

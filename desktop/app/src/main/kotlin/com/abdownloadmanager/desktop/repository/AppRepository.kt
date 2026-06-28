@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.repository
 
 import com.abdownloadmanager.shared.util.DownloadSystem
-import ir.amirab.downloader.DownloadSettings
+import com.xeton.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
 import com.abdownloadmanager.shared.repository.BaseAppRepository

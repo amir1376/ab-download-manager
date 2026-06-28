@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.storage
 
-import ir.amirab.downloader.db.TransactionalFileSaver
-import ir.amirab.downloader.utils.SuspendLockList
+import com.xeton.downloader.db.TransactionalFileSaver
+import com.xeton.downloader.utils.SuspendLockList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow

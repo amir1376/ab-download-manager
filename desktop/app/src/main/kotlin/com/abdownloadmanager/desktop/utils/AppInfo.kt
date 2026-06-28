@@ -4,7 +4,7 @@ import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.shared.util.SharedConstants
 import com.abdownloadmanager.desktop.storage.DesktopDefinedPaths
 import com.abdownloadmanager.shared.util.AppVersion
-import ir.amirab.util.platform.Platform
+import com.xeton.util.platform.Platform
 import okio.Path.Companion.toOkioPath
 import java.io.File
 

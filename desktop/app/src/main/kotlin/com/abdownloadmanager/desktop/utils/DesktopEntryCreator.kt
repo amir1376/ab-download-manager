@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.utils
 
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isLinux
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.isLinux
 import java.io.File
 
 object DesktopEntryCreator {

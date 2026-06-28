@@ -30,8 +30,8 @@ import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
-import ir.amirab.downloader.queue.QueueManager
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.downloader.queue.QueueManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json

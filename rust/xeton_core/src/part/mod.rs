@@ -1,6 +1,6 @@
 // xeton_core::part — Async part runner for downloading byte ranges.
 //
-// Replaces `ir.amirab.downloader.part.PartDownloader` which used an OS thread
+// Replaces `com.xeton.downloader.part.PartDownloader` which used an OS thread
 // per chunk (via `kotlin.concurrent.thread`). The Rust version is a pure Tokio
 // task — no OS thread needed. This is the critical performance win: 256 part
 // runners use 256 Tokio tasks on a small thread pool (default: num_cpus).
@@ -142,7 +142,7 @@ pub enum PartError {
 
 /// Async download worker for a single byte range.
 ///
-/// Replaces `ir.amirab.downloader.part.PartDownloader` (which used an OS
+/// Replaces `com.xeton.downloader.part.PartDownloader` (which used an OS
 /// thread). Runs entirely as a Tokio task.
 pub struct PartRunner {
     /// The byte range this runner is responsible for.
@@ -481,7 +481,7 @@ impl Default for SplitGuard {
 // ─── Range Splitting ────────────────────────────────────────────────────────
 
 /// Split a total byte range into parts.
-/// Mirrors `ir.amirab.downloader.utils.splitToRange`.
+/// Mirrors `com.xeton.downloader.utils.splitToRange`.
 pub fn split_to_ranges(size: i64, max_parts: u32, min_part_size: i64) -> Vec<(i64, i64)> {
     if size <= 0 {
         return vec![(0, 0)];

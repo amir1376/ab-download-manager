@@ -1,5 +1,5 @@
 import com.abdownloadmanager.updateapplier.UpdateInstaller
-import ir.amirab.util.osfileutil.FileUtils
+import com.xeton.util.osfileutil.FileUtils
 import java.io.File
 
 class ApkInstaller(

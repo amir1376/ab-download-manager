@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.MyDateAndTimeFormats
-import ir.amirab.downloader.db.QueueModel
-import ir.amirab.util.compose.asStringSource
+import com.xeton.downloader.db.QueueModel
+import com.xeton.util.compose.asStringSource
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime

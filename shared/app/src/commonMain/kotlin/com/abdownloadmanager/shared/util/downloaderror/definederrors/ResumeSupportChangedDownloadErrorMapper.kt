@@ -4,9 +4,9 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapper
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapper.Companion.createErrorReason
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
-import ir.amirab.downloader.exception.ServerPartIsNotTheSameAsWeExpectException
-import ir.amirab.downloader.exception.ServerResumeSupportChangeException
-import ir.amirab.util.compose.asStringSource
+import com.xeton.downloader.exception.ServerPartIsNotTheSameAsWeExpectException
+import com.xeton.downloader.exception.ServerResumeSupportChangeException
+import com.xeton.util.compose.asStringSource
 
 object ResumeSupportChangedDownloadErrorMapper : DownloadErrorMapper {
     override fun accept(throwable: Throwable): Boolean {

@@ -2,7 +2,7 @@ package com.abdownloadmanager.shared.ui.widget.menu.custom
 
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.compose.action.MenuItem
+import com.xeton.util.compose.action.MenuItem
 import com.abdownloadmanager.shared.util.div
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee

@@ -2,13 +2,13 @@ package com.abdownloadmanager.shared.singledownloadpage
 
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
-import ir.amirab.downloader.downloaditem.DownloadJobStatus
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.downloader.monitor.ProcessingDownloadItemState
-import ir.amirab.downloader.monitor.statusOrFinished
-import ir.amirab.downloader.utils.ExceptionUtils
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.downloader.downloaditem.DownloadJobStatus
+import com.xeton.downloader.monitor.IDownloadItemState
+import com.xeton.downloader.monitor.ProcessingDownloadItemState
+import com.xeton.downloader.monitor.statusOrFinished
+import com.xeton.downloader.utils.ExceptionUtils
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 
 fun createStatusString(
     it: IDownloadItemState,

@@ -4,10 +4,10 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapper
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapper.Companion.createErrorReason
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
-import ir.amirab.downloader.exception.UnSuccessfulResponseException
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
+import com.xeton.downloader.exception.UnSuccessfulResponseException
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.asStringSourceWithARgs
 
 object HttpStatusDownloadErrorMapper : DownloadErrorMapper {
     private data class TitleDescriptionSuggestion(

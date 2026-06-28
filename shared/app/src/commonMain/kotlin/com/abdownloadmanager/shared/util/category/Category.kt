@@ -3,10 +3,10 @@ package com.abdownloadmanager.shared.util.category
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
-import ir.amirab.util.compose.IIconResolver
-import ir.amirab.util.compose.IconSource
-import ir.amirab.util.compose.LocalIconFromUriResolver
-import ir.amirab.util.wildcardMatch
+import com.xeton.util.compose.IIconResolver
+import com.xeton.util.compose.IconSource
+import com.xeton.util.compose.LocalIconFromUriResolver
+import com.xeton.util.wildcardMatch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

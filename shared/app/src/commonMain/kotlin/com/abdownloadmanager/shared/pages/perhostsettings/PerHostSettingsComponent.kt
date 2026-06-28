@@ -15,11 +15,11 @@ import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsItem
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
-import ir.amirab.util.flow.combineStateFlows
-import ir.amirab.util.flow.mapTwoWayStateFlow
-import ir.amirab.util.flow.onEachLatest
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.asStringSourceWithARgs
+import com.xeton.util.flow.combineStateFlows
+import com.xeton.util.flow.mapTwoWayStateFlow
+import com.xeton.util.flow.onEachLatest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

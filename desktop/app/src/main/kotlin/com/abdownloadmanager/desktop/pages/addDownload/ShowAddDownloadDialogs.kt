@@ -23,9 +23,9 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.PlatformAppActivator
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.desktop.PlatformAppActivator
+import com.xeton.util.desktop.screen.applyUiScale
 import java.awt.Dimension
 
 @Composable

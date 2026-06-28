@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.util
 
-import ir.amirab.util.ifThen
-import ir.amirab.util.platform.Platform
-import ir.amirab.util.platform.isWindows
+import com.xeton.util.ifThen
+import com.xeton.util.platform.Platform
+import com.xeton.util.platform.isWindows
 
 /**
  * This utility class removes characters that are not supported by the current OS.

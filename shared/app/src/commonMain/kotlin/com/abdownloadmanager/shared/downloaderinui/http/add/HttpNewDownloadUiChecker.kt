@@ -4,8 +4,8 @@ import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadUiChecker
 import com.abdownloadmanager.shared.downloaderinui.LinkCheckerFactory
-import ir.amirab.downloader.connection.response.HttpResponseInfo
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import com.xeton.downloader.connection.response.HttpResponseInfo
+import com.xeton.downloader.downloaditem.http.HttpDownloadCredentials
 import kotlinx.coroutines.CoroutineScope
 
 class HttpNewDownloadUiChecker(

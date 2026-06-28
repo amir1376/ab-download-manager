@@ -8,7 +8,7 @@ kotlin {
     jvm("desktop")
     android {
         compileSdk = 36
-        namespace = "ir.amirab.util.startup"
+        namespace = "com.xeton.util.startup"
         minSdk = 26
     }
     sourceSets {

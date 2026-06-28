@@ -8,9 +8,9 @@ import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.DesktopEntryCreator
 import com.abdownloadmanager.desktop.utils.isAppInstalled
 import com.abdownloadmanager.desktop.window.Browser
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.action.buildMenu
-import ir.amirab.util.compose.action.simpleAction
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.compose.action.buildMenu
+import com.xeton.util.compose.action.simpleAction
 import com.abdownloadmanager.shared.util.getIcon
 import com.abdownloadmanager.shared.util.getName
 import com.abdownloadmanager.resources.Res
@@ -28,10 +28,10 @@ import com.abdownloadmanager.shared.action.createPerHostSettingsPage
 import com.abdownloadmanager.shared.action.createRequestExitAction
 import com.abdownloadmanager.shared.action.createStartQueueGroupAction
 import com.abdownloadmanager.shared.action.createStopQueueGroupAction
-import ir.amirab.downloader.queue.activeQueuesFlow
-import ir.amirab.util.URLOpener
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.desktop.PlatformAppActivator
+import com.xeton.downloader.queue.activeQueuesFlow
+import com.xeton.util.URLOpener
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.desktop.PlatformAppActivator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.get

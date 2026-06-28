@@ -1,10 +1,10 @@
 package com.abdownloadmanager.shared.downloaderinui.hls
 
-import ir.amirab.downloader.downloaditem.hls.HLSDownloadJob
-import ir.amirab.downloader.monitor.DurationBasedProcessingDownloadItemState
-import ir.amirab.downloader.monitor.ProcessingDownloadItemFactoryInputs
-import ir.amirab.downloader.monitor.UiDurationBasedPart
-import ir.amirab.downloader.part.PartDownloadStatus
+import com.xeton.downloader.downloaditem.hls.HLSDownloadJob
+import com.xeton.downloader.monitor.DurationBasedProcessingDownloadItemState
+import com.xeton.downloader.monitor.ProcessingDownloadItemFactoryInputs
+import com.xeton.downloader.monitor.UiDurationBasedPart
+import com.xeton.downloader.part.PartDownloadStatus
 
 object UiProcessingItemForHSLFactory {
     fun create(

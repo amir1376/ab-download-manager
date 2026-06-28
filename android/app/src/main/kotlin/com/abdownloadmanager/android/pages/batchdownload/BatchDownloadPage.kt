@@ -29,9 +29,9 @@ import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
 import com.abdownloadmanager.shared.util.ui.LocalContentColor
 import com.abdownloadmanager.shared.util.ui.VerticalScrollableContent
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
 
 @Composable
 fun BatchDownloadSheet(

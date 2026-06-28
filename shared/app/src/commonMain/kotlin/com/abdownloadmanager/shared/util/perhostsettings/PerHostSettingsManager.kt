@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util.perhostsettings
 
-import ir.amirab.util.wildcardMatch
+import com.xeton.util.wildcardMatch
 import kotlinx.coroutines.flow.update
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 

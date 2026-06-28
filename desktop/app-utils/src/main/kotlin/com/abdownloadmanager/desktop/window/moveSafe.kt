@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.PopupPositionProviderAtPosition
-import ir.amirab.util.desktop.GlobalLayoutDirection
+import com.xeton.util.desktop.GlobalLayoutDirection
 import java.awt.Component
 import java.awt.Insets
 import java.awt.Toolkit

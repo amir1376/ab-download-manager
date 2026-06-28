@@ -15,8 +15,8 @@ import com.abdownloadmanager.shared.util.ResponsiveDialog
 import com.abdownloadmanager.shared.util.ResponsiveDialogScope
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.asStringSource
+import com.xeton.util.compose.action.MenuItem
+import com.xeton.util.compose.asStringSource
 
 @Composable
 private fun ResponsiveDialogScope.RenderMenuInSheetUi(

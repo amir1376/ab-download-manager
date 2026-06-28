@@ -4,7 +4,7 @@ import com.github.markusbernhardt.proxy.selector.misc.BufferedProxySelector
 import com.github.markusbernhardt.proxy.selector.misc.ProxyListFallbackSelector
 import com.github.markusbernhardt.proxy.selector.pac.PacProxySelector
 import com.github.markusbernhardt.proxy.selector.pac.UrlPacScriptSource
-import ir.amirab.downloader.connection.proxy.AutoConfigurableProxyProvider
+import com.xeton.downloader.connection.proxy.AutoConfigurableProxyProvider
 import java.net.ProxySelector
 
 class AutoConfigurableProxyProviderForDesktop(

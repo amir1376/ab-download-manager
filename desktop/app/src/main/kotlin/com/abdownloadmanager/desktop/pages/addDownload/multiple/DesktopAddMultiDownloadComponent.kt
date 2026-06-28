@@ -14,7 +14,7 @@ import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.queue.QueueManager
+import com.xeton.downloader.queue.QueueManager
 
 class DesktopAddMultiDownloadComponent(
     ctx: ComponentContext,

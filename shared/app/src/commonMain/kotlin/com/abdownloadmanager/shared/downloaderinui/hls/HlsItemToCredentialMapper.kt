@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.downloaderinui.hls
 
 import com.abdownloadmanager.shared.downloaderinui.CredentialAndItemMapper
-import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
-import ir.amirab.downloader.downloaditem.hls.HLSDownloadItem
+import com.xeton.downloader.downloaditem.hls.HLSDownloadCredentials
+import com.xeton.downloader.downloaditem.hls.HLSDownloadItem
 
 class HlsItemToCredentialMapper : CredentialAndItemMapper<
         HLSDownloadCredentials, HLSDownloadItem> {

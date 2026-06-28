@@ -2,7 +2,7 @@ package com.abdownloadmanager.shared.pagemanager
 
 import com.abdownloadmanager.shared.ui.widget.MessageDialogType
 import com.abdownloadmanager.shared.ui.widget.NotificationType
-import ir.amirab.util.compose.StringSource
+import com.xeton.util.compose.StringSource
 
 interface NotificationSender {
     fun sendDialogNotification(title: StringSource, description: StringSource, type: MessageDialogType)

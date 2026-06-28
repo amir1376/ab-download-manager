@@ -21,8 +21,8 @@ import com.abdownloadmanager.desktop.window.custom.titlebar.SystemButtonsPositio
 import com.abdownloadmanager.desktop.window.custom.titlebar.Title
 import com.abdownloadmanager.desktop.window.custom.titlebar.TitleBar
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import ir.amirab.util.compose.layout.RelativeAlignment
-import ir.amirab.util.ifThen
+import com.xeton.util.compose.layout.RelativeAlignment
+import com.xeton.util.ifThen
 import kotlin.math.roundToInt
 
 object MacTitleBar : TitleBar {

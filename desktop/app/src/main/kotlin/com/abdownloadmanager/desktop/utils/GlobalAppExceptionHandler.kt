@@ -11,7 +11,7 @@ import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.ui.error.ErrorWindow
 import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
-import ir.amirab.util.logger.appLogger
+import com.xeton.util.logger.appLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import java.awt.Window

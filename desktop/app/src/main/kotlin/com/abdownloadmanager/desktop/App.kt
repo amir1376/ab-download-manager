@@ -16,9 +16,9 @@ import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
-import ir.amirab.util.logger.AppLogger
-import ir.amirab.util.logger.appLogger
-import ir.amirab.util.writeText
+import com.xeton.util.logger.AppLogger
+import com.xeton.util.logger.appLogger
+import com.xeton.util.writeText
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

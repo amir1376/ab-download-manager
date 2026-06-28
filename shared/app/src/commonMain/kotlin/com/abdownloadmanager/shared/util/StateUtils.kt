@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util
 
 import androidx.compose.runtime.*
-import ir.amirab.util.flow.DerivedStateFlow
+import com.xeton.util.flow.DerivedStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 

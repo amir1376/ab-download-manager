@@ -1,6 +1,6 @@
 // xeton_core::hls::job — HLS (M3U8) download job.
 //
-// Port of `ir.amirab.downloader.downloaditem.hls.HLSDownloadJob`.
+// Port of `com.xeton.downloader.downloaditem.hls.HLSDownloadJob`.
 // Uses `m3u8-rs` for playlist parsing and `aes`/`cbc` for segment decryption.
 
 #[cfg(feature = "hls")]

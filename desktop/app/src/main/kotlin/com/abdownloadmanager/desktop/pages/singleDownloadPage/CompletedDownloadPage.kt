@@ -29,10 +29,10 @@ import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.Tooltip
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import ir.amirab.downloader.monitor.CompletedDownloadItemState
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.isShiftPressed
+import com.xeton.downloader.monitor.CompletedDownloadItemState
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.desktop.isShiftPressed
 
 @Composable
 fun CompletedDownloadPage(

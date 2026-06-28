@@ -6,9 +6,9 @@ import buildlogic.versioning.getAppVersion
 import buildlogic.versioning.getAppVersionString
 import buildlogic.versioning.getApplicationPackageName
 import com.android.build.api.artifact.SingleArtifact
-import ir.amirab.installer.InstallerTargetFormat
-import ir.amirab.plugin.common_android.task.SignApkTask
-import ir.amirab.plugin.common_android.task.androidEnableFileTypesGeneratorForManifest
+import com.xeton.installer.InstallerTargetFormat
+import com.xeton.plugin.common_android.task.SignApkTask
+import com.xeton.plugin.common_android.task.androidEnableFileTypesGeneratorForManifest
 import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget

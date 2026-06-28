@@ -19,7 +19,7 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.ui.configurable.isConfigEnabled
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import ir.amirab.util.ifThen
+import com.xeton.util.ifThen
 
 object FontConfigurableRenderer : ConfigurableRenderer<FontConfigurable> {
     @Composable

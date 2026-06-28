@@ -12,8 +12,8 @@ import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.flow.mapTwoWayStateFlow
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.CoroutineScope
 
 class AndroidSingleDownloadComponent(

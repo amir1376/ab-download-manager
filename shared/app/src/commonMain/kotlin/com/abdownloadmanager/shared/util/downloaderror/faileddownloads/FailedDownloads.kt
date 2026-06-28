@@ -1,9 +1,9 @@
 package com.abdownloadmanager.shared.util.downloaderror.faileddownloads
 
 import com.abdownloadmanager.shared.util.downloaderror.IDownloadErrorMapperRegistry
-import ir.amirab.downloader.DownloadManagerEvents
-import ir.amirab.downloader.DownloadManagerMinimalControl
-import ir.amirab.util.guardedEntry
+import com.xeton.downloader.DownloadManagerEvents
+import com.xeton.downloader.DownloadManagerMinimalControl
+import com.xeton.util.guardedEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

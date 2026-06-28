@@ -11,7 +11,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.shared.pages.category.CategoryComponent
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
-import ir.amirab.util.desktop.screen.applyUiScale
+import com.xeton.util.desktop.screen.applyUiScale
 
 @Composable
 fun ShowCategoryDialogs(dialogManager: DesktopCategoryDialogManager) {

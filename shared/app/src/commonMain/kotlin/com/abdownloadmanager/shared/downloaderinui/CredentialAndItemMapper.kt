@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.downloaderinui
 
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadItem
 
 /**
  * the resulting value is a copied object so implementations doesn't have side effects

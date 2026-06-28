@@ -2,15 +2,15 @@ package com.abdownloadmanager.shared.downloaderinui
 
 import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadInputs
 import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadInputs
-import ir.amirab.downloader.Downloader
-import ir.amirab.downloader.connection.IResponseInfo
-import ir.amirab.downloader.downloaditem.DownloadJob
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.IDownloadItem
-import ir.amirab.downloader.monitor.CompletedDownloadItemState
-import ir.amirab.downloader.monitor.DownloadItemStateFactory
-import ir.amirab.downloader.monitor.ProcessingDownloadItemFactoryInputs
-import ir.amirab.downloader.monitor.ProcessingDownloadItemState
+import com.xeton.downloader.Downloader
+import com.xeton.downloader.connection.IResponseInfo
+import com.xeton.downloader.downloaditem.DownloadJob
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.downloaditem.IDownloadItem
+import com.xeton.downloader.monitor.CompletedDownloadItemState
+import com.xeton.downloader.monitor.DownloadItemStateFactory
+import com.xeton.downloader.monitor.ProcessingDownloadItemFactoryInputs
+import com.xeton.downloader.monitor.ProcessingDownloadItemState
 import kotlin.reflect.KClass
 
 typealias TADownloaderInUI = DownloaderInUi<

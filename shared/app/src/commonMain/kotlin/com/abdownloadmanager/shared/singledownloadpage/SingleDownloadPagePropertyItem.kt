@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.singledownloadpage
 
 import androidx.compose.runtime.Immutable
-import ir.amirab.util.compose.StringSource
+import com.xeton.util.compose.StringSource
 
 @Immutable
 data class SingleDownloadPagePropertyItem(

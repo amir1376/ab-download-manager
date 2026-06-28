@@ -2,9 +2,9 @@ package com.abdownloadmanager.shared.pages.home.category
 
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import ir.amirab.downloader.downloaditem.DownloadStatus
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.util.compose.asStringSource
+import com.xeton.downloader.downloaditem.DownloadStatus
+import com.xeton.downloader.monitor.IDownloadItemState
+import com.xeton.util.compose.asStringSource
 
 object DefinedStatusCategories {
     fun values() = listOf(All, Finished, Unfinished)

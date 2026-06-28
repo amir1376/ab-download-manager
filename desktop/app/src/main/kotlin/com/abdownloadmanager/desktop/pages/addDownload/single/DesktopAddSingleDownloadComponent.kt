@@ -18,9 +18,9 @@ import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.queue.QueueManager
+import com.xeton.downloader.downloaditem.DownloadJobExtraConfig
+import com.xeton.downloader.downloaditem.IDownloadCredentials
+import com.xeton.downloader.queue.QueueManager
 import kotlinx.coroutines.CoroutineScope
 
 class DesktopAddSingleDownloadComponent(

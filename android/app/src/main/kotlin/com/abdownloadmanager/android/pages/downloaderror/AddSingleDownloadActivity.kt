@@ -17,7 +17,7 @@ import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.*
 import com.abdownloadmanager.shared.util.category.CategoryManager
-import ir.amirab.downloader.queue.QueueManager
+import com.xeton.downloader.queue.QueueManager
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import org.koin.core.component.inject

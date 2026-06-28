@@ -3,10 +3,10 @@ package com.abdownloadmanager.desktop.pages.poweractionalert
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.BaseComponent
 import com.arkivanov.decompose.ComponentContext
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.desktop.DesktopUtils
-import ir.amirab.util.desktop.poweraction.PowerActionConfig
+import com.xeton.util.compose.StringSource
+import com.xeton.util.compose.asStringSource
+import com.xeton.util.desktop.DesktopUtils
+import com.xeton.util.desktop.poweraction.PowerActionConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -1,13 +1,13 @@
 import buildlogic.*
 import buildlogic.versioning.*
-import ir.amirab.installer.InstallerTargetFormat
+import com.xeton.installer.InstallerTargetFormat
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import ir.amirab.util.platform.Platform
+import com.xeton.util.platform.Platform
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat.*
 import com.mikepenz.aboutlibraries.plugin.DuplicateMode
 import com.mikepenz.aboutlibraries.plugin.DuplicateRule
-import ir.amirab.util.platform.Arch
+import com.xeton.util.platform.Arch
 
 plugins {
     id(MyPlugins.kotlin)
@@ -15,7 +15,7 @@ plugins {
     id(Plugins.Kotlin.serialization)
     id(Plugins.ksp)
     id(Plugins.aboutLibraries)
-    id("ir.amirab.installer-plugin")
+    id("com.xeton.installer-plugin")
 //    id(MyPlugins.proguardDesktop)
 }
 

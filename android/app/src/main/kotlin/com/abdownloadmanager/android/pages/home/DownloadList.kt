@@ -23,9 +23,9 @@ import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.myColors
-import ir.amirab.downloader.monitor.IDownloadItemState
-import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.ifThen
+import com.xeton.downloader.monitor.IDownloadItemState
+import com.xeton.util.compose.resources.myStringResource
+import com.xeton.util.ifThen
 
 
 @Composable
