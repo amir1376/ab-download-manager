@@ -23,6 +23,7 @@ object Plugins {
         private const val baseName = "com.android"
         const val application = "$baseName.application"
         const val library = "$baseName.library"
+        const val kotlinMultiplatformLibrary = "$baseName.kotlin.multiplatform.library"
     }
 
     const val ksp = "com.google.devtools.ksp"

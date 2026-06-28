@@ -1,8 +1,5 @@
 package myPlugins
 
-plugins {
-    kotlin("android")
-}
 repositories {
     mavenCentral()
     google()
@@ -22,7 +19,7 @@ fun getFeatures(): Set<String> = setOf(
 
 val jvmToolchainVersion =  providers.gradleProperty("jvm.toolchain").get().toInt()
 
-kotlin {
+configure<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension> {
     jvmToolchain(jvmToolchainVersion)
     compilerOptions {
         val optIns = getOptIns().map { "-Xopt-in=$it" }

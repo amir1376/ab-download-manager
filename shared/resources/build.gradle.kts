@@ -4,7 +4,7 @@ import java.util.Properties
 plugins {
     id(MyPlugins.kotlinMultiplatform)
     id(MyPlugins.composeBase)
-    id(Plugins.Android.library)
+    id(Plugins.Android.kotlinMultiplatformLibrary)
 }
 val ourPackageName = "com.abdownloadmanager.resources"
 val propertiesToKotlinTask by tasks.registering(PropertiesToKotlinTask::class) {
@@ -30,7 +30,13 @@ val generateResObject by tasks.registering(GenerateResObject::class) {
 
 kotlin {
     jvm("desktop")
-    androidTarget {
+    android {
+        compileSdk = 36
+        namespace = "com.abdownloadmanager.resources"
+        minSdk = 26
+        sourceSets.named("main") {
+            resources.srcDir("src/commonMain/resources")
+        }
     }
     sourceSets {
         commonMain {
@@ -45,16 +51,6 @@ kotlin {
                 implementation(project(":shared:resources:contracts"))
             }
         }
-    }
-}
-android {
-    compileSdk = 36
-    namespace = "com.abdownloadmanager.resources"
-    defaultConfig {
-        minSdk = 26
-    }
-    sourceSets.named("main") {
-        resources.srcDir("src/commonMain/resources")
     }
 }
 abstract class GenerateResObject @Inject constructor(

@@ -6,11 +6,13 @@ plugins{
 }
 
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-        mavenCentral()
         google()
+        mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://maven.mozilla.org/maven2/")
+        maven("https://jitpack.io")
     }
 }
 

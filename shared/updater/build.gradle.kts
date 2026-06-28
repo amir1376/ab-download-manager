@@ -1,14 +1,16 @@
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id(MyPlugins.kotlinMultiplatform)
-    id(Plugins.Android.library)
+    id(Plugins.Android.kotlinMultiplatformLibrary)
     id(Plugins.Kotlin.serialization)
 }
 kotlin {
     jvm("desktop")
-    androidTarget("android") {
+    android {
+        namespace = "com.abdownloadmanager.updater"
+        compileSdk = 36
+        minSdk = 26
     }
     sourceSets {
         commonMain.dependencies {
@@ -19,16 +21,9 @@ kotlin {
             implementation(libs.semver)
             implementation("ir.amirab.util:platform:1")
         }
-        val desktopMain by getting
+        val desktopMain = sourceSets.getByName("desktopMain")
         desktopMain.dependencies {
             implementation(libs.jna.platform)
         }
-    }
-}
-android {
-    namespace = "com.abdownloadmanager.updater"
-    compileSdk = 36
-    defaultConfig {
-        minSdk = 26
     }
 }

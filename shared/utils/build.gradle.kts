@@ -3,17 +3,21 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id(MyPlugins.kotlinMultiplatform)
     id(Plugins.Kotlin.serialization)
-    id(Plugins.Android.library)
+    id(Plugins.Android.kotlinMultiplatformLibrary)
 }
 kotlin {
     jvm("desktop")
-    androidTarget("android") {
+    android {
+        compileSdk = 36
+        namespace = "ir.amirab.util"
+        minSdk = 26
     }
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlin.serialization.json)
             api(libs.okio.okio)
             api(libs.okhttp.okhttp)
+            api(libs.okhttp.coroutines)
             api(libs.kotlin.coroutines.core)
             api(libs.kotlin.datetime)
             api(libs.semver)
@@ -29,12 +33,5 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.androidx.core.ktx)
         }
-    }
-}
-android {
-    compileSdk = 36
-    namespace = "ir.amirab.util"
-    defaultConfig {
-        minSdk = 26
     }
 }

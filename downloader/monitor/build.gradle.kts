@@ -4,11 +4,14 @@ plugins {
     id(MyPlugins.kotlinMultiplatform)
     id(Plugins.Kotlin.serialization)
     id(MyPlugins.composeBase)
-    id(Plugins.Android.library)
+    id(Plugins.Android.kotlinMultiplatformLibrary)
 }
 kotlin {
     jvm("desktop")
-    androidTarget("android") {
+    android {
+        compileSdk = 36
+        namespace = "ir.amirab.downloader.monitor"
+        minSdk = 26
     }
     sourceSets {
         commonMain {
@@ -19,12 +22,5 @@ kotlin {
                 implementation(libs.compose.runtime)
             }
         }
-    }
-}
-android {
-    compileSdk = 36
-    namespace = "ir.amirab.downloader.monitor"
-    defaultConfig {
-        minSdk = 26
     }
 }
