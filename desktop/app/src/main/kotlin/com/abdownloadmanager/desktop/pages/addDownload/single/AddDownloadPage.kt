@@ -1,38 +1,50 @@
 package com.abdownloadmanager.desktop.pages.addDownload.single
 
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import com.abdownloadmanager.shared.util.ui.WithContentColor
-import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import com.abdownloadmanager.desktop.window.moveSafe
 import androidx.compose.animation.*
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.window.WindowDraggableArea
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.rememberDialogState
 import arrow.core.Some
-import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.desktop.pages.addDownload.shared.*
-import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
+import com.abdownloadmanager.desktop.window.moveSafe
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
+import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
-import ir.amirab.util.compose.resources.myStringResource
+import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.resources.myStringResource
 import java.awt.MouseInfo
 
 @Composable
@@ -74,8 +86,7 @@ fun AddDownloadPage(
             },
             modifier = Modifier
         )
-        Row(
-        ) {
+        Row {
             val canAddResult by component.canAddResult.collectAsState()
             Column(Modifier.weight(1f)) {
                 val useCategory by component.useCategory.collectAsState()
@@ -171,15 +182,9 @@ fun AddDownloadPage(
         if (component.showSolutionsOnDuplicateDownloadUi) {
             ShowSolutionsOnDuplicateDownload(component)
         }
-        if (component.shouldShowAddToQueue) {
-            ShowAddToQueueDialog(
-                queueList = component.queues.collectAsState().value,
-                onClose = { component.shouldShowAddToQueue = false },
-                onQueueSelected = { queue, startQueue ->
-                    component.onRequestAddToQueue(queue, startQueue)
-                }
-            )
-        }
+        ShowAddToQueueDialog(
+            queueComponent = component.selectQueueComponent,
+        )
         if (component.showMoreSettings) {
             ExtraConfig(
                 onDismiss = { component.showMoreSettings = false },
@@ -356,7 +361,8 @@ private fun Divider() {
 
 @Composable
 fun RenderResumeSupport(component: BaseAddSingleDownloadComponent) {
-    val fileInfo by component.linkResponseInfo.collectAsState()
+    val responseResult by component.checkResponseResult.collectAsState()
+    val fileInfo = responseResult?.getOrNull()?.takeIf { it.isSuccessFul }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.height(16.dp)
@@ -371,25 +377,23 @@ fun RenderResumeSupport(component: BaseAddSingleDownloadComponent) {
             visible = canAddToDownloads && fileInfo != null,
         ) {
             fileInfo?.let { fileInfo ->
+                val iconModifier = Modifier
+                    .padding(horizontal = 2.dp)
+                    .size(10.dp)
                 if (fileInfo.resumeSupport) {
-                    val iconModifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .size(10.dp)
-                    if (fileInfo.resumeSupport) {
-                        MyIcon(
-                            icon = MyIcons.check,
-                            contentDescription = null,
-                            modifier = iconModifier,
-                            tint = myColors.success
-                        )
-                    } else {
-                        MyIcon(
-                            icon = MyIcons.clear,
-                            contentDescription = null,
-                            modifier = iconModifier,
-                            tint = myColors.error,
-                        )
-                    }
+                    MyIcon(
+                        icon = MyIcons.check,
+                        contentDescription = null,
+                        modifier = iconModifier,
+                        tint = myColors.success
+                    )
+                } else {
+                    MyIcon(
+                        icon = MyIcons.clear,
+                        contentDescription = null,
+                        modifier = iconModifier,
+                        tint = myColors.error,
+                    )
                 }
             }
         }
@@ -399,20 +403,10 @@ fun RenderResumeSupport(component: BaseAddSingleDownloadComponent) {
     }
 }
 
-@Composable
-private fun MainConfigActionButton(
-    text: String,
-    modifier: Modifier,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-) {
-    ActionButton(text, modifier, enabled, onClick)
-}
-
 
 @Composable
 fun ConfigActionsButtons(component: BaseAddSingleDownloadComponent) {
-    val responseInfo by component.linkResponseInfo.collectAsState()
+    val responseResult by component.checkResponseResult.collectAsState()
     Row {
         IconActionButton(MyIcons.refresh, Res.string.refresh.asStringSource()) {
             component.refresh()
@@ -422,9 +416,17 @@ fun ConfigActionsButtons(component: BaseAddSingleDownloadComponent) {
             MyIcons.settings,
             Res.string.settings.asStringSource(),
             indicateActive = component.showMoreSettings,
-            requiresAttention = responseInfo?.requireBasicAuth ?: false
+            requiresAttention = responseResult?.getOrNull()?.requireBasicAuth ?: false
         ) {
             component.showMoreSettings = true
+        }
+        Spacer(Modifier.width(6.dp))
+        component.lastError.collectAsState().value?.let { downloadErrorReason ->
+            DownloadErrorInfoButton(
+                onClick = component::openDownloadErrorDialog,
+                responseInfo = responseResult?.getOrNull(),
+                reason = downloadErrorReason,
+            )
         }
     }
 }
@@ -435,14 +437,14 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
         val onDuplicateStrategy by component.onDuplicateStrategy.collectAsState()
         val canAddResult by component.canAddResult.collectAsState()
         if (canAddResult is CanAddResult.DownloadAlreadyExists && onDuplicateStrategy == null) {
-            MainConfigActionButton(
+            ActionButton(
                 text = myStringResource(Res.string.show_solutions),
                 modifier = Modifier,
                 onClick = { component.showSolutionsOnDuplicateDownloadUi = true },
             )
             if (component.shouldShowOpenFile.collectAsState().value) {
                 Spacer(Modifier.width(8.dp))
-                MainConfigActionButton(
+                ActionButton(
                     text = myStringResource(Res.string.open_file),
                     modifier = Modifier,
                     onClick = { component.openExistingFile() },
@@ -450,13 +452,17 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
             }
         } else {
             val canAddToDownloads by component.canAddToDownloads.collectAsState()
-            MainConfigActionButton(
+            ActionButton(
                 text = myStringResource(Res.string.add),
                 modifier = Modifier,
                 enabled = canAddToDownloads,
                 onClick = {
-                    component.shouldShowAddToQueue = true
+                    component.selectQueueComponent.openAddToQueueDialog()
                 },
+                onLongClick = {
+                    component.selectQueueComponent.fastConfirm()
+                }
+
             )
             Spacer(Modifier.width(8.dp))
             PrimaryMainActionButton(
@@ -469,7 +475,7 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
             )
             if (onDuplicateStrategy != null) {
                 Spacer(Modifier.width(8.dp))
-                MainConfigActionButton(
+                ActionButton(
                     text = myStringResource(Res.string.change_solution),
                     modifier = Modifier,
                     onClick = { component.showSolutionsOnDuplicateDownloadUi = true },
@@ -480,7 +486,7 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
         //        Spacer(Modifier.weight(1f))
         Spacer(Modifier.weight(1f))
 
-        MainConfigActionButton(
+        ActionButton(
             text = myStringResource(Res.string.cancel),
             modifier = Modifier,
             onClick = {
@@ -495,9 +501,9 @@ fun RenderFileTypeAndSize(
     component: BaseAddSingleDownloadComponent,
 ) {
     val isLinkLoading by component.isLinkLoading.collectAsState()
-    val fileInfo by component.linkResponseInfo.collectAsState()
+    val linkCheckResult by component.checkResponseResult.collectAsState()
     val fileIconProvider = component.iconProvider
-    val iconModifier = Modifier.size(16.dp)
+    val iconModifier = Modifier.size(mySpacings.iconSize)
     Box(Modifier.padding(top = 16.dp)) {
         AnimatedContent(
             targetState = isLinkLoading,
@@ -515,38 +521,34 @@ fun RenderFileTypeAndSize(
 //                val bitmap = FileIconProvider.getIconOfFileExtension(extension)
 
                 AnimatedContent(
-                    fileInfo,
-                ) { fileInfo ->
+                    linkCheckResult,
+                ) { linkCheckResult ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         WithContentAlpha(1f) {
-                            if (fileInfo != null) {
-                                if (fileInfo.requiresAuth) {
+                            when (linkCheckResult) {
+                                null -> {
                                     MyIcon(
-                                        MyIcons.lock,
-                                        null,
-                                        iconModifier,
-                                        tint = myColors.error
+                                        icon = MyIcons.question,
+                                        contentDescription = null,
+                                        modifier = iconModifier,
                                     )
                                 }
-                                MyIcon(
-                                    icon,
-                                    null,
-                                    iconModifier
-                                )
-                                val size = component.getLengthString()
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    size.rememberString(),
-                                    fontSize = myTextSizes.sm,
-                                )
-                            } else {
-                                MyIcon(
-                                    icon = MyIcons.question,
-                                    contentDescription = null,
-                                    modifier = iconModifier,
-                                )
+
+                                else -> {
+                                    MyIcon(
+                                        icon,
+                                        null,
+                                        iconModifier
+                                    )
+                                    val size = component.getLengthString()
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        size.rememberString(),
+                                        fontSize = myTextSizes.sm,
+                                    )
+                                }
                             }
                         }
                     }
@@ -562,6 +564,29 @@ fun getExtension(s: String): String? {
         .takeIf { it.isNotBlank() }
 }
 
+
+@Composable
+private fun DownloadErrorInfoButton(
+    onClick: () -> Unit,
+    reason: DownloadErrorReason,
+    responseInfo: IResponseInfo?,
+) {
+    val tooltipStringSource = reason.title.asStringSource()
+    Tooltip(tooltipStringSource) {
+        IconActionButton(
+            onClick = {
+                onClick()
+            },
+            contentDescription = tooltipStringSource,
+            icon = if (responseInfo?.requireBasicAuth == true) {
+                MyIcons.lock
+            } else {
+                MyIcons.question
+            },
+            contentColor = myColors.error,
+        )
+    }
+}
 
 @Composable
 private fun UrlTextField(

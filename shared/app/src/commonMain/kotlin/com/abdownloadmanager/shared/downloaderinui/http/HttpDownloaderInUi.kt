@@ -4,7 +4,7 @@ import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
-import com.abdownloadmanager.shared.downloaderinui.http.add.HttpDownloadUiChecker
+import com.abdownloadmanager.shared.downloaderinui.http.add.HttpNewDownloadUiChecker
 import com.abdownloadmanager.shared.downloaderinui.http.add.HttpLinkChecker
 import com.abdownloadmanager.shared.downloaderinui.http.add.HttpNewDownloadInputs
 import com.abdownloadmanager.shared.downloaderinui.http.edit.HttpEditDownloadChecker
@@ -12,14 +12,12 @@ import com.abdownloadmanager.shared.downloaderinui.http.edit.HttpEditDownloadInp
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.connection.response.HttpResponseInfo
-import ir.amirab.downloader.downloaditem.DownloadJob
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloadJob
 import ir.amirab.downloader.downloaditem.http.HttpDownloader
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
-import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemFactoryInputs
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.downloader.monitor.RangeBasedProcessingDownloadItemState
@@ -49,8 +47,8 @@ class HttpDownloaderInUi(
         initialName: String,
         downloadSystem: DownloadSystem,
         scope: CoroutineScope,
-    ): HttpDownloadUiChecker {
-        return HttpDownloadUiChecker(
+    ): HttpNewDownloadUiChecker {
+        return HttpNewDownloadUiChecker(
             initialCredentials = initialCredentials,
             linkCheckerFactory = this,
             initialFolder = initialFolder,

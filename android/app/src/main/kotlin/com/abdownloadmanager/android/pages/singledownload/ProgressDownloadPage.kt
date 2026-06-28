@@ -2,14 +2,6 @@ package com.abdownloadmanager.android.pages.singledownload
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import com.abdownloadmanager.shared.ui.configurable.RenderConfigurable
-import com.abdownloadmanager.shared.util.ui.LocalContentColor
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -31,22 +23,26 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.abdownloadmanager.shared.ui.widget.rememberMyComponentRectPositionProvider
-import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.singledownloadpage.SingleDownloadPagePropertyItem
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
+import com.abdownloadmanager.shared.ui.configurable.RenderConfigurable
+import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.LocalSizeUnit
 import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
-import com.abdownloadmanager.shared.util.ui.useIsInDebugMode
 import com.abdownloadmanager.shared.util.div
-import com.abdownloadmanager.shared.util.ui.VerticalScrollableContent
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
+import com.abdownloadmanager.shared.util.ui.*
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.part.PartDownloadStatus
 import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
@@ -432,7 +428,7 @@ private fun prettifyStatus(status: PartDownloadStatus): StringSource {
         is PartDownloadStatus.Canceled -> Res.string.disconnected
         PartDownloadStatus.IDLE -> Res.string.idle
         PartDownloadStatus.Completed -> Res.string.finished
-        PartDownloadStatus.ReceivingData -> Res.string.receiving_data
+        PartDownloadStatus.ReceivingData -> Res.string.downloading
         PartDownloadStatus.Connecting -> Res.string.connecting
     }.asStringSource()
 }
@@ -499,16 +495,24 @@ private fun RenderActions(
     showingPartInfo: Boolean,
     onRequestShowPartInfo: (show: Boolean) -> Unit,
 ) {
+    val errorReason by singleDownloadComponent.lastError.collectAsState()
     Row {
         PartInfoButton(showingPartInfo, onRequestShowPartInfo)
-        Spacer(Modifier.width(8.dp))
+        errorReason?.let { errorReason ->
+            Spacer(Modifier.width(mySpacings.smallSpace))
+            DownloadErrorInfoButton(
+                onClick = singleDownloadComponent::openDownloadErrorPage,
+                reason = errorReason,
+            )
+        }
+        Spacer(Modifier.width(mySpacings.smallSpace))
         ToggleButton(
             itemState = itemState,
             toggle = singleDownloadComponent::toggle,
             pause = singleDownloadComponent::pause,
             modifier = Modifier.weight(1f),
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(mySpacings.smallSpace))
         CancelButton(
             cancel = singleDownloadComponent::cancel,
             icon = if (singleDownloadComponent.deletePartialFileOnDownloadCancellation.collectAsState().value) {
@@ -517,6 +521,22 @@ private fun RenderActions(
                 null
             },
             modifier = Modifier,
+        )
+    }
+}
+
+@Composable
+private fun DownloadErrorInfoButton(
+    onClick: () -> Unit,
+    reason: DownloadErrorReason,
+) {
+    val tooltipStringSource = reason.title.asStringSource()
+    Tooltip(tooltipStringSource) {
+        IconActionButton(
+            onClick = onClick,
+            contentDescription = tooltipStringSource,
+            icon = MyIcons.question,
+            contentColor = myColors.error,
         )
     }
 }

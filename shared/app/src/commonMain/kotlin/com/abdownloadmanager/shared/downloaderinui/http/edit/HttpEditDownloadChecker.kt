@@ -1,47 +1,21 @@
 package com.abdownloadmanager.shared.downloaderinui.http.edit
 
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
-import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditDownloadResult
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditWarnings
 import com.abdownloadmanager.shared.downloaderinui.edit.DownloadConflictDetector
+import com.abdownloadmanager.shared.downloaderinui.edit.EditDownloadChecker
 import com.abdownloadmanager.shared.downloaderinui.http.add.HttpLinkChecker
-import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.connection.response.HttpResponseInfo
-import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.util.FileNameValidator
 import ir.amirab.util.HttpUrlUtils
-import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-
-abstract class EditDownloadChecker<
-        TDownloadItem : IDownloadItem,
-        TCredentials : IDownloadCredentials,
-        TResponseInfo : IResponseInfo,
-        TDownloadSize : DownloadSize,
-        TLinkChecker : LinkChecker<TCredentials, TResponseInfo, TDownloadSize>
-        >(
-    val currentDownloadItem: MutableStateFlow<TDownloadItem>,
-    val editedDownloadItem: MutableStateFlow<TDownloadItem>,
-    val linkChecker: TLinkChecker,
-    val conflictDetector: DownloadConflictDetector,
-    val scope: CoroutineScope,
-) {
-    abstract fun check()
-
-    protected val _canEditResult = MutableStateFlow<CanEditDownloadResult>(CanEditDownloadResult.NothingChanged)
-    val canEditResult = _canEditResult.asStateFlow()
-    val canEdit = canEditResult.mapStateFlow {
-        it is CanEditDownloadResult.CanEdit
-    }
-}
 
 class HttpEditDownloadChecker(
     currentDownloadItem: MutableStateFlow<HttpDownloadItem>,

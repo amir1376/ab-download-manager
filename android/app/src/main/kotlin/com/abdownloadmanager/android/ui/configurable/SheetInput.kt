@@ -96,6 +96,7 @@ fun <T> SheetInput(
                         editingValue = it
                     },
                     modifier = Modifier
+                        .weight(1f, fill = false)
                         .focusRequester(fr),
                     keyboardActions = KeyboardActions(
                         onDone = {

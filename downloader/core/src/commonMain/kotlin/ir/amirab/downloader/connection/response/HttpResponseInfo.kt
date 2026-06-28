@@ -5,6 +5,7 @@ import ir.amirab.downloader.connection.response.headers.getContentRange
 import ir.amirab.downloader.connection.response.headers.extractFileNameFromContentDisposition
 import ir.amirab.downloader.exception.UnSuccessfulResponseException
 import ir.amirab.downloader.utils.FileNameUtil
+import ir.amirab.downloader.utils.throwIf
 import ir.amirab.util.HttpUrlUtils
 import ir.amirab.util.ifThen
 
@@ -83,11 +84,19 @@ data class HttpResponseInfo(
     val etag: String? by lazy {
         responseHeaders["etag"]
     }
+
+    override val unsuccessFullException: Throwable? by lazy {
+        if (!isSuccessFul) {
+            UnSuccessfulResponseException(statusCode, message)
+        } else {
+            null
+        }
+    }
 }
 
 
 fun HttpResponseInfo.expectSuccess() = apply {
-    if (!isSuccessFul) {
-        throw UnSuccessfulResponseException(statusCode, message)
+    unsuccessFullException?.let {
+        throw it
     }
 }

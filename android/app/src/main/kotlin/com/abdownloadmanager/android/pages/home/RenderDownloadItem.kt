@@ -1,37 +1,13 @@
 package com.abdownloadmanager.android.pages.home
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment.Companion.Unbounded
@@ -40,27 +16,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.singledownloadpage.createStatusString
+import com.abdownloadmanager.shared.singledownloadpage.createStatusStringWithReason
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.util.FileIconProvider
-import com.abdownloadmanager.shared.util.LocalSizeUnit
-import com.abdownloadmanager.shared.util.LocalSpeedUnit
-import com.abdownloadmanager.shared.util.LocalUseRelativeDateTime
-import com.abdownloadmanager.shared.util.MyDateAndTimeFormats
-import com.abdownloadmanager.shared.util.TimeNames
-import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
-import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
-import com.abdownloadmanager.shared.util.convertTimeRemainingToHumanReadable
-import com.abdownloadmanager.shared.util.div
-import com.abdownloadmanager.shared.util.formatTime
-import com.abdownloadmanager.shared.util.prettifyRelativeTime
-import com.abdownloadmanager.shared.util.ui.LocalContentAlpha
-import com.abdownloadmanager.shared.util.ui.LocalContentColor
-import com.abdownloadmanager.shared.util.ui.LocalTextStyle
-import com.abdownloadmanager.shared.util.ui.WithContentColor
-import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.*
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
+import com.abdownloadmanager.shared.util.ui.*
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
@@ -68,11 +30,8 @@ import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.CompletedDownloadItemState
 import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
-import ir.amirab.downloader.monitor.isFinished
 import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.utils.ExceptionUtils
-import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.datetime.TimeZone
@@ -80,6 +39,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.periodUntil
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -91,8 +51,9 @@ fun RenderDownloadItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     downloadItem: IDownloadItemState,
+    errorReason: DownloadErrorReason?,
     fileIconProvider: FileIconProvider,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     Row(
         modifier
@@ -160,7 +121,7 @@ fun RenderDownloadItem(
                     }
                 }
                 Spacer(Modifier.height(8.dp))
-                RenderSubTexts(downloadItem)
+                RenderSubTexts(downloadItem, errorReason)
             }
         }
     }
@@ -193,7 +154,7 @@ fun RenderProgressLight(itemState: IDownloadItemState) {
 }
 
 @Composable
-fun RenderSubTexts(itemState: IDownloadItemState) {
+fun RenderSubTexts(itemState: IDownloadItemState, errorReason: DownloadErrorReason?) {
     CompositionLocalProvider(
         LocalTextStyle provides LocalTextStyle.current.copy(fontSize = myTextSizes.xs),
         LocalContentAlpha provides 0.8f
@@ -202,7 +163,7 @@ fun RenderSubTexts(itemState: IDownloadItemState) {
             Modifier.fillMaxWidth()
         ) {
             RenderLeftSubText(itemState, Modifier.align(Alignment.CenterStart))
-            RenderCenterSubText(itemState, Modifier.align(Alignment.Center))
+            RenderCenterSubText(itemState, errorReason, Modifier.align(Alignment.Center))
             RenderRightSubText(itemState, Modifier.align(Alignment.CenterEnd))
         }
     }
@@ -238,7 +199,7 @@ private fun RenderAddedTime(itemState: IDownloadItemState, modifier: Modifier) {
                 val period = now.periodUntil(instant, TimeZone.UTC)
                 val relativeTime = prettifyRelativeTime(period)
                 dateAddedString = relativeTime
-                delay(1000)
+                delay(1000.milliseconds)
             }
         } else {
             val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -258,23 +219,27 @@ fun RenderRightSubText(itemState: IDownloadItemState, modifier: Modifier) {
 }
 
 @Composable
-fun RenderCenterSubText(itemState: IDownloadItemState, modifier: Modifier) {
+fun RenderCenterSubText(itemState: IDownloadItemState, errorReason: DownloadErrorReason?, modifier: Modifier) {
     if (itemState is ProcessingDownloadItemState) {
         if (itemState.status is DownloadJobStatus.IsActive) {
             RenderSpeed(itemState.speed, modifier)
         } else {
-            RenderTextStatus(itemState, modifier)
+            RenderTextStatus(itemState, errorReason, modifier)
         }
     }
 }
 
 @Composable
-fun RenderTextStatus(itemState: IDownloadItemState, modifier: Modifier) {
-    val status = createStatusString(itemState)
+fun RenderTextStatus(
+    itemState: IDownloadItemState,
+    errorReason: DownloadErrorReason?,
+    modifier: Modifier,
+) {
+    val status = createStatusStringWithReason(itemState, errorReason)
     Text(
         status.rememberString(),
-        color = if (itemState.isFinished()) {
-            myColors.success
+        color = if (errorReason != null) {
+            myColors.error
         } else {
             LocalContentColor.current
         },
@@ -315,7 +280,20 @@ fun RenderLeftSubText(itemState: IDownloadItemState, modifier: Modifier) {
             }
         }
     }
-    Text(text, modifier = modifier)
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (itemState is ProcessingDownloadItemState && itemState.supportResume == false) {
+            MyIcon(
+                MyIcons.pause,
+                contentDescription = null,
+                modifier = Modifier.size(12.dp),
+                tint = myColors.error,
+            )
+        }
+        Text(text)
+    }
 }
 
 

@@ -15,12 +15,11 @@ import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
+import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
 import ir.amirab.util.logger.AppLogger
 import ir.amirab.util.logger.appLogger
 import ir.amirab.util.writeText
 import kotlinx.coroutines.runBlocking
-import okio.FileSystem
-import okio.Path.Companion.toPath
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.system.exitProcess
@@ -108,6 +107,7 @@ fun main(args: Array<String>) {
         appLogger.e(throwable = e) { "Fail to start the ${AppInfo.displayName} app because:" }
         System.err.println("Fail to start the ${AppInfo.displayName} app because:")
         e.printStackTrace()
+        AppInfo.definedPaths.crashLogFile.writeText(e.stackTraceToString())
         exitProcess(-1)
     }
 }

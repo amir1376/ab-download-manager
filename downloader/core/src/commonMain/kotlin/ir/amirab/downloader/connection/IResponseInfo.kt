@@ -6,4 +6,7 @@ interface IResponseInfo {
     val requireBasicAuth: Boolean
     val resumeSupport: Boolean
     val isWebPage: Boolean
+
+    // lazy is preferred
+    val unsuccessFullException: Throwable?
 }

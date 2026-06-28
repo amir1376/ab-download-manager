@@ -33,6 +33,8 @@ data class HLSResponseInfo(
         get() = httpResponseInfo.isWebPage
     override val resumeSupport: Boolean
         get() = true
+    override val unsuccessFullException: Throwable?
+        get() = httpResponseInfo.unsuccessFullException
 
     companion object {
         fun fromConnection(connection: Connection<HttpResponseInfo>): HLSResponseInfo {

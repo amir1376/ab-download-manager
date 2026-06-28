@@ -1,15 +1,9 @@
 package com.abdownloadmanager.shared.ui.widget
 
 import androidx.compose.foundation.LocalIndication
-import com.abdownloadmanager.shared.util.ui.LocalContentColor
-import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import com.abdownloadmanager.shared.util.ui.WithContentColor
-import com.abdownloadmanager.shared.util.div
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
@@ -24,8 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.ui.LocalContentColor
+import com.abdownloadmanager.shared.util.ui.WithContentAlpha
+import com.abdownloadmanager.shared.util.ui.WithContentColor
+import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 
 @Composable
 fun ActionButton(
@@ -33,6 +33,7 @@ fun ActionButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     backgroundColor: Brush = SolidColor(myColors.surface),
     disabledBackgroundColor: Brush = SolidColor(myColors.surface / 0.5f),
     borderColor: Brush = SolidColor(myColors.onBackground / 10),
@@ -53,12 +54,13 @@ fun ActionButton(
             .border(1.dp, if (enabled) borderColor else disabledBorderColor, shape)
             .clip(shape)
             .background(if (enabled) backgroundColor else disabledBackgroundColor)
-            .clickable(
+            .combinedClickable(
                 enabled = enabled,
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
                 role = Role.Button,
                 onClick = onClick,
+                onLongClick = onLongClick
             )
             .padding(contentPadding),
         horizontalArrangement = Arrangement.Center,

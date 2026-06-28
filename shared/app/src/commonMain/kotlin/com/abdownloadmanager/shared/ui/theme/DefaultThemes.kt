@@ -98,6 +98,32 @@ object DefaultThemes {
         isLight = false
     )
 
+    val twilight = MyColors(
+        id = "twilight",
+        name = "Twilight",
+
+        primary = Color(0xFF4791BF),
+        onPrimary = Color.White,
+        secondary = Color(0xFFB85DFF),
+        onSecondary = Color.White,
+
+        background = Color(0xFF13111C),
+        onBackground = Color(0xFFE5DEFF),
+
+        surface = Color(0xFF1E1B29),
+        onSurface = Color(0xFFD4CBE5),
+
+        error = Color(0xFFFF5E7E),
+        onError = Color(0xFF410002),
+        success = Color(0xFF00D289),
+        onSuccess = Color(0xFF003320),
+        warning = Color(0xFFFFB74D),
+        onWarning = Color(0xFF4D2A00),
+        info = Color(0xFF29B6F6),
+        onInfo = Color(0xFF00334D),
+        isLight = false
+    )
+
     val black = MyColors(
         id = "black",
         name = "Black",
@@ -153,6 +179,7 @@ object DefaultThemes {
             light,
             obsidian,
             deepOcean,
+            twilight,
             black,
             lightGray,
         )

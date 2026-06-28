@@ -1,6 +1,7 @@
 package com.abdownloadmanager.android.pages.editdownload
 
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
+import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.pages.editdownload.BaseEditDownloadComponent
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
@@ -20,6 +21,7 @@ class AndroidEditDownloadComponent(
     downloadSystem: DownloadSystem,
     downloaderInUiRegistry: DownloaderInUiRegistry,
     iconProvider: FileIconProvider,
+    downloadErrorDialogManager: DownloadErrorDialogManager,
 ) : BaseEditDownloadComponent(
     ctx = ctx,
     downloadSystem = downloadSystem,
@@ -29,6 +31,7 @@ class AndroidEditDownloadComponent(
     onRequestClose = onRequestClose,
     downloadId = downloadId,
     acceptEdit = acceptEdit,
+    downloadErrorDialogManager = downloadErrorDialogManager,
 ),
     ContainsEffects<AndroidEditDownloadComponent.Effects> by supportEffects() {
     sealed interface Effects {

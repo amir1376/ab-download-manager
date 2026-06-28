@@ -20,6 +20,7 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.div
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.myColors
 import ir.amirab.downloader.monitor.IDownloadItemState
@@ -38,6 +39,7 @@ fun DownloadList(
     lazyListState: LazyListState,
     modifier: Modifier,
     contentPadding: PaddingValues,
+    downloadErrorReasons: Map<Long, DownloadErrorReason>,
 ) {
 
     fun newSelection(ids: List<Long>, isSelected: Boolean) {
@@ -71,6 +73,7 @@ fun DownloadList(
                 ) {
                     RenderDownloadItem(
                         downloadItem = item,
+                        errorReason = downloadErrorReasons[item.id],
                         checked = if (isInSelectMode) {
                             item.id in selectionList
                         } else {

@@ -24,6 +24,7 @@ import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.enterurl.EnterNewDownloadWindow
 import com.abdownloadmanager.desktop.pages.extenallibs.ShowOpenSourceLibraries
 import com.abdownloadmanager.desktop.pages.checksum.FileChecksumWindow
+import com.abdownloadmanager.desktop.pages.downloaderror.DownloadErrorDialog
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
 import com.abdownloadmanager.desktop.pages.perhostsettings.PerHostSettingsWindow
@@ -145,6 +146,7 @@ object Ui : KoinComponent {
                 ConfirmExit(appComponent)
                 PowerActionAlert(appComponent)
                 PerHostSettingsWindow(appComponent)
+                DownloadErrorDialog(appComponent)
             }
         }
     }

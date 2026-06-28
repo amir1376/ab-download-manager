@@ -47,9 +47,12 @@ import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.storage.PerHostSettingsDatastoreStorage
 import com.abdownloadmanager.shared.storage.ProxyDatastoreStorage
+import com.abdownloadmanager.shared.storage.SelectQueueSettings
 import com.abdownloadmanager.shared.storage.impl.LastSavedLocationStorage
+import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.ui.theme.ThemeSettingsStorage
 import com.abdownloadmanager.shared.ui.widget.NotificationManager
 import com.abdownloadmanager.shared.updater.UpdateDownloaderViaDownloadSystem
@@ -77,6 +80,13 @@ import ir.amirab.util.AppVersionTracker
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.util.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.shared.util.category.*
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegistryFactory
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.IFailedDownloadErrorStorage
+import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
+import com.abdownloadmanager.shared.util.keepawake.platformKeepAwake
+import com.abdownloadmanager.shared.util.notification.INotificationSettingsStorage
 import com.abdownloadmanager.shared.util.ondownloadcompletion.NoOpOnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionRunner
@@ -297,6 +307,9 @@ val downloadSystemModule = module {
             get(),
             get(),
             get(),
+            get(),
+            get(),
+            get(),
         )
     }
     single {
@@ -501,6 +514,7 @@ fun getAppModule(context: ABDMApp) = module {
         bind<BaseAppSettingsStorage>()
         bind<LanguageStorage>()
         bind<ThemeSettingsStorage>()
+        bind<INotificationSettingsStorage>()
     }
     single {
         RemovedDownloadsFromDiskTracker(
@@ -565,6 +579,23 @@ fun getAppModule(context: ABDMApp) = module {
             )
         )
     }
+    single<ISelectQueueStorage> {
+        val definedPaths = get<AndroidDefinedPaths>()
+        SelectQueueStorage(
+            kotlinxSerializationDataStore<SelectQueueSettings>(
+                definedPaths.selectQueueSettingsFile.toFile(),
+                get(),
+                ::SelectQueueSettings,
+            )
+        )
+    }
+    single {
+        KeepAwakeManager(
+            platformKeepAwake(),
+            get(),
+            get(),
+        )
+    }
     single<IPerHostSettingsStorage> {
         val definedPaths = get<DefinedPaths>()
         PerHostSettingsDatastoreStorage(
@@ -578,16 +609,30 @@ fun getAppModule(context: ABDMApp) = module {
     single {
         PerHostSettingsManager(get())
     }
+    single {
+        DownloadErrorMapperRegistryFactory().createRegistry()
+    }
+    single<IFailedDownloadErrorStorage> {
+        FailedDownloadErrorStorageInMemory()
+    }
+    single {
+        FailedDownloads(
+            get(),
+            get(),
+            get(),
+            get(),
+        )
+    }
     single { context }.apply {
         bind<ABDMApp>()
         bind<Application>()
         bind<Context>()
     }
     single {
-        ABDMAppManager(get(), get(), get(), get(), get(), get(), get())
+        ABDMAppManager(get(), get(), get(), get(), get(), get(), get(), get())
     }
     single {
-        ABDMServiceNotificationManager(get(), get(), get(), get(), get())
+        ABDMServiceNotificationManager(get(), get(), get(), get(), get(), get())
     }
     single {
         AndroidDownloadItemOpener(get())

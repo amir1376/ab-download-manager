@@ -218,7 +218,6 @@ fun HomePage(component: HomeComponent) {
                         .background(myColors.background),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    val filterMode by component.filterMode
                     DownloadList(
                         downloadList = downloadList,
                         selectionList = selectionList,
@@ -236,6 +235,7 @@ fun HomePage(component: HomeComponent) {
                         modifier = Modifier
                             .weight(1f),
                         contentPadding = params.paddingValues,
+                        downloadErrorReasons = component.failedDownloads.collectAsState().value,
                     )
                 }
                 AnimatedVisibility(

@@ -14,7 +14,6 @@ import com.abdownloadmanager.android.pages.onboarding.permissions.PermissionMana
 import com.abdownloadmanager.android.service.DownloadSystemService
 import com.abdownloadmanager.android.service.KeepAliveServiceReason
 import com.abdownloadmanager.android.storage.AppSettingsStorage
-import com.abdownloadmanager.android.util.notification.playNotificationSoundIfAllowed
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pagemanager.NotificationSender
 import com.abdownloadmanager.shared.ui.widget.MessageDialogType
@@ -22,48 +21,31 @@ import com.abdownloadmanager.shared.ui.widget.NotificationManager
 import com.abdownloadmanager.shared.ui.widget.NotificationType
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.category.CategorySelectionMode
+import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
+import com.abdownloadmanager.shared.util.notification.platformNotificationSound
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.User
-import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.queue.DefaultQueueInfo
 import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.downloader.queue.queueModelsFlow
-import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.combineStringSources
 import ir.amirab.util.coroutines.launchWithDeferred
 import ir.amirab.util.guardedEntry
 import ir.amirab.util.suspendGuardedEntry
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
-import java.util.UUID
+import java.util.*
 import kotlin.system.exitProcess
 
 class ABDMAppManager(
     private val context: Context,
     private val scope: CoroutineScope,
     val downloadSystem: DownloadSystem,
+    val keepAwakeManager: KeepAwakeManager,
     val permissionManager: PermissionManager,
     val notificationManager: NotificationManager,
     val serviceNotificationManager: ABDMServiceNotificationManager,
@@ -96,6 +78,7 @@ class ABDMAppManager(
     suspend fun startDownloadSystem() {
         downloadSystemBooted.action {
             downloadSystem.boot()
+            keepAwakeManager.boot()
             registerReceivers()
             registerDownloadEventNotifications()
         }
@@ -135,17 +118,15 @@ class ABDMAppManager(
                                 fullTitle,
                                 Toast.LENGTH_LONG,
                             )
-                            if (isSoundAllowed()) {
-                                val now = System.currentTimeMillis()
-                                val sinceLastSoundMillis = now - lastNotificationSound
-                                // don't repeatedly play notification!
-                                if (sinceLastSoundMillis > 5_000) {
-                                    runCatching {
-                                        playNotificationSoundIfAllowed(context)
-                                        lastNotificationSound = now
-                                    }.onFailure {
-                                        it.printStackTrace()
-                                    }
+                            val now = System.currentTimeMillis()
+                            val sinceLastSoundMillis = now - lastNotificationSound
+                            // don't repeatedly play notification!
+                            if (sinceLastSoundMillis > 5_000) {
+                                runCatching {
+                                    platformNotificationSound().play(notification.notificationType)
+                                    lastNotificationSound = now
+                                }.onFailure {
+                                    it.printStackTrace()
                                 }
                             }
                             toast.show()
@@ -178,30 +159,15 @@ class ABDMAppManager(
             return
         }
         if (it is DownloadManagerEvents.OnJobCanceled) {
-            val exception = it.e
-            if (ExceptionUtils.isNormalCancellation(exception)) {
-                return
+            val reason = downloadSystem.errorMapperRegistry.getReason(it.e)
+            reason?.let { reason ->
+                sendNotification(
+                    "downloadId=${it.downloadItem.id}",
+                    description = it.downloadItem.name.asStringSource(),
+                    title = reason.title.asStringSource(),
+                    type = NotificationType.Error,
+                )
             }
-            var isMaxTryReachedError = false
-            val actualCause = if (exception is TooManyErrorException) {
-                isMaxTryReachedError = true
-                exception.findActualDownloadErrorCause()
-            } else exception
-            if (ExceptionUtils.isNormalCancellation(actualCause)) {
-                return
-            }
-            val prefix = if (isMaxTryReachedError) {
-                "Too Many Error: "
-            } else {
-                "Error: "
-            }.asStringSource()
-            val reason = actualCause.message?.asStringSource() ?: Res.string.unknown.asStringSource()
-            sendNotification(
-                "downloadId=${it.downloadItem.id}",
-                description = it.downloadItem.name.asStringSource(),
-                title = listOf(prefix, reason).combineStringSources(),
-                type = NotificationType.Error,
-            )
         }
         if (it is DownloadManagerEvents.OnJobCompleted) {
             sendNotification(
@@ -320,6 +286,22 @@ class ABDMAppManager(
                 categoryId = categoryId,
             ).also {
                 downloadSystem.userManualResume(it)
+            }
+        }
+    }
+
+    fun startNewDownloads(
+        items: List<NewDownloadItemProps>,
+        categorySelectionMode: CategorySelectionMode?,
+    ): Deferred<List<Long>> {
+        return scope.launchWithDeferred {
+            downloadSystem.addDownload(
+                newItemsToAdd = items,
+                categorySelectionMode = categorySelectionMode,
+            ).also {
+                it.forEach {
+                    downloadSystem.userManualResume(it)
+                }
             }
         }
     }

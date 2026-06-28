@@ -56,7 +56,6 @@ class AndroidSettingsComponent(
 //                            DesktopSettings.mergeTopBarWithTitleBarConfig(appSettings),
 //                    CommonSettings.showIconLabels(appSettings),
                     CommonSettings.useRelativeDateTime(appSettings),
-                    CommonSettings.playSoundNotification(appSettings),
                 )
             ),
             ConfigurableGroup(
@@ -70,6 +69,15 @@ class AndroidSettingsComponent(
                     CommonSettings.sizeUnit(appRepository, scope),
                     CommonSettings.speedUnit(appRepository, scope),
                     CommonSettings.useAverageSpeedConfig(appRepository),
+                )
+            ),
+            ConfigurableGroup(
+                mainConfigurable = CommonSettings.playSoundNotification(appSettings),
+                nestedVisible = appSettings.notificationSound,
+                nestedConfigurable = listOf(
+                    CommonSettings.generalNotificationSound(appSettings),
+                    CommonSettings.errorNotificationSound(appSettings),
+                    CommonSettings.successNotificationSound(appSettings),
                 )
             ),
             ConfigurableGroup(

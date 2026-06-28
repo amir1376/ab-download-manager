@@ -12,7 +12,7 @@ import com.abdownloadmanager.android.util.activity.ABDMActivity
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadConfig
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
-import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialFromStringExtractor
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DefaultDownloadCredentialsExtractor
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import kotlinx.serialization.json.Json
@@ -77,7 +77,7 @@ class AddDownloadActivity : ABDMActivity() {
                 intent.data?.toString().orEmpty()
             }
         }
-        return DownloadCredentialFromStringExtractor
+        return DefaultDownloadCredentialsExtractor
             .extract(links)
             .distinctBy { it.link }
     }

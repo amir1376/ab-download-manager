@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class HLSNewDownloadInputs(
-    downloadUiChecker: HLSDownloadUIChecker,
+    downloadUiChecker: HLSNewDownloadUIChecker,
     private val sizeAndSpeedUnitProvider: SizeAndSpeedUnitProvider,
     private val scope: CoroutineScope,
 ) : NewDownloadInputs<
@@ -42,7 +42,7 @@ class HLSNewDownloadInputs(
         DownloadSize.Duration,
         HLSLinkChecker,
         >(
-    downloadUiChecker = downloadUiChecker
+    newDownloadUiChecker = downloadUiChecker
 ) {
 
     //extra settings

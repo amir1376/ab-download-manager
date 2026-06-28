@@ -3,16 +3,7 @@ package com.abdownloadmanager.android.pages.add.multiple
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
@@ -137,8 +128,6 @@ private fun RenderAddDownloadItem(
                 modifier = Modifier.basicMarquee(),
             )
             Spacer(Modifier.height(mySpacings.mediumSpace))
-            val sizeTitle = myStringResource(Res.string.size)
-            val sizeValue = state.sizeString.rememberString()
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -158,10 +147,21 @@ private fun RenderAddDownloadItem(
                         .alpha(0.75f)
                 )
                 Spacer(Modifier.width(mySpacings.largeSpace))
-                Text(
-                    text = "$sizeTitle: $sizeValue",
-                    maxLines = 1,
-                )
+                val lastErrorReason = state.lastErrorReason
+                if (lastErrorReason != null) {
+                    Text(
+                        text = lastErrorReason.title,
+                        maxLines = 1,
+                        color = myColors.error,
+                    )
+                } else {
+                    val sizeTitle = myStringResource(Res.string.size)
+                    val sizeValue = state.sizeString.rememberString()
+                    Text(
+                        text = "$sizeTitle: $sizeValue",
+                        maxLines = 1,
+                    )
+                }
             }
         }
 

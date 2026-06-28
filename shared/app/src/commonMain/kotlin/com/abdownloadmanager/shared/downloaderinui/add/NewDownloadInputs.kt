@@ -2,7 +2,6 @@ package com.abdownloadmanager.shared.downloaderinui.add
 
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
-import com.abdownloadmanager.shared.downloaderinui.DownloadUiChecker
 import com.abdownloadmanager.shared.downloaderinui.LinkChecker
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsItem
@@ -23,14 +22,14 @@ abstract class NewDownloadInputs<
         TDownloadSize : DownloadSize,
         TLinkChecker : LinkChecker<TCredentials, TResponseInfoType, TDownloadSize>,
         >(
-    val downloadUiChecker: DownloadUiChecker<TCredentials, TResponseInfoType, TDownloadSize, TLinkChecker>
+    val newDownloadUiChecker: NewDownloadUiChecker<TCredentials, TResponseInfoType, TDownloadSize, TLinkChecker>
 ) {
     val openedTime = System.currentTimeMillis()
 
-    val name = downloadUiChecker.name
-    val folder = downloadUiChecker.folder
-    val credentials = downloadUiChecker.credentials
-    val downloadSize = downloadUiChecker.downloadSize
+    val name = newDownloadUiChecker.name
+    val folder = newDownloadUiChecker.folder
+    val credentials = newDownloadUiChecker.credentials
+    val downloadSize = newDownloadUiChecker.downloadSize
     abstract val downloadItem: StateFlow<TDownloadItem>
     abstract val downloadJobConfig: StateFlow<DownloadJobExtraConfig?>
     abstract val configurableList: List<Configurable<*>>
@@ -38,7 +37,7 @@ abstract class NewDownloadInputs<
     abstract fun applyHostSettingsToExtraConfig(extraConfig: PerHostSettingsItem)
 
     fun setCredentials(credentials: TCredentials) {
-        downloadUiChecker.credentials.update { credentials }
+        newDownloadUiChecker.credentials.update { credentials }
     }
 
     abstract fun downloadSizeToStringSource(downloadSize: TDownloadSize): StringSource?

@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.pages.adddownload.multiple
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,7 @@ import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -22,6 +24,7 @@ import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.CategoryItem
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.CategorySelectionMode
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
 import com.abdownloadmanager.shared.util.perhostsettings.getSettingsForURL
 import com.arkivanov.decompose.ComponentContext
@@ -52,16 +55,24 @@ abstract class BaseAddMultiDownloadComponent(
     ctx: ComponentContext,
     id: String,
     private val onRequestClose: () -> Unit,
-    private val onRequestAdd: OnRequestAdd,
+    private val onRequestAddMultipleItem: OnRequestAddMultipleItem,
+    private val onRequestDownloadMultipleItem: OnRequestDownloadMultipleItem,
     private val appRepository: BaseAppRepository,
     private val perHostSettingsManager: PerHostSettingsManager,
     val downloadSystem: DownloadSystem,
     val fileIconProvider: FileIconProvider,
     private val categoryManager: CategoryManager,
     val downloaderInUiRegistry: DownloaderInUiRegistry,
-    protected val queueManager: QueueManager,
+    queueManager: QueueManager,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
-) : AddDownloadComponent(ctx, id, lastSavedLocationsStorage) {
+    selectQueueStorage: ISelectQueueStorage,
+) : AddDownloadComponent(
+    ctx = ctx,
+    id = id,
+    lastSavedLocationsStorage = lastSavedLocationsStorage,
+    queueManager = queueManager,
+    selectQueueStorage = selectQueueStorage
+) {
     override val shouldShowWindow: StateFlow<Boolean> = MutableStateFlow(true)
 
     private val _folder = MutableStateFlow(appRepository.saveLocation.value)
@@ -151,7 +162,7 @@ abstract class BaseAddMultiDownloadComponent(
 
     init {
         checkList.onEach {
-            it.downloadUiChecker.refresh()
+            it.newDownloadUiChecker.refresh()
         }
             .launchIn(scope)
     }
@@ -259,20 +270,23 @@ abstract class BaseAddMultiDownloadComponent(
         }
     }
 
-    fun requestAddDownloads(
-        queueId: Long?, startQueue: Boolean,
-    ) {
-
-        val categorySelectionMode = when {
+    override fun onRequestAddToQueue(queueId: Long?, startQueue: Boolean) {
+        requestAddDownloads(queueId, startQueue)
+    }
+    fun getCategorySelectionMode(): CategorySelectionMode? {
+        return when {
             alsoAutoCategorize.value -> CategorySelectionMode.Auto
             else -> selectedCategory.value?.let {
                 CategorySelectionMode.Fixed(it.id)
             }
         }
-        val itemsToAdd = totalList
+    }
+
+    fun getItemsToAdd(categorySelectionMode: CategorySelectionMode?): List<NewDownloadItemProps> {
+        return totalList
             .filter { it.getUniqueId() in selectionList }
             .filter {
-                val checker = it.downloadUiChecker
+                val checker = it.newDownloadUiChecker
                 checker.canAdd.value
                         || checker.isDuplicate.value // we add numbered file strategy
             }
@@ -294,8 +308,32 @@ abstract class BaseAddMultiDownloadComponent(
                     context = EmptyContext,
                 )
             }
+    }
+
+    fun requestDownloadAll() {
+        val categorySelectionMode = getCategorySelectionMode()
+        val itemsToAdd = getItemsToAdd(categorySelectionMode)
         consumeDialog {
-            onRequestAdd(
+            onRequestDownloadMultipleItem(
+                items = itemsToAdd,
+                categorySelectionMode = categorySelectionMode
+            ).invokeOnCompletion {
+                val folder = folder.value
+                if (allInSameLocation.value) {
+                    addToLastUsedLocations(folder)
+                }
+            }
+            requestClose()
+        }
+    }
+
+    private fun requestAddDownloads(
+        queueId: Long?, startQueue: Boolean,
+    ) {
+        val categorySelectionMode = getCategorySelectionMode()
+        val itemsToAdd = getItemsToAdd(categorySelectionMode)
+        consumeDialog {
+            onRequestAddMultipleItem(
                 items = itemsToAdd,
                 queueId = queueId,
                 categorySelectionMode = categorySelectionMode
@@ -314,9 +352,6 @@ abstract class BaseAddMultiDownloadComponent(
         }
     }
 
-    var showAddToQueue by mutableStateOf(false)
-        private set
-
     fun getIdOf(item: TANewDownloadInputs): Int {
         return item.getUniqueId()
     }
@@ -330,14 +365,6 @@ abstract class BaseAddMultiDownloadComponent(
     }
 
     val currentDownloadConfigurableList: MutableStateFlow<List<Configurable<*>>?> = MutableStateFlow(null)
-
-    fun openAddToQueueDialog() {
-        showAddToQueue = true
-    }
-
-    fun closeAddToQueue() {
-        showAddToQueue = false
-    }
 
     fun requestClose() {
         onRequestClose()
@@ -393,15 +420,17 @@ abstract class BaseAddMultiDownloadComponent(
         return combine(
             name,
             credentials,
-            downloadUiChecker.downloadSize,
+            newDownloadUiChecker.downloadSize,
             lengthStringFlow,
-        ) { name, credentials, downloadSize, lengthString ->
+            newDownloadUiChecker.lastErrorReason,
+        ) { name, credentials, downloadSize, lengthString, lastErrorReason ->
             NewMultiDownloadState(
                 id = id,
                 name = name,
                 size = downloadSize,
                 sizeString = lengthString,
                 link = credentials.link,
+                lastErrorReason = lastErrorReason,
             )
         }
     }
@@ -411,10 +440,12 @@ abstract class BaseAddMultiDownloadComponent(
 /**
  * this is used to represent multiple download list table
  */
+@Immutable
 data class NewMultiDownloadState(
     val id: NewDownloadInputsUniqueIdType,
     val name: String,
     val size: DownloadSize?,
     val sizeString: StringSource,
     val link: String,
+    val lastErrorReason: DownloadErrorReason?,
 )

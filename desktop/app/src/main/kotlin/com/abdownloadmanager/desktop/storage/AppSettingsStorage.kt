@@ -14,6 +14,7 @@ import com.abdownloadmanager.shared.util.ui.theme.DEFAULT_UI_SCALE
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.*
 import ir.amirab.util.enumValueOrNull
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 
@@ -32,7 +33,7 @@ data class AppSettingsModel(
     override val useRelativeDateTime: Boolean = true,
     val useSystemTray: Boolean = true,
     override val threadCount: Int = 8,
-    override val maxConcurrentDownloads: Int = 0,
+    override val maxConcurrentDownloads: Int = 3,
     override val maxDownloadRetryCount: Int = 3,
     override val dynamicPartCreation: Boolean = true,
     override val useServerLastModifiedTime: Boolean = false,
@@ -44,6 +45,9 @@ data class AppSettingsModel(
     override val speedLimit: Long = 0,
     override val autoStartOnBoot: Boolean = true,
     override val notificationSound: Boolean = true,
+    override val generalNotificationSound: String = "",
+    override val successNotificationSound: String = "",
+    override val errorNotificationSound: String = "",
     override val defaultDownloadFolder: String = PlatformDownloadLocationProvider
         .instance.getDownloadLocation()
         .resolve("ABDM")
@@ -88,6 +92,9 @@ data class AppSettingsModel(
             val speedLimit = longKeyOf("speedLimit")
             val autoStartOnBoot = booleanKeyOf("autoStartOnBoot")
             val notificationSound = booleanKeyOf("notificationSound")
+            val generalNotificationSound = stringKeyOf("generalNotificationSound")
+            val errorNotificationSound = stringKeyOf("errorNotificationSound")
+            val successNotificationSound = stringKeyOf("successNotificationSound")
             val defaultDownloadFolder = stringKeyOf("defaultDownloadFolder")
             val browserIntegrationEnabled = booleanKeyOf("browserIntegrationEnabled")
             val browserIntegrationPort = intKeyOf("browserIntegrationPort")
@@ -133,6 +140,11 @@ data class AppSettingsModel(
                 speedLimit = source.get(Keys.speedLimit) ?: default.speedLimit,
                 autoStartOnBoot = source.get(Keys.autoStartOnBoot) ?: default.autoStartOnBoot,
                 notificationSound = source.get(Keys.notificationSound) ?: default.notificationSound,
+                generalNotificationSound = source.get(Keys.generalNotificationSound)
+                    ?: default.generalNotificationSound,
+                errorNotificationSound = source.get(Keys.errorNotificationSound) ?: default.errorNotificationSound,
+                successNotificationSound = source.get(Keys.successNotificationSound)
+                    ?: default.successNotificationSound,
                 defaultDownloadFolder = source.get(Keys.defaultDownloadFolder) ?: default.defaultDownloadFolder,
                 browserIntegrationEnabled = source.get(Keys.browserIntegrationEnabled)
                     ?: default.browserIntegrationEnabled,
@@ -174,6 +186,9 @@ data class AppSettingsModel(
                 put(Keys.speedLimit, focus.speedLimit)
                 put(Keys.autoStartOnBoot, focus.autoStartOnBoot)
                 put(Keys.notificationSound, focus.notificationSound)
+                put(Keys.generalNotificationSound, focus.generalNotificationSound)
+                put(Keys.errorNotificationSound, focus.errorNotificationSound)
+                put(Keys.successNotificationSound, focus.successNotificationSound)
                 put(Keys.defaultDownloadFolder, focus.defaultDownloadFolder)
                 put(Keys.browserIntegrationEnabled, focus.browserIntegrationEnabled)
                 put(Keys.browserIntegrationPort, focus.browserIntegrationPort)
@@ -248,6 +263,9 @@ class AppSettingsStorage(
     override val speedLimit = from(AppSettingsModel.speedLimit)
     override val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)
     override val notificationSound = from(AppSettingsModel.notificationSound)
+    override val generalNotificationSound = from(AppSettingsModel.generalNotificationSound)
+    override val errorNotificationSound = from(AppSettingsModel.errorNotificationSound)
+    override val successNotificationSound = from(AppSettingsModel.successNotificationSound)
     override val defaultDownloadFolder = from(AppSettingsModel.defaultDownloadFolder)
     override val browserIntegrationEnabled = from(AppSettingsModel.browserIntegrationEnabled)
     override val browserIntegrationPort = from(AppSettingsModel.browserIntegrationPort)

@@ -38,6 +38,7 @@ import com.abdownloadmanager.shared.ui.widget.table.customtable.TableState
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.rememberCategoryOf
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.downloader.monitor.*
 import ir.amirab.util.compose.resources.myStringResource
@@ -47,6 +48,7 @@ import ir.amirab.util.desktop.isCtrlPressed
 import ir.amirab.util.desktop.isShiftPressed
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class DownloadListContext(
@@ -82,7 +84,8 @@ fun DownloadList(
     lastSelectedId: Long?,
     fileIconProvider: FileIconProvider,
     categoryManager: CategoryManager,
-    lazyListState: LazyListState
+    lazyListState: LazyListState,
+    failedDownloadReasons: Map<Long, DownloadErrorReason>,
 ) {
     ShowDownloadOptions(
         downloadOptions, onRequestCloseOption
@@ -165,7 +168,7 @@ fun DownloadList(
                     mutableStateOf(false)
                 }
                 LaunchedEffect(shouldWaitForSecondClick) {
-                    delay(DOUBLE_CLICK_DELAY)
+                    delay(DOUBLE_CLICK_DELAY.milliseconds)
                     if (shouldWaitForSecondClick) {
                         shouldWaitForSecondClick = false
                     }
@@ -313,7 +316,8 @@ fun DownloadList(
                 }
 
                 DownloadListCells.Status -> {
-                    StatusCell(item)
+                    val reason = failedDownloadReasons[item.id]
+                    StatusCell(item, reason)
                 }
 
                 DownloadListCells.TimeLeft -> {

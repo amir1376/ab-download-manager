@@ -11,6 +11,7 @@ abstract class DefinedPaths(
     val systemDir: Path = dataDir.resolve("system")
     val updateDir: Path = systemDir.resolve("update")
     val logDir: Path = systemDir.resolve("log")
+    val crashLogFile: Path = logDir.resolve("crash.log")
     val pagesStateDir: Path = configDir.resolve("pages")
     val optionsDir: Path = configDir.resolve("options")
     val downloadDbDir: Path = configDir.resolve("download_db")
@@ -19,6 +20,9 @@ abstract class DefinedPaths(
     val extraQueueSettings: Path = downloadDbDir.resolve("extra_queue_settings")
     val categoriesDir: Path = downloadDbDir.resolve("categories")
     val categoriesFile: Path = categoriesDir.resolve("categories.json")
+
+    val lastSavedLocationFile = pagesStateDir.resolve("lastSavedLocation.json")
+    val selectQueueSettingsFile = pagesStateDir.resolve("selectQueue.json")
 
     val partsDir: Path = downloadDbDir.resolve("parts")
     val updateDownloadLocation: Path = updateDir.resolve("downloads")

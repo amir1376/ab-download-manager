@@ -100,17 +100,8 @@ fun AddMultiItemPage(
         )
     }
     ShowAddToQueueDialog(
-        queueList = addMultiDownloadComponent.queueList.collectAsState().value,
-        onQueueSelected = { queue, startQueue ->
-            addMultiDownloadComponent.requestAddDownloads(
-                queue, startQueue
-            )
-        },
-        onClose = {
-            addMultiDownloadComponent.closeAddToQueue()
-        },
-        isOpened = addMultiDownloadComponent.showAddToQueue,
-        newQueueAction = addMultiDownloadComponent.newQueueAction,
+        queueComponent = addMultiDownloadComponent.selectQueueComponent,
+        onRequestAddNewQueue = addMultiDownloadComponent.newQueueAction,
     )
 }
 
@@ -194,21 +185,34 @@ fun Footer(
                 Modifier
             ) {
                 val buttonModifier = Modifier.weight(1f)
+                IconActionButton(
+                    icon = MyIcons.download,
+                    contentDescription = Res.string.download.asStringSource(),
+                    onClick = {
+                        component.requestDownloadAll()
+                    },
+                    enabled = component.canClickAdd,
+                )
+                Spacer(Modifier.width(8.dp))
                 PrimaryMainActionButton(
                     text = myStringResource(Res.string.add),
                     onClick = {
-                        component.openAddToQueueDialog()
+                        component.selectQueueComponent.openAddToQueueDialog()
+                    },
+                    onLongClick = {
+                        component.selectQueueComponent.fastConfirm()
                     },
                     enabled = component.canClickAdd,
                     modifier = buttonModifier,
                 )
-//                ActionButton(
-//                    text = myStringResource(Res.string.cancel),
-//                    onClick = {
-//                        component.requestClose()
-//                    },
-//                    modifier = buttonModifier,
-//                )
+                Spacer(Modifier.width(8.dp))
+                ActionButton(
+                    text = myStringResource(Res.string.cancel),
+                    onClick = {
+                        component.requestClose()
+                    },
+                    modifier = buttonModifier,
+                )
             }
         }
     }

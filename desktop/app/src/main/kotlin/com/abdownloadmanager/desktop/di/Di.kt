@@ -57,8 +57,11 @@ import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.storage.PerHostSettingsDatastoreStorage
 import com.abdownloadmanager.shared.storage.ProxyDatastoreStorage
+import com.abdownloadmanager.shared.storage.SelectQueueSettings
+import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.ui.theme.ThemeSettingsStorage
 import com.abdownloadmanager.shared.ui.widget.NotificationManager
 import com.abdownloadmanager.shared.updater.UpdateDownloaderViaDownloadSystem
@@ -87,6 +90,13 @@ import ir.amirab.util.AppVersionTracker
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.util.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.shared.util.category.*
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegistryFactory
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
+import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.IFailedDownloadErrorStorage
+import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
+import com.abdownloadmanager.shared.util.keepawake.platformKeepAwake
+import com.abdownloadmanager.shared.util.notification.INotificationSettingsStorage
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionProvider
 import com.abdownloadmanager.shared.util.ondownloadcompletion.OnDownloadCompletionActionRunner
 import com.abdownloadmanager.shared.util.onqueuecompletion.OnQueueEventActionRunner
@@ -120,7 +130,6 @@ import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.compose.localizationmanager.LanguageSourceProvider
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
 import ir.amirab.util.config.datastore.kotlinxSerializationDataStore
-import ir.amirab.util.desktop.DesktopUtils
 import ir.amirab.util.startup.AbstractStartupManager
 import ir.amirab.util.startup.Startup
 import kotlinx.serialization.modules.SerializersModule
@@ -297,6 +306,9 @@ val downloadSystemModule = module {
 
     single {
         DownloadSystem(
+            get(),
+            get(),
+            get(),
             get(),
             get(),
             get(),
@@ -543,6 +555,7 @@ val appModule = module {
         bind<BaseAppSettingsStorage>()
         bind<LanguageStorage>()
         bind<ThemeSettingsStorage>()
+        bind<INotificationSettingsStorage>()
     }
     single {
         val definedPaths = get<DesktopDefinedPaths>()
@@ -631,7 +644,7 @@ val appModule = module {
     }
     single {
         KeepAwakeManager(
-            DesktopUtils.keepAwakeService(),
+            platformKeepAwake(),
             get(),
             get(),
         )
@@ -643,6 +656,30 @@ val appModule = module {
                 definedPaths.perHostSettingsFile.toFile(),
                 get(),
                 ::emptyList,
+            )
+        )
+    }
+    single {
+        DownloadErrorMapperRegistryFactory().createRegistry()
+    }
+    single<IFailedDownloadErrorStorage> {
+        FailedDownloadErrorStorageInMemory()
+    }
+    single {
+        FailedDownloads(
+            get(),
+            get(),
+            get(),
+            get(),
+        )
+    }
+    single<ISelectQueueStorage> {
+        val definedPaths = get<DesktopDefinedPaths>()
+        SelectQueueStorage(
+            kotlinxSerializationDataStore<SelectQueueSettings>(
+                definedPaths.selectQueueSettingsFile.toFile(),
+                get(),
+                ::SelectQueueSettings,
             )
         )
     }

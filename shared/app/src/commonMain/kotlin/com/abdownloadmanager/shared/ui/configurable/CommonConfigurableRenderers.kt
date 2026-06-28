@@ -1,19 +1,6 @@
 package com.abdownloadmanager.shared.ui.configurable
 
-import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.DayOfWeekConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.FileChecksumConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.FloatConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.FolderConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.LongConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.TimeConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.*
 
 interface ContainsConfigurableRenderers {
     fun getAllRenderers(): Map<Configurable.Key, ConfigurableRenderer<*>>
@@ -34,8 +21,8 @@ data class CommonConfigurableRenderers(
     val themeConfigurableRenderer: ConfigurableRenderer<ThemeConfigurable>,
     val timeConfigurableRenderer: ConfigurableRenderer<TimeConfigurable>,
     val proxyConfigurableRenderer: ConfigurableRenderer<ProxyConfigurable>,
-
-    ) : ContainsConfigurableRenderers {
+    val soundConfigurableRenderer: ConfigurableRenderer<SoundConfigurable>,
+) : ContainsConfigurableRenderers {
     override fun getAllRenderers(): Map<Configurable.Key, ConfigurableRenderer<*>> {
         return mapOf(
             BooleanConfigurable.Key to booleanConfigurableRenderer,
@@ -52,6 +39,7 @@ data class CommonConfigurableRenderers(
             ThemeConfigurable.Key to themeConfigurableRenderer,
             TimeConfigurable.Key to timeConfigurableRenderer,
             ProxyConfigurable.Key to proxyConfigurableRenderer,
+            SoundConfigurable.Key to soundConfigurableRenderer,
         )
     }
 }

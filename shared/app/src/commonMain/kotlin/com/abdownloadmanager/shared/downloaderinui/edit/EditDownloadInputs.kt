@@ -15,6 +15,7 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
 import ir.amirab.util.flow.onEachLatest
+import ir.amirab.util.toSingleLine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.update
 
 typealias TAEditDownloadInputs = EditDownloadInputs<*, *, *, *, *, *>
 
+// if I make it like NewDownloadInputs it becomes more usable and simpler to use
 abstract class EditDownloadInputs<
         TDownloadItem : IDownloadItem,
         TCredentials : IDownloadCredentials,
@@ -71,7 +73,9 @@ abstract class EditDownloadInputs<
     abstract val configurableList: List<Configurable<*>>
     abstract fun applyEditedItemTo(item: TDownloadItem)
     fun setName(name: String) {
-        this.name.value = name
+        val refinedName = name
+            .toSingleLine()
+        this.name.value = refinedName
     }
 
     val link = credentials.mapTwoWayStateFlow(
@@ -94,7 +98,7 @@ abstract class EditDownloadInputs<
     }
 
     protected val linkChecker = linkCheckerFactory.createLinkChecker(credentials.value)
-    private val httpEditDownloadChecker = editDownloadCheckerFactory.createEditDownloadChecker(
+    private val editDownloadChecker = editDownloadCheckerFactory.createEditDownloadChecker(
         currentDownloadItem = currentDownloadItem,
         editedDownloadItem = editedDownloadItem,
         linkChecker = linkChecker,
@@ -105,11 +109,12 @@ abstract class EditDownloadInputs<
     val isLinkLoading = linkChecker.isLoading
 
     val gettingResponseInfo = linkChecker.isLoading
+    val responseResult = linkChecker.responseResult
     val responseInfo = linkChecker.responseInfo
 
 
-    val canEditDownloadResult = httpEditDownloadChecker.canEditResult
-    val canEdit = httpEditDownloadChecker.canEdit
+    val canEditDownloadResult = editDownloadChecker.canEditResult
+    val canEdit = editDownloadChecker.canEdit
 
     private val refreshResponseInfoImmediately = MutableSharedFlow<Unit>(
         replay = 1,
@@ -148,7 +153,7 @@ abstract class EditDownloadInputs<
             scheduleRecheckEditDownloadIsPossible.debounce(500),
 //            ...
         ).onEachLatest {
-            httpEditDownloadChecker.check()
+            editDownloadChecker.check()
         }.launchIn(scope)
 
         credentials.onEach { credentials ->

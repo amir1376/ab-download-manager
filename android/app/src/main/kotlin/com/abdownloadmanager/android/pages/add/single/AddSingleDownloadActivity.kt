@@ -13,13 +13,15 @@ import com.abdownloadmanager.android.util.ABDMAppManager
 import com.abdownloadmanager.android.util.AndroidDownloadItemOpener
 import com.abdownloadmanager.android.util.activity.ABDMActivity
 import com.abdownloadmanager.android.util.activity.HandleActivityEffects
+import com.abdownloadmanager.android.util.activity.RetainedComponentContainer
 import com.abdownloadmanager.android.util.activity.getSerializedExtra
 import com.abdownloadmanager.android.util.activity.putSerializedExtra
+import com.abdownloadmanager.android.util.pagemanager.AndroidDownloadErrorPageManager
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadConfig
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
-import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.OnFullyDismissed
@@ -42,6 +44,7 @@ class AddSingleDownloadActivity : ABDMActivity() {
     private val downloadItemOpener: AndroidDownloadItemOpener by inject()
     private val downloaderInUiRegistry: DownloaderInUiRegistry by inject()
     private val lastSavedLocationsStorage: ILastSavedLocationsStorage by inject()
+    private val selectQueueStorage: ISelectQueueStorage by inject()
     private val queueManager: QueueManager by inject()
     private val categoryManager: CategoryManager by inject()
     private val iconProvider: FileIconProvider by inject()
@@ -59,6 +62,13 @@ class AddSingleDownloadActivity : ABDMActivity() {
             val downloadItemOpener = downloadItemOpener
             val appSettingsStorage = appSettingsStorage
             val downloadSystem = downloadSystem
+            val downloadErrorDialogManager = AndroidDownloadErrorPageManager(
+                openIntent = {
+                    sendEffect(RetainedComponentContainer.Effects.StartActivity(it))
+                },
+                json = json,
+                context = applicationContext,
+            )
             val closeAddDownloadDialog = {
                 this@myRetainedComponent.finishActivityAction()
             }
@@ -104,7 +114,9 @@ class AddSingleDownloadActivity : ABDMActivity() {
                     }
                 },
                 downloadItemOpener = downloadItemOpener,
+                downloadErrorDialogManager = downloadErrorDialogManager,
                 lastSavedLocationsStorage = lastSavedLocationsStorage,
+                selectQueueStorage = selectQueueStorage,
                 importOptions = config.importOptions,
                 id = config.id,
                 downloaderInUi = downloaderInUiRegistry.getDownloaderOf(config.newDownload.credentials)!!,

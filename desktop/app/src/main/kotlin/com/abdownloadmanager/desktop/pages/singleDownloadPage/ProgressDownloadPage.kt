@@ -1,14 +1,5 @@
 package com.abdownloadmanager.desktop.pages.singleDownloadPage
 
-import com.abdownloadmanager.shared.ui.configurable.RenderConfigurable
-import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageSections.*
-import com.abdownloadmanager.shared.util.ui.LocalContentColor
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
-import ir.amirab.util.compose.IconSource
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
@@ -31,25 +22,31 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.abdownloadmanager.shared.ui.widget.rememberMyComponentRectPositionProvider
+import com.abdownloadmanager.desktop.pages.singleDownloadPage.SingleDownloadPageSections.*
+import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.singledownloadpage.SingleDownloadPagePropertyItem
+import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
+import com.abdownloadmanager.shared.ui.configurable.RenderConfigurable
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.ui.widget.table.customtable.CellSize
 import com.abdownloadmanager.shared.ui.widget.table.customtable.Table
 import com.abdownloadmanager.shared.ui.widget.table.customtable.TableCell
 import com.abdownloadmanager.shared.ui.widget.table.customtable.TableState
-import com.abdownloadmanager.resources.Res
-import com.abdownloadmanager.shared.singledownloadpage.SingleDownloadPagePropertyItem
-import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.util.LocalSizeUnit
 import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
-import com.abdownloadmanager.shared.util.ui.useIsInDebugMode
 import com.abdownloadmanager.shared.util.div
-import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
+import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
+import com.abdownloadmanager.shared.util.ui.*
+import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
+import com.abdownloadmanager.shared.util.ui.theme.mySpacings
+import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
+import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.monitor.*
 import ir.amirab.downloader.part.PartDownloadStatus
 import ir.amirab.downloader.utils.ExceptionUtils
+import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
@@ -82,6 +79,7 @@ fun ProgressDownloadPage(
     var selectedTab by remember { mutableStateOf(Info) }
     val showPartInfo by singleDownloadComponent.showPartInfo.collectAsState()
     val setShowPartInfo = singleDownloadComponent::setShowPartInfo
+    val downloadHasError by singleDownloadComponent.lastError.collectAsState()
     val resizingState = LocalSingleDownloadPageSizing.current
     val horizontalPadding = 16.dp
 
@@ -165,7 +163,14 @@ fun ProgressDownloadPage(
                 Spacer(Modifier.size(8.dp))
                 RenderProgressBar(itemState)
                 Spacer(Modifier.size(8.dp))
-                RenderActions(itemState, singleDownloadComponent, showPartInfo, setShowPartInfo)
+                RenderActions(
+                    itemState = itemState,
+                    singleDownloadComponent = singleDownloadComponent,
+                    showingPartInfo = showPartInfo,
+                    onRequestShowPartInfo = setShowPartInfo,
+                    downloadErrorReason = downloadHasError,
+                    onRequestShowDownloadError = singleDownloadComponent::openDownloadErrorPage
+                )
                 Spacer(Modifier.size(8.dp))
             }
             if (showPartInfo) {
@@ -472,7 +477,7 @@ private fun prettifyStatus(status: PartDownloadStatus): StringSource {
         is PartDownloadStatus.Canceled -> Res.string.disconnected
         PartDownloadStatus.IDLE -> Res.string.idle
         PartDownloadStatus.Completed -> Res.string.finished
-        PartDownloadStatus.ReceivingData -> Res.string.receiving_data
+        PartDownloadStatus.ReceivingData -> Res.string.downloading
         PartDownloadStatus.Connecting -> Res.string.connecting
     }.asStringSource()
 }
@@ -580,9 +585,18 @@ private fun RenderActions(
     singleDownloadComponent: DesktopSingleDownloadComponent,
     showingPartInfo: Boolean,
     onRequestShowPartInfo: (show: Boolean) -> Unit,
+    downloadErrorReason: DownloadErrorReason?,
+    onRequestShowDownloadError: () -> Unit,
 ) {
     Row {
         PartInfoButton(showingPartInfo, onRequestShowPartInfo)
+        downloadErrorReason?.let {
+            Spacer(Modifier.width(mySpacings.smallSpace))
+            DownloadErrorInfoButton(
+                downloadErrorReason = it,
+                onClick = onRequestShowDownloadError,
+            )
+        }
         Spacer(Modifier.weight(1f))
         ToggleButton(
             itemState = itemState,
@@ -618,6 +632,24 @@ private fun PartInfoButton(
             } else {
                 MyIcons.down
             }
+        )
+    }
+}
+
+@Composable
+private fun DownloadErrorInfoButton(
+    downloadErrorReason: DownloadErrorReason,
+    onClick: () -> Unit,
+) {
+    val description = downloadErrorReason.title.asStringSource()
+    Tooltip(description) {
+        IconActionButton(
+            onClick = {
+                onClick()
+            },
+            contentDescription = description,
+            icon = MyIcons.question,
+            contentColor = myColors.error,
         )
     }
 }

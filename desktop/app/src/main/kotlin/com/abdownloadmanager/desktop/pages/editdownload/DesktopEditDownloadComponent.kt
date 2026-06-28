@@ -1,6 +1,7 @@
 package com.abdownloadmanager.desktop.pages.editdownload
 
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
+import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.pages.editdownload.BaseEditDownloadComponent
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
@@ -25,6 +26,7 @@ class DesktopEditDownloadComponent(
     downloadSystem: DownloadSystem,
     downloaderInUiRegistry: DownloaderInUiRegistry,
     iconProvider: FileIconProvider,
+    downloadErrorDialogManager: DownloadErrorDialogManager,
 ) : BaseEditDownloadComponent(
     ctx = ctx,
     downloadSystem = downloadSystem,
@@ -34,6 +36,7 @@ class DesktopEditDownloadComponent(
     onRequestClose = onRequestClose,
     downloadId = downloadId,
     acceptEdit = acceptEdit,
+    downloadErrorDialogManager = downloadErrorDialogManager,
 ),
     ContainsEffects<EditDownloadPageEffects> by supportEffects(),
     KoinComponent {

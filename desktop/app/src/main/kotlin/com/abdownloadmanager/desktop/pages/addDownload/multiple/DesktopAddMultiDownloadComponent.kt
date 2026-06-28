@@ -6,8 +6,10 @@ import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
 import com.abdownloadmanager.shared.pages.adddownload.multiple.BaseAddMultiDownloadComponent
-import com.abdownloadmanager.shared.pages.adddownload.multiple.OnRequestAdd
+import com.abdownloadmanager.shared.pages.adddownload.multiple.OnRequestAddMultipleItem
+import com.abdownloadmanager.shared.pages.adddownload.multiple.OnRequestDownloadMultipleItem
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
+import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
@@ -18,9 +20,11 @@ class DesktopAddMultiDownloadComponent(
     ctx: ComponentContext,
     id: String,
     onRequestClose: () -> Unit,
-    onRequestAdd: OnRequestAdd,
+    onRequestAddMultipleItem: OnRequestAddMultipleItem,
+    onRequestDownloadMultipleItem: OnRequestDownloadMultipleItem,
     private val categoryDialogManager: CategoryDialogManager,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
+    selectQueueStorage: ISelectQueueStorage,
     perHostSettingsManager: PerHostSettingsManager, downloadSystem: DownloadSystem,
     fileIconProvider: FileIconProvider,
     appRepository: AppRepository,
@@ -31,7 +35,9 @@ class DesktopAddMultiDownloadComponent(
     ctx = ctx,
     id = id,
     lastSavedLocationsStorage = lastSavedLocationsStorage,
-    onRequestAdd = onRequestAdd,
+    selectQueueStorage = selectQueueStorage,
+    onRequestAddMultipleItem = onRequestAddMultipleItem,
+    onRequestDownloadMultipleItem = onRequestDownloadMultipleItem,
     onRequestClose = onRequestClose,
     perHostSettingsManager = perHostSettingsManager,
     downloadSystem = downloadSystem,
