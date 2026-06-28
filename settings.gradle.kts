@@ -33,6 +33,7 @@ include("shared:config")
 include("shared:updater")
 include("shared:auto-start")
 include("shared:nanohttp4k")
+include("cli:app")
 includeBuild("./compositeBuilds/shared"){
     name="build-shared"
 }
