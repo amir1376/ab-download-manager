@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use bytes::Bytes;
-use suppaftp::{AsyncRustlsFtpStream, AsyncRustlsConnector};
+use suppaftp::tokio::{AsyncRustlsFtpStream, AsyncRustlsConnector};
 use suppaftp::types::FileType;
 use tokio::sync::{watch, Mutex, RwLock};
 use tracing::{debug, error, info, warn};
@@ -106,7 +106,7 @@ impl FtpJob {
                 .with_root_certificates(root_store)
                 .with_no_client_auth();
             
-            let connector = AsyncRustlsConnector::from(futures_rustls::TlsConnector::from(std::sync::Arc::new(config)));
+            let connector = AsyncRustlsConnector::from(suppaftp::tokio_rustls::TlsConnector::from(std::sync::Arc::new(config)));
             control = control
                 .into_secure(connector, &ftp_url.host)
                 .await
@@ -207,8 +207,7 @@ impl FtpJob {
 
                 let data_stream = control.retr_as_stream(&ftp_url.path).await.map_err(|e| anyhow::anyhow!("FTP part RETR failed: {}", e))?;
 
-                use tokio_util::compat::FuturesAsyncReadCompatExt;
-                let mut data_stream = data_stream.compat();
+                let mut data_stream = data_stream;
                 let mut writer = disk.writer_for(p.current as u64);
 
                 use tokio::io::AsyncReadExt;
@@ -233,7 +232,7 @@ impl FtpJob {
                     *part.write().await = p.clone();
                 }
 
-                control.finalize_retr_stream(data_stream.into_inner()).await.map_err(|e| anyhow::anyhow!("FTP finalize failed: {}", e))?;
+                control.finalize_retr_stream(data_stream).await.map_err(|e| anyhow::anyhow!("FTP finalize failed: {}", e))?;
                 control.quit().await.ok();
 
                 Ok(())

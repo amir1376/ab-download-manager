@@ -1,5 +1,5 @@
 [package]
-name    = "xeton_core"
+name = "xeton_core"
 version = "0.1.0"
 edition = "2021"
 
@@ -18,8 +18,13 @@ path = "uniffi_bindgen.rs"
 tokio = { version = "1", features = ["full"] }
 
 # HTTP client — HTTP/1.1 + HTTP/2, TLS, proxy, streaming
-reqwest = { version = "0.12", features = [
-    "stream", "socks", "rustls-tls", "gzip", "brotli"
+reqwest = { version = "0.13.4", features = [
+    "stream",
+    "socks",
+    "rustls",
+    "gzip",
+    "brotli",
+    "json",
 ], default-features = false }
 
 # Zero-copy byte buffers
@@ -46,19 +51,19 @@ filetime = "0.2"
 portable-atomic = "1"
 
 # Serialization for persisted models
-serde      = { version = "1", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
 # UniFFI FFI binding generator (async Tokio support)
-uniffi = { version = "0.28", features = ["tokio", "cli"] }
-uniffi_bindgen = { version = "0.28" }
+uniffi = { version = "0.31.2", features = ["tokio", "cli"] }
+uniffi_bindgen = { version = "0.31.2" }
 
 # AES-128-CBC for HLS segment decryption (pure Rust)
-aes = "0.8"
-cbc = "0.1"
+aes = "0.9.1"
+cbc = "0.2.1"
 urlencoding = "2"
 libc = "0.2"
-cipher = "0.4"
+cipher = "0.5.2"
 regex = "1"
 
 # Token-bucket rate limiter (global + per-job speed limits)
@@ -69,53 +74,67 @@ tokio-stream = "0.1"
 tokio-util = { version = "0.7", features = ["compat"] }
 
 # Structured logging
-tracing            = "0.1"
+tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Error ergonomics
 thiserror = "2"
-anyhow    = "1"
+anyhow = "1"
 
 # Async trait support
 async-trait = "0.1"
 
 # FTP/FTPS engine
-suppaftp = { version = "6", features = ["async-rustls", "rustls"], optional = true }
+suppaftp = { version = "9", features = [
+    "tokio-rustls-ring",
+    "rustls-ring",
+], optional = true }
 rustls-native-certs = "0.8"
-webpki-roots = "0.26"
+webpki-roots = "1.0.8"
 futures-rustls = "0.26"
 
 # BitTorrent engine
 librqbit = { version = "8", features = [
-    "tokio-console", "timed_existence"
+    "tokio-console",
+    "timed_existence",
 ], optional = true }
 
 # M3U8 playlist parsing for HLS
 m3u8-rs = { version = "6", optional = true }
 
 # SHA-1 for HLS EXT-X-KEY IV derivation
-sha1 = { version = "0.10", features = ["oid"], optional = true }
+sha1 = { version = "0.11", features = ["oid"], optional = true }
 
 # FFmpeg bindings (audio transcoder — optional feature)
-ffmpeg-next = { version = "7", optional = true }
+ffmpeg-next = { version = "8", optional = true }
 
 # mDNS discovery and HTTP server for local sync
-mdns-sd = { version = "0.13", optional = true }
-axum = { version = "0.7", optional = true }
+mdns-sd = { version = "0.20", optional = true }
+axum = { version = "0.8", optional = true }
 
 # ─────────────────────────────────────────────────────────────────────────────
 [build-dependencies]
-uniffi = { version = "0.28", features = ["build"] }
+uniffi = { version = "0.31.2", features = ["build"] }
 
 # ─────────────────────────────────────────────────────────────────────────────
 [features]
-default    = ["ftp", "hls", "torrent", "extractors", "sync"]
-ftp        = ["suppaftp"]
-hls        = ["m3u8-rs", "sha1"]
-torrent    = ["librqbit"]
+default = ["ftp", "hls", "torrent", "extractors", "sync"]
+ftp = ["suppaftp"]
+hls = ["m3u8-rs", "sha1"]
+torrent = ["librqbit"]
 extractors = []
 transcoder = ["ffmpeg-next"]
-sync       = ["mdns-sd", "axum"]
+sync = ["mdns-sd", "axum"]
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "0.52", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_IO"] }
+windows-sys = { version = "0.61.2", features = [
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+panic = "abort"

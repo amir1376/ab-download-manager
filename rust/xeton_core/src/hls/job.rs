@@ -13,7 +13,7 @@ use aes::Aes128;
 #[cfg(feature = "hls")]
 use bytes::Bytes;
 #[cfg(feature = "hls")]
-use cbc::cipher::{BlockDecryptMut, KeyIvInit};
+use cbc::cipher::{BlockModeDecrypt, KeyIvInit};
 #[cfg(feature = "hls")]
 use reqwest::header::HeaderMap;
 #[cfg(feature = "hls")]
@@ -348,7 +348,7 @@ fn decrypt_aes128_cbc(data: &[u8], key: &[u8; 16], iv: &[u8; 16]) -> anyhow::Res
     let mut buf = data.to_vec();
     let decryptor = Aes128CbcDec::new(key.into(), iv.into());
     let decrypted = decryptor
-        .decrypt_padded_mut::<Pkcs7>(&mut buf)
+        .decrypt_padded::<Pkcs7>(&mut buf)
         .map_err(|e| anyhow::anyhow!("AES decryption failed: {:?}", e))?;
 
     Ok(Bytes::copy_from_slice(decrypted))

@@ -1,7 +1,5 @@
-use suppaftp::AsyncRustlsFtpStream;
+use suppaftp::tokio::{AsyncRustlsFtpStream, AsyncRustlsConnector};
 use suppaftp::types::FileType;
-use suppaftp::AsyncRustlsConnector;
-use futures_rustls::TlsConnector;
 use std::sync::Arc;
 
 #[tokio::main]
@@ -22,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_root_certificates(root_store)
         .with_no_client_auth();
         
-    let connector = AsyncRustlsConnector::from(TlsConnector::from(Arc::new(config)));
+    let connector = AsyncRustlsConnector::from(suppaftp::tokio_rustls::TlsConnector::from(Arc::new(config)));
     
     ftp_stream = ftp_stream.into_secure(connector, "test.rebex.net").await?;
     println!("TLS handshake completed. Logging in...");
@@ -40,8 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reader = ftp_stream.retr_as_stream("/readme.txt").await?;
     let mut data = Vec::new();
     use tokio::io::AsyncReadExt;
-    use tokio_util::compat::FuturesAsyncReadCompatExt;
-    let mut compat_reader = reader.compat();
+    let mut compat_reader = reader;
     compat_reader.read_to_end(&mut data).await?;
     
     let text = String::from_utf8_lossy(&data);
@@ -50,7 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("--------------------");
     
     // Finalize retrieve
-    ftp_stream.finalize_retr_stream(compat_reader.into_inner()).await?;
+    ftp_stream.finalize_retr_stream(compat_reader).await?;
     
     ftp_stream.quit().await?;
     println!("Done!");

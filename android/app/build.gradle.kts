@@ -43,6 +43,14 @@ android {
             applicationIdSuffix = ".debug"
             resValue("string", "app_short_name", "AB DM - Debug")
         }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
     buildFeatures {
         compose = true
