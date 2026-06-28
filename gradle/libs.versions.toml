@@ -39,7 +39,7 @@ agp = "9.2.1"
 androidx-core = "1.13.1"
 androidx-activity-compose = "1.9.2"
 slf4jApi = "2.0.16"
-geckoview = "131.0.20241001153903"
+geckoview = "131.0.20241011205646"
 
 [libraries]
 

@@ -7,20 +7,20 @@ plugins {
     id(Plugins.Android.kotlinMultiplatformLibrary)
 }
 val ourPackageName = "com.abdownloadmanager.resources"
-val propertiesToKotlinTask by tasks.registering(PropertiesToKotlinTask::class) {
+val propertiesToKotlinTask = tasks.register<PropertiesToKotlinTask>("propertiesToKotlinTask") {
     outputDir.set(file("build/tasks/propertiesToKotlinTask"))
     generatedFileName.set("String.kt")
     packageName.set(ourPackageName)
     myStringResourceClass.set("ir.amirab.resources.contracts.MyStringResource")
     propertyFiles.from("src/commonMain/resources/com/abdownloadmanager/resources/locales/en_US.properties")
 }
-val generateResourceMap by tasks.registering(GenerateResourceMap::class) {
+val generateResourceMap = tasks.register<GenerateResourceMap>("generateResourceMap") {
     outputDir.set(file("build/tasks/generateResourceMapTask"))
     generatedFileName.set("ResourceMap.kt")
     packageName.set(ourPackageName)
     baseFolder.set(file("src/commonMain/resources/"))
 }
-val generateResObject by tasks.registering(GenerateResObject::class) {
+val generateResObject = tasks.register<GenerateResObject>("generateResObject") {
     outputDir.set(file("build/tasks/generateResObjectTask"))
     generatedFileName.set("Res.kt")
     packageName.set(ourPackageName)
@@ -34,9 +34,6 @@ kotlin {
         compileSdk = 36
         namespace = "com.abdownloadmanager.resources"
         minSdk = 26
-        sourceSets.named("main") {
-            resources.srcDir("src/commonMain/resources")
-        }
     }
     sourceSets {
         commonMain {
@@ -50,6 +47,9 @@ kotlin {
                 api(libs.okio.okio)
                 implementation(project(":shared:resources:contracts"))
             }
+        }
+        androidMain.configure {
+            resources.srcDirs("src/commonMain/resources")
         }
     }
 }
