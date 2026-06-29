@@ -1,0 +1,73 @@
+name: Sync with upstream
+
+on:
+  schedule:
+    # 每天 UTC 时间 6:00 / 北京时间 14:00 检查一次
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # 也可以手动触发
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Add upstream and fetch
+        run: |
+          git remote add upstream https://github.com/amir1376/ab-download-manager.git
+          git fetch upstream master
+
+      - name: Check if behind upstream
+        id: check
+        run: |
+          BEHIND=$(git rev-list --count master..upstream/master)
+          echo "behind=$BEHIND" >> $GITHUB_OUTPUT
+          if [ "$BEHIND" -gt 0 ]; then
+            echo "has_update=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_update=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Configure git identity and rebase onto upstream
+        if: steps.check.outputs.has_update == 'true'
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git rebase upstream/master
+          git push origin master --force-with-lease
+
+      - name: Cache Gradle
+        if: steps.check.outputs.has_update == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ubuntu-gradle
+
+      - name: Set up JDK 21
+        if: steps.check.outputs.has_update == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version: '21'
+
+      - name: Build desktop packages
+        if: steps.check.outputs.has_update == 'true'
+        run: |
+          ./gradlew createReleaseFolderForCi
+
+      - name: Upload artifacts
+        if: steps.check.outputs.has_update == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-ubuntu-latest
+          path: ./build/ci-release
