@@ -1,6 +1,11 @@
 package com.abdownloadmanager.android.pages.browser
 
+import android.net.Uri
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -97,9 +102,27 @@ fun BrowserPage(
     }
     val tabs by browserComponent.tabs.collectAsState()
     val tab = tabs.activeTab
+
+    var fileChooserValueCallback = remember<ValueCallback<Array<out Uri?>?>?> {
+        null
+    }
+    val fileChooserLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        val uris = WebChromeClient.FileChooserParams.parseResult(it.resultCode, it.data)
+        fileChooserValueCallback?.onReceiveValue(uris)
+        fileChooserValueCallback = null
+    }
+
     val tabWebViewHolder = remember(tab?.tabId) {
         tab?.let {
-            viewRegistry.getWebViewHolder(it)
+            viewRegistry.getWebViewHolder(
+                tab = it,
+                onChooseFile = { intent, callback ->
+                    fileChooserValueCallback = callback
+                    fileChooserLauncher.launch(intent)
+                }
+            )
         }
     }
     BackHandler(tabs.tabsSize > 1) {
