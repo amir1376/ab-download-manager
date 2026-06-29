@@ -7,8 +7,8 @@
 <p align="center">
     <a href="https://github.com/amir1376/ab-download-manager/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/amir1376/ab-download-manager?color=greenlight&label=latest%20release"></a>
     <a href="https://abdownloadmanager.com"><img alt="AB Download Manager Website" src="https://img.shields.io/badge/project-website-purple?&labelColor=gray"></a>
-    <a href="https://t.me/abdownloadmanager_discussion"><img alt="Telegram Group" src="https://img.shields.io/badge/Telegram-Group-blue?logo=telegram&labelColor=gray"></a>
     <a href="https://t.me/abdownloadmanager"><img alt="Telegram Channel" src="https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram&labelColor=gray"></a>
+    <a href="https://t.me/abdownloadmanager_discussion"><img alt="Telegram Group" src="https://img.shields.io/badge/Telegram-Group-blue?logo=telegram&labelColor=gray"></a>
     <a href="https://crowdin.com/project/ab-download-manager"><img alt="Crowdin" src="https://badges.crowdin.net/ab-download-manager/localized.svg"></a>
 </p>
 
@@ -16,8 +16,7 @@
     <img alt="AB Download Manager Banner" src="assets/banners/app_banner.png"/>
 </a>
 
-
-## Description
+## Introduction
 
 [AB Download Manager](https://abdownloadmanager.com) is a desktop app that helps you manage and organize your downloads more efficiently than ever before.
 
@@ -33,6 +32,8 @@
 Please visit [Project Website](https://abdownloadmanager.com) for more info.
 
 ## Installation
+
+<a href="https://github.com/amir1376/ab-download-manager/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/amir1376/ab-download-manager?color=greenlight&label=latest%20release"></a>
 
 ### Download and Install the App
 
@@ -73,6 +74,9 @@ For alternative installation methods, uninstallation instructions, and more deta
 
 ### Browser Extensions
 
+<a href="https://addons.mozilla.org/en-US/firefox/addon/ab-download-manager/"><img src="https://img.shields.io/amo/v/ab-download-manager?label=Firefox&logo=firefoxbrowser" alt="Firefox Add-ons Version"></a>
+<a href="https://chromewebstore.google.com/detail/bbobopahenonfdgjgaleledndnnfhooj"> <img src="https://img.shields.io/chrome-web-store/v/bbobopahenonfdgjgaleledndnnfhooj?label=Chrome&logo=googlechrome" alt="Chrome Web Store Version"></a>
+
 You can download the browser extension to integrate the app with your browser.
 
 <p align="left">
@@ -106,20 +110,11 @@ You can download the browser extension to integrate the app with your browser.
 </picture>
 </div>
 
-## Project Status & Feedback
-
-Please keep in mind that this project is in the beginning of its journey.
-**Lots of features** are on the way!
-
-**But**, in the meantime you may face **Bugs or Problems**. If you do, please report them to me via the [Community chat](#community) or through `GitHub Issues`, and I'll do my best to fix them ASAP.
-
 ## Community
 
-You can join our [Telegram Group](https://t.me/abdownloadmanager_discussion) to:
-
-- Report problems
-- Suggest features
-- Get help with the app
+- 📢 [Telegram Channel](https://t.me/abdownloadmanager) – News, announcements, and release updates.
+- 💬 [Telegram Group](https://t.me/abdownloadmanager_discussion) – Get help, report bugs, suggest features, and discuss
+  the project with the community.
 
 ## Repositories And Source Code
 
@@ -166,6 +161,8 @@ follow these steps:
 > faced any problem you can check that too.
 
 ## Translations
+
+<a href="https://crowdin.com/project/ab-download-manager"><img alt="Crowdin" src="https://badges.crowdin.net/ab-download-manager/localized.svg"></a>
 
 If you’d like to help translate AB Download Manager into another language, or improve existing translations, you can do
 so on Crowdin. Here’s how:
