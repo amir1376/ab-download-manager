@@ -94,10 +94,20 @@ object DesktopLauncher {
     // --- Platform-specific binary discovery ---
 
     private fun findWindowsBinary(): File? {
+        val candidates = mutableListOf<File>()
+
+        // 1. Priority: read from registry (most reliable, supports custom install dir)
+        try {
+            val regPath = readRegistry("HKCU\\Software\\ABDownloadManager", "InstallPath")
+            if (regPath != null) {
+                candidates.add(File(regPath, "ABDownloadManager.exe"))
+            }
+        } catch (_: Exception) { }
+
+        // 2. Standard install locations (backward compatibility)
         val localAppData = System.getenv("LOCALAPPDATA")
         val programFiles = System.getenv("ProgramFiles")
         val programFilesX86 = System.getenv("ProgramFiles(x86)")
-        val candidates = mutableListOf<File>()
         if (localAppData != null) {
             candidates.add(File(localAppData, "ABDownloadManager/ABDownloadManager.exe"))
             candidates.add(File(localAppData, "AB Download Manager/ABDownloadManager.exe"))
@@ -108,8 +118,26 @@ object DesktopLauncher {
         if (programFilesX86 != null) {
             candidates.add(File(programFilesX86, "AB Download Manager/ABDownloadManager.exe"))
         }
+
+        // 3. User home fallback
         candidates.add(File(System.getProperty("user.home"), "ABDownloadManager/ABDownloadManager.exe"))
+
         return candidates.firstOrNull { it.exists() }
+    }
+
+    /**
+     * Read a Windows registry string value via reg query.
+     * Output format: "    InstallPath    REG_SZ    C:\path\to\..."
+     */
+    private fun readRegistry(key: String, valueName: String): String? {
+        return try {
+            val proc = ProcessBuilder("reg", "query", key, "/v", valueName)
+                .redirectErrorStream(true).start()
+            val output = proc.inputStream.bufferedReader().readText().trim()
+            proc.waitFor()
+            val regex = Regex("""\s+${Regex.escape(valueName)}\s+\S+\s+(.+)$""", RegexOption.MULTILINE)
+            regex.find(output)?.groupValues?.get(1)
+        } catch (_: Exception) { null }
     }
 
     private fun findMacBinary(): File? {

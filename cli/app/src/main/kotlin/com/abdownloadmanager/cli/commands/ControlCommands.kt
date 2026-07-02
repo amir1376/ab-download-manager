@@ -92,7 +92,7 @@ class RemoveCommand : BaseControlCommand(
     name = "remove",
     help = "Remove one or more downloads"
 ) {
-    private val keepFile: Boolean by option("--keep-file", "-k", help = "Keep the downloaded file").flag()
+    private val keepFile: Boolean by option("--keep-file", "-k", help = "Keep the downloaded file").flag(default = true)
 
     override fun runWithClient(term: Terminal, client: DesktopClient) {
         when (val result = client.removeDownloads(ids, keepFile)) {

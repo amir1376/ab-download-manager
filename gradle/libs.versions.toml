@@ -39,6 +39,7 @@ androidx-core = "1.18.0"
 androidx-activity-compose = "1.13.0"
 slf4jApi = "2.0.18"
 
+shadow = "9.0.0"
 [libraries]
 
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
@@ -135,4 +136,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 changeLog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 

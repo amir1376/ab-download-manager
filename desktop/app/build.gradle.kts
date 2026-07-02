@@ -87,6 +87,21 @@ tasks.processResources {
 }
 
 val desktopPackageName = "com.abdownloadmanager.desktop"
+
+/**
+ * Copy java.exe/javaw.exe from the JDK into the Compose runtime/bin directory.
+ * Compose's jlink produces a runtime that lacks the launcher executables on Windows.
+ */
+val copyJavaExeToRuntime by tasks.registering(Copy::class) {
+    dependsOn("createReleaseDistributable")
+    val jdkHome = file(System.getProperty("java.home"))
+    val runtimeBin = layout.buildDirectory.dir("compose/binaries/main-release/app/${getAppName()}/runtime/bin")
+    from(jdkHome.resolve("bin")) {
+        include("java.exe", "javaw.exe")
+    }
+    into(runtimeBin)
+}
+
 compose {
     desktop {
         application {
@@ -112,6 +127,7 @@ compose {
                     "java.instrument",
                     "jdk.unsupported",
                     "jdk.accessibility",
+                    "java.management",
                 )
                 targetFormats(Msi, Deb)
                 if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
@@ -162,6 +178,8 @@ compose {
 
 installerPlugin {
     dependsOn("createReleaseDistributable")
+    dependsOn(":cli:app:shadowJar")
+    dependsOn("copyJavaExeToRuntime")
     outputFolder.set(layout.buildDirectory.dir("custom-installer"))
     windows {
         appName = getAppName()
@@ -181,7 +199,9 @@ installerPlugin {
             "project_website" to "www.abdownloadmanager.com",
             "copyright" to "© 2024-present AB Download Manager App",
             "header_image_file" to project.file("resources/installer/abdm-header-image.bmp"),
-            "sidebar_image_file" to project.file("resources/installer/abdm-sidebar-image.bmp")
+            "sidebar_image_file" to project.file("resources/installer/abdm-sidebar-image.bmp"),
+            "cli_jar_path" to project(":cli:app").layout.buildDirectory.file("libs/abdm-cli.jar").get().asFile.absolutePath,
+            "installer_resources_dir" to project.file("resources/installer").absolutePath
         )
     }
     macos {

@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization")
     application
     id(Plugins.buildConfig)
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
@@ -46,4 +47,12 @@ buildConfig {
         "APP_VERSION",
         provider { getAppVersionString() }
     )
+}
+
+// Configure shadow JAR packaging for the CLI fat JAR
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    archiveBaseName.set("abdm-cli")
+    archiveClassifier.set("")
+    mergeServiceFiles()
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
 }
