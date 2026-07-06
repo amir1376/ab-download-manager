@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import okio.Throttler
+import ir.amirab.downloader.utils.speedlimiter.SpeedLimiter
 import java.io.File
 
 class DownloadManager(
@@ -348,9 +348,9 @@ class DownloadManager(
         MutableSharedFlow(extraBufferCapacity = 64)
 
     //global speed limiter
-    internal val throttler = Throttler()
+    internal val speedLimiter = SpeedLimiter()
     fun limitGlobalSpeed(bytePerSecond: Long) {
-        throttler.bytesPerSecond(bytePerSecond)
+        speedLimiter.bytesPerSecond(bytePerSecond)
     }
 
     fun reloadSetting() {

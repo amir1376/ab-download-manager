@@ -14,6 +14,7 @@ import ir.amirab.downloader.exception.DownloadValidationException
 import ir.amirab.downloader.exception.TooManyErrorException
 import ir.amirab.downloader.part.*
 import ir.amirab.downloader.utils.*
+import ir.amirab.downloader.utils.speedlimiter.SpeedLimiter
 import ir.amirab.util.tryLocked
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import okio.Throttler
 import java.util.concurrent.ConcurrentHashMap
 
 
@@ -227,7 +227,7 @@ class HLSDownloadJob(
     }
 
     private fun applySpeedLimit() {
-        jobThrottler.bytesPerSecond(bytesPerSecond = downloadItem.speedLimit)
+        speedLimiter.bytesPerSecond(bytesPerSecond = downloadItem.speedLimit)
     }
 
     fun onLinkChanged() {
@@ -459,7 +459,7 @@ class HLSDownloadJob(
         }
     }
 
-    private val jobThrottler = Throttler()
+    private val speedLimiter = SpeedLimiter()
 
     private val partDownloaderList = ConcurrentHashMap<Long, HLSPartDownloader>()
     private val listenerJobs: MutableMap<Long, Job> = ConcurrentHashMap<Long, Job>()
@@ -480,8 +480,8 @@ class HLSDownloadJob(
                     },
                     client = client,
                     speedLimiters = listOf(
-                        downloadManager.throttler,
-                        jobThrottler,
+                        downloadManager.speedLimiter,
+                        speedLimiter,
                     ),
                 ).also { partDownloader: HLSPartDownloader ->
                     partDownloader.onTooManyErrors = {
