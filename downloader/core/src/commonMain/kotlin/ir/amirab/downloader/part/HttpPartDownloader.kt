@@ -7,6 +7,7 @@ import ir.amirab.downloader.connection.response.expectSuccess
 import ir.amirab.downloader.destination.DestWriter
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
 import ir.amirab.downloader.exception.ServerPartIsNotTheSameAsWeExpectException
+import ir.amirab.downloader.utils.speedlimiter.SpeedLimiter
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -31,7 +32,7 @@ class HttpPartDownloader(
     getDestWriter: () -> DestWriter,
     part: RangedPart,
     val client: HttpDownloaderClient,
-    val speedLimiters: List<Throttler>,
+    val speedLimiters: List<SpeedLimiter>,
     val strictMode: Boolean,
     partSplitLock: Any,
 ) : PartDownloader<RangedPart>(
@@ -56,8 +57,8 @@ class HttpPartDownloader(
                 }
             }
             .getOrThrow()
-        val source = speedLimiters.fold<Throttler, Source>(connect.source) { acc, throttler ->
-            throttler.source(acc)
+        val source = speedLimiters.fold<SpeedLimiter, Source>(connect.source) { acc, speedLimiter ->
+            speedLimiter.source(acc)
         }
         return connect.copy(
             source = source

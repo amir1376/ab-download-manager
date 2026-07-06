@@ -3,7 +3,6 @@ package ir.amirab.downloader.downloaditem.hls
 import ir.amirab.downloader.connection.Connection
 import ir.amirab.downloader.connection.HttpDownloaderClient
 import ir.amirab.downloader.connection.response.HttpResponseInfo
-import ir.amirab.downloader.connection.response.expectSuccess
 import ir.amirab.downloader.destination.DestWriter
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.part.MediaSegment
@@ -11,7 +10,7 @@ import ir.amirab.downloader.part.PartDownloader
 import ir.amirab.util.HttpUrlUtils
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
-import okio.Throttler
+import ir.amirab.downloader.utils.speedlimiter.SpeedLimiter
 import kotlin.coroutines.cancellation.CancellationException
 
 class HLSPartDownloader(
@@ -19,7 +18,7 @@ class HLSPartDownloader(
     getDestWriter: () -> DestWriter,
     private val baseURL: String,
     private val client: HttpDownloaderClient,
-    private val speedLimiters: List<Throttler>,
+    private val speedLimiters: List<SpeedLimiter>,
 ) : PartDownloader<
         MediaSegment
         >(
