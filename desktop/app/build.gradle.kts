@@ -13,6 +13,7 @@ plugins {
     id(Plugins.Kotlin.serialization)
     id(Plugins.ksp)
     id(Plugins.aboutLibraries)
+    id(Plugins.kotlinRpc)
     id("ir.amirab.installer-plugin")
 //    id(MyPlugins.proguardDesktop)
 }
@@ -33,9 +34,6 @@ dependencies {
 
     implementation(libs.compose.reorderable)
 
-    implementation(libs.http4k.core)
-    implementation(libs.http4k.client.okhttp)
-
     implementation(libs.arrow.core)
     implementation(libs.arrow.optics)
     ksp(libs.arrow.opticKsp)
@@ -53,6 +51,16 @@ dependencies {
     implementation(libs.jna.core)
     implementation(libs.jna.platform)
 
+    implementation(libs.kotlin.reflect) // used by kotlin-rpc
+    implementation(libs.kotlinx.rpc.client)
+    implementation(libs.kotlinx.rpc.client.ktor)
+    implementation(libs.kotlinx.rpc.server)
+    implementation(libs.kotlinx.rpc.server.ktor)
+    implementation(libs.kotlinx.rpc.serializationJson)
+
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.server.cio)
+
     implementation(project(":downloader:core"))
     implementation(project(":downloader:monitor"))
 
@@ -66,7 +74,6 @@ dependencies {
     implementation(project(":shared:app"))
     implementation(project(":shared:utils"))
     implementation(project(":shared:updater"))
-    implementation(project(":shared:nanohttp4k"))
     implementation(project(":desktop:mac_utils"))
     implementation(project(":desktop:slf4j-impl"))
 }

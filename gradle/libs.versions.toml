@@ -16,7 +16,6 @@ decompose = "3.5.0"
 essenty = "2.5.0"
 buildConfig = "6.0.10"
 changelog = "2.5.0"
-http4k = "6.51.0.0"
 arrow = "2.2.3"
 datastore = "1.2.1"
 aboutLibraries = "14.2.1"
@@ -42,6 +41,8 @@ agp = "8.13.2"
 androidx-core = "1.18.0"
 androidx-activity-compose = "1.13.0"
 slf4jApi = "2.0.18"
+kotlinRpc = "0.10.3"
+ktor = "3.3.1"
 
 [libraries]
 
@@ -81,12 +82,6 @@ kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 autoService-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoServiceKsp" }
 autoService-annoations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
 
-
-nanoHttpd-core = "org.nanohttpd:nanohttpd:2.3.1"
-http4k-core = { module = "org.http4k:http4k-core", version.ref = "http4k" }
-http4k-server-jetty = { module = "org.http4k:http4k-server-jetty", version.ref = "http4k" }
-http4k-client-okhttp = { module = "org.http4k:http4k-client-okhttp", version.ref = "http4k" }
-
 compose-material-rippleEffect = { module = "org.jetbrains.compose.material:material-ripple", version.ref = "compose" }
 compose-reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
@@ -98,7 +93,6 @@ semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 
 aboutLibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
-aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
 
 jna-core = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
@@ -126,6 +120,16 @@ markdownRenderer-core = { module = "com.mikepenz:multiplatform-markdown-renderer
 handlebarsJava = { module = "com.github.jknack:handlebars", version.ref = "handlebars" }
 
 kotlinFileWatcher = { module = "io.github.irgaly.kfswatch:kfswatch", version.ref = "kotlinFileWatcher" }
+
+kotlinx-rpc-gradlePlugin = { module = "org.jetbrains.kotlinx.rpc.plugin:org.jetbrains.kotlinx.rpc.plugin.gradle.plugin", version.ref = "kotlinRpc" }
+kotlinx-rpc-client = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-client", version.ref = "kotlinRpc" }
+kotlinx-rpc-client-ktor = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-ktor-client", version.ref = "kotlinRpc" }
+kotlinx-rpc-server = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-server", version.ref = "kotlinRpc" }
+kotlinx-rpc-server-ktor = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-ktor-server", version.ref = "kotlinRpc" }
+kotlinx-rpc-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-serialization-json", version.ref = "kotlinRpc" }
+
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 
 composeNativeTray = { module = "io.github.kdroidfilter:composenativetray", version.ref = "composeNativeTray" }
 nucleus-plugin = { module = "dev.nucleusframework:dev.nucleusframework.gradle.plugin", version.ref = "nucleus" }

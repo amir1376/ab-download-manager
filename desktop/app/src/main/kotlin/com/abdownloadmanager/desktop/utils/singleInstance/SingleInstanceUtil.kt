@@ -10,19 +10,13 @@ class SingleInstanceUtil(baseFolder: Path) {
         SingleInstanceServer(baseFolder / "app.port")
     }
 
-    fun <T:Any>sendToInstance(msg: Command<T>): CommandResult<T> {
-        return server.sendMessage(msg).also {
-//            println("server respond with ${it}")
-        }
-    }
+    fun singleInstanceService() = server.singleInstanceService()
 
     @Throws(AnotherInstanceIsRunning::class)
-    fun lockInstance(
-        createMessageHandler: () -> SingleInstanceServerHandler,
-    ) {
+    fun lockInstance() {
         locker.tryLockInstance()
 
         // we are alone so we create the server
-        server.start(createMessageHandler())
+        server.start()
     }
 }

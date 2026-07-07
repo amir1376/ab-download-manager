@@ -1,10 +1,11 @@
 package com.abdownloadmanager.integration
 
-import com.abdownloadmanager.integration.http4k.MyHttp4KServer
+import io.ktor.server.cio.*
+import io.ktor.server.engine.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.builtins.ListSerializer
 
 sealed interface IntegrationResult {
     data object Inactive : IntegrationResult
@@ -79,48 +80,9 @@ class Integration(
 
 
     private fun createServer(port: Int): MyServer {
-        val handlers = HandlerMap().apply {
-            post("/add") {
-                runBlocking {
-                    val itemsToAdd = kotlin.runCatching {
-                        val message = it.getBody().orEmpty()
-                        AddDownloadsFromIntegration.createFromRequest(
-                            json = json,
-                            jsonData = message
-                        )
-                    }
-                    itemsToAdd.onFailure { it.printStackTrace() }
-                    itemsToAdd.getOrThrow().let { newImportRequest ->
-                        integrationHandler.addDownload(
-                            newImportRequest.items,
-                            newImportRequest.options,
-                        )
-                    }
-                }
-                MyResponse.Text("OK")
-            }
-            get("/queues") {
-                runBlocking {
-                    val queues = integrationHandler.listQueues()
-                    val jsonResponse = json.encodeToString(ListSerializer(ApiQueueModel.serializer()), queues)
-                    MyResponse.Text(jsonResponse)
-                }
-            }
-            post("/start-headless-download") {
-                runBlocking {
-                    val itemsToAdd = kotlin.runCatching {
-                        val message = it.getBody().orEmpty()
-                        json.decodeFromString<NewDownloadTask>(message)
-                    }
-                    itemsToAdd.onFailure { it.printStackTrace() }
-                    integrationHandler.addDownloadTask(itemsToAdd.getOrThrow())
-                }
-                MyResponse.Text("OK")
-            }
-            post("/ping") {
-                MyResponse.Text("pong")
-            }
+        val server = embeddedServer(CIO, port) {
+            setupRouting(json, integrationHandler)
         }
-        return MyHttp4KServer(port, handlers, debugMode)
+        return KtorServer(server)
     }
 }

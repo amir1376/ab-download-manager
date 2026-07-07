@@ -10,8 +10,8 @@ import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
-import com.abdownloadmanager.desktop.utils.singleInstance.MutableSingleInstanceServerHandler
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
+import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceServerInitializer
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
@@ -40,7 +40,6 @@ class App : AutoCloseable,
     //private val browserNativeMessaging: NativeMessaging by inject()
     fun start(
         appArguments: AppArguments,
-        singleInstanceServerHandler: MutableSingleInstanceServerHandler,
         globalAppExceptionHandler: GlobalAppExceptionHandler,
     ) {
         try {
@@ -60,7 +59,7 @@ class App : AutoCloseable,
                 //waiting for compose kmp to add multi launcher to nativeDistributions,the PR is already exists but not merger
                 //or maybe I should use a custom solution
                 //browserNativeMessaging.boot()
-                SingleInstanceServerInitializer.boot(singleInstanceServerHandler)
+                SingleInstanceServerInitializer.boot()
                 Ui.boot(appArguments, globalAppExceptionHandler)
             }
         } catch (e: Exception) {
@@ -97,7 +96,9 @@ fun main(args: Array<String>) {
             startAndWaitForRunIfNotRunning(singleInstance)
         }
         if (appArguments.getIntegrationPort) {
-            dispatchIntegrationPortAndExit(singleInstance)
+            runBlocking {
+                dispatchIntegrationPortAndExit(singleInstance)
+            }
         }
         trainTheAOT(singleInstance)
         //going to start main app
@@ -144,14 +145,19 @@ private fun dispatchVersionAndExit(): Nothing {
 }
 
 private fun exitExistingProcessAndExit(singleInstance: SingleInstanceUtil): Nothing {
-    singleInstance.sendToInstance(Commands.exit)
+    runBlocking {
+        singleInstance.singleInstanceService().useService {
+            it.exit()
+        }
+    }
     exitProcess(0)
 }
 
-private fun dispatchIntegrationPortAndExit(singleInstance: SingleInstanceUtil): Nothing {
-    val port =
-        singleInstance.sendToInstance(Commands.getIntegrationPort)
-            .orElse { IntegrationPortBroadcaster.INTEGRATION_UNKNOWN }
+private suspend fun dispatchIntegrationPortAndExit(singleInstance: SingleInstanceUtil): Nothing {
+    val port = runCatching {
+        singleInstance.singleInstanceService().useService { it.getIntegrationPort() }
+    }.getOrElse { IntegrationPortBroadcaster.INTEGRATION_UNKNOWN }
+
     print(port)
     exitProcess(0)
 }
@@ -168,9 +174,14 @@ private fun startAndWaitForRunIfNotRunning(
     }
     var firstLoop = true
     while (true) {
-        val isReady: Boolean = singleInstance
-            .sendToInstance(Commands.isReady)
-            .orElse {
+        val isReady: Boolean = runCatching {
+            runBlocking {
+                singleInstance.singleInstanceService().useService {
+                    it.isReady()
+                }
+            }
+        }
+            .getOrElse {
 //                println("or else $it")
                 false
             }
@@ -196,12 +207,15 @@ private fun defaultApp(
     appArguments: AppArguments,
     singleInstance: SingleInstanceUtil,
 ) {
-    val singleInstanceServerHandler by lazy { MutableSingleInstanceServerHandler() }
     try {
-        singleInstance.lockInstance { singleInstanceServerHandler }
+        singleInstance.lockInstance()
     } catch (e: AnotherInstanceIsRunning) {
         println("instance already running")
-        singleInstance.sendToInstance(Commands.showUserThatAppIsRunning)
+        runBlocking {
+            singleInstance.singleInstanceService().useService {
+                it.showUserThatAppIsRunning()
+            }
+        }
         return
     }
     val startedMessage = "${AppInfo.displayName}-${AppInfo.version} started"
@@ -216,7 +230,6 @@ private fun defaultApp(
         it.start(
             appArguments = appArguments,
             globalAppExceptionHandler = globalExceptionHandler,
-            singleInstanceServerHandler = singleInstanceServerHandler,
         )
     }
 }
