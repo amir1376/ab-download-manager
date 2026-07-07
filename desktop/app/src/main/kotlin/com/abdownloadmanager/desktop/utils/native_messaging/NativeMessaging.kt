@@ -2,6 +2,7 @@ package com.abdownloadmanager.desktop.utils.native_messaging
 
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.isAppInstalled
+import com.abdownloadmanager.shared.util.SharedConstants
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -68,7 +69,7 @@ class NativeMessaging(
             path = execFile,
             type = "stdio",
             allowedExtensions = listOf(
-                ""
+                SharedConstants.firefoxExtensionId
             )
         )
     }
@@ -81,7 +82,7 @@ class NativeMessaging(
             path = execFile,
             type = "stdio",
             allowedOrigins = listOf(
-                ""
+                SharedConstants.chromeExtensionOrigin
             )
         )
     }

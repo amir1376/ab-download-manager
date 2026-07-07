@@ -7,6 +7,7 @@ data class AppArguments(
     val debug: Boolean,
     val version: Boolean,
     val exit: Boolean,
+    val nativeMessaging: Boolean,
 ) {
     companion object {
         private lateinit var instance: AppArguments
@@ -27,6 +28,7 @@ data class AppArguments(
                 debug = args.contains(Args.DEBUG),
                 version = args.contains(Args.VERSION),
                 exit = args.contains(Args.EXIT),
+                nativeMessaging = args.contains(Args.NATIVE_MESSAGING),
             )
         }
     }
@@ -38,5 +40,6 @@ data class AppArguments(
         const val DEBUG = "--debug"
         const val VERSION = "--version"
         const val EXIT = "--exit"
+        const val NATIVE_MESSAGING = "nativeMessaging"
     }
 }

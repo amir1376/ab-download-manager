@@ -8,9 +8,10 @@ import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.*
+import com.abdownloadmanager.desktop.utils.native_messaging.host.NativeMessagingHostLauncher
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
-import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceUtil
+import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceManager
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceServerInitializer
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.DownloadSystem
@@ -85,25 +86,29 @@ fun main(args: Array<String>) {
                 AppInfo.isInDebugMode()
             },
         )
+
+        // Native messaging mode - handle early before any UI initialization
+        if (appArguments.nativeMessaging) {
+            runNativeMessagingMode(args)
+        }
+
         if (appArguments.version) {
             dispatchVersionAndExit()
         }
-        val singleInstance = SingleInstanceUtil(AppInfo.definedPaths.configDir)
         if (appArguments.exit) {
-            exitExistingProcessAndExit(singleInstance)
+            exitExistingProcessAndExit()
         }
         if (appArguments.startIfNotStarted && !AppInfo.isInIDE()) {
-            startAndWaitForRunIfNotRunning(singleInstance)
+            startAndWaitForRunIfNotRunning()
         }
         if (appArguments.getIntegrationPort) {
             runBlocking {
-                dispatchIntegrationPortAndExit(singleInstance)
+                dispatchIntegrationPortAndExit()
             }
         }
-        trainTheAOT(singleInstance)
+        trainTheAOT()
         //going to start main app
         defaultApp(
-            singleInstance = singleInstance,
             appArguments = appArguments,
         )
 
@@ -117,7 +122,6 @@ fun main(args: Array<String>) {
 }
 
 private fun trainTheAOT(
-    singleInstance: SingleInstanceUtil
 ) {
     if (!AotRuntime.isTraining()) {
         return
@@ -144,7 +148,8 @@ private fun dispatchVersionAndExit(): Nothing {
     exitProcess(0)
 }
 
-private fun exitExistingProcessAndExit(singleInstance: SingleInstanceUtil): Nothing {
+private fun exitExistingProcessAndExit(): Nothing {
+    val singleInstance = SingleInstanceManager.get()
     runBlocking {
         singleInstance.singleInstanceService().useService {
             it.exit()
@@ -153,7 +158,9 @@ private fun exitExistingProcessAndExit(singleInstance: SingleInstanceUtil): Noth
     exitProcess(0)
 }
 
-private suspend fun dispatchIntegrationPortAndExit(singleInstance: SingleInstanceUtil): Nothing {
+private suspend fun dispatchIntegrationPortAndExit(): Nothing {
+    val singleInstance = SingleInstanceManager.get()
+
     val port = runCatching {
         singleInstance.singleInstanceService().useService { it.getIntegrationPort() }
     }.getOrElse { IntegrationPortBroadcaster.INTEGRATION_UNKNOWN }
@@ -163,11 +170,11 @@ private suspend fun dispatchIntegrationPortAndExit(singleInstance: SingleInstanc
 }
 
 private fun startAndWaitForRunIfNotRunning(
-    singleInstance: SingleInstanceUtil,
     howMuchWait: Long = 10_000,
     initialDelay: Long = 0,
     eachTimeDelay: Long = 500L,
 ) {
+    val singleInstance = SingleInstanceManager.get()
     val deadLine = System.currentTimeMillis() + howMuchWait
     if (initialDelay > 0) {
         Thread.sleep(initialDelay)
@@ -205,8 +212,8 @@ private fun startAndWaitForRunIfNotRunning(
 
 private fun defaultApp(
     appArguments: AppArguments,
-    singleInstance: SingleInstanceUtil,
 ) {
+    val singleInstance = SingleInstanceManager.get()
     try {
         singleInstance.lockInstance()
     } catch (e: AnotherInstanceIsRunning) {
@@ -232,4 +239,14 @@ private fun defaultApp(
             globalAppExceptionHandler = globalExceptionHandler,
         )
     }
+}
+
+/**
+ * Runs the app in native messaging mode for browser extension communication.
+ * This mode runs without UI and communicates via stdin/stdout.
+ */
+private fun runNativeMessagingMode(args: Array<String>): Nothing {
+    val nmArgs = args.drop(1).toTypedArray() // nativeMessaging command
+    NativeMessagingHostLauncher.main(nmArgs)
+    exitProcess(0)
 }

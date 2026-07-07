@@ -145,6 +145,18 @@ buildConfig {
         }
     )
     buildConfigField(
+        "INTEGRATION_FIREFOX_EXTENSION_ID",
+        provider {
+            "firefox-integration@abdownloadmanager.com"
+        }
+    )
+    buildConfigField(
+        "INTEGRATION_CHROME_EXTENSION_ID",
+        provider {
+            "chrome-extension://bbobopahenonfdgjgaleledndnnfhooj/"
+        }
+    )
+    buildConfigField(
         "TELEGRAM_GROUP",
         provider {
             "https://t.me/abdownloadmanager_discussion"

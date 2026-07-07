@@ -1,10 +1,12 @@
 package com.abdownloadmanager.desktop.utils.singleInstance
 
+import com.abdownloadmanager.desktop.utils.singleInstance.service.DefaultAppIPCService
 import com.abdownloadmanager.desktop.utils.singleInstance.service.ISingleInstanceService
 import io.ktor.client.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.rpc.annotations.Rpc
 import kotlinx.rpc.krpc.client.KrpcClient
 import kotlinx.rpc.withService
 import okio.Path
@@ -51,7 +53,10 @@ class SingleInstanceServer(
         )
     }
 
-    fun singleInstanceService(): CloseableService<ISingleInstanceService> {
+    fun singleInstanceService() = getIPCService<ISingleInstanceService>()
+    fun appIPCService() = getIPCService<DefaultAppIPCService>()
+
+    private inline fun <@Rpc reified T : Any> getIPCService(): CloseableService<T> {
         val port = portPath
             .toNioPath()
             .takeIf { it.exists() }
@@ -61,7 +66,7 @@ class SingleInstanceServer(
             ?: throw ServerNotExist()
         val ktorClient = getKtorClient()
         val kRpcClient = ktorClient.getRpcClient(port)
-        val service = kRpcClient.withService<ISingleInstanceService>()
+        val service = kRpcClient.withService<T>()
         return service.withCloseable(kRpcClient, ktorClient)
     }
 }
@@ -100,4 +105,18 @@ private fun <T> T.withCloseable(
             runCatching { client.close() }
         }
     )
+}
+
+interface IPCServiceProvider<T> {
+    fun getService(): CloseableService<T>
+
+    companion object {
+        fun <T> from(provider: () -> CloseableService<T>): IPCServiceProvider<T> {
+            return object : IPCServiceProvider<T> {
+                override fun getService(): CloseableService<T> {
+                    return provider()
+                }
+            }
+        }
+    }
 }

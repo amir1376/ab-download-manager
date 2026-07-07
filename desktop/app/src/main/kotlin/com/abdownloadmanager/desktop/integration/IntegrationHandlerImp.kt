@@ -10,7 +10,7 @@ import com.abdownloadmanager.integration.IntegrationHandler
 import com.abdownloadmanager.integration.HttpDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.NewDownloadTask
 import com.abdownloadmanager.integration.ApiQueueModel
-import com.abdownloadmanager.integration.AddDownloadOptionsFromIntegration
+import com.abdownloadmanager.integration.AddDownloadsFromIntegration
 import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
 import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
@@ -32,9 +32,10 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
     private val downloaderInUiRegistry by inject<DownloaderInUiRegistry>()
 
     override suspend fun addDownload(
-        list: List<IDownloadCredentialsFromIntegration>,
-        options: AddDownloadOptionsFromIntegration,
+        request: AddDownloadsFromIntegration
     ) {
+        val list = request.items
+        val options = request.options
         appComponent.externalCredentialComingIntoApp(
             list.map {
                 convertToDownloadSystemCredentials(it)

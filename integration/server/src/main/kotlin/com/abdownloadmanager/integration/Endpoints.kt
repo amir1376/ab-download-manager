@@ -24,8 +24,10 @@ internal fun Application.setupRouting(
             itemsToAdd.onFailure { it.printStackTrace() }
             itemsToAdd.getOrThrow().let { newImportRequest ->
                 integrationHandler.addDownload(
-                    newImportRequest.items,
-                    newImportRequest.options,
+                    AddDownloadsFromIntegration(
+                        newImportRequest.items,
+                        newImportRequest.options,
+                    )
                 )
             }
             call.respondText("OK")

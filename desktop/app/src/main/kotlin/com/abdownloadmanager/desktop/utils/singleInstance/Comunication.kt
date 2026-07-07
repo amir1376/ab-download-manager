@@ -37,7 +37,7 @@ fun HttpClient.getRpcClient(port: Int): KrpcClient {
 fun Application.setupKtorKRpcServer() {
     install(Krpc) {
         serialization {
-            json()
+            json(json)
         }
     }
     routing {
