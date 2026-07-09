@@ -60,6 +60,6 @@ If you're ready to contribute code, that's awesome! Before you start, here’s w
 
 You are responsible for testing, debugging, and maintaining your pull request until it is merged.
 
-Vibe coding is not allowed. Do not submit AI-generated code and expect review cycles to shape it into a working implementation. If you submit a pull request, you must understand the code, verify that it works, and address issues yourself.
+Vibe coding is not allowed. DO NOT submit AI-generated code and expect review cycles to shape it into a working implementation. If you submit a pull request, you must understand the code completely, verify that it works, and address issues yourself.
 
 Pull requests that primarily shift development, testing, or debugging work to reviewers may be closed without review.
