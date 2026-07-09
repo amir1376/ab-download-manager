@@ -1,4 +1,4 @@
-package com.abdownloadmanager.cli.client
+package com.abdownloadmanager.integration.client
 
 import com.abdownloadmanager.integration.IdRequest
 import com.abdownloadmanager.integration.IdsRequest
@@ -14,7 +14,7 @@ import org.http4k.core.*
  * HTTP client for CLI commands to communicate with the desktop app's
  * embedded integration server.
  *
- * Uses http4k.Client(OkHttp) — the same HTTP stack as the desktop app's
+ * Uses http4k Client(OkHttp) — the same HTTP stack as the desktop app's
  * SingleInstance communication (see Comunication.kt).
  *
  * @param port The browserIntegrationPort from appSettings.json (typically 15151).

@@ -1,15 +1,16 @@
 package com.abdownloadmanager.cli.commands
 
-import com.abdownloadmanager.cli.client.DesktopLauncher
-import com.abdownloadmanager.cli.client.DesktopClient
-import com.abdownloadmanager.cli.client.DesktopResult
-import com.abdownloadmanager.cli.utils.CliFormatting
-import com.abdownloadmanager.cli.utils.PortResolver
+import com.abdownloadmanager.cli.CliContext
+import com.abdownloadmanager.integration.client.DesktopClient
+import com.abdownloadmanager.integration.client.DesktopResult
+import com.abdownloadmanager.integration.client.PortResolver
 import com.abdownloadmanager.integration.ApiDownloadModel
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.terminal.Terminal
+import ir.amirab.util.datasize.CommonSizeConvertConfigs
+import ir.amirab.util.datasize.SizeConverter
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.builtins.ListSerializer
@@ -26,7 +27,7 @@ class ListCommand : CliktCommand(
         val jsonParser = Json { ignoreUnknownKeys = true; prettyPrint = true }
 
         // Ensure desktop app is running
-        if (!DesktopLauncher.ensureDesktopRunning()) {
+        if (!CliContext.desktopLauncher.ensureDesktopRunning()) {
             term.println((TextColors.red)("Error: AB Download Manager is not available."))
             return
         }
@@ -94,7 +95,7 @@ class ListCommand : CliktCommand(
                 else -> paddedStatus
             }
             val size = if (item.size > 0) {
-                CliFormatting.formatSize(item.size)
+                SizeConverter.bytesToSize(item.size, CommonSizeConvertConfigs.BinaryBytes).toString()
             } else {
                 "?"
             }

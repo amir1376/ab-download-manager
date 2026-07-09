@@ -4,8 +4,6 @@ SetCompressor /SOLID lzma
 !include "LogicLib.nsh"
 !include "MUI2.nsh"
 !addincludedir "{{ installer_resources_dir }}"
-!include "AddToPath.nsh"
-!include "RemoveFromPath.nsh"
 
 
 !define APP_PUBLISHER "{{ app_publisher }}"
@@ -103,9 +101,7 @@ FunctionEnd
 !macro clearFiles
     RmDir /r "${INSTALL_DIR}\app"
     RmDir /r "${INSTALL_DIR}\runtime"
-    RmDir /r "${INSTALL_DIR}\cli"
     Delete "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe"
-    Delete "${INSTALL_DIR}\abdm-cli.bat"
     Delete "${INSTALL_DIR}\${MAIN_BINARY_NAME}.ico"
     Delete "${INSTALL_DIR}\uninstall.exe"
     RmDir "${INSTALL_DIR}"
@@ -192,14 +188,6 @@ Section "${APP_DISPLAY_NAME}"
     File /nonfatal /r "${INPUT_DIR}\"
 
 
-    ; Copy CLI fat JAR and launcher batch file
-    CreateDirectory "${INSTALL_DIR}\cli"
-    SetOutPath "${INSTALL_DIR}\cli"
-    File "{{ cli_jar_path }}"
-    SetOutPath "${INSTALL_DIR}"
-    File "{{ installer_resources_dir }}\abdm-cli.bat"
-
-
     ; Registry information for add/remove programs
     WriteRegStr SHCTX "${REG_UNINSTALL_KEY}" "DisplayName" "${APP_DISPLAY_NAME}"
     WriteRegStr SHCTX "${REG_UNINSTALL_KEY}" "DisplayIcon" "$\"${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe$\""
@@ -223,11 +211,6 @@ Section "Desktop Shortcut"
     !insertmacro CreateDesktopShortcut
 SectionEnd
 
-Section /o "Add AB Download Manager to PATH"
-    Push "$INSTDIR"
-    Call AddToPath
-SectionEnd
-
 Section /o "un.Remove User Data"
     !insertmacro RemoveUserData
 SectionEnd
@@ -240,10 +223,6 @@ Section "Uninstall"
 
     !insertmacro RemoveStartMenu
     !insertmacro RemoveDesktopShortCut
-
-    ; Clean up PATH (always -- safe redundancy)
-    Push "$INSTDIR"
-    Call un.RemoveFromPath
 
     DeleteRegKey SHCTX "${REG_UNINSTALL_KEY}"
     DeleteRegKey SHCTX "${REG_APP_KEY}"

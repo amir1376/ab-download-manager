@@ -1,8 +1,9 @@
 package com.abdownloadmanager.cli.commands
 
-import com.abdownloadmanager.cli.client.DesktopLauncher
-import com.abdownloadmanager.cli.client.DesktopClient
-import com.abdownloadmanager.cli.client.DesktopResult
+import com.abdownloadmanager.cli.CliContext
+import com.abdownloadmanager.integration.client.DesktopClient
+import com.abdownloadmanager.integration.client.DesktopResult
+import com.abdownloadmanager.integration.client.PortResolver
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
@@ -59,12 +60,12 @@ class AddCommand : CliktCommand(
         val json = Json { ignoreUnknownKeys = true }
 
         // Ensure desktop app is running
-        if (!DesktopLauncher.ensureDesktopRunning()) {
+        if (!CliContext.desktopLauncher.ensureDesktopRunning()) {
             term.println((TextColors.red)("Error: AB Download Manager is not available."))
             return
         }
 
-        val client = DesktopClient(com.abdownloadmanager.cli.utils.PortResolver.readIntegrationPort()
+        val client = DesktopClient(PortResolver.readIntegrationPort()
             ?: error("Integration port not configured"))
         var successCount = 0
 

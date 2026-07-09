@@ -1,29 +1,13 @@
 package com.abdownloadmanager.cli.utils
 
-import ir.amirab.util.datasize.CommonSizeConvertConfigs
-import ir.amirab.util.datasize.SizeConverter
-import ir.amirab.util.datasize.SizeWithUnit
-
 /**
  * Shared formatting utilities for CLI output.
  *
- * Uses the project's shared datasize library (SizeConverter) for size/speed
- * formatting to avoid duplicating the framework in `shared/utils/datasize`.
- *
  * formatTimestamp uses java.util.Calendar since no shared equivalent exists.
+ * Size/speed formatting is delegated to SizeConverter (see :shared:utils)
+ * per maintainer directive — callers inline SizeConverter.bytesToSize directly.
  */
 object CliFormatting {
-
-    fun formatSize(bytes: Long): String {
-        if (bytes < 0) return "Unknown"
-        return SizeConverter.bytesToSize(bytes, CommonSizeConvertConfigs.BinaryBytes).toString()
-    }
-
-    fun formatSpeed(bytes: Long): String {
-        if (bytes < 0) return "Unknown"
-        val swu = SizeConverter.bytesToSize(bytes, CommonSizeConvertConfigs.BinaryBytes)
-        return "${swu.formatedValue()} ${swu.unit}/s"
-    }
 
     fun formatTimestamp(ts: Long): String {
         if (ts <= 0) return "N/A"

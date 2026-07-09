@@ -178,7 +178,6 @@ compose {
 
 installerPlugin {
     dependsOn("createReleaseDistributable")
-    dependsOn(":cli:app:shadowJar")
     dependsOn("copyJavaExeToRuntime")
     outputFolder.set(layout.buildDirectory.dir("custom-installer"))
     windows {
@@ -200,8 +199,6 @@ installerPlugin {
             "copyright" to "© 2024-present AB Download Manager App",
             "header_image_file" to project.file("resources/installer/abdm-header-image.bmp"),
             "sidebar_image_file" to project.file("resources/installer/abdm-sidebar-image.bmp"),
-            "cli_jar_path" to project(":cli:app").layout.buildDirectory.file("libs/abdm-cli.jar").get().asFile.absolutePath,
-            "installer_resources_dir" to project.file("resources/installer").absolutePath
         )
     }
     macos {

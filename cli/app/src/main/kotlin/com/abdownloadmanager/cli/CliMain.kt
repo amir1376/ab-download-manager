@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.terminal.Terminal
+import kotlin.system.exitProcess
 
 private const val DEBUG_MODE = false
 
@@ -41,20 +42,20 @@ fun main(args: Array<String>) {
 
         app.main(args)
         // Force exit — OkHttp non-daemon threads keep JVM alive
-        System.exit(0)
+        exitProcess(0)
     } catch (e: PrintHelpMessage) {
-        System.exit(0)
+        exitProcess(0)
     } catch (e: PrintCompletionMessage) {
-        System.exit(0)
+        exitProcess(0)
     } catch (e: com.github.ajalt.clikt.core.CliktError) {
         // Clikt prints the error message to stderr internally
-        System.exit(64)
+        exitProcess(64)
     } catch (e: Exception) {
         val term = Terminal()
         term.println((TextColors.red)("Error: ${e.message ?: e::class.simpleName ?: "Unknown error"}"))
         if (DEBUG_MODE) {
             e.printStackTrace()
         }
-        System.exit(1)
+        exitProcess(1)
     }
 }

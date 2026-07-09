@@ -9,8 +9,9 @@ plugins {
 }
 
 dependencies {
-    // Project modules — DTOs + shared utilities (datasize)
+    // Project modules — DTOs + shared utilities (datasize) + IPC client
     implementation(project(":integration:server"))
+    implementation(project(":integration:client"))
     implementation(project(":shared:utils"))
 
     // Kotlin

@@ -1,4 +1,4 @@
-package com.abdownloadmanager.cli.client
+package com.abdownloadmanager.integration.client
 
 /**
  * Result of a DesktopClient HTTP request to the desktop app's integration server.

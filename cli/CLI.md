@@ -139,22 +139,6 @@ abdm-cli remove 12
 abdm-cli remove 12 --keep-file=false
 ```
 
-## Installation
-
-On Windows, `abdm-cli` is bundled with the NSIS installer. The installer includes an optional "Add AB Download Manager to PATH" checkbox (disabled by default).
-
-After installation with PATH enabled, `abdm-cli` is available from any terminal:
-
-```bash
-abdm-cli --help
-```
-
-If PATH is not enabled, you can run the CLI directly from the install directory:
-
-```bash
-"C:\Program Files\ABDownloadManager\abdm-cli.bat" --help
-```
-
 ## Platform Support
 
 | Platform | Status |
