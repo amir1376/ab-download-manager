@@ -8,7 +8,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: vedantmgoyal9/winget-releaser@main
+      - uses: vedantmgoyal9/winget-releaser@7bd472be23763def6e16bd06cc8b1cdfab0e2fd5 # main @ 2026-03-15
         with:
           identifier: amir1376.ABDownloadManager
           token: ${{ secrets.WINGET_TOKEN }}
