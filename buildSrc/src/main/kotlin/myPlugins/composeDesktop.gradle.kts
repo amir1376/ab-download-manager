@@ -3,6 +3,7 @@ package myPlugins
 plugins {
     id("myPlugins.kotlin")
     id("myPlugins.composeBase")
+    id("dev.nucleusframework")
 }
 
 val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")

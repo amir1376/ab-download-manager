@@ -16,12 +16,14 @@ import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.util.keepawake.KeepAwakeManager
+import dev.nucleusframework.aot.runtime.AotRuntime
 import ir.amirab.util.logger.AppLogger
 import ir.amirab.util.logger.appLogger
 import ir.amirab.util.writeText
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 class App : AutoCloseable,
@@ -97,6 +99,7 @@ fun main(args: Array<String>) {
         if (appArguments.getIntegrationPort) {
             dispatchIntegrationPortAndExit(singleInstance)
         }
+        trainTheAOT(singleInstance)
         //going to start main app
         defaultApp(
             singleInstance = singleInstance,
@@ -109,6 +112,18 @@ fun main(args: Array<String>) {
         e.printStackTrace()
         AppInfo.definedPaths.crashLogFile.writeText(e.stackTraceToString())
         exitProcess(-1)
+    }
+}
+
+private fun trainTheAOT(
+    singleInstance: SingleInstanceUtil
+) {
+    if (!AotRuntime.isTraining()) {
+        return
+    }
+    thread {
+        Thread.sleep(30_000)
+        exitProcess(0)
     }
 }
 

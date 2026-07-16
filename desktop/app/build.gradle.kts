@@ -1,13 +1,11 @@
 import buildlogic.*
 import buildlogic.versioning.*
-import ir.amirab.installer.InstallerTargetFormat
-import org.jetbrains.changelog.Changelog
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import ir.amirab.util.platform.Platform
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat.*
 import com.mikepenz.aboutlibraries.plugin.DuplicateMode
 import com.mikepenz.aboutlibraries.plugin.DuplicateRule
+import dev.nucleusframework.desktop.application.dsl.TargetFormat
 import ir.amirab.util.platform.Arch
+import ir.amirab.util.platform.isLinux
 
 plugins {
     id(MyPlugins.kotlin)
@@ -63,6 +61,7 @@ dependencies {
     implementation(project(":desktop:app-utils"))
 
     implementation(libs.composeNativeTray)
+    implementation(libs.nucleus.aot)
 
     implementation(project(":shared:app"))
     implementation(project(":shared:utils"))
@@ -87,12 +86,11 @@ tasks.processResources {
 }
 
 val desktopPackageName = "com.abdownloadmanager.desktop"
-compose {
-    desktop {
-        application {
+nucleus {
+    application {
 //            val getProguardConfigurationsTask = tasks.getProguardConfigurations.get()
-            buildTypes.release.proguard {
-                isEnabled.set(false)
+        buildTypes.release.proguard {
+            isEnabled.set(false)
 //                obfuscate.set(false)
 //                optimize.set(true)
 //                configurationFiles.from(
@@ -101,60 +99,53 @@ compose {
 //                        !it.name.contains("r8")
 //                    },
 //                )
-            }
+        }
 
-            // Define the main class for the application.
-            mainClass = "$desktopPackageName.AppKt"
-            nativeDistributions {
-                // avoid java 25 warning
-                jvmArgs("--enable-native-access=ALL-UNNAMED")
-                modules(
-                    "java.instrument",
-                    "jdk.unsupported",
-                    "jdk.accessibility",
-                )
-                targetFormats(Msi, Deb)
-                if (Platform.getCurrentPlatform() == Platform.Desktop.Linux) {
-                    // filekit library requires this module in linux.
-                    modules("jdk.security.auth")
-                }
-                packageVersion = getAppVersionStringForPackaging()
-                packageName = getAppName()
-                vendor = "abdownloadmanager.com"
-                appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
-                val menuGroupName = getPrettifiedAppName()
-                licenseFile.set(rootProject.file("LICENSE"))
-                linux {
-                    debPackageVersion = getAppVersionStringForPackaging(Deb)
-                    rpmPackageVersion = getAppVersionStringForPackaging(Rpm)
-                    appCategory = "Network"
-                    iconFile = project.file("icons/icon.png")
-                    menuGroup = menuGroupName
-                    shortcut = true
-                }
-                macOS {
-                    pkgPackageVersion = getAppVersionStringForPackaging(Pkg)
-                    dmgPackageVersion = getAppVersionStringForPackaging(Dmg)
-                    iconFile = project.file("icons/icon.icns")
-                    infoPlist {
-                        extraKeysRawXml = """
+        // Define the main class for the application.
+        mainClass = "$desktopPackageName.AppKt"
+        nativeDistributions {
+            cleanupNativeLibs = true
+            // enable it later
+            enableAotCache = false
+            modules(
+                "java.instrument",
+                "jdk.unsupported",
+                "jdk.accessibility",
+            )
+            if (Platform.isLinux()) {
+                // filekit library requires this module in linux.
+                modules("jdk.security.auth")
+            }
+            packageVersion = getAppVersionStringForPackaging()
+            packageName = getAppName()
+            vendor = "abdownloadmanager.com"
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
+            val menuGroupName = getPrettifiedAppName()
+            licenseFile.set(rootProject.file("LICENSE"))
+            linux {
+                appCategory = "Network"
+                iconFile = project.file("icons/icon.png")
+                menuGroup = menuGroupName
+                shortcut = true
+            }
+            macOS {
+                iconFile = project.file("icons/icon.icns")
+                infoPlist {
+                    extraKeysRawXml = """
                             <key>LSUIElement</key>
                             <string>true</string>
                         """.trimIndent()
-                    }
-                    jvmArgs("-Dapple.awt.enableTemplateImages=true")
                 }
-                windows {
-                    exePackageVersion = getAppVersionStringForPackaging(Exe)
-                    msiPackageVersion = getAppVersionStringForPackaging(Msi)
-                    upgradeUuid = properties["INSTALLER.WINDOWS.UPGRADE_UUID"]?.toString()
-                    iconFile = project.file("icons/icon.ico")
-                    console = false
-                    dirChooser = true
-                    shortcut = true
-                    menuGroup = menuGroupName
-                    menu = true
-                }
+                jvmArgs("-Dapple.awt.enableTemplateImages=true")
+            }
+            windows {
+                upgradeUuid = properties["INSTALLER.WINDOWS.UPGRADE_UUID"]?.toString()
+                iconFile = project.file("icons/icon.ico")
+                console = false
+                dirChooser = true
+                shortcut = true
+                menuGroup = menuGroupName
+                menu = true
             }
         }
     }
@@ -166,7 +157,7 @@ installerPlugin {
     windows {
         appName = getAppName()
         appDisplayName = getPrettifiedAppName()
-        appVersion = getAppVersionStringForPackaging(Exe)
+        appVersion = getAppVersionStringForPackaging(TargetFormat.Exe)
         appDisplayVersion = getAppVersionString()
         appDataDirName = getAppDataDirName()
         inputDir = project.file("build/compose/binaries/main-release/app/${getAppName()}")
@@ -176,7 +167,7 @@ installerPlugin {
         nsisTemplate = project.file("resources/installer/nsis-script-template.nsi")
         extraParams = mapOf(
             "app_publisher" to "abdownloadmanager.com",
-            "app_version_with_build" to "${getAppVersionStringForPackaging(Exe)}.0",
+            "app_version_with_build" to "${getAppVersionStringForPackaging(TargetFormat.Exe)}.0",
             "source_code_url" to "https://github.com/amir1376/ab-download-manager",
             "project_website" to "www.abdownloadmanager.com",
             "copyright" to "© 2024-present AB Download Manager App",
@@ -195,12 +186,24 @@ installerPlugin {
     }
 }
 
+fun Task.dependsOnAOT() {
+    if (nucleus.application.nativeDistributions.enableAotCache) {
+        dependsOn("generateReleaseAotCache")
+    }
+}
+
+val postReleaseDistributable by tasks.registering {
+    dependsOn("createReleaseDistributable")
+    description = "Any modification need to be added to the app distributable folder, should be added here"
+    dependsOnAOT()
+}
+installerPlugin.dependsOn(postReleaseDistributable)
 
 // ======= begin of GitHub action stuff
 val ciDir = CiUtils.getCiDir(project)
 
 val appPackageNameByComposePlugin
-    get() = requireNotNull(compose.desktop.application.nativeDistributions.packageName) {
+    get() = requireNotNull(nucleus.application.nativeDistributions.packageName) {
         "compose.desktop.application.nativeDistributions.packageName must not be null!"
     }
 
@@ -225,12 +228,14 @@ fun AbstractArchiveTask.preserveFileAttributes() {
 }
 
 val createDistributableAppArchiveTar by tasks.registering(Tar::class) {
+    dependsOn(postReleaseDistributable)
     preserveFileAttributes()
     archiveFileName.set("app.tar.gz")
     compression = Compression.GZIP
     fromAppImagePath()
 }
 val createDistributableAppArchiveZip by tasks.registering(Zip::class) {
+    dependsOn(postReleaseDistributable)
     preserveFileAttributes()
     archiveFileName.set("app.zip")
     fromAppImagePath()
@@ -290,15 +295,3 @@ tasks.register(CiUtils.getCreateBinaryFolderForCiTaskName()) {
     }
 }
 // ======= end of GitHub action stuff
-
-fun TargetFormat.toInstallerTargetFormat(): InstallerTargetFormat {
-    return when (this) {
-        AppImage -> error("$this is not recognized as installer")
-        Deb -> InstallerTargetFormat.Deb
-        Rpm -> InstallerTargetFormat.Rpm
-        Dmg -> InstallerTargetFormat.Dmg
-        Pkg -> InstallerTargetFormat.Pkg
-        Exe -> InstallerTargetFormat.Exe
-        Msi -> InstallerTargetFormat.Msi
-    }
-}
