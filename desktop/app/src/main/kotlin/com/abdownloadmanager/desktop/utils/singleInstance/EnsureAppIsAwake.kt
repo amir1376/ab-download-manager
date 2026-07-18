@@ -17,13 +17,14 @@ object EnsureAppIsAwake {
             return
         }
 
-        val executable = requireNotNull(AppInfo.exeFile) {
+        val executable = requireNotNull(AppInfo.cliExeFile) {
             "No executable file detected"
         }
         val result = execAndWait(
             arrayOf(
                 executable,
-                AppArguments.Args.START_IF_NOT_STARTED
+                AppArguments.Commands.GUI,
+                AppArguments.Commands.START_IF_NOT_STARTED
             ),
             timeout,
         )
@@ -38,11 +39,13 @@ object EnsureAppIsAwake {
 }
 
 object StartIfNotStartedCommand {
+
+
     suspend fun startAndWaitForRunIfNotRunning(
         howMuchWait: Long = 10_000,
         initialDelay: Long = 0,
         eachTimeDelay: Long = 500L,
-    ) {
+    ): AppStartResult {
         val deadLine = System.currentTimeMillis() + howMuchWait
         if (initialDelay > 0) {
             delay(initialDelay.milliseconds)
@@ -52,7 +55,11 @@ object StartIfNotStartedCommand {
             val isReady: Boolean = awaitToBeReady()
 //          println("isReady: $isReady")
             if (isReady) {
-                return
+                return if (firstLoop) {
+                    AppStartResult.AlreadyRunning
+                } else {
+                    AppStartResult.Started
+                }
             }
             if (firstLoop) {
                 startAppInAnotherProcess()
@@ -61,7 +68,7 @@ object StartIfNotStartedCommand {
             if (System.currentTimeMillis() >= deadLine) {
 //            println("dead line reached")
                 //deadline reached exiting now
-                error("Timed out waiting for application startup.")
+                return AppStartResult.DeadlineReached
             }
             delay(eachTimeDelay.milliseconds)
             firstLoop = false
@@ -69,11 +76,21 @@ object StartIfNotStartedCommand {
     }
 
     private fun startAppInAnotherProcess() {
-        val exeFile = requireNotNull(AppInfo.exeFile)
+        val exeFile = requireNotNull(AppInfo.mainExeFile)
         ProcessBuilder(
             exeFile,
             AppArguments.Args.BACKGROUND
         ).start()
+    }
+}
+
+sealed interface AppStartResult {
+    data object Started : AppStartResult
+    data object AlreadyRunning : AppStartResult
+    data object DeadlineReached : AppStartResult
+
+    fun isSuccessful(): Boolean {
+        return this is Started || this is AlreadyRunning
     }
 }
 

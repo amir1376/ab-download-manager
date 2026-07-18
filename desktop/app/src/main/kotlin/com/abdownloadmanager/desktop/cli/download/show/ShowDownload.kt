@@ -4,19 +4,64 @@ import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceManager
 import com.abdownloadmanager.desktop.utils.singleInstance.service.ShowDownloadIPC
 import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.long
+import com.github.ajalt.mordant.animation.animation
 import com.github.ajalt.mordant.rendering.TextColors.*
-import com.github.ajalt.mordant.rendering.TextStyles.*
+import com.github.ajalt.mordant.table.table
 
 class ShowDownload : SuspendingCliktCommand("show") {
     override fun help(context: Context) = "Show download(s)"
 
     private val ids by argument("ID").long().multiple()
+    private val watch by option(
+        "--watch",
+        help = "Track the download progress"
+    ).flag()
 
     override suspend fun run() {
-        val downloads = SingleInstanceManager.get().appIPCService().useService {
+        if (watch) {
+            monitorDownloads()
+        } else {
+            showOnce()
+        }
+    }
+
+    private suspend fun monitorDownloads() {
+        SingleInstanceManager.get().awokenAppIPCService().getService().useService { service ->
+            val flow = service.watchDownload(ids)
+            val animation = terminal.animation { downloads: List<ShowDownloadIPC> ->
+                table {
+                    header {
+                        row("ID", "Status", "%", "Name", "Folder")
+                    }
+                    body {
+                        downloads.forEach { download ->
+                            row(
+                                download.id,
+                                download.status.coloredName,
+                                download.percent?.toString().orEmpty(),
+                                download.name,
+                                cyan(download.folder)
+                            )
+                        }
+                    }
+                }
+            }
+            try {
+                flow.collect(animation::update)
+            } finally {
+                animation.stop()
+            }
+        }
+    }
+
+    private suspend fun showOnce() {
+        val downloads = SingleInstanceManager.get().awokenAppIPCService().getService().useService {
             it.showDownload(ids)
         }
 
@@ -25,37 +70,26 @@ class ShowDownload : SuspendingCliktCommand("show") {
             return
         }
 
-        printDownloads(downloads)
-    }
+        terminal.println(
+            table {
+                header {
+                    row("ID", "Status", "Name", "Folder")
+                }
 
-    private fun printDownloads(downloads: List<ShowDownloadIPC>) {
-        val idWidth = maxOf(2, downloads.maxOf { it.id.toString().length })
-        val statusWidth = maxOf("STATUS".length, downloads.maxOf { it.status.displayName.length })
-
-        echo(
-            bold(
-                "%-${idWidth}s  %-${statusWidth}s  %-4s  %s".format(
-                    "ID",
-                    "STATUS",
-                    "%",
-                    "NAME"
-                )
-            )
+                body {
+                    downloads.forEach { download ->
+                        row(
+                            download.id,
+                            download.status.coloredName,
+                            download.name,
+                            cyan(download.folder)
+                        )
+                    }
+                }
+            }
         )
-
-        downloads.forEach { download ->
-            echo(
-                "%-${idWidth}d  %-${statusWidth}s  %3d%%  %s".format(
-                    download.id,
-                    download.status.coloredName,
-                    download.percent,
-                    download.name
-                )
-            )
-
-            echo(" ".repeat(idWidth + statusWidth + 8) + cyan(download.folder))
-        }
     }
+
 
     private val ShowDownloadIPC.DownloadStatus.displayName: String
         get() = when (this) {

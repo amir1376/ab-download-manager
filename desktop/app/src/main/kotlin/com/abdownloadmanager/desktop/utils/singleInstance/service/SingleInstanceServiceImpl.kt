@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.utils.singleInstance.service
 
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.utils.IntegrationPortBroadcaster
-import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceServerInitializer
+import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceInitialized
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -10,7 +10,7 @@ class SingleInstanceServiceImpl : ISingleInstanceService, KoinComponent {
     private val appComponent by inject<AppComponent>()
 
     override suspend fun awaitReady() {
-        SingleInstanceServerInitializer.booted.awaitDone()
+        SingleInstanceInitialized.awaitDone()
     }
 
     override suspend fun getIntegrationPort(): Int {
@@ -20,7 +20,7 @@ class SingleInstanceServiceImpl : ISingleInstanceService, KoinComponent {
     }
 
     override suspend fun isReady(): Boolean {
-        return SingleInstanceServerInitializer.booted.isDone()
+        return SingleInstanceInitialized.isDone()
     }
 
     override suspend fun showUserThatAppIsRunning() {

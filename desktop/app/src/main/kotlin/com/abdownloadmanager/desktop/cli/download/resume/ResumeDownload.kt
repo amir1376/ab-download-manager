@@ -9,10 +9,10 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.types.long
 
 class ResumeDownload : SuspendingCliktCommand("resume") {
-    override fun help(context: Context) = "resume download(s)"
+    override fun help(context: Context) = "Resume download(s)"
     val id by argument("id").long().multiple()
     override suspend fun run() {
-        SingleInstanceManager.get().appIPCService().useService {
+        SingleInstanceManager.get().awokenAppIPCService().getService().useService {
             it.resumeDownload(id)
         }
     }

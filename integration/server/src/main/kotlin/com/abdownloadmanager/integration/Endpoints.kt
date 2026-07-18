@@ -1,5 +1,8 @@
 package com.abdownloadmanager.integration
 
+import com.abdownloadmanager.integration.model.AddDownloadsFromIntegration
+import com.abdownloadmanager.integration.model.ApiQueueModel
+import com.abdownloadmanager.integration.model.NewDownloadTask
 import io.ktor.server.application.Application
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respondText
@@ -23,7 +26,7 @@ internal fun Application.setupRouting(
             }
             itemsToAdd.onFailure { it.printStackTrace() }
             itemsToAdd.getOrThrow().let { newImportRequest ->
-                integrationHandler.addDownload(
+                integrationHandler.addDownloadByGui(
                     AddDownloadsFromIntegration(
                         newImportRequest.items,
                         newImportRequest.options,
@@ -43,7 +46,7 @@ internal fun Application.setupRouting(
                 json.decodeFromString<NewDownloadTask>(message)
             }
             itemsToAdd.onFailure { it.printStackTrace() }
-            integrationHandler.addDownloadTask(itemsToAdd.getOrThrow())
+            integrationHandler.addDownload(itemsToAdd.getOrThrow())
             call.respondText("OK")
         }
         post("/ping") {

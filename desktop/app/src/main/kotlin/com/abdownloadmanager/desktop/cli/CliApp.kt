@@ -1,7 +1,6 @@
 package com.abdownloadmanager.desktop.cli
 
 import com.github.ajalt.clikt.command.main
-import com.github.ajalt.clikt.core.main
 import kotlinx.coroutines.runBlocking
 
 

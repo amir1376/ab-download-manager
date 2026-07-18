@@ -1,4 +1,4 @@
-package com.abdownloadmanager.integration
+package com.abdownloadmanager.integration.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

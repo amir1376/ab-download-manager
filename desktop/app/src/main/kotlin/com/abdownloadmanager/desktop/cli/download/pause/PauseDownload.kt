@@ -8,10 +8,10 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.types.long
 
 class PauseDownload : SuspendingCliktCommand("pause") {
-    override fun help(context: Context) = "pause download(s)"
+    override fun help(context: Context) = "Pause download(s)"
     val id by argument("id").long().multiple()
     override suspend fun run() {
-        SingleInstanceManager.get().appIPCService().useService {
+        SingleInstanceManager.get().awokenAppIPCService().getService().useService {
             it.pauseDownload(id)
         }
     }

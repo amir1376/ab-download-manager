@@ -14,6 +14,10 @@ class SingleInstanceManager private constructor(baseFolder: Path) {
     fun singleInstanceService() = server.singleInstanceService()
     fun appIPCService() = server.appIPCService()
 
+    fun awokenAppIPCService() = IPCServiceProviderAwakerSupport(
+        IPCServiceProvider.from { appIPCService() }
+    )
+
     @Throws(AnotherInstanceIsRunning::class)
     fun lockInstance() {
         locker.tryLockInstance()

@@ -13,7 +13,8 @@ fun execAndWait(
     waitFor: Long = 2_000,
 ): Boolean {
     return runCatching {
-        val p = Runtime.getRuntime().exec(command)
+        val pb = ProcessBuilder(*command)
+        val p = pb.start()
         val exited = p.waitFor(waitFor, TimeUnit.MILLISECONDS)
         if (exited) {
             p.exitValue() == 0

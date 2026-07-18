@@ -12,11 +12,11 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.long
 
 class RemoveDownload : SuspendingCliktCommand("remove") {
-    override fun help(context: Context) = "remove download(s)"
+    override fun help(context: Context) = "Remove download(s)"
     val id by argument("id").long().multiple()
     val removeFiles by option("--remove-file").flag()
     override suspend fun run() {
-        SingleInstanceManager.get().appIPCService().useService {
+        SingleInstanceManager.get().awokenAppIPCService().getService().useService {
             it.removeDownload(id, removeFiles)
         }
     }

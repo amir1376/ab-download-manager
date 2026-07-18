@@ -109,9 +109,7 @@ object NativeMessagingHostLauncher {
             json = json,
             router = NativeMessagingRouter(
                 DefinedNativeMessagingHandlers.getAll(
-                    json, IPCServiceProvider.from {
-                        SingleInstanceManager.get().appIPCService()
-                    }
+                    json, SingleInstanceManager.get().awokenAppIPCService()
                 )
             )
         ).main(args)

@@ -1,7 +1,6 @@
 package com.abdownloadmanager.desktop.utils.native_messaging
 
 import com.abdownloadmanager.desktop.utils.AppInfo
-import com.abdownloadmanager.desktop.utils.isAppInstalled
 import com.abdownloadmanager.shared.util.SharedConstants
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -44,25 +43,25 @@ data class ChromeNativeMessagingManifest(
 class NativeMessaging(
     private val nativeMessagingManifestApplier: NativeMessagingManifestApplier,
 ) {
-    fun boot(){
+    fun boot() {
         installManifests()
     }
+
     fun installManifests() {
-        val firefox = createFirefoxManifest()
-        val chrome = createChromeManifest()
-        if (chrome!=null && firefox!=null){
-            nativeMessagingManifestApplier.updateManifests(
-                NativeMessagingManifests(
-                    firefoxNativeMessagingManifest = firefox,
-                    chromeNativeMessagingManifest = chrome,
-                )
+        val execFile = AppInfo.nativeMessagingExeFile ?: return
+        val firefox = createFirefoxManifest(execFile)
+        val chrome = createChromeManifest(execFile)
+        nativeMessagingManifestApplier.updateManifests(
+            NativeMessagingManifests(
+                firefoxNativeMessagingManifest = firefox,
+                chromeNativeMessagingManifest = chrome,
             )
-        }
+        )
     }
 
-    private fun createFirefoxManifest(): FirefoxNativeMessagingManifest? {
-        if (!AppInfo.isAppInstalled()) return null
-        val execFile = AppInfo.exeFile!!
+    private fun createFirefoxManifest(
+        execFile: String
+    ): FirefoxNativeMessagingManifest {
         return FirefoxNativeMessagingManifest(
             name = AppInfo.displayName,
             description = AppInfo.displayName,
@@ -73,9 +72,10 @@ class NativeMessaging(
             )
         )
     }
-    private fun createChromeManifest(): ChromeNativeMessagingManifest? {
-        if (!AppInfo.isAppInstalled()) return null
-        val execFile = AppInfo.exeFile!!
+
+    private fun createChromeManifest(
+        execFile: String,
+    ): ChromeNativeMessagingManifest {
         return ChromeNativeMessagingManifest(
             name = AppInfo.displayName,
             description = AppInfo.displayName,

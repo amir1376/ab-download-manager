@@ -6,7 +6,6 @@ import com.abdownloadmanager.desktop.cli.download.remove.RemoveDownload
 import com.abdownloadmanager.desktop.cli.download.resume.ResumeDownload
 import com.abdownloadmanager.desktop.cli.download.show.ShowDownload
 import com.github.ajalt.clikt.command.SuspendingCliktCommand
-import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.subcommands
 

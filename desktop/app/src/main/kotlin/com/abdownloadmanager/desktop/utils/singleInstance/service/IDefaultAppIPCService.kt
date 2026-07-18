@@ -1,30 +1,31 @@
 package com.abdownloadmanager.desktop.utils.singleInstance.service
 
-import com.abdownloadmanager.integration.AddDownloadOptionsFromIntegration
-import com.abdownloadmanager.integration.ApiQueueModel
-import com.abdownloadmanager.integration.NewDownloadTask
+import com.abdownloadmanager.integration.model.AddDownloadsFromIntegration
+import com.abdownloadmanager.integration.model.ApiQueueModel
+import com.abdownloadmanager.integration.model.NewDownloadTask
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.utils.ExceptionUtils
+import kotlinx.coroutines.flow.Flow
 import kotlinx.rpc.annotations.Rpc
 import kotlinx.serialization.Serializable
+import ir.amirab.downloader.downloaditem.DownloadStatus as DownloadItemStatus
 
 @Rpc
 interface IDefaultAppIPCService {
     // download
-    suspend fun addDownload(request: AddDownloadFromIPC)
+    suspend fun addDownloadByGui(request: AddDownloadsFromIntegration)
+    suspend fun addDownload(request: NewDownloadTask): Long
+
     suspend fun pauseDownload(ids: List<Long>)
     suspend fun resumeDownload(ids: List<Long>)
+
     suspend fun removeDownload(ids: List<Long>, alsoRemoveFile: Boolean)
+
     suspend fun showDownload(ids: List<Long>): List<ShowDownloadIPC>
+    fun watchDownload(ids: List<Long>): Flow<List<ShowDownloadIPC>>
 
     suspend fun listQueues(): List<ApiQueueModel>
 }
-
-@Serializable
-data class AddDownloadFromIPC(
-    val items: List<NewDownloadTask>,
-    val options: AddDownloadOptionsFromIntegration = AddDownloadOptionsFromIntegration()
-)
 
 @Serializable
 data class ShowDownloadIPC(
@@ -54,12 +55,23 @@ data class ShowDownloadIPC(
                             Error
                         }
                     }
+
                     DownloadJobStatus.Downloading -> Downloading
                     DownloadJobStatus.Finished -> Finished
                     DownloadJobStatus.IDLE -> Paused
                     is DownloadJobStatus.PreparingFile -> PreparingFile
                     DownloadJobStatus.Resuming -> Resuming
                     is DownloadJobStatus.Retrying -> Retrying
+                }
+            }
+
+            fun fromDownloadStatus(status: DownloadItemStatus): ShowDownloadIPC.DownloadStatus {
+                return when (status) {
+                    DownloadItemStatus.Paused -> Paused
+                    DownloadItemStatus.Error -> Error
+                    DownloadItemStatus.Downloading -> Downloading
+                    DownloadItemStatus.Completed -> Finished
+                    DownloadItemStatus.Added -> Paused
                 }
             }
         }
