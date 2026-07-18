@@ -9,7 +9,7 @@ import org.koin.core.component.inject
 class SingleInstanceServiceImpl : ISingleInstanceService, KoinComponent {
     private val appComponent by inject<AppComponent>()
 
-    suspend fun awaitReady() {
+    override suspend fun awaitReady() {
         SingleInstanceServerInitializer.booted.awaitDone()
     }
 
@@ -20,8 +20,7 @@ class SingleInstanceServiceImpl : ISingleInstanceService, KoinComponent {
     }
 
     override suspend fun isReady(): Boolean {
-        awaitReady()
-        return appComponent.isReady()
+        return SingleInstanceServerInitializer.booted.isDone()
     }
 
     override suspend fun showUserThatAppIsRunning() {

@@ -89,7 +89,7 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
     }
 
     companion object {
-        private fun convertToDownloadSystemCredentials(it: IDownloadCredentialsFromIntegration): AddDownloadCredentialsInUiProps {
+        fun convertToDownloadSystemCredentials(it: IDownloadCredentialsFromIntegration): AddDownloadCredentialsInUiProps {
             val credentials = when (it) {
                 is HttpDownloadCredentialsFromIntegration -> {
                     HttpDownloadCredentials(

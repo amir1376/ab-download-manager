@@ -1,5 +1,7 @@
 package com.abdownloadmanager.desktop.utils.singleInstance
 
+import com.abdownloadmanager.desktop.utils.singleInstance.service.IDefaultAppIPCService
+import com.abdownloadmanager.desktop.utils.singleInstance.service.DefaultAppIPCServiceImpl
 import com.abdownloadmanager.desktop.utils.singleInstance.service.SingleInstanceServiceImpl
 import com.abdownloadmanager.desktop.utils.singleInstance.service.ISingleInstanceService
 import io.ktor.client.*
@@ -44,6 +46,9 @@ fun Application.setupKtorKRpcServer() {
         rpc(SINGLE_INSTANCE_RPC_PATH) {
             registerService<ISingleInstanceService> {
                 SingleInstanceServiceImpl()
+            }
+            registerService<IDefaultAppIPCService> {
+                DefaultAppIPCServiceImpl()
             }
         }
     }

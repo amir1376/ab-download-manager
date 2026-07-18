@@ -8,4 +8,5 @@ data class NewDownloadTask(
     var folder: String? = null,
     var name: String? = null,
     var queueId: Long? = null,
+    var categoryId: Long? = null,
 )

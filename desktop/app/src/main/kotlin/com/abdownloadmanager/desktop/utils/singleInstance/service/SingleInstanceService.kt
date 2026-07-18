@@ -6,6 +6,7 @@ import kotlinx.rpc.annotations.Rpc
 interface ISingleInstanceService {
     suspend fun getIntegrationPort(): Int?
     suspend fun isReady(): Boolean
+    suspend fun awaitReady()
     suspend fun showUserThatAppIsRunning()
     suspend fun exit()
 }

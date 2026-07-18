@@ -61,6 +61,9 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.server.cio)
 
+    // cli
+    implementation(libs.clikit)
+
     implementation(project(":downloader:core"))
     implementation(project(":downloader:monitor"))
 
@@ -110,6 +113,12 @@ nucleus {
 
         // Define the main class for the application.
         mainClass = "$desktopPackageName.AppKt"
+        additionalLaunchers {
+            create("${getAppName()}Cli") {
+                mainClass = "$desktopPackageName.cli.CliAppKt"
+                winConsole = true
+            }
+        }
         nativeDistributions {
             cleanupNativeLibs = true
             // enable it later

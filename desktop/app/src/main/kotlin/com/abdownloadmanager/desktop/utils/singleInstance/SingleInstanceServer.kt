@@ -1,11 +1,13 @@
 package com.abdownloadmanager.desktop.utils.singleInstance
 
-import com.abdownloadmanager.desktop.utils.singleInstance.service.DefaultAppIPCService
+import com.abdownloadmanager.desktop.utils.singleInstance.service.IDefaultAppIPCService
 import com.abdownloadmanager.desktop.utils.singleInstance.service.ISingleInstanceService
 import io.ktor.client.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.rpc.annotations.Rpc
 import kotlinx.rpc.krpc.client.KrpcClient
 import kotlinx.rpc.withService
@@ -54,7 +56,7 @@ class SingleInstanceServer(
     }
 
     fun singleInstanceService() = getIPCService<ISingleInstanceService>()
-    fun appIPCService() = getIPCService<DefaultAppIPCService>()
+    fun appIPCService() = getIPCService<IDefaultAppIPCService>()
 
     private inline fun <@Rpc reified T : Any> getIPCService(): CloseableService<T> {
         val port = portPath
@@ -119,4 +121,20 @@ interface IPCServiceProvider<T> {
             }
         }
     }
+}
+
+class IPCServiceProviderAwakerSupport<T>(
+    private val serviceProvider: IPCServiceProvider<T>,
+) {
+    // awake the app if it's not running
+    suspend fun getService(): CloseableService<T> {
+        withContext(Dispatchers.IO) {
+            SingleInstanceManager.get().awakeMainInstance()
+        }
+        return serviceProvider.getService()
+    }
+}
+
+fun <T> IPCServiceProvider<T>.withAwake(): IPCServiceProviderAwakerSupport<T> {
+    return IPCServiceProviderAwakerSupport(this)
 }

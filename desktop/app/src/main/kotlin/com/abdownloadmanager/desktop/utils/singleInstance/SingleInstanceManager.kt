@@ -22,6 +22,10 @@ class SingleInstanceManager private constructor(baseFolder: Path) {
         server.start()
     }
 
+    suspend fun awakeMainInstance() {
+        EnsureAppIsAwake.awakeTheApp()
+    }
+
     companion object {
         private val instance by lazy {
             SingleInstanceManager(AppInfo.definedPaths.configDir)

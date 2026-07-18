@@ -11,8 +11,10 @@ import com.abdownloadmanager.desktop.utils.*
 import com.abdownloadmanager.desktop.utils.native_messaging.host.NativeMessagingHostLauncher
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
+import com.abdownloadmanager.desktop.utils.singleInstance.EnsureAppIsAwake
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceManager
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceServerInitializer
+import com.abdownloadmanager.desktop.utils.singleInstance.StartIfNotStartedCommand
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
@@ -99,7 +101,9 @@ fun main(args: Array<String>) {
             exitExistingProcessAndExit()
         }
         if (appArguments.startIfNotStarted && !AppInfo.isInIDE()) {
-            startAndWaitForRunIfNotRunning()
+            runBlocking {
+                StartIfNotStartedCommand.startAndWaitForRunIfNotRunning()
+            }
         }
         if (appArguments.getIntegrationPort) {
             runBlocking {
@@ -132,16 +136,6 @@ private fun trainTheAOT(
     }
 }
 
-private fun startAppInAnotherProcess() {
-    val exeFile = requireNotNull(AppInfo.exeFile)
-    val cmd = listOf(
-        exeFile,
-        AppArguments.Args.BACKGROUND
-    ).joinToString(" ").also {
-//        println("executing $it")
-    }
-    Runtime.getRuntime().exec(cmd)
-}
 
 private fun dispatchVersionAndExit(): Nothing {
     print(AppInfo.version)
@@ -169,46 +163,6 @@ private suspend fun dispatchIntegrationPortAndExit(): Nothing {
     exitProcess(0)
 }
 
-private fun startAndWaitForRunIfNotRunning(
-    howMuchWait: Long = 10_000,
-    initialDelay: Long = 0,
-    eachTimeDelay: Long = 500L,
-) {
-    val singleInstance = SingleInstanceManager.get()
-    val deadLine = System.currentTimeMillis() + howMuchWait
-    if (initialDelay > 0) {
-        Thread.sleep(initialDelay)
-    }
-    var firstLoop = true
-    while (true) {
-        val isReady: Boolean = runCatching {
-            runBlocking {
-                singleInstance.singleInstanceService().useService {
-                    it.isReady()
-                }
-            }
-        }
-            .getOrElse {
-//                println("or else $it")
-                false
-            }
-//        println("isReady: $isReady")
-        if (isReady) {
-            return
-        }
-        if (firstLoop) {
-            startAppInAnotherProcess()
-//            println("send start signal")
-        }
-        if (System.currentTimeMillis() >= deadLine) {
-//            println("dead line reached")
-            //deadline reached exiting now
-            exitProcess(1)
-        }
-        Thread.sleep(eachTimeDelay)
-        firstLoop = false
-    }
-}
 
 private fun defaultApp(
     appArguments: AppArguments,
