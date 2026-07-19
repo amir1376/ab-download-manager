@@ -31,6 +31,7 @@ import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
 import com.abdownloadmanager.desktop.utils.proxy.AutoConfigurableProxyProviderForDesktop
 import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvider
+import com.abdownloadmanager.desktop.utils.net.NetworkInterfaceProvider
 import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
@@ -210,6 +211,7 @@ val downloaderModule = module {
             get(),
             get(),
             get(),
+            get(),
         )
     }
     single {
@@ -346,6 +348,12 @@ val downloadSystemModule = module {
         )
     }.apply {
         bind<IExtraQueueSettingsStorage<*>>()
+    }
+    single<IExtraQueueSettingsStorage<DesktopExtraQueueSettings>> {
+        get<ExtraQueueSettingsStorage<DesktopExtraQueueSettings>>()
+    }
+    single {
+        NetworkInterfaceProvider(get(), get())
     }
     single<OnDownloadCompletionActionProvider> {
         DesktopOnDownloadCompletionActionProvider(get())

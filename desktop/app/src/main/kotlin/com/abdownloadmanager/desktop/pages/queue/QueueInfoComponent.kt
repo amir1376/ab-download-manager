@@ -7,10 +7,12 @@ import ir.amirab.util.flow.mapStateFlow
 import com.abdownloadmanager.shared.util.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
 import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
+import com.abdownloadmanager.desktop.utils.net.NetworkInterfaceProvider
 import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.DayOfWeekConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.TimeConfigurable
@@ -48,6 +50,7 @@ class QueueInfoComponent(
     private val lastSelectedItem = MutableStateFlow(null as Long?)
 
     val extraQueueSettingsStorage by inject<ExtraQueueSettingsStorage<DesktopExtraQueueSettings>>()
+    private val networkInterfaceProvider by inject<NetworkInterfaceProvider>()
     val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
         flow = extraQueueSettingsStorage.getExternalQueueSettingsAsFlow(
             id = id,
@@ -141,6 +144,40 @@ class QueueInfoComponent(
         createConfigurableList(downloadQueue, scope)
 
 
+    private fun networkInterfaceConfigurable(): EnumConfigurable<String> {
+        val default = ""
+        val interfaces = networkInterfaceProvider.listInterfaces()
+        val possibleValues = buildList {
+            add(default)
+            interfaces.forEach { info ->
+                // offer both the interface name and each usable address
+                add(info.name)
+                addAll(info.allAddresses)
+            }
+        }
+        return EnumConfigurable(
+            title = Res.string.queue_network_interface.asStringSource(),
+            description = Res.string.queue_network_interface_description.asStringSource(),
+            backedBy = extraDownloadItemSettingsFlow.mapTwoWayStateFlow(
+                map = {
+                    it.networkInterface ?: default
+                },
+                unMap = {
+                    copy(networkInterface = it.takeIf { v -> v != default })
+                },
+            ),
+            possibleValues = possibleValues,
+            describe = {
+                if (it == default) {
+                    Res.string.queue_network_interface_default.asStringSource()
+                } else {
+                    it.asStringSource()
+                }
+            },
+            valueToString = { listOf(if (it == default) "Default" else it) },
+        )
+    }
+
     private fun createConfigurableList(
         downloadQueue: DownloadQueue, parentScope: CoroutineScope,
     ): List<ConfigurableGroup> {
@@ -198,6 +235,7 @@ class QueueInfoComponent(
                         range = 1..32,
                         renderMode = IntConfigurable.RenderMode.TextField,
                     ),
+                    networkInterfaceConfigurable(),
                 ),
             ),
             ConfigurableGroup(

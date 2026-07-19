@@ -6,9 +6,14 @@ import ir.amirab.downloader.downloaditem.http.IHttpBasedDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
 import ir.amirab.downloader.utils.await
 import okhttp3.*
+import java.net.Inet4Address
+import java.net.Inet6Address
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.ProxySelector
+import java.net.Socket
+import javax.net.SocketFactory
 
 class OkHttpHttpDownloaderClient(
     private val okHttpClient: OkHttpClient,
@@ -16,6 +21,7 @@ class OkHttpHttpDownloaderClient(
     private val proxyStrategyProvider: ProxyStrategyProvider,
     private val systemProxySelectorProvider: SystemProxySelectorProvider,
     private val autoConfigurableProxyProvider: AutoConfigurableProxyProvider,
+    private val networkInterfaceBinder: NetworkInterfaceBinder? = null,
 ) : HttpDownloaderClient() {
     private fun newCall(
         downloadCredentials: IHttpBasedDownloadCredentials,
@@ -76,6 +82,16 @@ class OkHttpHttpDownloaderClient(
     private fun OkHttpClient.applyProxy(
         downloadCredentials: IHttpBasedDownloadCredentials,
     ): OkHttpClient {
+        val downloadId = (downloadCredentials as? ir.amirab.downloader.downloaditem.IDownloadItem)?.id
+        val boundAddress = downloadId?.let { id ->
+            networkInterfaceBinder?.getBoundAddress(id)
+        }
+        if (boundAddress != null) {
+            // bind every connection of this download to the queue's network interface
+            return newBuilder()
+                .socketFactory(BindingSocketFactory(boundAddress))
+                .build()
+        }
         return when (
             val strategy = proxyStrategyProvider.getProxyStrategyFor(downloadCredentials.link)
         ) {
@@ -191,3 +207,39 @@ class OkHttpHttpDownloaderClient(
         )
     }
 }
+
+/**
+ * A [SocketFactory] that binds created sockets to a specific local address,
+ * forcing egress through the corresponding network interface. This mirrors
+ * `dispatch`'s per-connection `bind_socket` but is applied statically per queue.
+ */
+private class BindingSocketFactory(
+    private val localAddress: InetAddress,
+) : SocketFactory() {
+    private fun newBoundSocket(): Socket {
+        return Socket().apply {
+            bind(InetSocketAddress(localAddress, 0))
+        }
+    }
+
+    override fun createSocket(): Socket {
+        return newBoundSocket()
+    }
+
+    override fun createSocket(host: String?, port: Int): Socket {
+        return newBoundSocket().apply { connect(InetSocketAddress(host, port)) }
+    }
+
+    override fun createSocket(host: String?, port: Int, localHost: InetAddress?, localPort: Int): Socket {
+        return newBoundSocket().apply { connect(InetSocketAddress(host, port)) }
+    }
+
+    override fun createSocket(address: InetAddress?, port: Int): Socket {
+        return newBoundSocket().apply { connect(InetSocketAddress(address, port)) }
+    }
+
+    override fun createSocket(address: InetAddress?, port: Int, localAddress: InetAddress?, localPort: Int): Socket {
+        return newBoundSocket().apply { connect(InetSocketAddress(address, port)) }
+    }
+}
+
