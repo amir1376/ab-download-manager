@@ -3,9 +3,7 @@ package com.abdownloadmanager.desktop.ui.configurable.comon.renderer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,33 +43,14 @@ object NetworkInterfacesConfigurableRenderer : ConfigurableRenderer<NetworkInter
         val selected by cfg.stateFlow.collectAsState()
         val setValue = cfg::set
         val enabled = isConfigEnabled()
-        val optionsById = cfg.availableOptions.associate { (id, label) -> id to label }
-
-        fun toggle(id: String) {
-            if (!enabled) return
-            setValue(
-                if (id in selected) {
-                    selected.minus(id)
-                } else {
-                    selected.plus(id)
-                }
-            )
+        val labelOf: (String) -> String = { id ->
+            cfg.availableOptions.firstOrNull { it.first == id }?.second ?: id
         }
 
-        fun move(index: Int, delta: Int) {
+        fun select(id: String) {
             if (!enabled) return
-            val target = index + delta
-            if (target < 0 || target >= selected.size) return
-            val list = selected.toMutableList()
-            val tmp = list[index]
-            list[index] = list[target]
-            list[target] = tmp
-            setValue(list)
-        }
-
-        fun remove(index: Int) {
-            if (!enabled) return
-            setValue(selected.toMutableList().also { it.removeAt(index) })
+            // toggle: clicking the already-selected one clears the binding
+            setValue(if (selected == id) null else id)
         }
 
         ConfigTemplate(
@@ -85,7 +64,6 @@ object NetworkInterfacesConfigurableRenderer : ConfigurableRenderer<NetworkInter
                         .fillMaxWidth()
                         .ifThen(!enabled) { alpha(0.5f) }
                 ) {
-                    // available interfaces: discover & select
                     if (cfg.availableOptions.isEmpty()) {
                         Text(
                             text = Res.string.queue_network_interface_none_found
@@ -94,121 +72,55 @@ object NetworkInterfacesConfigurableRenderer : ConfigurableRenderer<NetworkInter
                             color = myColors.onBackground / 70,
                         )
                     } else {
-                        FlowRowItem(optionsById, selected, enabled, ::toggle)
-                    }
-
-                    Spacer(Modifier.height(8.dp))
-
-                    // ordered selection summary
-                    if (selected.isEmpty()) {
-                        Text(
-                            text = Res.string.queue_network_interface_default
-                                .asStringSource().rememberString(),
-                            fontSize = myTextSizes.sm,
-                            color = myColors.onBackground / 60,
-                        )
-                    } else {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .verticalScroll(rememberScrollState())
-                                .heightIn(max = 200.dp),
+                        FlowRow(
+                            Modifier.fillMaxWidth()
                         ) {
-                            selected.forEachIndexed { index, id ->
-                                val label = optionsById[id] ?: id
+                            cfg.availableOptions.forEach { (id, label) ->
+                                val isSelected = id == selected
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 2.dp)
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(myColors.onBackground / 5)
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                        .padding(2.dp)
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .ifThen(isSelected) {
+                                            background(myColors.primary / 20)
+                                        }
+                                        .clickable(enabled = enabled) { select(id) }
+                                        .padding(vertical = 4.dp)
+                                        .padding(horizontal = 8.dp)
                                 ) {
-                                    Text(
-                                        "${index + 1}.",
-                                        fontSize = myTextSizes.sm,
-                                        color = myColors.onBackground / 60,
+                                    MyIcon(
+                                        MyIcons.check,
+                                        null,
+                                        Modifier.size(12.dp)
+                                            .alpha(if (isSelected) 1f else 0f),
                                     )
-                                    Spacer(Modifier.width(6.dp))
+                                    Spacer(Modifier.width(2.dp))
                                     Text(
-                                        label,
-                                        modifier = Modifier.weight(1f),
+                                        text = label,
+                                        modifier = Modifier.alpha(if (isSelected) 1f else 0.6f),
+                                        softWrap = false,
                                         fontSize = myTextSizes.base,
-                                    )
-                                    MyIcon(
-                                        MyIcons.up,
-                                        null,
-                                        Modifier
-                                            .size(16.dp)
-                                            .clickable(enabled = enabled) { move(index, -1) }
-                                            .alpha(if (index > 0) 1f else 0.3f),
-                                    )
-                                    Spacer(Modifier.width(4.dp))
-                                    MyIcon(
-                                        MyIcons.down,
-                                        null,
-                                        Modifier
-                                            .size(16.dp)
-                                            .clickable(enabled = enabled) { move(index, 1) }
-                                            .alpha(if (index < selected.lastIndex) 1f else 0.3f),
-                                    )
-                                    Spacer(Modifier.width(4.dp))
-                                    MyIcon(
-                                        MyIcons.remove,
-                                        null,
-                                        Modifier
-                                            .size(16.dp)
-                                            .clickable(enabled = enabled) { remove(index) },
                                     )
                                 }
                             }
                         }
                     }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    val currentSelection = selected
+                    Text(
+                        text = if (currentSelection == null) {
+                            Res.string.queue_network_interface_default.asStringSource().rememberString()
+                        } else {
+                            labelOf(currentSelection)
+                        },
+                        fontSize = myTextSizes.sm,
+                        color = myColors.onBackground / 60,
+                    )
                 }
             }
         )
-    }
-
-    @Composable
-    private fun FlowRowItem(
-        optionsById: Map<String, String>,
-        selected: List<String>,
-        enabled: Boolean,
-        toggle: (String) -> Unit,
-    ) {
-        FlowRow(
-            Modifier.fillMaxWidth()
-        ) {
-            optionsById.forEach { (id, label) ->
-                val isSelected = id in selected
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .ifThen(isSelected) {
-                            background(myColors.primary / 20)
-                        }
-                        .clickable(enabled = enabled) { toggle(id) }
-                        .padding(vertical = 4.dp)
-                        .padding(horizontal = 8.dp)
-                ) {
-                    MyIcon(
-                        MyIcons.check,
-                        null,
-                        Modifier.size(12.dp)
-                            .alpha(if (isSelected) 1f else 0f),
-                    )
-                    Spacer(Modifier.width(2.dp))
-                    Text(
-                        text = label,
-                        modifier = Modifier.alpha(if (isSelected) 1f else 0.6f),
-                        softWrap = false,
-                        fontSize = myTextSizes.base,
-                    )
-                }
-            }
-        }
     }
 }

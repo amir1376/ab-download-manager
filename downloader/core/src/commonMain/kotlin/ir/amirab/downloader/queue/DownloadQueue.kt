@@ -8,6 +8,7 @@ import ir.amirab.downloader.db.QueueModel
 import ir.amirab.downloader.downloaditem.contexts.Queue
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.StoppedBy
+import ir.amirab.util.logger.appLogger
 import ir.amirab.downloader.utils.swap
 import ir.amirab.downloader.utils.swapped
 import ir.amirab.util.coroutines.debounce
@@ -425,8 +426,9 @@ class DownloadQueue(
             // decide which network interface this download should use, based on
             // how many downloads are already active (round-robin over the queue's list)
             networkPolicy?.interfaceForActiveIndex(id, activeItems.size)?.let { iface ->
+                appLogger.d { "DownloadQueue: assigning downloadId=$it to interface '$iface'" }
                 networkPolicy.assignInterface(it, iface)
-            }
+            } ?: appLogger.d { "DownloadQueue: no interface assigned for downloadId=$it (policy=null or empty list)" }
             activeItems.add(it)
             scope.launch {
                 downloadEvents.startJob(it, ResumedBy(me))

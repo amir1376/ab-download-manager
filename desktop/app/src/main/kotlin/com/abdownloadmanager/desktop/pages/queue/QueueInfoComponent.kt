@@ -150,16 +150,14 @@ class QueueInfoComponent(
             description = Res.string.queue_network_interface_description.asStringSource(),
             availableOptions = networkInterfaceProvider.discoverInterfaces(),
             backedBy = extraDownloadItemSettingsFlow.mapTwoWayStateFlow(
-                map = { it.networkInterfaces },
-                unMap = { copy(networkInterfaces = it) },
+                map = { it.networkInterface },
+                unMap = { copy(networkInterface = it) },
             ),
             describe = {
-                if (it.isEmpty()) {
+                if (it == null) {
                     Res.string.queue_network_interface_default.asStringSource()
                 } else {
-                    Res.string.queue_network_interface_selected.asStringSourceWithARgs(
-                        Res.string.queue_network_interface_selected_createArgs(count = it.size.toString())
-                    )
+                    it.asStringSource()
                 }
             },
         )

@@ -6,29 +6,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * A configurable that lets the user pick an ordered list of network interface
- * identifiers (discovered and passed via [availableOptions]) to bind downloads
- * to. The selection order matters: concurrent downloads are spread across the
- * chosen interfaces in that order (round-robin).
- *
- * The [backedBy] value is the list of selected identifiers; an empty list means
- * "use the system default route".
+ * A configurable that lets the user pick a single network interface
+ * (discovered and passed via [availableOptions]) to bind the queue's downloads
+ * to. The selection is a single identifier, or `null` for the system default
+ * route.
  */
 class NetworkInterfacesConfigurable(
     title: StringSource,
     description: StringSource,
     /**
      * Discovered options the user can pick from, as pairs of
-     * (identifier, displayLabel). The identifier is what gets stored in the
-     * selection; the label is shown in the UI.
+     * (identifier, displayLabel). The identifier is what gets stored; the
+     * label is shown in the UI.
      */
     val availableOptions: List<Pair<String, String>>,
-    backedBy: MutableStateFlow<List<String>>,
-    describe: (List<String>) -> StringSource,
-    validate: (List<String>) -> Boolean = { true },
+    backedBy: MutableStateFlow<String?>,
+    describe: (String?) -> StringSource,
+    validate: (String?) -> Boolean = { true },
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
-) : Configurable<List<String>>(
+) : Configurable<String?>(
     title = title,
     description = description,
     backedBy = backedBy,

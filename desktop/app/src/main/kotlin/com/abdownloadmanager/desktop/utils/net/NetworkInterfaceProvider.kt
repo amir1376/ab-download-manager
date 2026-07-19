@@ -4,6 +4,7 @@ import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import ir.amirab.downloader.connection.NetworkInterfaceBinder
 import ir.amirab.downloader.connection.QueueNetworkPolicy
+import ir.amirab.util.logger.appLogger
 import java.net.InetAddress
 import java.net.NetworkInterface
 
@@ -53,21 +54,25 @@ class NetworkInterfaceProvider(
             if (!seen.add(ip)) continue
             result.add(ip to "${netIf.name} (${ip})")
         }
+        appLogger.d { "discoverInterfaces: found ${result.size} -> ${result.map { it.second }}" }
         return result
     }
 
     override fun interfaceForActiveIndex(queueId: Long, activeIndex: Int): String? {
-        val list = extraQueueSettingsStorage.getExtraQueueSettings(queueId).networkInterfaces
-        if (list.isEmpty()) return null
-        return list[activeIndex % list.size]
+        val iface = extraQueueSettingsStorage.getExtraQueueSettings(queueId).networkInterface
+        appLogger.d { "interfaceForActiveIndex: queueId=$queueId -> $iface" }
+        return iface
     }
 
     override fun assignInterface(downloadId: Long, identifier: String) {
         assignment[downloadId] = identifier
+        appLogger.d { "assignInterface: downloadId=$downloadId -> $identifier (assignment=${assignment.toList()})" }
     }
 
     override fun getBoundAddress(downloadId: Long): InetAddress? {
-        val identifier = assignment[downloadId] ?: return null
+        val identifier = assignment[downloadId]
+        appLogger.d { "getBoundAddress: downloadId=$downloadId identifier=$identifier" }
+        if (identifier == null) return null
         return resolveAddress(identifier)
     }
 
@@ -76,6 +81,8 @@ class NetworkInterfaceProvider(
      * local [InetAddress] to bind sockets to.
      */
     fun resolveAddress(value: String): InetAddress? {
-        return runCatching { InetAddress.getByName(value) }.getOrNull()
+        val addr = runCatching { InetAddress.getByName(value) }.getOrNull()
+        appLogger.d { "resolveAddress: '$value' -> $addr" }
+        return addr
     }
 }

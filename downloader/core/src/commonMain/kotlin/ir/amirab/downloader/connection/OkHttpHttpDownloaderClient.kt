@@ -5,6 +5,7 @@ import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.http.IHttpBasedDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
 import ir.amirab.downloader.utils.await
+import ir.amirab.util.logger.appLogger
 import okhttp3.*
 import java.net.Inet4Address
 import java.net.Inet6Address
@@ -83,9 +84,11 @@ class OkHttpHttpDownloaderClient(
         downloadCredentials: IHttpBasedDownloadCredentials,
     ): OkHttpClient {
         val downloadId = (downloadCredentials as? ir.amirab.downloader.downloaditem.IDownloadItem)?.id
+        appLogger.d { "applyProxy: downloadId=$downloadId binder=${networkInterfaceBinder != null}" }
         val boundAddress = downloadId?.let { id ->
             networkInterfaceBinder?.getBoundAddress(id)
         }
+        appLogger.d { "applyProxy: boundAddress=$boundAddress" }
         if (boundAddress != null) {
             // bind every connection of this download to the queue's network interface
             return newBuilder()
@@ -217,8 +220,15 @@ private class BindingSocketFactory(
     private val localAddress: InetAddress,
 ) : SocketFactory() {
     private fun newBoundSocket(): Socket {
+        appLogger.d { "BindingSocketFactory: binding socket to $localAddress" }
         return Socket().apply {
-            bind(InetSocketAddress(localAddress, 0))
+            try {
+                bind(InetSocketAddress(localAddress, 0))
+                appLogger.d { "BindingSocketFactory: bound OK to $localAddress" }
+            } catch (e: Throwable) {
+                appLogger.e(e) { "BindingSocketFactory: failed to bind to $localAddress" }
+                throw e
+            }
         }
     }
 
