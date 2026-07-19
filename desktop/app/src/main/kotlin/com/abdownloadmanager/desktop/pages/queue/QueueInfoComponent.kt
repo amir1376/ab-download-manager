@@ -12,7 +12,6 @@ import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.DayOfWeekConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.TimeConfigurable
@@ -50,7 +49,6 @@ class QueueInfoComponent(
     private val lastSelectedItem = MutableStateFlow(null as Long?)
 
     val extraQueueSettingsStorage by inject<ExtraQueueSettingsStorage<DesktopExtraQueueSettings>>()
-    private val networkInterfaceProvider by inject<NetworkInterfaceProvider>()
     val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
         flow = extraQueueSettingsStorage.getExternalQueueSettingsAsFlow(
             id = id,
@@ -144,37 +142,29 @@ class QueueInfoComponent(
         createConfigurableList(downloadQueue, scope)
 
 
-    private fun networkInterfaceConfigurable(): EnumConfigurable<String> {
-        val default = ""
-        val interfaces = networkInterfaceProvider.listInterfaces()
-        val possibleValues = buildList {
-            add(default)
-            interfaces.forEach { info ->
-                // offer both the interface name and each usable address
-                add(info.name)
-                addAll(info.allAddresses)
-            }
-        }
-        return EnumConfigurable(
+    private fun networkInterfaceConfigurable(): StringConfigurable {
+        return StringConfigurable(
             title = Res.string.queue_network_interface.asStringSource(),
             description = Res.string.queue_network_interface_description.asStringSource(),
             backedBy = extraDownloadItemSettingsFlow.mapTwoWayStateFlow(
                 map = {
-                    it.networkInterface ?: default
+                    it.networkInterfaces.joinToString(", ")
                 },
-                unMap = {
-                    copy(networkInterface = it.takeIf { v -> v != default })
+                unMap = { raw ->
+                    val list = raw.split(',', '\n')
+                        .map { v -> v.trim() }
+                        .filter { v -> v.isNotEmpty() }
+                    copy(networkInterfaces = list)
                 },
             ),
-            possibleValues = possibleValues,
             describe = {
-                if (it == default) {
+                if (it.isBlank()) {
                     Res.string.queue_network_interface_default.asStringSource()
                 } else {
                     it.asStringSource()
                 }
             },
-            valueToString = { listOf(if (it == default) "Default" else it) },
+            validate = { true },
         )
     }
 

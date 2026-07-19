@@ -111,6 +111,8 @@ import com.abdownloadmanager.shared.util.proxy.ProxyData
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import ir.amirab.downloader.DownloaderRegistry
+import ir.amirab.downloader.connection.NetworkInterfaceBinder
+import ir.amirab.downloader.connection.QueueNetworkPolicy
 import ir.amirab.downloader.connection.UserAgentProvider
 import ir.amirab.downloader.connection.proxy.AutoConfigurableProxyProvider
 import ir.amirab.downloader.connection.proxy.ProxyStrategyProvider
@@ -177,7 +179,7 @@ val downloaderModule = module {
         DesktopSystemThemeDetector()
     }
     single {
-        QueueManager(get(), get())
+        QueueManager(get(), get(), get<NetworkInterfaceProvider>())
     }
     single {
         DownloadFoldersRegistry()
@@ -211,7 +213,7 @@ val downloaderModule = module {
             get(),
             get(),
             get(),
-            get(),
+            get<NetworkInterfaceProvider>(),
         )
     }
     single {
@@ -354,6 +356,9 @@ val downloadSystemModule = module {
     }
     single {
         NetworkInterfaceProvider(get(), get())
+    }.apply {
+        bind<NetworkInterfaceBinder>()
+        bind<QueueNetworkPolicy>()
     }
     single<OnDownloadCompletionActionProvider> {
         DesktopOnDownloadCompletionActionProvider(get())

@@ -8,6 +8,7 @@ import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
@@ -100,6 +101,21 @@ object DesktopSettings {
             describe = {
                 it?.prettyName?.asStringSource()?: Res.string.default.asStringSource()
             }
+        )
+    }
+
+    fun defaultNetworkInterfacesConfig(appSettings: AppSettingsStorage): StringConfigurable {
+        return StringConfigurable(
+            title = Res.string.settings_network_default_interfaces.asStringSource(),
+            description = Res.string.settings_network_default_interfaces_description.asStringSource(),
+            backedBy = appSettings.defaultNetworkInterfaces,
+            describe = {
+                if (it.isBlank()) {
+                    Res.string.queue_network_interface_default.asStringSource()
+                } else {
+                    it.asStringSource()
+                }
+            },
         )
     }
 }

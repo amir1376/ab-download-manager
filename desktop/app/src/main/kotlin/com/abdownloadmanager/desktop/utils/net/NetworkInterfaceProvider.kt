@@ -1,25 +1,39 @@
 package com.abdownloadmanager.desktop.utils.net
 
+import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import ir.amirab.downloader.connection.NetworkInterfaceBinder
-import ir.amirab.downloader.queue.QueueManager
+import ir.amirab.downloader.connection.QueueNetworkPolicy
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.ServerSocket
 
 /**
  * Provides information about the machine's network interfaces and resolves
- * which local address a given download queue should bind its sockets to.
+ * which local address a given download should bind its sockets to.
  *
  * This is the desktop counterpart of `dispatch`'s interface enumeration
  * (`list.rs` / `net.rs`): instead of running a SOCKS proxy, we bind each
  * connection directly to the chosen interface's local address.
+ *
+ * For per-queue multi-homing, a queue is configured with an ordered list of
+ * interfaces. Concurrent downloads in that queue are spread across them
+ * round-robin: the N-th active download uses the (N-1)-th interface in the
+ * list, wrapping around.
  */
 class NetworkInterfaceProvider(
     private val extraQueueSettingsStorage: IExtraQueueSettingsStorage<DesktopExtraQueueSettings>,
-    private val queueManager: QueueManager,
-) : NetworkInterfaceBinder {
+    private val appSettingsStorage: AppSettingsStorage,
+) : NetworkInterfaceBinder, QueueNetworkPolicy {
+
+    /**
+     * Per-download assigned interface identifier (interface name or IP).
+     * Populated by [assignInterface] when a download starts (via the queue
+     * policy), so the egress binding can be resolved at connect time.
+     */
+    private val assignment = mutableMapOf<Long, String>()
+
     /**
      * A usable (non-loopback, non-link-local, bindable) network interface.
      */
@@ -52,18 +66,34 @@ class NetworkInterfaceProvider(
     }
 
     /**
-     * Resolve the local [InetAddress] a queue's downloads should bind to.
-     * Returns `null` when the queue has no interface override (system route).
+     * Ordered list of interface identifiers for a queue, falling back to the
+     * global default list when the queue has none configured.
      */
-    fun getBoundAddressForQueue(queueId: Long): InetAddress? {
-        val configured = extraQueueSettingsStorage.getExtraQueueSettings(queueId).networkInterface
-            ?: return null
-        return resolveAddress(configured)
+    private fun listForQueue(queueId: Long): List<String> {
+        val configured = extraQueueSettingsStorage.getExtraQueueSettings(queueId).networkInterfaces
+        if (configured.isNotEmpty()) return configured
+        return parseList(appSettingsStorage.defaultNetworkInterfaces.value)
+    }
+
+    private fun parseList(raw: String): List<String> {
+        return raw.split(',', '\n')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+    }
+
+    override fun interfaceForActiveIndex(queueId: Long, activeIndex: Int): String? {
+        val list = listForQueue(queueId)
+        if (list.isEmpty()) return null
+        return list[activeIndex % list.size]
+    }
+
+    override fun assignInterface(downloadId: Long, identifier: String) {
+        assignment[downloadId] = identifier
     }
 
     override fun getBoundAddress(downloadId: Long): InetAddress? {
-        val queueId = queueManager.findItemInQueue(downloadId) ?: return null
-        return getBoundAddressForQueue(queueId)
+        val identifier = assignment[downloadId] ?: return null
+        return resolveAddress(identifier)
     }
 
     /**
@@ -83,7 +113,7 @@ class NetworkInterfaceProvider(
 
     private fun bindable(address: InetAddress): Boolean {
         return runCatching {
-            java.net.ServerSocket().use { socket ->
+            ServerSocket().use { socket ->
                 socket.bind(java.net.InetSocketAddress(address, 0))
             }
         }.isSuccess

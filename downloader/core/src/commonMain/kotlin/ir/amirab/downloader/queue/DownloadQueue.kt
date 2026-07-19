@@ -2,6 +2,7 @@ package ir.amirab.downloader.queue
 
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.DownloadManagerMinimalControl
+import ir.amirab.downloader.connection.QueueNetworkPolicy
 import ir.amirab.downloader.db.DownloadQueuePersistedDataAccess
 import ir.amirab.downloader.db.QueueModel
 import ir.amirab.downloader.downloaditem.contexts.Queue
@@ -20,6 +21,7 @@ class DownloadQueue(
     val persistedData: DownloadQueuePersistedDataAccess,
     val downloadEvents: DownloadManagerMinimalControl,
     val onQueueEvent: (QueueEvent) -> Unit,
+    val networkPolicy: QueueNetworkPolicy? = null,
 ) {
     private val scope = CoroutineScope(SupervisorJob())
 
@@ -420,6 +422,11 @@ class DownloadQueue(
      */
     private fun downloadAQueueItemIfPossible(): Boolean {
         return getDownloadableItemFromQueue()?.let {
+            // decide which network interface this download should use, based on
+            // how many downloads are already active (round-robin over the queue's list)
+            networkPolicy?.interfaceForActiveIndex(id, activeItems.size)?.let { iface ->
+                networkPolicy.assignInterface(it, iface)
+            }
             activeItems.add(it)
             scope.launch {
                 downloadEvents.startJob(it, ResumedBy(me))
