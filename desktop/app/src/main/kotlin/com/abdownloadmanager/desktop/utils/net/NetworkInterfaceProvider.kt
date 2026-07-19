@@ -7,7 +7,6 @@ import ir.amirab.downloader.connection.NetworkInterfaceBinder
 import ir.amirab.downloader.connection.QueueNetworkPolicy
 import java.net.InetAddress
 import java.net.NetworkInterface
-import java.net.ServerSocket
 
 /**
  * Provides information about the machine's network interfaces and resolves
@@ -33,37 +32,6 @@ class NetworkInterfaceProvider(
      * policy), so the egress binding can be resolved at connect time.
      */
     private val assignment = mutableMapOf<Long, String>()
-
-    /**
-     * A usable (non-loopback, non-link-local, bindable) network interface.
-     */
-    data class NetworkInterfaceInfo(
-        val name: String,
-        val ipv4: List<String>,
-        val ipv6: List<String>,
-    ) {
-        val allAddresses: List<String>
-            get() = ipv4 + ipv6
-    }
-
-    /**
-     * List all network interfaces that have at least one usable address.
-     */
-    fun listInterfaces(): List<NetworkInterfaceInfo> {
-        return NetworkInterface.getNetworkInterfaces().toList()
-            .filter { it.inetAddresses.toList().isNotEmpty() }
-            .mapNotNull { networkInterface ->
-                val addrs = networkInterface.inetAddresses.toList()
-                    .filter { !it.isLoopbackAddress && !it.isLinkLocalAddress }
-                    .filter { runCatching { bindable(it) }.getOrDefault(false) }
-                if (addrs.isEmpty()) return@mapNotNull null
-                NetworkInterfaceInfo(
-                    name = networkInterface.name,
-                    ipv4 = addrs.filter { it is java.net.Inet4Address }.map { it.hostAddress },
-                    ipv6 = addrs.filter { it is java.net.Inet6Address }.map { it.hostAddress },
-                )
-            }
-    }
 
     /**
      * Ordered list of interface identifiers for a queue, falling back to the
@@ -109,13 +77,5 @@ class NetworkInterfaceProvider(
         }
         // otherwise try as a literal IP
         return runCatching { InetAddress.getByName(value) }.getOrNull()
-    }
-
-    private fun bindable(address: InetAddress): Boolean {
-        return runCatching {
-            ServerSocket().use { socket ->
-                socket.bind(java.net.InetSocketAddress(address, 0))
-            }
-        }.isSuccess
     }
 }
