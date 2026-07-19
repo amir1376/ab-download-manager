@@ -3,9 +3,9 @@ package com.abdownloadmanager.desktop.ui.configurable.comon.renderer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -108,12 +108,13 @@ object NetworkInterfacesConfigurableRenderer : ConfigurableRenderer<NetworkInter
                             color = myColors.onBackground / 60,
                         )
                     } else {
-                        LazyColumn(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .verticalScroll(rememberScrollState())
                                 .heightIn(max = 200.dp),
                         ) {
-                            itemsIndexed(selected) { index, id ->
+                            selected.forEachIndexed { index, id ->
                                 val label = optionsById[id] ?: id
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
