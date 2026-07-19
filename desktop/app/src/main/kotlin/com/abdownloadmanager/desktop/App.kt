@@ -4,6 +4,8 @@
 package com.abdownloadmanager.desktop
 
 import com.abdownloadmanager.desktop.cli.Cli
+import com.abdownloadmanager.desktop.utils.EntryType
+import com.abdownloadmanager.desktop.utils.EntrypointInitializer
 import com.github.ajalt.clikt.command.main
 import kotlinx.coroutines.runBlocking
 
@@ -22,6 +24,10 @@ class DefaultAppLauncher {
 
 fun main(args: Array<String>) {
     runBlocking {
+        EntrypointInitializer.boot(
+            entryType = EntryType.GUI,
+            debug = true
+        )
         DefaultAppLauncher().main(args)
     }
 }

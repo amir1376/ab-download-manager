@@ -3,8 +3,11 @@ package com.abdownloadmanager.desktop.cli
 import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.desktop.cli.download.Download
 import com.abdownloadmanager.desktop.cli.gui.Gui
+import com.abdownloadmanager.desktop.cli.nativemessaging.NativeMessagingCommand
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.AppProperties
+import com.abdownloadmanager.desktop.utils.EntryType
+import com.abdownloadmanager.desktop.utils.EntrypointInitializer
 import com.abdownloadmanager.desktop.utils.isInDebugMode
 import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.core.subcommands
@@ -22,21 +25,15 @@ class Cli : SuspendingCliktCommand("ABDownloadManagerCli") {
         subcommands(
             Gui(),
             Download(),
+            NativeMessagingCommand(),
         )
     }
 
     override suspend fun run() {
-        AppArguments.update {
-            it.copy(
-                debug = debug,
-            )
-        }
-        AppProperties.boot()
-        AppLogger.init(
-            writeToConsole = false,
-            logFilePath = AppInfo.definedPaths.logDir.takeIf {
-                AppInfo.isInDebugMode()
-            },
+        EntrypointInitializer.boot(
+            debug = debug,
+            entryType = EntryType.CLI,
         )
     }
+
 }

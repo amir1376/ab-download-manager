@@ -14,7 +14,9 @@ fun execAndWait(
 ): Boolean {
     return runCatching {
         val pb = ProcessBuilder(*command)
-        val p = pb.start()
+        val p = pb
+            .withoutJPackageEnvVariable()
+            .start()
         val exited = p.waitFor(waitFor, TimeUnit.MILLISECONDS)
         if (exited) {
             p.exitValue() == 0
@@ -22,4 +24,9 @@ fun execAndWait(
             false
         }
     }.getOrElse { false }
+}
+
+// in linux if I don't remove it the program won't restart
+fun ProcessBuilder.withoutJPackageEnvVariable() = apply {
+    environment().remove("_JPACKAGE_LAUNCHER")
 }

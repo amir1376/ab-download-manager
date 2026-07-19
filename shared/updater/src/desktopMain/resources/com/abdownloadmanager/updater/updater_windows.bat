@@ -1,19 +1,28 @@
 @echo off
 
 set APP_NAME=ABDownloadManager
+set NATIVE_MESSAGING_HOST_NAME=ABDownloadManagerNativeMessagingHost
+set CLI_NAME=ABDownloadManagerCli
+
 call :main "%1" "%2"
 goto :eof
 
+:stopProcess
+echo execute: taskkill /IM %1.exe /F
+taskkill /IM %1.exe /F
+call :wait_for_termination %1
+echo %1 is terminated
+goto :eof
+
 :stopApp
-echo execute: taskkill /IM %APP_NAME%.exe /F
-taskkill /IM %APP_NAME%.exe /F
-call :wait_for_termination
-echo %APP_NAME% is terminated
+call :stopProcess %NATIVE_MESSAGING_HOST_NAME%
+call :stopProcess %CLI_NAME%
+call :stopProcess %APP_NAME%
 goto :eof
 
 :wait_for_termination
-echo checking for termination of %APP_NAME%
-tasklist /FI "IMAGENAME eq %APP_NAME%.exe" | find /I "%APP_NAME%.exe" >nul 2>&1
+echo checking for termination of %1
+tasklist /FI "IMAGENAME eq %1.exe" | find /I "%1.exe" >nul 2>&1
 if errorlevel 1 (
     goto :eof
 ) else (
@@ -25,7 +34,7 @@ if errorlevel 1 (
 :removeCurrentInstallation
 setlocal
     set installationFolder=%~1
-    set filesToRemove=("app" "runtime" "ABDownloadManager.exe" "ABDownloadManager.ico")
+    set filesToRemove=("app" "runtime" "%APP_NAME%.exe" "%APP_NAME%.ico" "%NATIVE_MESSAGING_HOST_NAME%.exe" "%CLI_NAME%.exe")
     for %%f in %filesToRemove% do (
         if exist %installationFolder%\%%f (
             if exist %installationFolder%\%%f\* (
@@ -78,5 +87,3 @@ goto :eof
     call :executeProgram %installationFolder%
     endlocal
 goto :eof
-
-

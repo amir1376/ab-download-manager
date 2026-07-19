@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.utils.native_messaging.host.stdio
+package com.abdownloadmanager.desktop.nativemessaging.host.stdio
 
 import java.io.EOFException
 import java.io.InputStream
@@ -15,47 +15,35 @@ import java.nio.ByteOrder
  * Chrome limit: 1MB
  * Firefox limit: 4MB
  */
-object StdioProtocol {
-    private const val MAX_MESSAGE_SIZE = 1024 * 1024 * 4 // 4MB (Firefox limit)
+class StdioProtocol(
+    private val input: InputStream,
+    private val output: OutputStream,
+) {
+    companion object {
+        private const val MAX_MESSAGE_SIZE = 1024 * 1024 * 4 // 4MB (Firefox limit)
+        private const val MESSAGE_LENGTH_SIZE = 4
+    }
 
     /**
      * Reads a single message from stdin.
      * 
-     * @param input The input stream (typically System.`in`)
      * @return The JSON message as a string, or null if EOF is reached
      * @throws EOFException if stream ends unexpectedly
      * @throws IllegalArgumentException if message size exceeds limit
      */
-    fun readMessage(input: InputStream): String? {
-        // Read 4-byte length prefix
-        val lengthBytes = ByteArray(4)
-        val bytesRead = input.readNBytes(lengthBytes, 0, 4)
-
-        if (bytesRead == 0) {
-            // EOF reached, browser disconnected
-            return null
-        }
-
-        if (bytesRead < 4) {
-            throw EOFException("Unexpected end of stream while reading message length")
-        }
-
-        // Convert to unsigned int using native byte order
-        val messageLength = ByteBuffer.wrap(lengthBytes)
-            .order(ByteOrder.nativeOrder())
-            .int
-            .toLong() and 0xFFFFFFFFL
+    fun readMessage(): String {
+        val messageLength = readLength(input)
 
         // Validate message size
-        if (messageLength <= 0 || messageLength > MAX_MESSAGE_SIZE) {
+        if (messageLength !in 1..MAX_MESSAGE_SIZE) {
             throw IllegalArgumentException(
                 "Invalid message size: $messageLength (max: $MAX_MESSAGE_SIZE)"
             )
         }
 
         // Read message content
-        val messageBytes = ByteArray(messageLength.toInt())
-        val messageBytesRead = input.readNBytes(messageBytes, 0, messageLength.toInt())
+        val messageBytes = ByteArray(messageLength)
+        val messageBytesRead = input.readNBytes(messageBytes, 0, messageLength)
 
         if (messageBytesRead < messageLength) {
             throw EOFException(
@@ -70,11 +58,10 @@ object StdioProtocol {
     /**
      * Writes a message to stdout.
      * 
-     * @param output The output stream (typically System.out)
      * @param message The JSON message to send
      * @throws IllegalArgumentException if message exceeds size limit
      */
-    fun writeMessage(output: OutputStream, message: String) {
+    fun writeMessage(message: String) {
         val messageBytes = message.toByteArray(Charsets.UTF_8)
         val messageLength = messageBytes.size
 
@@ -95,5 +82,25 @@ object StdioProtocol {
         // Write message content
         output.write(messageBytes)
         output.flush()
+    }
+
+    fun readLength(input: InputStream): Int {
+        // Read 4-byte length prefix
+        val lengthBytes = ByteArray(MESSAGE_LENGTH_SIZE)
+        val bytesRead = input.readNBytes(lengthBytes, 0, 4)
+
+        if (bytesRead == 0) {
+            // EOF reached, browser disconnected
+            throw NativeMessagingFinished()
+        }
+
+        if (bytesRead < 4) {
+            throw EOFException("Unexpected end of stream while reading message length")
+        }
+
+        // Convert to unsigned int using native byte order
+        return ByteBuffer.wrap(lengthBytes)
+            .order(ByteOrder.nativeOrder())
+            .int
     }
 }

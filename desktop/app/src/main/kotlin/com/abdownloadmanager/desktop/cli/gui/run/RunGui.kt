@@ -6,10 +6,10 @@ import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.createAndSetGlobalExceptionHandler
 import com.abdownloadmanager.desktop.utils.isInIDE
 import com.abdownloadmanager.desktop.utils.singleInstance.AnotherInstanceIsRunning
+import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceInitialized
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceManager
 import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.core.Abort
-import com.github.ajalt.clikt.core.ProgramResult
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import dev.nucleusframework.aot.runtime.AotRuntime
@@ -17,6 +17,7 @@ import ir.amirab.util.logger.appLogger
 import ir.amirab.util.writeText
 import kotlinx.coroutines.runBlocking
 import kotlin.concurrent.thread
+import kotlin.system.exitProcess
 
 class RunGui : SuspendingCliktCommand(AppArguments.Commands.RUN) {
     val background by option(AppArguments.Args.BACKGROUND).flag()
@@ -77,8 +78,10 @@ class RunGui : SuspendingCliktCommand(AppArguments.Commands.RUN) {
             return
         }
         thread {
-            Thread.sleep(30_000)
-            throw ProgramResult(0)
+            runBlocking {
+                SingleInstanceInitialized.awaitDone()
+            }
+            exitProcess(0)
         }
     }
 }

@@ -26,8 +26,7 @@ object AppLogger {
                     add(
                         FileLogWriter(
                             config = FileLogWriterConfig(
-                                logFileName = "AppLog.log",
-                                logDirectory = logFilePath,
+                                logFile = logFilePath,
                             ),
                         )
                     )

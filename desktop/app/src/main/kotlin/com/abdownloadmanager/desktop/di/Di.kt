@@ -27,8 +27,7 @@ import com.abdownloadmanager.desktop.storage.*
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.ISystemThemeDetector
 import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
-import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
+import com.abdownloadmanager.desktop.nativemessaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.proxy.AutoConfigurableProxyProviderForDesktop
 import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvider
 import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
@@ -478,7 +477,7 @@ val startUpModule = module {
 }
 val nativeMessagingModule = module {
     single<NativeMessaging> {
-        NativeMessaging(NativeMessagingManifestApplier.getForCurrentPlatform())
+        NativeMessaging.getDefault()
     }
 }
 

@@ -95,6 +95,9 @@ tasks.processResources {
     from(tasks.named("exportLibraryDefinitions"))
 }
 
+val cliBinaryName = "${getAppName()}Cli"
+val nativeMessagingHostBinaryName = "${getAppName()}NativeMessagingHost"
+
 val desktopPackageName = "com.abdownloadmanager.desktop"
 nucleus {
     application {
@@ -114,8 +117,12 @@ nucleus {
         // Define the main class for the application.
         mainClass = "$desktopPackageName.AppKt"
         additionalLaunchers {
-            create("${getAppName()}Cli") {
+            create(cliBinaryName) {
                 mainClass = "$desktopPackageName.cli.CliAppKt"
+                winConsole = true
+            }
+            create(nativeMessagingHostBinaryName) {
+                mainClass = "$desktopPackageName.nativemessaging.host.NativeMessagingHostKt"
                 winConsole = true
             }
         }
@@ -182,6 +189,8 @@ installerPlugin {
         iconFile = project.file("icons/icon.ico")
         nsisTemplate = project.file("resources/installer/nsis-script-template.nsi")
         extraParams = mapOf(
+            "native_messaging_host_binary_name" to nativeMessagingHostBinaryName,
+            "cli_binary_name" to cliBinaryName,
             "app_publisher" to "abdownloadmanager.com",
             "app_version_with_build" to "${getAppVersionStringForPackaging(TargetFormat.Exe)}.0",
             "source_code_url" to "https://github.com/amir1376/ab-download-manager",

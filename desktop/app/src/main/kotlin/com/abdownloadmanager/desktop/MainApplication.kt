@@ -4,7 +4,7 @@ import com.abdownloadmanager.desktop.di.Di
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.ui.Ui
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
-import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
+import com.abdownloadmanager.desktop.nativemessaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.singleInstance.SingleInstanceInitialized
 import com.abdownloadmanager.integration.Integration

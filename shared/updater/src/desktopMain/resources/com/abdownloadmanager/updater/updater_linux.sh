@@ -1,4 +1,7 @@
 APP_NAME="ABDownloadManager"
+NATIVE_MESSAGING_HOST_NAME="ABDownloadManagerNativeMessagingHost"
+CLI_NAME="ABDownloadManagerCli"
+
 awaitTermination(){
   local processName="${1:?}"
   local count=0
@@ -13,22 +16,27 @@ awaitTermination(){
     fi
     echo "waiting for $processName to terminate"
     sleep 1
+    count=$((count + 1))
   done
 }
 stopApp(){
   echo "stopping the app"
-  local pids=$(pidof "$APP_NAME")
-  if [ -z "$pids" ]; then
-    echo "no process found with name $APP_NAME"
-    return
-  fi
-  kill -9 "$pids"
-  awaitTermination "$APP_NAME"
-  if [ $? -ne 0 ]; then
-    echo "failed to stop $APP_NAME"
-    return 1
-  fi
-  echo "process $APP_NAME stopped"
+
+  for processName in "$NATIVE_MESSAGING_HOST_NAME" "$CLI_NAME" "$APP_NAME"; do
+    local pids=$(pidof "$processName")
+    if [ -z "$pids" ]; then
+      echo "no process found with name $processName"
+      continue
+    fi
+    kill -9 "$pids"
+    awaitTermination "$processName"
+    if [ $? -ne 0 ]; then
+      echo "failed to stop $processName"
+      return 1
+    fi
+
+    echo "process $processName stopped"
+  done
 }
 removeCurrentInstallation(){
   local installationFolder="${1:?}"

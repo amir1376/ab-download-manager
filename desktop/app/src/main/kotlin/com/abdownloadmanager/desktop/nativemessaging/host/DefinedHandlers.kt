@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.utils.native_messaging.host
+package com.abdownloadmanager.desktop.nativemessaging.host
 
 import com.abdownloadmanager.desktop.utils.singleInstance.IPCServiceProviderAwakerSupport
 import com.abdownloadmanager.desktop.utils.singleInstance.service.IDefaultAppIPCService
@@ -9,29 +9,32 @@ class AddDownloadNativeRequestHandler(
     private val json: Json,
     private val appIPC: IPCServiceProviderAwakerSupport<IDefaultAppIPCService>,
 ) : NativeMessagingMessageHandler {
-    override fun accept(request: BrowserMessageRequest): Boolean {
+    override fun accept(request: NativeMessagingMessage.Content): Boolean {
         return request.action == "add"
     }
 
-    override suspend fun handle(request: BrowserMessageRequest): NativeMessageResponse {
+    override suspend fun handle(request: NativeMessagingMessage.Content): NativeMessagingMessage.Content {
         val integrationRequest = json.decodeFromString<AddDownloadsFromIntegration>(request.payload)
         appIPC.getService().useService {
             it.addDownloadByGui(integrationRequest)
         }
-        return NativeMessageResponse.Success.ok(request.requestId)
+        return context(json) {
+            NativeMessagingMessage.Content.boolean(true)
+        }
     }
 }
 
-class PingNativeRequestHandler : NativeMessagingMessageHandler {
-    override fun accept(request: BrowserMessageRequest): Boolean {
+class PingNativeRequestHandler(
+    private val json: Json
+) : NativeMessagingMessageHandler {
+    override fun accept(request: NativeMessagingMessage.Content): Boolean {
         return request.action == "ping"
     }
 
-    override suspend fun handle(request: BrowserMessageRequest): NativeMessageResponse {
-        return NativeMessageResponse.Success(
-            requestId = request.requestId,
-            action = "Pong",
-        )
+    override suspend fun handle(request: NativeMessagingMessage.Content): NativeMessagingMessage.Content {
+        return context(json) {
+            NativeMessagingMessage.Content.boolean(true)
+        }
     }
 }
 
@@ -41,7 +44,7 @@ object DefinedNativeMessagingHandlers {
     ): List<NativeMessagingMessageHandler> {
         return listOf(
             AddDownloadNativeRequestHandler(json, appIPC),
-            PingNativeRequestHandler()
+            PingNativeRequestHandler(json)
         )
     }
 }

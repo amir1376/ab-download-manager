@@ -1,7 +1,8 @@
-package com.abdownloadmanager.desktop.utils.native_messaging
+package com.abdownloadmanager.desktop.nativemessaging
 
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.shared.util.SharedConstants
+import ir.amirab.util.logger.thisLogger
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -43,8 +44,13 @@ data class ChromeNativeMessagingManifest(
 class NativeMessaging(
     private val nativeMessagingManifestApplier: NativeMessagingManifestApplier,
 ) {
+    val logger = thisLogger()
     fun boot() {
-        installManifests()
+        try {
+            installManifests()
+        } catch (e: Exception) {
+            logger.e(e) { "can't install native messaging manifests" }
+        }
     }
 
     fun installManifests() {
@@ -58,12 +64,15 @@ class NativeMessaging(
             )
         )
     }
+    fun uninstallManifests() {
+        nativeMessagingManifestApplier.removeManifests()
+    }
 
     private fun createFirefoxManifest(
         execFile: String
     ): FirefoxNativeMessagingManifest {
         return FirefoxNativeMessagingManifest(
-            name = AppInfo.displayName,
+            name = AppInfo.packageName,
             description = AppInfo.displayName,
             path = execFile,
             type = "stdio",
@@ -77,7 +86,7 @@ class NativeMessaging(
         execFile: String,
     ): ChromeNativeMessagingManifest {
         return ChromeNativeMessagingManifest(
-            name = AppInfo.displayName,
+            name = AppInfo.packageName,
             description = AppInfo.displayName,
             path = execFile,
             type = "stdio",
@@ -85,5 +94,11 @@ class NativeMessaging(
                 SharedConstants.chromeExtensionOrigin
             )
         )
+    }
+
+    companion object {
+        fun getDefault(): NativeMessaging {
+            return NativeMessaging(NativeMessagingManifestApplier.getForCurrentPlatform())
+        }
     }
 }

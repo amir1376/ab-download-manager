@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.utils.native_messaging
+package com.abdownloadmanager.desktop.nativemessaging
 
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.AppProperties
@@ -42,9 +42,9 @@ abstract class NativeMessagingManifestApplier : KoinComponent {
 }
 
 class WindowsNativeMessagingManifestApplier : NativeMessagingManifestApplier() {
-    private val baseNativeMessagingDir get() = AppInfo.definedPaths.configDir / "native-messaging"
-    private val firefoxManifestFile get() = baseNativeMessagingDir / "firefox-native-messaging-manifest.json"
-    private val chromeManifestFile get() = baseNativeMessagingDir / "chrome-native-messaging-manifest.json"
+    private val baseNativeMessagingDir get() = AppInfo.definedPaths.configDir / "native_messaging"
+    private val firefoxManifestFile get() = baseNativeMessagingDir / "firefox" / "${AppInfo.packageName}.json"
+    private val chromeManifestFile get() = baseNativeMessagingDir / "chrome" / "${AppInfo.packageName}.json"
     private val firefoxRegistryPath get() = "HKCU\\SOFTWARE\\Mozilla\\NativeMessagingHosts\\${AppInfo.packageName}"
     private val chromeRegistryPath get() = "HKCU\\SOFTWARE\\Google\\Chrome\\NativeMessagingHosts\\${AppInfo.packageName}"
 

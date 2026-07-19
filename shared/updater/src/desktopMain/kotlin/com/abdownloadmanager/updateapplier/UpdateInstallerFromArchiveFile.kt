@@ -1,6 +1,7 @@
 package com.abdownloadmanager.updateapplier
 
 import ir.amirab.util.platform.Platform
+import ir.amirab.util.withoutJPackageEnvVariable
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer
@@ -96,10 +97,7 @@ class UpdateInstallerFromArchiveFile(
 //        println("execute script $command")
         ProcessBuilder()
             .command(*command)
-            .apply {
-                // in linux if I don't remove it the program won't restart
-                environment().remove("_JPACKAGE_LAUNCHER")
-            }
+            .withoutJPackageEnvVariable()
             .start()
     }
 

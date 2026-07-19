@@ -9,9 +9,9 @@ import okio.Path.Companion.toOkioPath
 import java.io.File
 
 object FileNameConstants {
-    val mainApp = "ABDownloadManager"
-    val cliApp = "ABDownloadManagerCli"
-    val nativeMessaging = "ABDownloadManagerNativeMessaging"
+    const val mainApp = "ABDownloadManager"
+    const val cliApp = "ABDownloadManagerCli"
+    const val nativeMessagingHost = "ABDownloadManagerNativeMessagingHost"
 }
 
 object AppInfo {
@@ -52,7 +52,7 @@ object AppInfo {
         calcExecutable(FileNameConstants.cliApp)
     }
     val nativeMessagingExeFile: String? = run {
-        calcExecutable(FileNameConstants.nativeMessaging)
+        calcExecutable(FileNameConstants.nativeMessagingHost)
     }
 
     private fun File.findAppFolder() = generateSequence(this) { it.parentFile }

@@ -19,6 +19,8 @@ SetCompressor /SOLID lzma
 !define INPUT_DIR "{{ input_dir }}"
 !define LICENSE_FILE "{{ license_file }}"
 !define MAIN_BINARY_NAME "${APP_NAME}"
+!define NATIVE_MESSAGING_HOST_BINARY_NAME "{{ native_messaging_host_binary_name }}"
+!define CLI_BINARY_NAME "{{ cli_binary_name }}"
 
 !define SIDEBAR_IMAGE "{{ sidebar_image_file }}"
 !define HEADER_IMAGE "{{ header_image_file }}"
@@ -102,6 +104,8 @@ FunctionEnd
     RmDir /r "${INSTALL_DIR}\runtime"
     Delete "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe"
     Delete "${INSTALL_DIR}\${MAIN_BINARY_NAME}.ico"
+    Delete "${INSTALL_DIR}\${CLI_BINARY_NAME}.exe"
+    Delete "${INSTALL_DIR}\${NATIVE_MESSAGING_HOST_BINARY_NAME}.exe"
     Delete "${INSTALL_DIR}\uninstall.exe"
     RmDir "${INSTALL_DIR}"
 !macroend
@@ -110,8 +114,16 @@ Function RunMainBinary
    Exec "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe"
 FunctionEnd
 
-!macro GetBestExecutableName result
-    StrCpy ${result} "${MAIN_BINARY_NAME}.exe"
+!macro closeProcess executableName
+    DetailPrint "Stopping Executable ${executableName}"
+
+    ${If} "$EXEFILE" != "${executableName}"
+        ExecWait 'taskkill /F /IM "${executableName}"' $0
+    ${Else}
+        DetailPrint "It seems that installer file name is same as executable name"
+        DetailPrint "Please close app manually"
+        StrCpy $0 "1"
+    ${Endif}
 !macroend
 
 ; Function RestorePreviousInstallLocation
@@ -123,17 +135,10 @@ FunctionEnd
 
 ; I should improve this.
 !macro closeApp
-    !insertmacro GetBestExecutableName $1
-    DetailPrint "Stopping Executable $1"
-    ; I don't wanna kill myself!
-    ${If} "$EXEFILE" != "$1"
-        ExecWait 'taskkill /F /IM "$1"' $0
-    ${Else}
-        DetailPrint "It seems that installer file name is same as app executable name"
-        DetailPrint "Please close app manually"
-        ; don't sleep the script for nothing.
-        StrCpy $0 "1"
-    ${EndIf}
+    !insertmacro closeProcess "${NATIVE_MESSAGING_HOST_BINARY_NAME}.exe"
+    !insertmacro closeProcess "${CLI_BINARY_NAME}.exe"
+    !insertmacro closeProcess "${MAIN_BINARY_NAME}.exe"
+
     ${If} $0 == "0"
         Sleep 500
         BringToFront ; when we sleep it seems that window goes down

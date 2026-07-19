@@ -12,7 +12,6 @@ import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.util.LocalShortCutManager
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.awt.Dimension
@@ -33,7 +32,6 @@ fun HomeWindow(
             WindowPlacement.Floating
         }
     )
-    val onCloseRequest = onCLoseRequest
     val windowIcon = MyIcons.appIcon
     val windowController = rememberWindowController(
         AppInfo.displayName,
@@ -45,7 +43,7 @@ fun HomeWindow(
     ) {
         CustomWindow(
             state = windowState,
-            onCloseRequest = onCloseRequest,
+            onCloseRequest = onCLoseRequest,
             windowController = windowController,
             onKeyEvent = {
                 homeComponent.shortcutManager.handle(it)

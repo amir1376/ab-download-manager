@@ -2,9 +2,11 @@ package com.abdownloadmanager.desktop.utils.singleInstance
 
 import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.desktop.utils.AppInfo
+import com.abdownloadmanager.desktop.utils.DetachedLauncher
 import ir.amirab.util.execAndWait
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
+import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -77,10 +79,11 @@ object StartIfNotStartedCommand {
 
     private fun startAppInAnotherProcess() {
         val exeFile = requireNotNull(AppInfo.mainExeFile)
-        ProcessBuilder(
-            exeFile,
+
+        DetachedLauncher.launch(
+            File(exeFile),
             AppArguments.Args.BACKGROUND
-        ).start()
+        )
     }
 }
 

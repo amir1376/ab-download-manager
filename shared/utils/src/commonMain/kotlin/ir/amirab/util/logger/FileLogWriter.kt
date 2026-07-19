@@ -9,7 +9,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
-import okhttp3.internal.closeQuietly
 import okio.*
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -69,7 +68,7 @@ internal open class FileLogWriter(
     private fun formatMessage(severity: Severity, tag: Tag?, message: Message): String =
         messageStringFormatter.formatMessage(severity, if (config.logTag) tag else null, message)
 
-    val logFilePath = config.logDirectory / config.logFileName
+    val logFilePath = config.logFile
 
     fun createNewLogSink(): BufferedSink {
         logFilePath.createParentDirectories()
@@ -90,8 +89,7 @@ internal open class FileLogWriter(
 }
 
 data class FileLogWriterConfig(
-    val logFileName: String,
-    val logDirectory: Path,
+    val logFile: Path,
     val logTag: Boolean = true,
     val prependTimestamp: Boolean = true,
 )

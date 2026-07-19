@@ -24,7 +24,6 @@ data class AppArguments(
     object Commands {
         const val GUI = "gui"
         const val RUN = "run"
-        const val NATIVE_MESSAGING = "native-messaging"
         const val EXIT = "exit"
         const val START_IF_NOT_STARTED = "start-if-not-started"
     }
