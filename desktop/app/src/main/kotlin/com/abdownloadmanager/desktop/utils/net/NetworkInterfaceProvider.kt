@@ -15,11 +15,6 @@ import java.net.NetworkInterface
  * This is the desktop counterpart of `dispatch`'s interface enumeration
  * (`list.rs` / `net.rs`): instead of running a SOCKS proxy, we bind each
  * connection directly to the chosen interface's local address.
- *
- * For per-queue multi-homing, a queue is configured with an ordered list of
- * interfaces. Concurrent downloads in that queue are spread across them
- * round-robin: the N-th active download uses the (N-1)-th interface in the
- * list, wrapping around.
  */
 class NetworkInterfaceProvider(
     private val extraQueueSettingsStorage: IExtraQueueSettingsStorage<DesktopExtraQueueSettings>,
@@ -54,26 +49,26 @@ class NetworkInterfaceProvider(
             if (!seen.add(ip)) continue
             result.add(ip to "${netIf.name} (${ip})")
         }
-        appLogger.d { "discoverInterfaces: found ${result.size} -> ${result.map { it.second }}" }
         return result
     }
 
     override fun interfaceForActiveIndex(queueId: Long, activeIndex: Int): String? {
-        val iface = extraQueueSettingsStorage.getExtraQueueSettings(queueId).networkInterface
-        appLogger.d { "interfaceForActiveIndex: queueId=$queueId -> $iface" }
-        return iface
+        return extraQueueSettingsStorage.getExtraQueueSettings(queueId).networkInterface
     }
 
     override fun assignInterface(downloadId: Long, identifier: String) {
         assignment[downloadId] = identifier
-        appLogger.d { "assignInterface: downloadId=$downloadId -> $identifier (assignment=${assignment.toList()})" }
     }
 
     override fun getBoundAddress(downloadId: Long): InetAddress? {
-        val identifier = assignment[downloadId]
-        appLogger.d { "getBoundAddress: downloadId=$downloadId identifier=$identifier" }
-        if (identifier == null) return null
+        val identifier = assignment[downloadId] ?: return null
         return resolveAddress(identifier)
+    }
+
+    override fun getBoundInterface(downloadId: Long): NetworkInterface? {
+        val identifier = assignment[downloadId] ?: return null
+        val addr = resolveAddress(identifier) ?: return null
+        return NetworkInterface.getByInetAddress(addr)
     }
 
     /**
@@ -81,8 +76,6 @@ class NetworkInterfaceProvider(
      * local [InetAddress] to bind sockets to.
      */
     fun resolveAddress(value: String): InetAddress? {
-        val addr = runCatching { InetAddress.getByName(value) }.getOrNull()
-        appLogger.d { "resolveAddress: '$value' -> $addr" }
-        return addr
+        return runCatching { InetAddress.getByName(value) }.getOrNull()
     }
 }

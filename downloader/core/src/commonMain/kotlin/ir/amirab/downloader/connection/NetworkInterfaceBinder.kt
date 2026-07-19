@@ -1,6 +1,7 @@
 package ir.amirab.downloader.connection
 
 import java.net.InetAddress
+import java.net.NetworkInterface
 
 interface NetworkInterfaceBinder {
     /**
@@ -8,6 +9,14 @@ interface NetworkInterfaceBinder {
      * or null to use the system default route.
      */
     fun getBoundAddress(downloadId: Long): InetAddress?
+
+    /**
+     * Returns the [NetworkInterface] a [downloadId] should use for egress,
+     * or null to use the system default route. This pins egress by interface
+     * index (via `IP_UNICAST_IF`) so the OS actually sends packets out the
+     * chosen interface even when the routing table prefers another one.
+     */
+    fun getBoundInterface(downloadId: Long): NetworkInterface?
 
     /**
      * Records the resolved interface identifier for a download so that

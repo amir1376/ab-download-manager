@@ -423,12 +423,9 @@ class DownloadQueue(
      */
     private fun downloadAQueueItemIfPossible(): Boolean {
         return getDownloadableItemFromQueue()?.let {
-            // decide which network interface this download should use, based on
-            // how many downloads are already active (round-robin over the queue's list)
             networkPolicy?.interfaceForActiveIndex(id, activeItems.size)?.let { iface ->
-                appLogger.d { "DownloadQueue: assigning downloadId=$it to interface '$iface'" }
                 networkPolicy.assignInterface(it, iface)
-            } ?: appLogger.d { "DownloadQueue: no interface assigned for downloadId=$it (policy=null or empty list)" }
+            }
             activeItems.add(it)
             scope.launch {
                 downloadEvents.startJob(it, ResumedBy(me))
