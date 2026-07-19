@@ -13,6 +13,7 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.DayOfWeekConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.NetworkInterfacesConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.TimeConfigurable
 import com.arkivanov.decompose.ComponentContext
@@ -49,6 +50,7 @@ class QueueInfoComponent(
     private val lastSelectedItem = MutableStateFlow(null as Long?)
 
     val extraQueueSettingsStorage by inject<ExtraQueueSettingsStorage<DesktopExtraQueueSettings>>()
+    private val networkInterfaceProvider by inject<NetworkInterfaceProvider>()
     val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
         flow = extraQueueSettingsStorage.getExternalQueueSettingsAsFlow(
             id = id,
@@ -142,29 +144,24 @@ class QueueInfoComponent(
         createConfigurableList(downloadQueue, scope)
 
 
-    private fun networkInterfaceConfigurable(): StringConfigurable {
-        return StringConfigurable(
+    private fun networkInterfaceConfigurable(): NetworkInterfacesConfigurable {
+        return NetworkInterfacesConfigurable(
             title = Res.string.queue_network_interface.asStringSource(),
             description = Res.string.queue_network_interface_description.asStringSource(),
+            availableOptions = networkInterfaceProvider.discoverInterfaces(),
             backedBy = extraDownloadItemSettingsFlow.mapTwoWayStateFlow(
-                map = {
-                    it.networkInterfaces.joinToString(", ")
-                },
-                unMap = { raw ->
-                    val list = raw.split(',', '\n')
-                        .map { v -> v.trim() }
-                        .filter { v -> v.isNotEmpty() }
-                    copy(networkInterfaces = list)
-                },
+                map = { it.networkInterfaces },
+                unMap = { copy(networkInterfaces = it) },
             ),
             describe = {
-                if (it.isBlank()) {
+                if (it.isEmpty()) {
                     Res.string.queue_network_interface_default.asStringSource()
                 } else {
-                    it.asStringSource()
+                    Res.string.queue_network_interface_selected.asStringSourceWithARgs(
+                        Res.string.queue_network_interface_selected_createArgs(count = it.size.toString())
+                    )
                 }
             },
-            validate = { true },
         )
     }
 

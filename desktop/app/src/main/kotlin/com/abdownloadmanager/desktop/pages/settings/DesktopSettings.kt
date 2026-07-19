@@ -3,18 +3,20 @@ package com.abdownloadmanager.desktop.pages.settings
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.ui.configurable.platform.item.FontConfigurable
+import com.abdownloadmanager.desktop.utils.net.NetworkInterfaceProvider
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.NetworkInterfacesConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
+import ir.amirab.util.flow.mapTwoWayStateFlow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
@@ -104,16 +106,29 @@ object DesktopSettings {
         )
     }
 
-    fun defaultNetworkInterfacesConfig(appSettings: AppSettingsStorage): StringConfigurable {
-        return StringConfigurable(
+    fun defaultNetworkInterfacesConfig(
+        appSettings: AppSettingsStorage,
+        networkInterfaceProvider: NetworkInterfaceProvider,
+    ): NetworkInterfacesConfigurable {
+        val parse: (String) -> List<String> = { raw ->
+            raw.split(',', '\n').map { it.trim() }.filter { it.isNotEmpty() }
+        }
+        val flow = appSettings.defaultNetworkInterfaces.mapTwoWayStateFlow(
+            map = { parse(it) },
+            unMap = { it.joinToString(", ") },
+        )
+        return NetworkInterfacesConfigurable(
             title = Res.string.settings_network_default_interfaces.asStringSource(),
             description = Res.string.settings_network_default_interfaces_description.asStringSource(),
-            backedBy = appSettings.defaultNetworkInterfaces,
+            availableOptions = networkInterfaceProvider.discoverInterfaces(),
+            backedBy = flow,
             describe = {
-                if (it.isBlank()) {
+                if (it.isEmpty()) {
                     Res.string.queue_network_interface_default.asStringSource()
                 } else {
-                    it.asStringSource()
+                    Res.string.queue_network_interface_selected.asStringSourceWithARgs(
+                        Res.string.queue_network_interface_selected_createArgs(count = it.size.toString())
+                    )
                 }
             },
         )

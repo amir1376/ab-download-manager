@@ -6,6 +6,7 @@ import com.abdownloadmanager.desktop.pages.settings.SettingSection.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
+import com.abdownloadmanager.desktop.utils.net.NetworkInterfaceProvider
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
@@ -60,6 +61,7 @@ class DesktopSettingsComponent(
     private val languageManager by inject<LanguageManager>()
     private val fontManager by inject<FontManager>()
     private val customRenderApi by inject<CustomRenderApi>()
+    private val networkInterfaceProvider by inject<NetworkInterfaceProvider>()
     private val allConfigs = object : SettingSectionGetter {
         override operator fun get(key: SettingSection): List<ConfigurableGroup> {
             return when (key) {
@@ -127,7 +129,7 @@ class DesktopSettingsComponent(
                 Network -> listOf(
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
-                            DesktopSettings.defaultNetworkInterfacesConfig(appSettings),
+                            DesktopSettings.defaultNetworkInterfacesConfig(appSettings, networkInterfaceProvider),
                         )
                     ),
                 )

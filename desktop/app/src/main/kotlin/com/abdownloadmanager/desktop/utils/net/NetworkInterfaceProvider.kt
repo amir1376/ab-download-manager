@@ -34,6 +34,28 @@ class NetworkInterfaceProvider(
     private val assignment = mutableMapOf<Long, String>()
 
     /**
+     * Discover the machine's usable network interfaces as `(identifier, label)`
+     * pairs the user can pick from. The identifier is either the interface name
+     * or one of its local IP addresses (both are accepted by [resolveAddress]);
+     * the label is a friendly "Name (ip)" string. Loopback and link-local
+     * addresses are skipped.
+     */
+    fun discoverInterfaces(): List<Pair<String, String>> {
+        val result = mutableListOf<Pair<String, String>>()
+        for (netIf in NetworkInterface.getNetworkInterfaces()) {
+            val addrs = netIf.inetAddresses
+                .toList()
+                .filter { !it.isLoopbackAddress && !it.isLinkLocalAddress }
+            if (addrs.isEmpty()) continue
+            result.add(netIf.name to netIf.name)
+            for (addr in addrs) {
+                result.add(addr.hostAddress to "${netIf.name} (${addr.hostAddress})")
+            }
+        }
+        return result
+    }
+
+    /**
      * Ordered list of interface identifiers for a queue, falling back to the
      * global default list when the queue has none configured.
      */
