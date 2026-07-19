@@ -6,7 +6,6 @@ import com.abdownloadmanager.desktop.pages.settings.SettingSection.*
 import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.PageStatesStorage
-import com.abdownloadmanager.desktop.utils.net.NetworkInterfaceProvider
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
@@ -34,9 +33,6 @@ sealed class SettingSection(
     data object Appearance :
         SettingSection(MyIcons.appearance, Res.string.appearance.asStringSource())
 
-    data object Network :
-        SettingSection(MyIcons.network, Res.string.settings_network.asStringSource())
-
     data object DownloadEngine :
         SettingSection(MyIcons.downloadEngine, Res.string.download_engine.asStringSource())
 
@@ -61,7 +57,6 @@ class DesktopSettingsComponent(
     private val languageManager by inject<LanguageManager>()
     private val fontManager by inject<FontManager>()
     private val customRenderApi by inject<CustomRenderApi>()
-    private val networkInterfaceProvider by inject<NetworkInterfaceProvider>()
     private val allConfigs = object : SettingSectionGetter {
         override operator fun get(key: SettingSection): List<ConfigurableGroup> {
             return when (key) {
@@ -124,14 +119,6 @@ class DesktopSettingsComponent(
                             DesktopSettings.renderApi(customRenderApi),
                         )
                     )
-                )
-
-                Network -> listOf(
-                    ConfigurableGroup(
-                        nestedConfigurable = listOf(
-                            DesktopSettings.defaultNetworkInterfacesConfig(appSettings, networkInterfaceProvider),
-                        )
-                    ),
                 )
 
                 BrowserIntegration -> listOf(
@@ -217,7 +204,6 @@ class DesktopSettingsComponent(
 
     var pages = listOf(
         Appearance,
-        Network,
         DownloadEngine,
         BrowserIntegration,
     )

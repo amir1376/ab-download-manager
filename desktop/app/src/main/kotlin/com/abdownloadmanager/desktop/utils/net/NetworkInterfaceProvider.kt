@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.utils.net
 
-import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import ir.amirab.downloader.connection.NetworkInterfaceBinder
@@ -23,11 +22,10 @@ import java.net.NetworkInterface
  */
 class NetworkInterfaceProvider(
     private val extraQueueSettingsStorage: IExtraQueueSettingsStorage<DesktopExtraQueueSettings>,
-    private val appSettingsStorage: AppSettingsStorage,
 ) : NetworkInterfaceBinder, QueueNetworkPolicy {
 
     /**
-     * Per-download assigned interface identifier (interface name or IP).
+     * Per-download assigned interface identifier (a local IP address).
      * Populated by [assignInterface] when a download starts (via the queue
      * policy), so the egress binding can be resolved at connect time.
      */
@@ -35,44 +33,31 @@ class NetworkInterfaceProvider(
 
     /**
      * Discover the machine's usable network interfaces as `(identifier, label)`
-     * pairs the user can pick from. The identifier is either the interface name
-     * or one of its local IP addresses (both are accepted by [resolveAddress]);
-     * the label is a friendly "Name (ip)" string. Loopback and link-local
-     * addresses are skipped.
+     * pairs the user can pick from.
+     *
+     * Each interface yields a single option identified by its first usable
+     * local IP address (loopback and link-local addresses are skipped), with a
+     * friendly "Name (ip)" label. Using the IP as the identifier guarantees the
+     * socket can be bound to the exact interface the user selected, and avoids
+     * showing the same interface twice (once by name, once by address).
      */
     fun discoverInterfaces(): List<Pair<String, String>> {
+        val seen = mutableSetOf<String>()
         val result = mutableListOf<Pair<String, String>>()
         for (netIf in NetworkInterface.getNetworkInterfaces()) {
-            val addrs = netIf.inetAddresses
+            val addr = netIf.inetAddresses
                 .toList()
-                .filter { !it.isLoopbackAddress && !it.isLinkLocalAddress }
-            if (addrs.isEmpty()) continue
-            result.add(netIf.name to netIf.name)
-            for (addr in addrs) {
-                result.add(addr.hostAddress to "${netIf.name} (${addr.hostAddress})")
-            }
+                .firstOrNull { !it.isLoopbackAddress && !it.isLinkLocalAddress }
+                ?: continue
+            val ip = addr.hostAddress
+            if (!seen.add(ip)) continue
+            result.add(ip to "${netIf.name} (${ip})")
         }
         return result
     }
 
-    /**
-     * Ordered list of interface identifiers for a queue, falling back to the
-     * global default list when the queue has none configured.
-     */
-    private fun listForQueue(queueId: Long): List<String> {
-        val configured = extraQueueSettingsStorage.getExtraQueueSettings(queueId).networkInterfaces
-        if (configured.isNotEmpty()) return configured
-        return parseList(appSettingsStorage.defaultNetworkInterfaces.value)
-    }
-
-    private fun parseList(raw: String): List<String> {
-        return raw.split(',', '\n')
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-    }
-
     override fun interfaceForActiveIndex(queueId: Long, activeIndex: Int): String? {
-        val list = listForQueue(queueId)
+        val list = extraQueueSettingsStorage.getExtraQueueSettings(queueId).networkInterfaces
         if (list.isEmpty()) return null
         return list[activeIndex % list.size]
     }
@@ -87,17 +72,10 @@ class NetworkInterfaceProvider(
     }
 
     /**
-     * Resolve a configured value (interface name or raw IP) to a local [InetAddress].
+     * Resolve a configured interface identifier (a local IP address) to a
+     * local [InetAddress] to bind sockets to.
      */
     fun resolveAddress(value: String): InetAddress? {
-        // try as an interface name first
-        runCatching {
-            NetworkInterface.getByName(value)
-        }.getOrNull()?.let { netIf ->
-            return netIf.inetAddresses.toList()
-                .firstOrNull { !it.isLoopbackAddress && !it.isLinkLocalAddress }
-        }
-        // otherwise try as a literal IP
         return runCatching { InetAddress.getByName(value) }.getOrNull()
     }
 }

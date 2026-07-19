@@ -355,7 +355,7 @@ val downloadSystemModule = module {
         get<ExtraQueueSettingsStorage<DesktopExtraQueueSettings>>()
     }
     single {
-        NetworkInterfaceProvider(get(), get())
+        NetworkInterfaceProvider(get())
     }.apply {
         bind<NetworkInterfaceBinder>()
         bind<QueueNetworkPolicy>()
