@@ -1,4 +1,4 @@
-plugins{
+plugins {
     `kotlin-dsl`
 }
 repositories {
@@ -6,17 +6,18 @@ repositories {
     mavenCentral()
     google()
 }
-dependencies{
+dependencies {
     implementation(libs.pluginKotlin)
     implementation(libs.pluginAndroidGradle)
     implementation(libs.pluginComposeCompiler)
     implementation(libs.pluginKsp)
     implementation(libs.pluginSerialization)
-    implementation(libs.pluginComposeMultiplatform)
     implementation(libs.pluginChangeLog)
     implementation(libs.pluginBuildConfig)
     implementation(libs.pluginAboutLibraries)
     implementation(libs.pluginGradleVersions)
+    implementation(libs.nucleus.plugin)
+    implementation(libs.kotlinx.rpc.gradlePlugin)
     implementation(libs.semver)
     implementation("ir.amirab.util:platform:1")
     implementation("ir.amirab.plugin:git-version-plugin:1")

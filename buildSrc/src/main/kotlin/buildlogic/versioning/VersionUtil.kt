@@ -1,9 +1,8 @@
 package buildlogic.versioning
 
+import dev.nucleusframework.desktop.application.dsl.TargetFormat
 import io.github.z4kn4fein.semver.Version
-import ir.amirab.util.platform.Platform
 import org.gradle.api.Project
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 fun Project.getAppVersion(): Version {
     return rootProject.version as Version
@@ -37,21 +36,10 @@ fun Project.getApplicationPackageName(): String {
     return "com.abdownloadmanager"
 }
 
-private fun guessTargetFormatBasedOnCurrentOs()= when (Platform.getCurrentPlatform()) {
-    Platform.Desktop.Linux -> TargetFormat.Deb
-    Platform.Desktop.MacOS -> TargetFormat.Dmg
-    Platform.Desktop.Windows -> TargetFormat.Msi
-    Platform.Android -> error("we are executing gradle in desktop :D")
-}
-
 fun Project.getAppVersionStringForPackaging(targetFormat: TargetFormat? = null): String {
     val v = getAppVersion()
     val simple = { v.run { "$major.$minor.$patch" } }
-    val semantic = { v.toString() }
-    val forRpm = { semantic().replace("-", "_") }
-    return when (targetFormat?: guessTargetFormatBasedOnCurrentOs()) {
-        TargetFormat.Rpm -> forRpm()
-        TargetFormat.Deb, TargetFormat.AppImage -> semantic()
-        TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Dmg, TargetFormat.Pkg -> simple()
-    }
+//    val semantic = { v.toString() }
+//    val forRpm = { semantic().replace("-", "_") }
+    return simple()
 }

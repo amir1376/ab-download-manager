@@ -27,15 +27,14 @@ import com.abdownloadmanager.desktop.storage.*
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.ISystemThemeDetector
 import com.abdownloadmanager.desktop.utils.*
-import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessaging
-import com.abdownloadmanager.desktop.utils.native_messaging.NativeMessagingManifestApplier
+import com.abdownloadmanager.desktop.nativemessaging.NativeMessaging
 import com.abdownloadmanager.desktop.utils.proxy.AutoConfigurableProxyProviderForDesktop
 import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvider
 import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
-import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
-import com.abdownloadmanager.integration.HttpDownloadCredentialsFromIntegration
-import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
+import com.abdownloadmanager.integration.model.HLSDownloadCredentialsFromIntegration
+import com.abdownloadmanager.integration.model.HttpDownloadCredentialsFromIntegration
+import com.abdownloadmanager.integration.model.IDownloadCredentialsFromIntegration
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import ir.amirab.downloader.DownloadManagerMinimalControl
@@ -468,7 +467,7 @@ val startUpModule = module {
     single {
         Startup.getStartUpManagerForDesktop(
             name = AppInfo.displayName,
-            path = AppInfo.exeFile,
+            path = AppInfo.mainExeFile,
             args = listOf(AppArguments.Args.BACKGROUND),
             packageName = AppInfo.packageName,
         )
@@ -478,7 +477,7 @@ val startUpModule = module {
 }
 val nativeMessagingModule = module {
     single<NativeMessaging> {
-        NativeMessaging(NativeMessagingManifestApplier.getForCurrentPlatform())
+        NativeMessaging.getDefault()
     }
 }
 

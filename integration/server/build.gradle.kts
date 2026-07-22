@@ -6,6 +6,6 @@ plugins{
 dependencies {
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.ktor.server.cio)
     implementation(project(":shared:utils"))
-    implementation(project(":shared:nanohttp4k"))
 }

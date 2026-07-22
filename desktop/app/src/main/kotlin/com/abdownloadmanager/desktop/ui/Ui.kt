@@ -69,15 +69,14 @@ import org.koin.core.component.inject
 
 object Ui : KoinComponent {
     val scope: CoroutineScope by inject()
+    val appComponent: AppComponent = get()
+    val themeManager: ThemeManager = get()
+    val fontManager: FontManager = get()
+    val languageManager: LanguageManager = get()
+    val notificationManager: NotificationManager = get()
     fun boot(
         appArguments: AppArguments,
-        globalAppExceptionHandler: GlobalAppExceptionHandler,
     ) {
-        val appComponent: AppComponent = get()
-        val themeManager: ThemeManager = get()
-        val fontManager: FontManager = get()
-        val languageManager: LanguageManager = get()
-        val notificationManager: NotificationManager = get()
         themeManager.boot()
         fontManager.boot()
         languageManager.boot()
@@ -96,6 +95,10 @@ object Ui : KoinComponent {
                 }
             )
         }
+    }
+    fun start(
+        globalAppExceptionHandler: GlobalAppExceptionHandler,
+    ) {
         application {
             ProvideLocalProviders(
                 languageManager = languageManager,

@@ -14,7 +14,7 @@ object DesktopEntryCreator {
                 name = AppInfo.displayName,
                 comment = "Manage and organize your download files better than before",
                 desktopEntryFilename = AppInfo.packageName,
-                execFile = requireNotNull(AppInfo.exeFile) {
+                execFile = requireNotNull(AppInfo.mainExeFile) {
                     "Exe file not known"
                 },
                 startupWMClass = "com-abdownloadmanager-desktop-AppKt"

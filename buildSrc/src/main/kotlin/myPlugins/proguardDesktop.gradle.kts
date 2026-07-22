@@ -1,10 +1,10 @@
 package myPlugins
 
-import org.jetbrains.compose.desktop.application.tasks.AbstractProguardTask
+import dev.nucleusframework.desktop.application.tasks.AbstractProguardTask
 import java.util.zip.ZipFile
 
 plugins {
-    id("org.jetbrains.compose")
+    id("dev.nucleusframework")
 }
 
 fun getProguardFileContent(file: File): List<Pair<String, String>> {

@@ -1,125 +1,115 @@
 package ir.amirab.util.desktop
 
+import com.sun.jna.platform.win32.Advapi32Util
+import com.sun.jna.platform.win32.WinReg
+
 object WindowsRegistry {
 
     /**
-     * Set value in registry
+     * Set a REG_SZ value.
      *
-     * @param path full path including HKey and path
-     * @param key key name or `null` for default
+     * @param path Full path including root key, e.g.
+     * "HKEY_CURRENT_USER\\Software\\MyApp"
+     * @param key Value name, or null for the default value.
      */
     fun setValueInRegistry(
         path: String,
         key: String?,
         value: String,
     ) {
-        val keySection = if (key == null) {
-            arrayOf("/ve")
-        } else {
-            arrayOf("/v", quoted(key))
+        val (root, subKey) = splitPath(path)
+
+        if (!Advapi32Util.registryKeyExists(root, subKey)) {
+            Advapi32Util.registryCreateKey(root, subKey)
         }
-        Runtime.getRuntime().exec(
-            arrayOf(
-                "reg", "add", quoted(path), *keySection,
-                "/t", "REG_SZ",
-                "/d", value,
-                "/f",
-            )
+
+        Advapi32Util.registrySetStringValue(
+            root,
+            subKey,
+            key ?: "",
+            value,
         )
     }
 
-
     /**
-     * gets a value in Registry or null
-     *
-     * @param path full path including HKey and path
-     * @param key key name or `null` for default
-     *
-     * @return the value or `null` on fail or not found
+     * Returns the REG_SZ value, or null if it doesn't exist.
      */
     fun getValueInRegistry(
         path: String,
-        key: String?,//null for default
+        key: String?,
     ): String? {
-        val keySection = if (key == null) {
-            arrayOf("/ve")
-        } else {
-            arrayOf("/v", quoted(key))
-        }
-        return try {
-            val p = Runtime.getRuntime().exec(
-                arrayOf(
-                    "reg", "query", quoted(path), *keySection,
-                )
-            )
-            p.inputStream.reader().use {
-                val text = it.readText()
-                val result = queryResultPattern.find(text)
-                result?.groupValues?.getOrNull(1)
-            }
-        } catch (e: Throwable) {
+        val (root, subKey) = splitPath(path)
+
+        if (!Advapi32Util.registryValueExists(root, subKey, key ?: "")) {
             return null
         }
+
+        return Advapi32Util.registryGetStringValue(
+            root,
+            subKey,
+            key ?: "",
+        )
     }
 
     /**
-     * remove entire path in registry.
-     *
-     * **BE CAREFUL** about this
-     *
-     * @param path full path including HKey and path
+     * Deletes the entire registry key.
      */
     fun removePathInRegistry(path: String) {
-        Runtime.getRuntime().exec(
-            arrayOf(
-                "reg", "delete", quoted(path),
-                "/f",
-            )
-        )
-    }
+        val (root, subKey) = splitPath(path)
 
-    /**
-     * remove value in registry
-     *
-     * @param path full path including HKey and path
-     * @param key key name or `null` for default
-     */
-    fun removeValueInRegistry(path: String, key: String?) {
-        val keySection = if (key == null) {
-            arrayOf("/ve")
-        } else {
-            arrayOf("/v", quoted(key))
+        if (Advapi32Util.registryKeyExists(root, subKey)) {
+            Advapi32Util.registryDeleteKey(root, subKey)
         }
-        Runtime.getRuntime().exec(
-            arrayOf(
-                "reg", "delete", quoted(path),
-                *keySection, "/f",
-            )
-        )
     }
 
-    // utils
-
     /**
-     * wrap the [value] with quote name -> "name"
+     * Deletes a value.
      */
-    private fun quoted(value: String) = "\"$value\""
+    fun removeValueInRegistry(
+        path: String,
+        key: String?,
+    ) {
+        val (root, subKey) = splitPath(path)
 
+        if (Advapi32Util.registryValueExists(root, subKey, key ?: "")) {
+            Advapi32Util.registryDeleteValue(
+                root,
+                subKey,
+                key ?: "",
+            )
+        }
+    }
 
-    /**
-     * the correct result for
-     * ```
-     * reg query path [...params]
-     * ```
-     * @see [getValueInRegistry]
-     *
-     * would be
-     *```
-     * HKCU\path\to\destination
-     *     type    name    value
-     *```
-     * if you use this so many times you may change it to `lazy` instead of `get`
-     */
-    private val queryResultPattern get() = """\n(?:\s+)\w+(?:\s)+\w+(?:\s)+(.+)""".toRegex()
+    private fun splitPath(path: String): Pair<WinReg.HKEY, String> {
+        val normalized = path.replace('/', '\\')
 
+        val index = normalized.indexOf('\\')
+        require(index != -1) {
+            "Registry path must include root key: $path"
+        }
+
+        val rootName = normalized.substring(0, index).uppercase()
+        val subKey = normalized.substring(index + 1)
+
+        val root = when (rootName) {
+            "HKCU", "HKEY_CURRENT_USER" ->
+                WinReg.HKEY_CURRENT_USER
+
+            "HKLM", "HKEY_LOCAL_MACHINE" ->
+                WinReg.HKEY_LOCAL_MACHINE
+
+            "HKCR", "HKEY_CLASSES_ROOT" ->
+                WinReg.HKEY_CLASSES_ROOT
+
+            "HKU", "HKEY_USERS" ->
+                WinReg.HKEY_USERS
+
+            "HKCC", "HKEY_CURRENT_CONFIG" ->
+                WinReg.HKEY_CURRENT_CONFIG
+
+            else -> error("Unknown registry root: $rootName")
+        }
+
+        return root to subKey
+    }
 }

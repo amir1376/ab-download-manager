@@ -1,23 +1,18 @@
 package com.abdownloadmanager.desktop.integration
 
 import com.abdownloadmanager.desktop.AppComponent
+import com.abdownloadmanager.desktop.repository.AppRepository
+import com.abdownloadmanager.integration.IntegrationHandler
+import com.abdownloadmanager.integration.model.*
+import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
+import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
 import com.abdownloadmanager.shared.pages.adddownload.SilentImportOptions
-import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.shared.util.DownloadSystem
-import com.abdownloadmanager.integration.IntegrationHandler
-import com.abdownloadmanager.integration.HttpDownloadCredentialsFromIntegration
-import com.abdownloadmanager.integration.NewDownloadTask
-import com.abdownloadmanager.integration.ApiQueueModel
-import com.abdownloadmanager.integration.AddDownloadOptionsFromIntegration
-import com.abdownloadmanager.integration.HLSDownloadCredentialsFromIntegration
-import com.abdownloadmanager.integration.IDownloadCredentialsFromIntegration
-import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
-import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
-import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.downloaditem.EmptyContext
+import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
@@ -31,10 +26,11 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
     val appSettings by inject<AppRepository>()
     private val downloaderInUiRegistry by inject<DownloaderInUiRegistry>()
 
-    override suspend fun addDownload(
-        list: List<IDownloadCredentialsFromIntegration>,
-        options: AddDownloadOptionsFromIntegration,
+    override suspend fun addDownloadByGui(
+        request: AddDownloadsFromIntegration
     ) {
+        val list = request.items
+        val options = request.options
         appComponent.externalCredentialComingIntoApp(
             list.map {
                 convertToDownloadSystemCredentials(it)
@@ -55,7 +51,8 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
             ApiQueueModel(id = queueModel.id, name = queueModel.name)
         }
     }
-    override suspend fun addDownloadTask(task: NewDownloadTask) {
+
+    override suspend fun addDownload(task: NewDownloadTask): Long {
         val addDownloaderInUiProps = convertToDownloadSystemCredentials(task.downloadSource)
         val downloaderInUi = downloaderInUiRegistry.getDownloaderOf(
             addDownloaderInUiProps.credentials
@@ -68,23 +65,28 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
                 ?: task.downloadSource.link.substringAfterLast("/"),
             ),
         )
-        val id =
-            downloadSystem.addDownload(
-                newDownload = NewDownloadItemProps(
-                    downloadItem = downloadItem,
-                    onDuplicateStrategy = OnDuplicateStrategy.default(),
-                    extraConfig = null,
-                    context = EmptyContext,
-                ),
-                queueId = task.queueId,
-                categoryId = null
-            )
-        if (task.queueId != null) {
-            val queue = queueManager.getQueue(task.queueId!!)
+        val id = downloadSystem.addDownload(
+            newDownload = NewDownloadItemProps(
+                downloadItem = downloadItem,
+                onDuplicateStrategy = OnDuplicateStrategy.default(),
+                extraConfig = null,
+                context = EmptyContext,
+            ),
+            queueId = task.queueId,
+            categoryId = task.categoryId,
+        )
+        val queueId = task.queueId
+        // either start the queue or manually start the download
+        // both of them at the same time is not good idea
+        if (task.startQueue && queueId != null) {
+            val queue = queueManager.getQueue(queueId)
             queue.start()
         } else {
-            downloadSystem.userManualResume(id)
+            if (task.startDownload) {
+                downloadSystem.userManualResume(id)
+            }
         }
+        return id
     }
 
     companion object {
