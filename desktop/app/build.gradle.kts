@@ -1,11 +1,12 @@
-import buildlogic.*
+import buildlogic.CiUtils
 import buildlogic.versioning.*
-import ir.amirab.util.platform.Platform
 import com.mikepenz.aboutlibraries.plugin.DuplicateMode
 import com.mikepenz.aboutlibraries.plugin.DuplicateRule
 import dev.nucleusframework.desktop.application.dsl.TargetFormat
 import ir.amirab.util.platform.Arch
+import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isLinux
+import ir.amirab.util.platform.isWindows
 
 plugins {
     id(MyPlugins.kotlin)
@@ -91,6 +92,8 @@ aboutLibraries {
     }
 }
 
+val isAOTEnabled = true
+
 tasks.processResources {
     from(tasks.named("exportLibraryDefinitions"))
 }
@@ -120,16 +123,22 @@ nucleus {
             create(cliBinaryName) {
                 mainClass = "$desktopPackageName.cli.CliAppKt"
                 winConsole = true
+                jvmArgs(*defaultJvmArgs())
             }
             create(nativeMessagingHostBinaryName) {
                 mainClass = "$desktopPackageName.nativemessaging.host.NativeMessagingHostKt"
                 winConsole = true
+                jvmArgs(
+                    *defaultJvmArgs(),
+                    // we don't want to write anything other than browser's stdio!
+                    "-Xlog:disable"
+                )
             }
         }
         nativeDistributions {
             cleanupNativeLibs = true
             // enable it later
-            enableAotCache = false
+            enableAotCache = isAOTEnabled
             modules(
                 "java.instrument",
                 "jdk.unsupported",
@@ -211,8 +220,39 @@ installerPlugin {
     }
 }
 
+/**
+ * Temporary workaround. needs to be improved by the plugin.
+ * I want to add default jvm-args used by the default launcher.
+ * however when I add a single item to the jvmArgs, all default values are gone!
+ * so I have to manually add these default values to each additional launcher
+ */
+fun defaultJvmArgs(): Array<String> {
+    fun appDir(vararg pathParts: String): String {
+        /** For windows we need to pass '\\' to jpackage file, each '\' need to be escaped.
+        Otherwise '$APPDIR\resources' is passed to jpackage,
+        and '\r' is treated as a special character at run time.
+         */
+        val separator = if (Platform.isWindows()) "\\\\" else "/"
+        return listOf($$"$APPDIR", *pathParts).joinToString(separator) { it }
+    }
+
+    return buildList {
+        if (isAOTEnabled) {
+            add("-XX:AOTCache=${appDir("app.aot")}")
+        }
+//        add("-Djpackage.app-version=1.0.0")
+        add("-Dcompose.application.resources.dir=${appDir("resources")}")
+        add("-Dcompose.application.configure.swing.globals=true")
+        add("--enable-native-access=ALL-UNNAMED")
+        add("-Dnucleus.executable.type=dev")
+        add("-Dnucleus.app.id=${getAppName()}")
+        add("-Dapple.awt.enableTemplateImages=true")
+        add("-Dskiko.library.path=${appDir()}")
+    }.toTypedArray()
+}
+
 fun Task.dependsOnAOT() {
-    if (nucleus.application.nativeDistributions.enableAotCache) {
+    if (isAOTEnabled) {
         dependsOn("generateReleaseAotCache")
     }
 }
