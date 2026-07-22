@@ -1,13 +1,8 @@
 package com.abdownloadmanager.desktop.utils
 
-import okio.FileSystem
-import okio.Path.Companion.toOkioPath
+import okio.*
 import okio.Path.Companion.toPath
-import okio.Source
-import okio.buffer
-import okio.use
-import java.util.Properties
-import kotlin.io.path.Path
+import java.util.*
 
 object AppProperties {
     private val defaultProps = Properties()
@@ -15,7 +10,6 @@ object AppProperties {
 
     private object Paths {
         const val DEFAULT_APP_PROPS_PATH = "configs/app_default.properties"
-        const val INSTALLED_APP_PROPS_NAME = "app.properties"
     }
 
     private object Keys {
@@ -38,21 +32,9 @@ object AppProperties {
             }
     }
 
-    private var foundAppProperties = false
-    private fun loadAppProps() {
-        val resourceDir:String?=System.getProperty("compose.application.resources.dir")
-        if (resourceDir.isNullOrBlank()){
-            foundAppProperties = false
-            return
-        }
-        val file = Path(resourceDir,Paths.INSTALLED_APP_PROPS_NAME).toOkioPath()
+    private fun loadAppProps(file: Path) {
         if (!FileSystem.SYSTEM.exists(file)) {
-            // app is in development and don't have app.properties,
-            // so we use only default
-            foundAppProperties = false
             return
-        } else {
-            foundAppProperties = true
         }
         FileSystem.SYSTEM
             .source(file)
@@ -76,18 +58,14 @@ object AppProperties {
             .toBoolean()
     }
 
-    //app.properties in installation directory
-    fun isAppPropertiesFound(): Boolean {
-        return foundAppProperties
-    }
+    val userDir: String
+        get() {
+            return System.getProperty("user.home")
+        }
 
-    val userDir: String get() {
-        return System.getProperty("user.home")
-    }
-
-    fun boot(){
+    fun boot(appPropertiesFile: Path) {
         loadDefaultProps()
-        loadAppProps()
+        loadAppProps(appPropertiesFile)
     }
 
     fun getAll() = appProps

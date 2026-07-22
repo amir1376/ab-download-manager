@@ -26,7 +26,6 @@ fun main(args: Array<String>) {
     runBlocking {
         EntrypointInitializer.boot(
             entryType = EntryType.GUI,
-            debug = true
         )
         DefaultAppLauncher().main(args)
     }

@@ -11,4 +11,7 @@ class DesktopDefinedPaths(
 ) {
     val pageStatesStorageFile: Path = configDir.resolve("pageStatesStorage.json")
     val renderApiFile: Path = optionsDir.resolve("renderApi.txt")
+
+    // optional read only properties file
+    val appPropertiesFile = configDir.resolve("app.properties")
 }
