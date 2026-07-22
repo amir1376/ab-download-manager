@@ -138,7 +138,6 @@ fun main(args: Array<String>) {
     runBlocking {
         EntrypointInitializer.boot(
             entryType = EntryType.NativeMessaging,
-            debug = true,
         )
         NativeMessagingHostLauncher().main(args)
     }

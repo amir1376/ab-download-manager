@@ -22,7 +22,7 @@ object EntrypointInitializer {
                     debug = debug,
                 )
             }
-            AppProperties.boot()
+            AppProperties.boot(AppInfo.definedPaths.appPropertiesFile)
             AppLogger.init(
                 writeToConsole = false,
                 logFilePath = AppInfo.definedPaths.logDir
