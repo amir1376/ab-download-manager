@@ -214,16 +214,25 @@ private val fontLens: Lens<AppSettingsModel, String?>
         }
     )
 
-// use null for default scale!
+// use null for auto-detected scale!
 private val uiScaleLens: Lens<AppSettingsModel, Float>
     get() = Lens(
         get = {
-            it.uiScale ?: DEFAULT_UI_SCALE
+            it.uiScale ?: getAutoDetectedUiScale()
         },
         set = { s, f ->
-            s.copy(uiScale = f.takeIf { it != DEFAULT_UI_SCALE })
+            s.copy(uiScale = f)
         }
     )
+
+private fun getAutoDetectedUiScale(): Float {
+    return try {
+        val systemScale = ir.amirab.util.desktop.screen.getGlobalScale()
+        if (systemScale > 1f) systemScale else DEFAULT_UI_SCALE
+    } catch (_: Exception) {
+        DEFAULT_UI_SCALE
+    }
+}
 private val languageLens: Lens<AppSettingsModel, String?>
     get() = Lens(
         get = {
