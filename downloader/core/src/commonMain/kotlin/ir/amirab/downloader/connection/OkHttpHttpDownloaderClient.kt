@@ -5,10 +5,17 @@ import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.http.IHttpBasedDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
 import ir.amirab.downloader.utils.await
+import ir.amirab.util.logger.appLogger
 import okhttp3.*
+import java.net.Inet4Address
+import java.net.Inet6Address
+import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.NetworkInterface
 import java.net.Proxy
 import java.net.ProxySelector
+import java.net.Socket
+import javax.net.SocketFactory
 
 class OkHttpHttpDownloaderClient(
     private val okHttpClient: OkHttpClient,
@@ -16,6 +23,7 @@ class OkHttpHttpDownloaderClient(
     private val proxyStrategyProvider: ProxyStrategyProvider,
     private val systemProxySelectorProvider: SystemProxySelectorProvider,
     private val autoConfigurableProxyProvider: AutoConfigurableProxyProvider,
+    private val networkInterfaceBinder: NetworkInterfaceBinder? = null,
 ) : HttpDownloaderClient() {
     private fun newCall(
         downloadCredentials: IHttpBasedDownloadCredentials,
@@ -76,6 +84,19 @@ class OkHttpHttpDownloaderClient(
     private fun OkHttpClient.applyProxy(
         downloadCredentials: IHttpBasedDownloadCredentials,
     ): OkHttpClient {
+        val downloadId = (downloadCredentials as? ir.amirab.downloader.downloaditem.IDownloadItem)?.id
+        val boundAddress = downloadId?.let { id ->
+            networkInterfaceBinder?.getBoundAddress(id)
+        }
+        if (boundAddress != null) {
+            val networkInterface = downloadId?.let { id ->
+                networkInterfaceBinder?.getBoundInterface(id)
+            } ?: error("no network interface for bound address $boundAddress")
+            // bind every connection of this download to the queue's network interface
+            return newBuilder()
+                .socketFactory(BindingSocketFactory(boundAddress, networkInterface))
+                .build()
+        }
         return when (
             val strategy = proxyStrategyProvider.getProxyStrategyFor(downloadCredentials.link)
         ) {
@@ -191,3 +212,90 @@ class OkHttpHttpDownloaderClient(
         )
     }
 }
+
+/**
+ * A [SocketFactory] that forces every created socket to use a specific network
+ * interface for egress.
+ *
+ * Two mechanisms are applied:
+ * 1. The socket is **bound** to the interface's local address (source binding).
+ * 2. `IP_UNICAST_IF` is set on the raw socket so the OS pins egress to the
+ *    interface *by index*. This is what actually makes Windows/Linux send the
+ *    packets out the chosen interface even when the routing table would
+ *    otherwise prefer another one (e.g. a lower-metric wired connection).
+ *    `IP_UNICAST_IF` is not exposed by `java.net`, so we set it through the
+ *    JDK-internal `sun.nio.ch.Net.setInterface4/6`, which does exactly
+ *    `setsockopt(IP_UNICAST_IF, ifIndex)`.
+ */
+private class BindingSocketFactory(
+    private val localAddress: InetAddress,
+    private val networkInterface: NetworkInterface,
+) : SocketFactory() {
+    private fun newBoundSocket(): Socket {
+        return Socket().apply {
+            try {
+                bind(InetSocketAddress(localAddress, 0))
+                setUnicastInterface(this, networkInterface)
+            } catch (e: Throwable) {
+                appLogger.e(e) { "BindingSocketFactory: failed to bind socket to $localAddress" }
+                throw e
+            }
+        }
+    }
+
+    override fun createSocket(): Socket {
+        return newBoundSocket()
+    }
+
+    override fun createSocket(host: String?, port: Int): Socket {
+        return newBoundSocket().apply { connect(InetSocketAddress(host, port)) }
+    }
+
+    override fun createSocket(host: String?, port: Int, localHost: InetAddress?, localPort: Int): Socket {
+        return newBoundSocket().apply { connect(InetSocketAddress(host, port)) }
+    }
+
+    override fun createSocket(address: InetAddress?, port: Int): Socket {
+        return newBoundSocket().apply { connect(InetSocketAddress(address, port)) }
+    }
+
+    override fun createSocket(address: InetAddress?, port: Int, localAddress: InetAddress?, localPort: Int): Socket {
+        return newBoundSocket().apply { connect(InetSocketAddress(address, port)) }
+    }
+}
+
+private val setInterface4 = runCatching {
+    val m = Class.forName("sun.nio.ch.Net").getDeclaredMethod("setInterface4", java.io.FileDescriptor::class.java, Int::class.javaPrimitiveType)
+    m.isAccessible = true
+    m
+}.getOrNull()
+
+private val setInterface6 = runCatching {
+    val m = Class.forName("sun.nio.ch.Net").getDeclaredMethod("setInterface6", java.io.FileDescriptor::class.java, Int::class.javaPrimitiveType)
+    m.isAccessible = true
+    m
+}.getOrNull()
+
+private fun setUnicastInterface(socket: Socket, networkInterface: NetworkInterface) {
+    val fileDescriptor = runCatching {
+        val impl = Socket::class.java.getDeclaredField("impl").also { it.isAccessible = true }.get(socket)!!
+        impl.javaClass.getDeclaredField("fd").also { it.isAccessible = true }.get(impl) as java.io.FileDescriptor
+    }.getOrNull() ?: run {
+        appLogger.w { "setUnicastInterface: could not access socket fd" }
+        return
+    }
+    try {
+        if (localAddressIsV6(socket)) {
+            setInterface6?.invoke(null, fileDescriptor, networkInterface.index)
+        } else {
+            setInterface4?.invoke(null, fileDescriptor, networkInterface.index)
+        }
+    } catch (e: Throwable) {
+        appLogger.e(e) { "setUnicastInterface: failed to set IP_UNICAST_IF" }
+    }
+}
+
+private fun localAddressIsV6(socket: Socket): Boolean {
+    return runCatching { socket.localAddress is Inet6Address }.getOrDefault(false)
+}
+

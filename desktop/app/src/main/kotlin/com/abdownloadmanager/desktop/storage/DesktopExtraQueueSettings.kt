@@ -11,6 +11,12 @@ data class DesktopExtraQueueSettings(
     override val id: Long,
     val powerActionTypeOnFinish: PowerActionConfig.Type? = null,
     val powerActionUseForceOnFinish: Boolean = false,
+    /**
+     * Network interface (local IP) that all downloads in this queue should be
+     * bound to, or `null` to use the system default route.
+     * Desktop-only (per-queue network interface binding).
+     */
+    val networkInterface: String? = null,
 ) : IExtraQueueSettings, ContainsPowerActionConfigOnFinish {
 
     override fun getPowerActionConfigOnFinish() = powerActionTypeOnFinish?.let {

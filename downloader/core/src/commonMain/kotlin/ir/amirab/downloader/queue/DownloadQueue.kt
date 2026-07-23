@@ -2,11 +2,13 @@ package ir.amirab.downloader.queue
 
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.DownloadManagerMinimalControl
+import ir.amirab.downloader.connection.QueueNetworkPolicy
 import ir.amirab.downloader.db.DownloadQueuePersistedDataAccess
 import ir.amirab.downloader.db.QueueModel
 import ir.amirab.downloader.downloaditem.contexts.Queue
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.StoppedBy
+import ir.amirab.util.logger.appLogger
 import ir.amirab.downloader.utils.swap
 import ir.amirab.downloader.utils.swapped
 import ir.amirab.util.coroutines.debounce
@@ -20,6 +22,7 @@ class DownloadQueue(
     val persistedData: DownloadQueuePersistedDataAccess,
     val downloadEvents: DownloadManagerMinimalControl,
     val onQueueEvent: (QueueEvent) -> Unit,
+    val networkPolicy: QueueNetworkPolicy? = null,
 ) {
     private val scope = CoroutineScope(SupervisorJob())
 
@@ -420,6 +423,9 @@ class DownloadQueue(
      */
     private fun downloadAQueueItemIfPossible(): Boolean {
         return getDownloadableItemFromQueue()?.let {
+            networkPolicy?.interfaceForActiveIndex(id, activeItems.size)?.let { iface ->
+                networkPolicy.assignInterface(it, iface)
+            }
             activeItems.add(it)
             scope.launch {
                 downloadEvents.startJob(it, ResumedBy(me))

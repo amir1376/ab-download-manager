@@ -33,8 +33,6 @@ sealed class SettingSection(
     data object Appearance :
         SettingSection(MyIcons.appearance, Res.string.appearance.asStringSource())
 
-    //    TODO ADD Network section (proxy , etc..)
-    //    data object Network : SettingSections(MyIcons.network, "Network")
     data object DownloadEngine :
         SettingSection(MyIcons.downloadEngine, Res.string.download_engine.asStringSource())
 
@@ -123,7 +121,6 @@ class DesktopSettingsComponent(
                     )
                 )
 
-//                Network -> listOf()
                 BrowserIntegration -> listOf(
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
@@ -207,7 +204,6 @@ class DesktopSettingsComponent(
 
     var pages = listOf(
         Appearance,
-//        Network,
         DownloadEngine,
         BrowserIntegration,
     )

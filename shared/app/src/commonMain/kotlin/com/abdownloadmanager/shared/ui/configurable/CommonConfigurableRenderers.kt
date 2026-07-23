@@ -22,6 +22,7 @@ data class CommonConfigurableRenderers(
     val timeConfigurableRenderer: ConfigurableRenderer<TimeConfigurable>,
     val proxyConfigurableRenderer: ConfigurableRenderer<ProxyConfigurable>,
     val soundConfigurableRenderer: ConfigurableRenderer<SoundConfigurable>,
+    val networkInterfacesConfigurableRenderer: ConfigurableRenderer<NetworkInterfacesConfigurable>,
 ) : ContainsConfigurableRenderers {
     override fun getAllRenderers(): Map<Configurable.Key, ConfigurableRenderer<*>> {
         return mapOf(
@@ -40,6 +41,7 @@ data class CommonConfigurableRenderers(
             TimeConfigurable.Key to timeConfigurableRenderer,
             ProxyConfigurable.Key to proxyConfigurableRenderer,
             SoundConfigurable.Key to soundConfigurableRenderer,
+            NetworkInterfacesConfigurable.Key to networkInterfacesConfigurableRenderer,
         )
     }
 }
