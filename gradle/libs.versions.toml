@@ -42,7 +42,7 @@ androidx-core = "1.18.0"
 androidx-activity-compose = "1.13.0"
 slf4jApi = "2.0.18"
 kotlinRpc = "0.10.3"
-ktor = "3.3.1"
+ktor = "3.5.1"
 clikit = "5.1.0"
 
 [libraries]
@@ -131,6 +131,8 @@ kotlinx-rpc-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-rpc-kr
 
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktor-server-auth-core = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
+ktor-server-auth-apiKey = { module = "io.ktor:ktor-server-auth-api-key", version.ref = "ktor" }
 
 clikit = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikit" }
 

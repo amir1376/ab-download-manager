@@ -8,6 +8,7 @@ import com.abdownloadmanager.shared.storage.IAppSettingsModel
 import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import com.abdownloadmanager.shared.util.downloadlocation.PlatformDownloadLocationProvider
 import com.abdownloadmanager.shared.util.ConfigBaseSettingsByMapConfig
+import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.ui.theme.DEFAULT_UI_SCALE
 import ir.amirab.util.config.*
 import ir.amirab.util.enumValueOrNull
@@ -45,8 +46,10 @@ data class AppSettingsModel(
         .instance.getDownloadLocation()
         .resolve("ABDM")
         .canonicalFile.absolutePath,
-    override val browserIntegrationEnabled: Boolean = true,
-    override val browserIntegrationPort: Int = 15151,
+    override val apiEnabled: Boolean = true,
+    override val apiPort: Int = 15151,
+    override val apiAuthEnabled: Boolean = false,
+    override val apiAuthKey: String = ApiKeyUtil.generateKey(),
     override val trackDeletedFilesOnDisk: Boolean = false,
     override val deletePartialFileOnDownloadCancellation: Boolean = false,
     override val sizeUnit: SupportedSizeUnits = SupportedSizeUnits.BinaryBytes,
@@ -90,8 +93,10 @@ data class AppSettingsModel(
             val errorNotificationSound = stringKeyOf("errorNotificationSound")
             val successNotificationSound = stringKeyOf("successNotificationSound")
             val defaultDownloadFolder = stringKeyOf("defaultDownloadFolder")
-            val browserIntegrationEnabled = booleanKeyOf("browserIntegrationEnabled")
-            val browserIntegrationPort = intKeyOf("browserIntegrationPort")
+            val apiEnabled = booleanKeyOf("apiEnabled")
+            val apiPort = intKeyOf("apiPort")
+            val apiAuthEnabled = booleanKeyOf("apiAuthEnabled")
+            val apiAuthKey = stringKeyOf("apiAuthKey")
             val trackDeletedFilesOnDisk = booleanKeyOf("trackDeletedFilesOnDisk")
             val deletePartialFileOnDownloadCancellation = booleanKeyOf("deletePartialFileOnDownloadCancellation")
             val sizeUnit = stringKeyOf("sizeUnit")
@@ -138,9 +143,10 @@ data class AppSettingsModel(
                 successNotificationSound = source.get(Keys.successNotificationSound)
                     ?: default.successNotificationSound,
                 defaultDownloadFolder = source.get(Keys.defaultDownloadFolder) ?: default.defaultDownloadFolder,
-                browserIntegrationEnabled = source.get(Keys.browserIntegrationEnabled)
-                    ?: default.browserIntegrationEnabled,
-                browserIntegrationPort = source.get(Keys.browserIntegrationPort) ?: default.browserIntegrationPort,
+                apiEnabled = source.get(Keys.apiEnabled) ?: default.apiEnabled,
+                apiPort = source.get(Keys.apiPort) ?: default.apiPort,
+                apiAuthEnabled = source.get(Keys.apiAuthEnabled) ?: default.apiAuthEnabled,
+                apiAuthKey = source.get(Keys.apiAuthKey) ?: default.apiAuthKey,
                 trackDeletedFilesOnDisk = source.get(Keys.trackDeletedFilesOnDisk) ?: default.trackDeletedFilesOnDisk,
                 deletePartialFileOnDownloadCancellation = source.get(Keys.deletePartialFileOnDownloadCancellation)
                     ?: default.deletePartialFileOnDownloadCancellation,
@@ -180,8 +186,10 @@ data class AppSettingsModel(
                 put(Keys.errorNotificationSound, focus.errorNotificationSound)
                 put(Keys.successNotificationSound, focus.successNotificationSound)
                 put(Keys.defaultDownloadFolder, focus.defaultDownloadFolder)
-                put(Keys.browserIntegrationEnabled, focus.browserIntegrationEnabled)
-                put(Keys.browserIntegrationPort, focus.browserIntegrationPort)
+                put(Keys.apiEnabled, focus.apiEnabled)
+                put(Keys.apiPort, focus.apiPort)
+                put(Keys.apiAuthEnabled, focus.apiAuthEnabled)
+                put(Keys.apiAuthKey, focus.apiAuthKey)
                 put(Keys.trackDeletedFilesOnDisk, focus.trackDeletedFilesOnDisk)
                 put(Keys.deletePartialFileOnDownloadCancellation, focus.deletePartialFileOnDownloadCancellation)
                 put(Keys.sizeUnit, focus.sizeUnit.name)
@@ -255,8 +263,10 @@ class AppSettingsStorage(
     override val errorNotificationSound = from(AppSettingsModel.errorNotificationSound)
     override val successNotificationSound = from(AppSettingsModel.successNotificationSound)
     override val defaultDownloadFolder = from(AppSettingsModel.defaultDownloadFolder)
-    override val browserIntegrationEnabled = from(AppSettingsModel.browserIntegrationEnabled)
-    override val browserIntegrationPort = from(AppSettingsModel.browserIntegrationPort)
+    override val apiEnabled = from(AppSettingsModel.apiEnabled)
+    override val apiPort = from(AppSettingsModel.apiPort)
+    override val apiAuthEnabled = from(AppSettingsModel.apiAuthEnabled)
+    override val apiAuthKey = from(AppSettingsModel.apiAuthKey)
     override val trackDeletedFilesOnDisk = from(AppSettingsModel.trackDeletedFilesOnDisk)
     override val deletePartialFileOnDownloadCancellation =
         from(AppSettingsModel.deletePartialFileOnDownloadCancellation)

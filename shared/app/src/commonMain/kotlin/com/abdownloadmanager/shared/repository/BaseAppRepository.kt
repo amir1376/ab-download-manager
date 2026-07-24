@@ -43,8 +43,10 @@ open class BaseAppRepository(
     val maxDownloadRetryCount = appSettings.maxDownloadRetryCount
     val useAverageSpeed = appSettings.useAverageSpeed
     val saveLocation = appSettings.defaultDownloadFolder
-    val integrationEnabled = appSettings.browserIntegrationEnabled
-    val integrationPort = appSettings.browserIntegrationPort
+    val apiEnabled = appSettings.apiEnabled
+    val apiPort = appSettings.apiPort
+    val apiAuthEnabled = appSettings.apiAuthEnabled
+    val apiAuthKey = appSettings.apiAuthKey
     val trackDeletedFilesOnDisk = appSettings.trackDeletedFilesOnDisk
 
     override val sizeUnit = appSettings.sizeUnit.mapStateFlow {

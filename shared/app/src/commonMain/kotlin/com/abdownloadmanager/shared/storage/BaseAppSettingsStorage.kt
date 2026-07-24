@@ -31,8 +31,10 @@ interface IAppSettingsModel {
     val errorNotificationSound: String
     val successNotificationSound: String
     val defaultDownloadFolder: String
-    val browserIntegrationEnabled: Boolean
-    val browserIntegrationPort: Int
+    val apiEnabled: Boolean
+    val apiPort: Int
+    val apiAuthKey: String
+    val apiAuthEnabled: Boolean
     val trackDeletedFilesOnDisk: Boolean
     val deletePartialFileOnDownloadCancellation: Boolean
     val sizeUnit: SupportedSizeUnits
@@ -72,8 +74,10 @@ interface BaseAppSettingsStorage :
     override val errorNotificationSound: MutableStateFlow<String>
     override val successNotificationSound: MutableStateFlow<String>
     val defaultDownloadFolder: MutableStateFlow<String>
-    val browserIntegrationEnabled: MutableStateFlow<Boolean>
-    val browserIntegrationPort: MutableStateFlow<Int>
+    val apiEnabled: MutableStateFlow<Boolean>
+    val apiPort: MutableStateFlow<Int>
+    val apiAuthEnabled: MutableStateFlow<Boolean>
+    val apiAuthKey: MutableStateFlow<String>
     val trackDeletedFilesOnDisk: MutableStateFlow<Boolean>
     val deletePartialFileOnDownloadCancellation: MutableStateFlow<Boolean>
     val sizeUnit: MutableStateFlow<SupportedSizeUnits>

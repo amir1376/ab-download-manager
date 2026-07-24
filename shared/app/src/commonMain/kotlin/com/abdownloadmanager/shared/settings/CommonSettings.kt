@@ -15,6 +15,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
+import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.MaximumDownloadRetriesLimitation
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
@@ -640,7 +641,7 @@ object CommonSettings {
         return BooleanConfigurable(
             title = Res.string.settings_browser_integration.asStringSource(),
             description = Res.string.settings_browser_integration_description.asStringSource(),
-            backedBy = appRepository.integrationEnabled,
+            backedBy = appRepository.apiEnabled,
             renderMode = BooleanConfigurable.RenderMode.Switch,
             describe = {
                 if (it) {
@@ -656,7 +657,7 @@ object CommonSettings {
         return IntConfigurable(
             title = Res.string.settings_browser_integration_server_port.asStringSource(),
             description = Res.string.settings_browser_integration_server_port_description.asStringSource(),
-            backedBy = appRepository.integrationPort,
+            backedBy = appRepository.apiPort,
             describe = {
                 Res.string.settings_browser_integration_server_port_describe
                     .asStringSourceWithARgs(
@@ -668,6 +669,39 @@ object CommonSettings {
             range = 0..65000,
         )
     }
+
+    fun apiAuthEnabled(appRepository: BaseAppRepository): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = Res.string.settings_api_auth_enabled.asStringSource(),
+            description = Res.string.settings_api_auth_enabled_description.asStringSource(),
+            backedBy = appRepository.apiAuthEnabled,
+            renderMode = BooleanConfigurable.RenderMode.Switch,
+            describe = {
+                if (it) {
+                    Res.string.enabled.asStringSource()
+                } else {
+                    Res.string.disabled.asStringSource()
+                }
+            }
+        )
+    }
+
+    fun apiAuthKey(appRepository: BaseAppRepository): StringConfigurable {
+        return StringConfigurable(
+            title = Res.string.settings_api_auth_key.asStringSource(),
+            description = Res.string.settings_api_auth_key_description.asStringSource(),
+            backedBy = appRepository.apiAuthKey,
+            describe = {
+                if (ApiKeyUtil.isValidKey(it)) {
+                    Res.string.enabled.asStringSource()
+                } else {
+                    Res.string.disabled.asStringSource()
+                }
+            },
+        )
+    }
+
+
     fun proxyConfig(proxyManager: ProxyManager): ProxyConfigurable {
         return ProxyConfigurable(
             title = Res.string.settings_use_proxy.asStringSource(),

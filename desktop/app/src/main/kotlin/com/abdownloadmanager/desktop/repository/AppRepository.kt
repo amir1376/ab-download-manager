@@ -4,8 +4,10 @@ import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
+import com.abdownloadmanager.integration.IntegrationSettings
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
@@ -31,18 +33,26 @@ class AppRepository(
     categoryManager = categoryManager,
 ) {
     init {
-        integrationPort
+        combine(
+            apiEnabled,
+            apiPort,
+            apiAuthEnabled,
+            apiAuthKey,
+        ) { apiEnabled, apiPort, apiAuthEnabled, apiAuthKey ->
+            if (!apiEnabled) {
+                return@combine null
+            }
+            IntegrationSettings(
+                port = apiPort,
+                apiKey = apiAuthKey
+                    .takeIf { apiAuthEnabled }
+                    .takeIf { ApiKeyUtil.isValidKey(apiAuthKey) }
+            )
+        }
             .debounce(500)
             .onEach {
-                if (integrationEnabled.value) {
+                if (it != null) {
                     integration.enable(it)
-                }
-            }.launchIn(scope)
-        integrationEnabled
-            .debounce(500)
-            .onEach { isEnabled ->
-                if (isEnabled) {
-                    integration.enable(integrationPort.value)
                 } else {
                     integration.disable()
                 }
@@ -50,7 +60,7 @@ class AppRepository(
         integration.integrationStatus.onEach { result ->
             //if there is an error in connection disable integration
             if (result is IntegrationResult.Fail) {
-                integrationEnabled.update { false }
+                apiEnabled.update { false }
             }
         }.launchIn(scope)
     }

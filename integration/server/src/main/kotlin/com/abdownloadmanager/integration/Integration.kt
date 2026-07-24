@@ -20,11 +20,11 @@ class Integration(
     val debugMode: Boolean,
 ) {
 
-    private val portFlow = MutableStateFlow<Int?>(null)
+    private val portFlow = MutableStateFlow<IntegrationSettings?>(null)
     val integrationStatus = MutableStateFlow<IntegrationResult>(IntegrationResult.Inactive)
 
-    fun enable(port: Int) {
-        portFlow.update { port }
+    fun enable(settings: IntegrationSettings) {
+        portFlow.update { settings }
     }
 
     fun disable() {
@@ -34,11 +34,11 @@ class Integration(
     fun boot() {
         scope.launch {
             kotlin.runCatching {
-                portFlow.collect { port ->
+                portFlow.collect { settings ->
                     runCatching {
-                        if (port != null) {
-                            startServer(port)
-                            integrationStatus.update { IntegrationResult.Success(port) }
+                        if (settings != null) {
+                            startServer(settings)
+                            integrationStatus.update { IntegrationResult.Success(settings.port) }
                         } else {
                             stopServer()
                             integrationStatus.update { IntegrationResult.Inactive }
@@ -58,9 +58,9 @@ class Integration(
 
     @Volatile
     private var server: MyServer? = null
-    private suspend fun startServer(port: Int) {
+    private suspend fun startServer(settings: IntegrationSettings) {
         stopServer()
-        val server = createServer(port)
+        val server = createServer(settings)
         this.server = server
         withContext(Dispatchers.IO) {
 //            println("start server")
@@ -79,9 +79,9 @@ class Integration(
     }
 
 
-    private fun createServer(port: Int): MyServer {
-        val server = embeddedServer(CIO, port) {
-            setupRouting(json, integrationHandler)
+    private fun createServer(settings: IntegrationSettings): MyServer {
+        val server = embeddedServer(CIO, settings.port) {
+            setupRouting(json, integrationHandler, settings)
         }
         return KtorServer(server)
     }

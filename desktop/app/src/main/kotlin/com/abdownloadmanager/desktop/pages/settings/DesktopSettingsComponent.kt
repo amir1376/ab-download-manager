@@ -128,7 +128,9 @@ class DesktopSettingsComponent(
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
                             CommonSettings.browserIntegrationEnabled(appRepository),
-                            CommonSettings.browserIntegrationPort(appRepository)
+                            CommonSettings.browserIntegrationPort(appRepository),
+                            CommonSettings.apiAuthEnabled(appRepository),
+                            CommonSettings.apiAuthKey(appRepository),
                         )
                     )
                 )
