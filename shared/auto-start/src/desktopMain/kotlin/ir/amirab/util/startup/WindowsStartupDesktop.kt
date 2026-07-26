@@ -25,11 +25,14 @@ class WindowsStartupDesktop(
 
     override fun uninstall() {
         try {
-            Advapi32Util.registryDeleteValue(
-                WinReg.HKEY_CURRENT_USER,
-                "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                this.name,
-            )
+            val location = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+            if (Advapi32Util.registryValueExists(WinReg.HKEY_CURRENT_USER, location, this.name)) {
+                Advapi32Util.registryDeleteValue(
+                    WinReg.HKEY_CURRENT_USER,
+                    location,
+                    this.name,
+                )
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
