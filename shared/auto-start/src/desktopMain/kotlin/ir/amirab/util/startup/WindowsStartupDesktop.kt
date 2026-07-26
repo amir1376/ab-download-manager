@@ -12,12 +12,15 @@ class WindowsStartupDesktop(
     path = path,
     args = args
 ) {
+    private val hKey = WinReg.HKEY_CURRENT_USER
+    private val location = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+
     @Throws(Exception::class)
     override fun install() {
         val data = getExecutableWithArgs()
         Advapi32Util.registrySetStringValue(
-            WinReg.HKEY_CURRENT_USER,
-            "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+            hKey,
+            location,
             this.name,
             data
         )
@@ -25,11 +28,13 @@ class WindowsStartupDesktop(
 
     override fun uninstall() {
         try {
-            Advapi32Util.registryDeleteValue(
-                WinReg.HKEY_CURRENT_USER,
-                "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                this.name,
-            )
+            if (Advapi32Util.registryValueExists(hKey, location, this.name)) {
+                Advapi32Util.registryDeleteValue(
+                    hKey,
+                    location,
+                    this.name,
+                )
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
