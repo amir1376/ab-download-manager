@@ -14,6 +14,7 @@ import ir.amirab.util.platform.isWindows
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class RemovedDownloadsFromDiskTracker(
@@ -84,7 +85,7 @@ class RemovedDownloadsFromDiskTracker(
                 }
                 .launchIn(this)
             itemsToCheck
-                .debounce(500)
+                .debounce(500.milliseconds)
                 .filter { it.isNotEmpty() }
                 .onEach { downloadItems ->
                     checkAndRemoveThisItems(downloadItems)

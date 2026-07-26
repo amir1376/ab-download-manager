@@ -17,6 +17,7 @@ import ir.amirab.downloader.monitor.IDownloadItemState
 import ir.amirab.downloader.monitor.ProcessingDownloadItemState
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 private fun getDownloadTitle(itemState: IDownloadItemState): String {
@@ -43,7 +44,7 @@ fun ShowDownloadDialog(
     LaunchedEffect(Unit) {
         // animate open after activity becomes fully open
         // is there a better way?
-        delay(10)
+        delay(10.milliseconds)
         dialogState.show()
     }
     val closeDialog = dialogState::hide

@@ -41,6 +41,7 @@ import ir.amirab.util.toSingleLine
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 abstract class BaseAddSingleDownloadComponent(
@@ -175,7 +176,7 @@ abstract class BaseAddSingleDownloadComponent(
         credentials
             .map { it.link }
             .distinctUntilChanged()
-            .debounce(250)
+            .debounce(250.milliseconds)
             .onEachLatest { link ->
                 perHostSettingsManager
                     .getSettingsForURL(link)

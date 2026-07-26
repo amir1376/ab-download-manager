@@ -17,7 +17,6 @@ fun getOptIns(): Set<String> = setOf(
 )
 
 fun getFeatures(): Set<String> = setOf(
-    "context-parameters",
 )
 
 val jvmToolchainVersion =  providers.gradleProperty("jvm.toolchain").get().toInt()

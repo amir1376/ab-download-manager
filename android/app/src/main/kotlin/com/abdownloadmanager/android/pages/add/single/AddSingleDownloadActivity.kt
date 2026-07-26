@@ -36,6 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class AddSingleDownloadActivity : ABDMActivity() {
     private val json: Json by inject()
@@ -149,7 +150,7 @@ class AddSingleDownloadActivity : ABDMActivity() {
             LaunchedEffect(Unit) {
                 // animate open after activity becomes fully open
                 // is there a better way?
-                delay(10)
+                delay(10.milliseconds)
                 dialogState.show()
             }
             val onDismiss = { dialogState.hide() }

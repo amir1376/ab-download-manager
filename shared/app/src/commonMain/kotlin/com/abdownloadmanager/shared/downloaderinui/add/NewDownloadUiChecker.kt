@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlin.time.Duration.Companion.milliseconds
 
 abstract class NewDownloadUiChecker<
         TCredentials : IDownloadCredentials,
@@ -94,7 +95,7 @@ abstract class NewDownloadUiChecker<
 
     init {
         merge(
-            scheduleRefreshResponseInfo.debounce(500),
+            scheduleRefreshResponseInfo.debounce(500.milliseconds),
             refreshResponseInfoImmediately
         ).onEachLatest {
             linkChecker.check()

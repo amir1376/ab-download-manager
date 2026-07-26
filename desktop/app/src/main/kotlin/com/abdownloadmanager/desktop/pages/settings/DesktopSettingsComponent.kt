@@ -25,6 +25,7 @@ import ir.amirab.util.flow.mapTwoWayStateFlow
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.milliseconds
 
 sealed class SettingSection(
     val icon: IconSource,
@@ -201,7 +202,7 @@ class DesktopSettingsComponent(
 
     init {
         settingsPageStateToPersist
-            .debounce(500)
+            .debounce(500.milliseconds)
             .onEach { newValue ->
                 pageStorage.settingsPageStorage.update { newValue }
             }.launchIn(scope)

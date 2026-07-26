@@ -8,6 +8,7 @@ import ir.amirab.util.HttpUrlUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 typealias ABDMWebRequestId = String
 
@@ -70,7 +71,7 @@ class DownloadInterceptor(
     private fun addToHeaders(request: ABDMWebRequest) {
         requests[request.id] = request
         scope.launch {
-            delay(REMOVE_REQUESTS_DELAY)
+            delay(REMOVE_REQUESTS_DELAY.milliseconds)
             requests.remove(request.id)
         }
     }

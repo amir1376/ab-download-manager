@@ -45,7 +45,9 @@ class GithubApi(
                 error(response.message)
             }
             val release = json.decodeFromString<Release>(
-                response.body!!.string()
+                requireNotNull(response.body) {
+                    "response.body is null"
+                }.string()
             )
             return release
         }

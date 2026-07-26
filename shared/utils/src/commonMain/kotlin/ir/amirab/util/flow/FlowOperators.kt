@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 private val NULL = Any()
 
@@ -30,7 +31,7 @@ fun <T> Flow<T>.rest(time: Long, emitLastEmissionWithoutRest: Boolean = false): 
 
         val ticker = launch {
             while (isActive) {
-                delay(time)
+                delay(time.milliseconds)
                 pushValue()
                 if (upStreamFinished) {
                     break
@@ -92,7 +93,7 @@ fun <T> Flow<T>.throttle(waitMillis: Int) = flow {
                 val delayNext = nextTime
                 delayPost?.cancel()
                 delayPost = async(Dispatchers.Default) {
-                    delay(nextTime - current)
+                    delay((nextTime - current).milliseconds)
                     if (delayNext == nextTime) {
                         nextTime = System.currentTimeMillis() + waitMillis
                         withContext(context) {
@@ -141,7 +142,7 @@ fun <T> Flow<T>.rateLimit(limit: Long, per: Long) = flow<T> {
 
                 } else {
                     val waitUntil = lastStartTime + per
-                    delay(waitUntil - System.currentTimeMillis())
+                    delay((waitUntil - System.currentTimeMillis()).milliseconds)
                     lastStartTime = System.currentTimeMillis()
                     remainingInDuration = limit
                 }
@@ -162,11 +163,11 @@ fun <T> interval(time: Long, initialValue: T, newValue: (T) -> T): Flow<T> {
 
 fun interval(time: Long, timeOut: Long = time) = flow {
     if (timeOut > 0) {
-        delay(timeOut)
+        delay(timeOut.milliseconds)
     }
     emit(Unit)
     while (true) {
-        delay(time)
+        delay(time.milliseconds)
         emit(Unit)
     }
 }

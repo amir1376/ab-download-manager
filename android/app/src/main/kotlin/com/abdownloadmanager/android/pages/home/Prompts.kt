@@ -107,7 +107,7 @@ private fun ShowDeletePrompts(
     state.OnFullyDismissed(onCancel)
     // shadow the actual parameter
     ResponsiveDialog(state, state::hide) {
-        deletePromptState?.let { deletePromptState ->
+        deletePromptState.let { deletePromptState ->
             SheetUI(
                 header = {
                     SheetHeader(

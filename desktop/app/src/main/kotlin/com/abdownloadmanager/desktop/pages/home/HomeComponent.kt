@@ -53,6 +53,8 @@ import java.awt.event.KeyEvent
 import java.io.File
 import kotlin.collections.map
 import kotlin.getValue
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 
 class HomeComponent(
@@ -108,7 +110,7 @@ class HomeComponent(
 
     init {
         homePageStateToPersist
-            .debounce(500)
+            .debounce(500.milliseconds)
             .onEach { newValue ->
                 pageStorage.homePageStorage.update { newValue }
             }.launchIn(scope)
@@ -360,14 +362,14 @@ class HomeComponent(
                     // temporary fix:
                     // at the moment we relly on DownloadMonitor for getting the list of downloads by their folder
                     // so wait for the download list to be updated by the download monitor
-                    delay(1000)
+                    delay(1.seconds)
                     // then clean up the downloaded files
                     updateManager.cleanDownloadedFiles()
                 }
                 // show user about update
                 scope.launch {
                     // let user focus to the app
-                    delay(1000)
+                    delay(1.seconds)
                     notificationSender.sendNotification(
                         title = Res.string.update_updater.asStringSource(),
                         description = Res.string.update_app_updated_to_version_n.asStringSourceWithARgs(

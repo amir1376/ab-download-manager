@@ -9,6 +9,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 class CategoryManager(
     private val categoryStorage: CategoryStorage,
@@ -31,7 +32,7 @@ class CategoryManager(
                 reset()
             }
             _categories
-                .sample(500)
+                .sample(500.milliseconds)
                 .onEach { categoryStorage.setCategories(it) }
                 .launchIn(scope)
         }

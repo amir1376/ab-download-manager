@@ -16,6 +16,7 @@ import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun RenderUpdateNotifications(updateComponent: UpdateComponent) {
@@ -29,7 +30,7 @@ fun RenderUpdateNotifications(updateComponent: UpdateComponent) {
     fun clearMessageAfter(delay: Long) {
         clearMessageInJob?.cancel()
         clearMessageInJob = scope.launch {
-            delay(delay)
+            delay(delay.milliseconds)
             message = null
         }
     }

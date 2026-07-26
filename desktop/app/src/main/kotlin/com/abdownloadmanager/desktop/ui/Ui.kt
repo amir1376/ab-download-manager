@@ -66,6 +66,7 @@ import kotlinx.coroutines.withTimeout
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.seconds
 
 object Ui : KoinComponent {
     val scope: CoroutineScope by inject()
@@ -212,7 +213,7 @@ private fun HandleEffectsForApp(appComponent: AppComponent) {
         when (it) {
             is AppEffects.SimpleNotificationNotification -> {
                 scope.launch {
-                    withTimeout(5000) {
+                    withTimeout(5.seconds) {
                         notificationManager.showNotification(it.notificationModel)
                     }
                 }

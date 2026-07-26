@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlin.time.Duration.Companion.milliseconds
 
 typealias TAEditDownloadInputs = EditDownloadInputs<*, *, *, *, *, *>
 
@@ -144,13 +145,13 @@ abstract class EditDownloadInputs<
 
     init {
         merge(
-            scheduleRefreshResponseInfo.debounce(500),
+            scheduleRefreshResponseInfo.debounce(500.milliseconds),
             refreshResponseInfoImmediately
         ).onEachLatest {
             linkChecker.check()
         }.launchIn(scope)
         merge(
-            scheduleRecheckEditDownloadIsPossible.debounce(500),
+            scheduleRecheckEditDownloadIsPossible.debounce(500.milliseconds),
 //            ...
         ).onEachLatest {
             editDownloadChecker.check()
