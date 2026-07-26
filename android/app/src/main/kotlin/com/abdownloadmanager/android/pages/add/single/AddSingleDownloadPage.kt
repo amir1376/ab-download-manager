@@ -162,6 +162,27 @@ fun ResponsiveDialogScope.AddSingleDownloadPage(
                                 lastUsedLocations = component.lastUsedLocations.collectAsState().value,
                                 onRequestRemoveSaveLocation = component::removeFromLastDownloadLocation,
                             )
+                            val shouldShowRememberCategoryPath by component.shouldShowRememberCategoryPath.collectAsState()
+                            if (shouldShowRememberCategoryPath) {
+                                val rememberCategoryPath by component.rememberCategoryPath.collectAsState()
+                                Space()
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clickable {
+                                            component.setRememberCategoryPath(!rememberCategoryPath)
+                                        }
+                                        .padding(vertical = 4.dp)
+                                ) {
+                                    CheckBox(
+                                        size = 16.dp,
+                                        value = rememberCategoryPath,
+                                        onValueChange = component::setRememberCategoryPath
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(myStringResource(Res.string.remember_this))
+                                }
+                            }
                         }
                     }
                     val name by component.name.collectAsState()
@@ -640,4 +661,3 @@ private fun NameTextField(
         errorText = errorText,
     )
 }
-
