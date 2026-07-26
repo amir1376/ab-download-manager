@@ -22,14 +22,15 @@ plugins {
     id(Plugins.aboutLibrariesAndroid)
 }
 android {
+    val compileSdkVersion = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
         minSdk = 26
-        targetSdk = 36
+        targetSdk = compileSdkVersion
         applicationId = getApplicationPackageName()
         versionCode = getAppVersion().convertToVersionCode()
         versionName = getAppVersionString()
     }
-    compileSdk = 36
+    compileSdk = compileSdkVersion
     namespace = "com.abdownloadmanager.android"
     buildTypes {
         debug {
