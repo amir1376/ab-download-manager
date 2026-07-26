@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package com.abdownloadmanager.desktop.pages.home.sections
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -42,7 +40,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.periodUntil
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 val LocalDownloadItemProperties =
@@ -144,7 +142,7 @@ fun DateAddedCell(
                 val period = now.periodUntil(instant, TimeZone.UTC)
                 val relativeTime = prettifyRelativeTime(period)
                 dateAddedString = relativeTime
-                delay(1000)
+                delay(1.seconds)
             }
         } else {
             val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())

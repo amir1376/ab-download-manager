@@ -25,6 +25,7 @@ import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val TooltipDelay = 500L
 
@@ -101,7 +102,7 @@ fun DelayedTooltipPopup(
 ) {
     var showPopup by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        delay(delay)
+        delay(delay.milliseconds)
         showPopup = true
     }
     if (showPopup) {

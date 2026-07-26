@@ -13,6 +13,7 @@ import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class AppRepository(
     scope: CoroutineScope,
@@ -49,7 +50,7 @@ class AppRepository(
                     .takeIf { ApiKeyUtil.isValidKey(apiAuthKey) }
             )
         }
-            .debounce(500)
+            .debounce(500.milliseconds)
             .onEach {
                 if (it != null) {
                     integration.enable(it)

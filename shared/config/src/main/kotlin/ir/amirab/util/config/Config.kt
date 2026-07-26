@@ -169,7 +169,7 @@ class MapConfig() : Config {
     }
 
     override fun hashCode(): Int {
-        return map.hashCode() ?: 0
+        return map.hashCode()
     }
 
 }

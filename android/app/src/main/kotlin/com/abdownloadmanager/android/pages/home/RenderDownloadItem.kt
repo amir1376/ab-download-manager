@@ -39,7 +39,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.periodUntil
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -199,7 +199,7 @@ private fun RenderAddedTime(itemState: IDownloadItemState, modifier: Modifier) {
                 val period = now.periodUntil(instant, TimeZone.UTC)
                 val relativeTime = prettifyRelativeTime(period)
                 dateAddedString = relativeTime
-                delay(1000.milliseconds)
+                delay(1.seconds)
             }
         } else {
             val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())

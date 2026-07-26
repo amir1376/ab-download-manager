@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class ABDMServiceNotificationManager(
     private val context: Context,
@@ -148,7 +149,7 @@ class ABDMServiceNotificationManager(
                     if (shouldShowDownloadCompletionNotifications(event)) {
                         launch {
                             // wait a while until we make sure download progress notification not sending anymore
-                            delay(1000.milliseconds)
+                            delay(1.seconds)
                             runCatching {
                                 notificationManagerCompat.notify(
                                     getNotificationIdForDownloadItem(event.downloadItem.id),

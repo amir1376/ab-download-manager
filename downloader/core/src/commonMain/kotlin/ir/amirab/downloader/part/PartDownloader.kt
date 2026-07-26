@@ -2,7 +2,6 @@ package ir.amirab.downloader.part
 
 import ir.amirab.downloader.anntation.HeavyCall
 import ir.amirab.downloader.connection.Connection
-import ir.amirab.downloader.connection.IResponseInfo
 import ir.amirab.downloader.destination.DestWriter
 import ir.amirab.downloader.exception.DownloadValidationException
 import ir.amirab.downloader.exception.PartTooManyErrorException
@@ -27,6 +26,8 @@ import okio.Source
 import okio.use
 import kotlin.concurrent.thread
 import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 const val PART_MAX_TRIES = 10
 const val RetryDelay = 1_000L
@@ -77,7 +78,7 @@ abstract class PartDownloader<
             val result = runCatching {
                 while (coroutineContext.isActive || !stop) {
                     if (tries > 0) {
-                        delay(RetryDelay)
+                        delay(RetryDelay.milliseconds)
 //                        println("#${part.from}retrying $tries")
                     }
                     if (haveToManyErrors()) {
@@ -317,7 +318,7 @@ abstract class PartDownloader<
     }
 
     suspend fun awaitToEnsureDataBeingTransferred(): Boolean {
-        return withTimeoutOrNull(5_000) {
+        return withTimeoutOrNull(5.seconds) {
             val isThatOk = statusFlow.filter {
                 when (it) {
                     PartDownloadStatus.Completed,

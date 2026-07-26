@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.milliseconds
 
 abstract class BaseStorage<T> : KoinComponent {
     val scope: CoroutineScope by inject()
@@ -29,7 +30,7 @@ abstract class BaseStorage<T> : KoinComponent {
         inMemoryState
             //first
             .drop(1)
-            .debounce(500)
+            .debounce(500.milliseconds)
             .onEach { s ->
                 saveData(s)
             }.launchIn(scope)

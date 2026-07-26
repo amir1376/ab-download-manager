@@ -71,6 +71,7 @@ import kotlinx.coroutines.launch
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
+import kotlin.time.Duration.Companion.milliseconds
 
 val alwaysAllowedPaths = listOf(
     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toOkioPath(),
@@ -151,7 +152,7 @@ fun DirectoryPicker(
                 runCatching {
                     currentDirectory.resolve(newFolderName).createDirectories()
                 }
-                delay(50)
+                delay(50.milliseconds)
                 refreshDirectories()
                 // schedule refresh
             }

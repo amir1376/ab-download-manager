@@ -16,6 +16,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class PowerActionComponent(
     val ctx: ComponentContext,
@@ -46,7 +48,7 @@ class PowerActionComponent(
             var remaining = this@PowerActionComponent.powerActionDelay
             val eachStep = 1000 / 33L
             while (remaining >= 0) {
-                delay(eachStep)
+                delay(eachStep.milliseconds)
                 remaining = (remaining - eachStep)
                 _remainingDelay.value = remaining.coerceAtLeast(0)
             }
@@ -79,7 +81,7 @@ class PowerActionComponent(
 
     private suspend fun doPowerAction(): Boolean {
         onBeforePowerAction()
-        delay(1000)
+        delay(1.seconds)
         return DesktopUtils.powerAction().initiate(powerActionConfig)
     }
 

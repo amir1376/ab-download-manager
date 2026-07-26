@@ -49,6 +49,8 @@ import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
+
 fun <T> defaultValueToString(item: T): List<String> {
     return emptyList()
 }
@@ -65,7 +67,7 @@ private fun Modifier.onSearch(
         LaunchedEffect(textToSearch) {
             if (textToSearch.isNotEmpty()) {
                 onSearchRequested(textToSearch)
-                delay(searchDelayTimeout)
+                delay(searchDelayTimeout.milliseconds)
                 textToSearch = ""
             }
         }
@@ -168,7 +170,7 @@ fun <T> RenderSpinner(
                 }
                 LaunchedEffect(itemToBeIndicated) {
                     if (itemToBeIndicated != -1) {
-                        delay(SEARCH_RESET_TIMEOUT)
+                        delay(SEARCH_RESET_TIMEOUT.milliseconds)
                         itemToBeIndicated = -1
                     }
                 }

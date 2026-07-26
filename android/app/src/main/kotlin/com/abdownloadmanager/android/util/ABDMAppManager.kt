@@ -40,6 +40,8 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import java.util.*
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class ABDMAppManager(
     private val context: Context,
@@ -429,7 +431,7 @@ class ABDMAppManager(
                     .flatMapLatest {
                         if (it == null) flow {
                             // let it be null for 10 seconds
-                            delay(10_000)
+                            delay(10.seconds)
                             emit(Unit)
                         }
                         else emptyFlow()

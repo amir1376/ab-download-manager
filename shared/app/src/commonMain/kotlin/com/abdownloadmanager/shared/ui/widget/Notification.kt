@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 private val LocalNotification = compositionLocalOf<NotificationManager> {
     error("LocalNotification not provided yet")
@@ -274,7 +275,7 @@ class NotificationManager {
             if (delay == -1L) {
                 showNotification(notification)
             } else {
-                withTimeoutOrNull(delay) {
+                withTimeoutOrNull(delay.milliseconds) {
                     showNotification(notification)
                 }
             }

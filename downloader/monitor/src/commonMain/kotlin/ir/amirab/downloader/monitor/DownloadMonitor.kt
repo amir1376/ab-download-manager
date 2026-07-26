@@ -17,6 +17,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class DownloadMonitor(
     private val downloadManager: DownloadManager,
@@ -134,7 +136,7 @@ class DownloadMonitor(
                     }
                 )
                 lastWrites = newWrites
-                delay(1_000)
+                delay(1.seconds)
             }
         }
     }
@@ -255,7 +257,7 @@ class DownloadMonitor(
             downloadManager.listOfJobsEvents.map { },
             downloadSpeedFlow,
             headlessQueuePendingItemsFlow,
-            intervalFlow(500)
+            intervalFlow(500.milliseconds)
         ).onEach {
             val newList = downloadManager.downloadJobs.filter {
                 it.status.value != DownloadJobStatus.Finished

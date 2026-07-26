@@ -43,6 +43,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import kotlin.time.Duration.Companion.seconds
 
 
 @Composable
@@ -65,7 +66,7 @@ fun MainContent(
 
                 is MainComponent.MainAppEffects.SimpleNotificationNotification -> {
                     scope.launch {
-                        withTimeout(5000) {
+                        withTimeout(5.seconds) {
                             notificationManager.showNotification(effect.notificationModel)
                         }
                     }

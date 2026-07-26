@@ -15,9 +15,7 @@ object DefaultDownloadCredentialsExtractor :
             runCatching {
                 extractor
                     .extract(input)
-                    .takeIf { it.isNotEmpty() }?.also {
-                        println("$extractor used")
-                    }
+                    .takeIf { it.isNotEmpty() }
             }.getOrElse { null }
         }?.distinctBy { it.link } ?: emptyList()
         return items

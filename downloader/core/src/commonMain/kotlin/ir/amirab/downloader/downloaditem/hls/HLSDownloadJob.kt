@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
@@ -397,7 +398,7 @@ class HLSDownloadJob(
                     cancelDownloadScope()
                     stopAllParts()
                     _status.update { DownloadJobStatus.Retrying(delayForEachRetry) }
-                    delay(delayForEachRetry)
+                    delay(delayForEachRetry.milliseconds)
                     createAndInitializeDownloadScope()
                 }
                 retryJob = job

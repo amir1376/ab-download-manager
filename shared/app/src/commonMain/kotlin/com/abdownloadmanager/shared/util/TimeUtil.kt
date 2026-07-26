@@ -9,6 +9,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalDateTime
 import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.seconds
 
 fun formatTime(
     value: Long,
@@ -186,7 +187,7 @@ fun rememberTimeEllapsed(value: Long): Long {
             } else {
                 System.currentTimeMillis() - value
             }
-            delay(1_000)
+            delay(1.seconds)
         }
     }
     return result

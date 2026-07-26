@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 abstract class BaseHomeComponent(
     componentContext: ComponentContext,
@@ -281,7 +282,7 @@ abstract class BaseHomeComponent(
             .filterIsInstance<DownloadManagerEvents.OnJobAdded>()
             // wait until download list in table is also updated
             // it also prevents extra emits when multiple download added at the same time
-            .debounce(100)
+            .debounce(100.milliseconds)
             .onEach {
                 sendEffect(Effects.Common.ScrollToDownloadItem(it.downloadItem.id))
             }.launchIn(scope)

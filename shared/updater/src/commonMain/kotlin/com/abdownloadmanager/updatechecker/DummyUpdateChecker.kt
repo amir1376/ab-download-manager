@@ -5,6 +5,7 @@ import io.github.z4kn4fein.semver.Version
 import ir.amirab.util.platform.Arch
 import ir.amirab.util.platform.Platform
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 class DummyUpdateChecker(currentVersion: Version) : UpdateChecker(currentVersion) {
     override suspend fun getMyPlatformLatestVersion(): UpdateInfo {
@@ -13,7 +14,7 @@ class DummyUpdateChecker(currentVersion: Version) : UpdateChecker(currentVersion
             preRelease = null,
             buildMetadata = null,
         )
-        delay(1000)
+        delay(1.seconds)
 //        error("Something wrong")
         return UpdateInfo(
             version = newVersion,

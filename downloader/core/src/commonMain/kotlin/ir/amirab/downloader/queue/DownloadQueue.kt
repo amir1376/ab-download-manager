@@ -13,6 +13,8 @@ import ir.amirab.util.coroutines.debounce
 import ir.amirab.util.guardedEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 
 class DownloadQueue(
@@ -210,12 +212,12 @@ class DownloadQueue(
         if (scheduleTimes.enabledStartTime) {
             autoStartJob = scope.launch {
                 val now = System.currentTimeMillis()
-                delay(scheduleTimes.getNearestTimeToStart() - now)
+                delay((scheduleTimes.getNearestTimeToStart() - now).milliseconds)
                 val wasActive = isQueueActive
                 onEvent(QueueEvent.OnQueueStartTimeReached(id, wasActive))
                 start()
                 //wait a little
-                delay(1000)
+                delay(1.seconds)
                 //for tomorrow
                 setUpAutoStartJob()
             }
@@ -234,12 +236,12 @@ class DownloadQueue(
         if (scheduleTimes.enabledEndTime) {
             autoStopJob = scope.launch {
                 val now = System.currentTimeMillis()
-                delay(scheduleTimes.getNearestTimeToStop() - now)
+                delay((scheduleTimes.getNearestTimeToStop() - now).milliseconds)
                 val wasActive = isQueueActive
                 onEvent(QueueEvent.QueueEndTimeReached(id, wasActive))
                 stop()
                 //wait a little
-                delay(1000)
+                delay(1.seconds)
                 //for tomorrow
                 setUpAutoStopJob()
             }
