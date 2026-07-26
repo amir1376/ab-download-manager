@@ -8,7 +8,6 @@ import com.android.build.api.artifact.SingleArtifact
 import ir.amirab.installer.InstallerTargetFormat
 import ir.amirab.plugin.common_android.task.SignApkTask
 import ir.amirab.plugin.common_android.task.androidEnableFileTypesGeneratorForManifest
-import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import java.util.Properties
 
@@ -86,7 +85,7 @@ androidComponents.onVariants { variant ->
     }
 }
 
-val androidBinaries by tasks.registering {
+val androidBinaries = tasks.register("androidBinaries") {
     val signedApks = tasks.named("createReleaseSignedBinaryRelease")
         .map { task ->
             task.outputs.files.singleFile
@@ -97,8 +96,9 @@ val androidBinaries by tasks.registering {
         // at the moment we only have one apk
         // if I decided to add multiple targets (arm64 x64 etc..)
         // ... I need to extract arch and use forEach instead of first
-        val signedApk = signedApks.get().listFiles()
-            .first { it.name.endsWith(".apk") }
+        val signedApk = requireNotNull(signedApks.get().listFiles()) {
+            "No items found inside folder"
+        }.first { it.name.endsWith(".apk") }
         val outputFileName = CiUtils.getTargetFileName(
             getAppName(),
             getAppVersion(),

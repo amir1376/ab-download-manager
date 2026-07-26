@@ -49,7 +49,7 @@ changelog {
     path.set(rootProject.layout.projectDirectory.dir("CHANGELOG.md").asFile.path)
     version.set(getAppVersionString())
 }
-val createChangeNoteForCi by tasks.registering {
+val createChangeNoteForCi = tasks.register("createChangeNoteForCi") {
     inputs.property("appVersion", getAppVersionString())
     inputs.file(changelog.path)
     outputs.file(ciDir.changeNotesFile)
@@ -65,7 +65,7 @@ val createChangeNoteForCi by tasks.registering {
     }
 }
 
-val createReleaseFolderForCi by tasks.registering {
+val createReleaseFolderForCi = tasks.register("createReleaseFolderForCi") {
     val createBinariesForCi = CiUtils.getCreateBinaryFolderForCiTaskName()
     dependsOn("desktop:app:$createBinariesForCi")
     val skipAndroidBuild = System.getenv("SKIP_ANDROID_BUILD")

@@ -36,7 +36,7 @@ $content
     return list
 }
 val compileClasspathProvider = configurations.named("compileClasspath")
-val getProguardConfigurations by tasks.registering {
+val getProguardConfigurations = tasks.register("getProguardConfigurations") {
     dependsOn(compileClasspathProvider)
     val folder = layout.buildDirectory.map {
         it.dir("resolvedProguards")

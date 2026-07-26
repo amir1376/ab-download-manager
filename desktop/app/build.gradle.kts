@@ -138,8 +138,9 @@ nucleus {
         }
         nativeDistributions {
             cleanupNativeLibs = true
-            // enable it later
-            enableAotCache = isAOTEnabled
+            aotCache {
+                enabled = isAOTEnabled
+            }
             modules(
                 "java.instrument",
                 "jdk.unsupported",
@@ -169,10 +170,12 @@ nucleus {
                             <string>true</string>
                         """.trimIndent()
                 }
-                jvmArgs("-Dapple.awt.enableTemplateImages=true")
+                if (Platform.isMac()) {
+                    jvmArgs("-Dapple.awt.enableTemplateImages=true")
+                }
             }
             windows {
-                upgradeUuid = properties["INSTALLER.WINDOWS.UPGRADE_UUID"]?.toString()
+                upgradeUuid = providers.gradleProperty("INSTALLER.WINDOWS.UPGRADE_UUID").orNull
                 iconFile = project.file("icons/icon.ico")
                 console = false
                 dirChooser = true
@@ -247,7 +250,9 @@ fun defaultJvmArgs(): Array<String> {
         add("--enable-native-access=ALL-UNNAMED")
         add("-Dnucleus.executable.type=dev")
         add("-Dnucleus.app.id=${getAppName()}")
-        add("-Dapple.awt.enableTemplateImages=true")
+        if (Platform.isMac()) {
+            add("-Dapple.awt.enableTemplateImages=true")
+        }
         add("-Dskiko.library.path=${appDir()}")
     }.toTypedArray()
 }
@@ -258,7 +263,7 @@ fun Task.dependsOnAOT() {
     }
 }
 
-val postReleaseDistributable by tasks.registering {
+val postReleaseDistributable = tasks.register("postReleaseDistributable") {
     dependsOn("createReleaseDistributable")
     description = "Any modification need to be added to the app distributable folder, should be added here"
     dependsOnAOT()
@@ -293,20 +298,20 @@ fun AbstractArchiveTask.preserveFileAttributes() {
     useFileSystemPermissions()
 }
 
-val createDistributableAppArchiveTar by tasks.registering(Tar::class) {
+val createDistributableAppArchiveTar = tasks.register("createDistributableAppArchiveTar", Tar::class) {
     dependsOn(postReleaseDistributable)
     preserveFileAttributes()
     archiveFileName.set("app.tar.gz")
     compression = Compression.GZIP
     fromAppImagePath()
 }
-val createDistributableAppArchiveZip by tasks.registering(Zip::class) {
+val createDistributableAppArchiveZip = tasks.register("createDistributableAppArchiveZip", Zip::class) {
     dependsOn(postReleaseDistributable)
     preserveFileAttributes()
     archiveFileName.set("app.zip")
     fromAppImagePath()
 }
-val createDistributableAppArchive by tasks.registering {
+val createDistributableAppArchive = tasks.register("createDistributableAppArchive") {
     when (Platform.getCurrentPlatform()) {
         Platform.Desktop.Linux,
         Platform.Desktop.MacOS -> dependsOn(createDistributableAppArchiveTar)
