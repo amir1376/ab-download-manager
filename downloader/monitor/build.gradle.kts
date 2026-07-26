@@ -7,7 +7,7 @@ plugins {
 kotlin {
     jvm("desktop")
     android {
-        compileSdk = 36
+        compileSdk = libs.versions.androidCompileSdk.get().toInt()
         namespace = "ir.amirab.downloader.monitor"
         minSdk = 26
     }

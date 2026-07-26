@@ -7,7 +7,7 @@ kotlin {
     jvm("desktop")
     android {
         namespace = "com.abdownloadmanager.updater"
-        compileSdk = 36
+        compileSdk = libs.versions.androidCompileSdk.get().toInt()
         minSdk = 26
     }
     sourceSets {

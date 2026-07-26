@@ -15,7 +15,7 @@ plugins {
 kotlin {
     jvm("desktop")
     android {
-        compileSdk = 36
+        compileSdk = libs.versions.androidCompileSdk.get().toInt()
         namespace = "com.abdownloadmanager.shared"
         minSdk = 26
     }
