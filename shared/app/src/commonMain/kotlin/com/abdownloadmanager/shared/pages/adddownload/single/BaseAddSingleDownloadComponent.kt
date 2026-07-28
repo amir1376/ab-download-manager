@@ -272,23 +272,16 @@ abstract class BaseAddSingleDownloadComponent(
                     onDuplicateStrategy = onDuplicateStrategy.value.orDefault(),
                     context = EmptyContext
                 ),
-                categoryId = getCategoryIfUseCategoryIsOn()?.id
+                categoryId = selectedCategory.value?.id
             )
             onRequestClose()
         }
     }
 
-    private fun getCategoryIfUseCategoryIsOn(): Category? {
-        return if (useCategory.value)
-            selectedCategory.value
-        else
-            null
-    }
-
     private fun saveLocationIfNecessary(folder: String) {
-        val category = getCategoryIfUseCategoryIsOn()
+        val category = if (useCategory.value) selectedCategory.value else null
         val shouldAdd = if (category == null) {
-            // always add if user don't use category
+            // always add if user don't use category folder
             true
         } else {
             // only add if category path is not the same as provided path
@@ -316,7 +309,7 @@ abstract class BaseAddSingleDownloadComponent(
                     context = EmptyContext,
                 ),
                 queueId = queueId,
-                categoryId = getCategoryIfUseCategoryIsOn()?.id,
+                categoryId = selectedCategory.value?.id,
             ).invokeOnCompletion {
                 if (queueId != null && startQueue) {
                     GlobalScope.launch {
