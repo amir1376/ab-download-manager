@@ -22,6 +22,23 @@ data class HttpDownloadCredentialsFromIntegration(
     override val suggestedName: String? = null,
 ) : IDownloadCredentialsFromIntegration
 
+@Serializable
+data class HttpDownloadBundleSourceFromIntegration(
+    val link: String,
+    val headers: Map<String, String>? = null,
+    val suggestedName: String,
+    val contentLength: Long,
+)
+
+@SerialName("http-bundle")
+@Serializable
+data class HttpBundleDownloadCredentialsFromIntegration(
+    override val link: String,
+    val sources: List<HttpDownloadBundleSourceFromIntegration>,
+    override val downloadPage: String? = null,
+    override val suggestedName: String? = null,
+) : IDownloadCredentialsFromIntegration
+
 @SerialName("hls")
 @Serializable
 data class HLSDownloadCredentialsFromIntegration(

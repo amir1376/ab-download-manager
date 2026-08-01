@@ -33,6 +33,7 @@ import com.abdownloadmanager.desktop.utils.proxy.DesktopSystemProxySelectorProvi
 import com.abdownloadmanager.desktop.utils.proxy.ProxyCachingConfig
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
 import com.abdownloadmanager.integration.model.HLSDownloadCredentialsFromIntegration
+import com.abdownloadmanager.integration.model.HttpBundleDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.model.HttpDownloadCredentialsFromIntegration
 import com.abdownloadmanager.integration.model.IDownloadCredentialsFromIntegration
 import com.arkivanov.decompose.DefaultComponentContext
@@ -405,6 +406,10 @@ val jsonModule = module {
                     subclass(
                         HLSDownloadCredentialsFromIntegration::class,
                         HLSDownloadCredentialsFromIntegration.serializer()
+                    )
+                    subclass(
+                        HttpBundleDownloadCredentialsFromIntegration::class,
+                        HttpBundleDownloadCredentialsFromIntegration.serializer()
                     )
                     defaultDeserializer {
                         HttpDownloadCredentialsFromIntegration.serializer()

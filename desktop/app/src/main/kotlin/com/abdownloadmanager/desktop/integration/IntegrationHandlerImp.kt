@@ -14,6 +14,8 @@ import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.downloaditem.EmptyContext
 import ir.amirab.downloader.downloaditem.hls.HLSDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import ir.amirab.downloader.downloaditem.http.HttpDownloadBundle
+import ir.amirab.downloader.downloaditem.http.HttpDownloadBundleSource
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import org.koin.core.component.KoinComponent
@@ -105,6 +107,24 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
                         link = it.link,
                         headers = it.headers,
                         downloadPage = it.downloadPage,
+                    )
+                }
+
+                is HttpBundleDownloadCredentialsFromIntegration -> {
+                    HttpDownloadCredentials(
+                        link = it.link,
+                        downloadPage = it.downloadPage,
+                        bundle = HttpDownloadBundle(
+                            sources = it.sources.map { source ->
+                                HttpDownloadBundleSource(
+                                    link = source.link,
+                                    headers = source.headers,
+                                    suggestedName = source.suggestedName,
+                                    contentLength = source.contentLength,
+                                )
+                            },
+                            suggestedName = it.suggestedName ?: "google-drive-download.zip",
+                        ),
                     )
                 }
             }

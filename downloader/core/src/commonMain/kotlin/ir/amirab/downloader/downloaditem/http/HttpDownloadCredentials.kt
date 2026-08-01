@@ -16,6 +16,7 @@ data class HttpDownloadCredentials(
     override val password: String? = null,
     override val downloadPage: String? = null,
     override val userAgent: String? = null,
+    val bundle: HttpDownloadBundle? = null,
 ) : IHttpDownloadCredentials {
     override fun validateCredentials() {
         validate(this)
@@ -40,6 +41,15 @@ data class HttpDownloadCredentials(
             credentials.run {
                 return when (this) {
                     is HttpDownloadCredentials -> this
+                    is HttpDownloadItem -> HttpDownloadCredentials(
+                        link = link,
+                        headers = headers,
+                        username = username,
+                        password = password,
+                        downloadPage = downloadPage,
+                        userAgent = userAgent,
+                        bundle = bundle,
+                    )
                     else -> HttpDownloadCredentials(
                         link = link,
                         headers = headers,
@@ -57,6 +67,11 @@ data class HttpDownloadCredentials(
             require(HttpUrlUtils.isValidUrl(credentials.link)) {
                 "url is not valid"
             }
+            when (credentials) {
+                is HttpDownloadCredentials -> credentials.bundle
+                is HttpDownloadItem -> credentials.bundle
+                else -> null
+            }?.validate()
         }
     }
 }

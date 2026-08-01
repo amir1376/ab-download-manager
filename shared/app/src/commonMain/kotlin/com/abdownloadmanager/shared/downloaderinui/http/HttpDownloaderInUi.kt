@@ -12,7 +12,9 @@ import com.abdownloadmanager.shared.downloaderinui.http.edit.HttpEditDownloadInp
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.DownloadSystem
 import ir.amirab.downloader.connection.response.HttpResponseInfo
+import ir.amirab.downloader.downloaditem.DownloadJob
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import ir.amirab.downloader.downloaditem.http.HttpBundleDownloadJob
 import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.HttpDownloadItem
 import ir.amirab.downloader.downloaditem.http.HttpDownloadJob
@@ -31,7 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class HttpDownloaderInUi(
     httpDownloader: HttpDownloader,
     private val sizeAndSpeedUnitProvider: SizeAndSpeedUnitProvider,
-) : DownloaderInUi<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker, HttpDownloadItem, HttpNewDownloadInputs, HttpEditDownloadInputs, HttpCredentialsToItemMapper, HttpDownloadJob, HttpDownloader>(
+) : DownloaderInUi<HttpDownloadCredentials, HttpResponseInfo, DownloadSize.Bytes, HttpLinkChecker, HttpDownloadItem, HttpNewDownloadInputs, HttpEditDownloadInputs, HttpCredentialsToItemMapper, DownloadJob, HttpDownloader>(
     downloader = httpDownloader
 ) {
     override fun createLinkChecker(initialCredentials: HttpDownloadCredentials): HttpLinkChecker {
@@ -110,13 +112,40 @@ class HttpDownloaderInUi(
     }
 
     override fun createProcessingDownloadItemState(
-        props: ProcessingDownloadItemFactoryInputs<HttpDownloadJob>
+        props: ProcessingDownloadItemFactoryInputs<DownloadJob>
     ): ProcessingDownloadItemState {
         val downloadJob = props.downloadJob
         val downloadItem = downloadJob.downloadItem
         val downloadJobStatus = downloadJob.status.value
-        val parts = downloadJob.getParts()
         val contentLength = downloadItem.contentLength
+        val (parts, supportResume) = when (downloadJob) {
+            is HttpDownloadJob -> {
+                downloadJob.getParts().map {
+                    UiRangedPart.fromPart(
+                        part = it,
+                        totalLength = contentLength,
+                    )
+                } to downloadJob.supportsConcurrent
+            }
+
+            is HttpBundleDownloadJob -> {
+                downloadJob.getParts().map { part ->
+                    UiRangedPart(
+                        id = part.index,
+                        status = part.status,
+                        howMuchProceed = part.howMuchProceed(),
+                        percent = part.percent,
+                        length = part.length,
+                        partSpace = when {
+                            contentLength <= 0 || part.length <= 0 -> 0f
+                            else -> (part.length.toDouble() / contentLength.toDouble()).toFloat()
+                        },
+                    )
+                } to true
+            }
+
+            else -> error("Unsupported HTTP download job: ${downloadJob::class.qualifiedName}")
+        }
         return RangeBasedProcessingDownloadItemState(
             id = downloadItem.id,
             folder = downloadItem.folder,
@@ -127,14 +156,9 @@ class HttpDownloaderInUi(
             completeTime = downloadItem.completeTime ?: -1,
             status = downloadJobStatus,
             saveLocation = downloadItem.name,
-            parts = parts.map {
-                UiRangedPart.fromPart(
-                    part = it,
-                    totalLength = contentLength,
-                )
-            },
+            parts = parts,
             speed = props.speed,
-            supportResume = downloadJob.supportsConcurrent,
+            supportResume = supportResume,
             downloadLink = downloadItem.link,
             isWaiting = props.isWaiting,
         )

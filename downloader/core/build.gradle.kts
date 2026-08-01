@@ -21,8 +21,14 @@ kotlin {
                 api(libs.okio.okio)
                 api(libs.okhttp.okhttp)
                 api(libs.okhttp.coroutines)
+                implementation(libs.commons.compress)
                 implementation(project(":shared:utils"))
                 api("io.lindstrom:m3u8-parser:0.29")
+            }
+        }
+        named("desktopTest") {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
     }

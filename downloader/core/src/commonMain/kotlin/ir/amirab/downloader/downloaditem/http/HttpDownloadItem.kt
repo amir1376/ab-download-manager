@@ -20,6 +20,7 @@ data class HttpDownloadItem(
     override var userAgent: String? = null,
 
     var serverETag: String? = null,
+    var bundle: HttpDownloadBundle? = null,
 
 //    IDownloadItem
     override var id: Long,
@@ -136,6 +137,7 @@ data class HttpDownloadItem(
                 name = name,
                 contentLength = contentLength,
                 serverETag = serverETag,
+                bundle = credentials.bundle,
                 dateAdded = dateAdded,
                 startTime = startTime,
                 completeTime = completeTime,
@@ -163,6 +165,7 @@ fun HttpDownloadItem.applyFrom(other: HttpDownloadItem) {
 
     contentLength = other.contentLength
     serverETag = other.serverETag
+    bundle = other.bundle
 
     dateAdded = other.dateAdded
     startTime = other.startTime
@@ -181,5 +184,6 @@ fun HttpDownloadItem.withHttpCredentials(credentials: IHttpDownloadCredentials) 
     password = credentials.password
     downloadPage = credentials.downloadPage
     userAgent = credentials.userAgent
+    bundle = (credentials as? HttpDownloadCredentials)?.bundle
 }
 

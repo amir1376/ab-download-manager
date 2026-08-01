@@ -29,15 +29,26 @@ class HttpLinkChecker(
     }
 
     override suspend fun actualCheck(credentials: HttpDownloadCredentials): HttpResponseInfo {
-        return client.test(credentials)
+        val credentialsToCheck = credentials.bundle
+            ?.sources
+            ?.firstOrNull()
+            ?.asCredentials(credentials.downloadPage)
+            ?: credentials
+        return client.test(credentialsToCheck)
     }
 
     private fun updateNameAndLength(responseInfo: HttpResponseInfo?) {
-        val suggestedName = responseInfo
-            ?.fileName ?: HttpUrlUtils.extractNameFromLink(credentials.value.link)
-            ?.let(FilenameFixer::fix)
-        val length = responseInfo?.run {
-            totalLength.takeIf { isSuccessFul }
+        val currentCredentials = credentials.value
+        val bundle = currentCredentials.bundle
+        val suggestedName = bundle?.suggestedName?.let(FilenameFixer::fix)
+            ?: responseInfo?.fileName
+            ?: HttpUrlUtils.extractNameFromLink(currentCredentials.link)?.let(FilenameFixer::fix)
+        val length = if (bundle != null) {
+            bundle.totalContentLength.takeIf { it >= 0 }
+        } else {
+            responseInfo?.run {
+                totalLength.takeIf { isSuccessFul }
+            }
         }
         _suggestedName.update { suggestedName }
         _length.update { length }
