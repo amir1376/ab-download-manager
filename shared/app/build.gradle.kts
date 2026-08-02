@@ -107,7 +107,7 @@ buildConfig {
     buildConfigField(
         "DONATE_LINK",
         provider {
-            "https://github.com/amir1376/ab-download-manager/blob/master/DONATE.md"
+            "https://abdownloadmanager.com/donate"
         }
     )
     buildConfigField(
