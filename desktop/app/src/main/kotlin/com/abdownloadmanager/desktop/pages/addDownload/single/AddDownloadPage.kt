@@ -144,6 +144,27 @@ fun AddDownloadPage(
                     lastUsedLocations = component.lastUsedLocations.collectAsState().value,
                     onRequestRemoveSaveLocation = component::removeFromLastDownloadLocation,
                 )
+                val shouldShowRememberCategoryPath by component.shouldShowRememberCategoryPath.collectAsState()
+                if (shouldShowRememberCategoryPath) {
+                    val rememberCategoryPath by component.rememberCategoryPath.collectAsState()
+                    Spacer(Modifier.size(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .onClick {
+                                component.setRememberCategoryPath(!rememberCategoryPath)
+                            }
+                            .padding(vertical = 4.dp)
+                    ) {
+                        CheckBox(
+                            size = 16.dp,
+                            value = rememberCategoryPath,
+                            onValueChange = component::setRememberCategoryPath,
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(myStringResource(Res.string.remember_this))
+                    }
+                }
                 val name by component.name.collectAsState()
                 Spacer(Modifier.size(8.dp))
                 NameTextField(
@@ -626,4 +647,3 @@ private fun NameTextField(
         errorText = errorText,
     )
 }
-
