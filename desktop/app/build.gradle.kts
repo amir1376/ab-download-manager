@@ -2,6 +2,7 @@ import buildlogic.CiUtils
 import buildlogic.versioning.*
 import com.mikepenz.aboutlibraries.plugin.DuplicateMode
 import com.mikepenz.aboutlibraries.plugin.DuplicateRule
+import dev.nucleusframework.desktop.application.dsl.AotCacheCompatibility
 import dev.nucleusframework.desktop.application.dsl.TargetFormat
 import ir.amirab.util.platform.Arch
 import ir.amirab.util.platform.Platform
@@ -93,7 +94,9 @@ aboutLibraries {
     }
 }
 
-val isAOTEnabled = false
+val isAOTEnabled =
+    // macOS build fails on CI. needs further investigation
+    !Platform.isMac()
 
 tasks.processResources {
     from(tasks.named("exportLibraryDefinitions"))
@@ -140,6 +143,7 @@ nucleus {
             cleanupNativeLibs = true
             aotCache {
                 enabled = isAOTEnabled
+                compatibility = AotCacheCompatibility.COMPATIBILITY
             }
             modules(
                 "java.instrument",
