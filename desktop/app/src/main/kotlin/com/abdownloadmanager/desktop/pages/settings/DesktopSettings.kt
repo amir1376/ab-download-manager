@@ -8,11 +8,9 @@ import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
 import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
