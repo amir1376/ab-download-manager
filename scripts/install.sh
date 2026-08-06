@@ -50,7 +50,7 @@ detect_package_manager() {
     elif [ -f /etc/debian_version ]; then
         local OS=Debian
     else
-        logger error "Your Linux Distro is not Supperted."
+        logger error "Your Linux Distro is not Supported."
         logger error "Please install ${DEPENDENCIES[@]} Manually."
         exit 1
     fi
