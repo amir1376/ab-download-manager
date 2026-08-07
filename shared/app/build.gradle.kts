@@ -58,7 +58,7 @@ kotlin {
             api(libs.androidx.core.ktx)
             api(libs.androidx.activity.compose)
         }
-        val desktopMain by getting
+        val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
             implementation(libs.osThemeDetector.get().toString()) {
                 exclude(group = "net.java.dev.jna")

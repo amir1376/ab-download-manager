@@ -14,7 +14,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:utils"))
         }
-        val desktopMain by getting
+        val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
             //    // for windows, we use registry
             implementation(libs.jna.platform)

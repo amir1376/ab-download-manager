@@ -22,7 +22,7 @@ kotlin {
             api(libs.kermit)
             api("ir.amirab.util:platform:1")
         }
-        val desktopMain by getting
+        val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
             api(libs.jna.platform)
         }

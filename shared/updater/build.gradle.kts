@@ -19,7 +19,7 @@ kotlin {
             implementation(libs.semver)
             implementation("ir.amirab.util:platform:1")
         }
-        val desktopMain by getting
+        val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
             implementation(libs.jna.platform)
         }
