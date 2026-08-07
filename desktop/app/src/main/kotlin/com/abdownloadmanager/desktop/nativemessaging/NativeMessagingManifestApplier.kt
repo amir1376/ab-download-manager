@@ -9,11 +9,10 @@ import ir.amirab.util.desktop.WindowsRegistry
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.writeText
 import kotlinx.serialization.json.Json
+import okio.Path
+import okio.Path.Companion.toOkioPath
 import org.koin.core.component.KoinComponent
 import kotlin.io.path.Path
-import kotlin.io.path.createParentDirectories
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.writeText
 
 abstract class NativeMessagingManifestApplier(val json: Json) : KoinComponent {
     protected inline fun <reified T : Any> serialize(data: T): String {
@@ -26,6 +25,14 @@ abstract class NativeMessagingManifestApplier(val json: Json) : KoinComponent {
 
     abstract fun updateManifests(manifests: NativeMessagingManifests)
     abstract fun removeManifests()
+
+    protected fun writeManifestContent(
+        path: Path,
+        manifestContent: String
+    ) {
+        path.createParentDirectories()
+        path.writeText(manifestContent)
+    }
 
     companion object {
         fun getForCurrentPlatform(json: Json): NativeMessagingManifestApplier {
@@ -52,17 +59,14 @@ class WindowsNativeMessagingManifestApplier(json: Json) : NativeMessagingManifes
     override fun updateManifests(
         manifests: NativeMessagingManifests
     ) {
-        listOf(
-            firefoxManifestFile,
-            chromeManifestFile,
-        ).forEach { it.createParentDirectories() }
-        firefoxManifestFile.writeText(serialize(manifests.firefoxNativeMessagingManifest))
+        writeManifestContent(firefoxManifestFile, serialize(manifests.firefoxNativeMessagingManifest))
         WindowsRegistry.setValueInRegistry(
             path = firefoxRegistryPath,
             key = null,
             value = firefoxManifestFile.toString()
         )
-        chromeManifestFile.writeText(serialize(manifests.chromeNativeMessagingManifest))
+
+        writeManifestContent(chromeManifestFile, serialize(manifests.chromeNativeMessagingManifest))
         WindowsRegistry.setValueInRegistry(
             path = chromeRegistryPath,
             key = null,
@@ -86,72 +90,105 @@ class WindowsNativeMessagingManifestApplier(json: Json) : NativeMessagingManifes
 class MacosNativeMessagingManifestApplier(
     json: Json
 ) : NativeMessagingManifestApplier(json) {
-    private val firefoxNativeMessagingPath
-        get() = Path(
-            AppProperties.userDir, "Library/Application Support/Mozilla/NativeMessagingHosts",
-            "${AppInfo.packageName}.json"
-        )
-    private val chromeNativeMessagingPath
-        get() = Path(
-            AppProperties.userDir, "Library/Application Support/Google/Chrome/NativeMessagingHosts",
-            "${AppInfo.packageName}.json"
-        )
-    private val chromiumNativeMessagingPath
-        get() = Path(
-            AppProperties.userDir, "Library/Application Support/Chromium/NativeMessagingHosts",
-            "${AppInfo.packageName}.json"
-        )
 
+    private val nativeMessagingFileName = "${AppInfo.packageName}.json"
+
+    // firefox and chromium paths are the same just app name is different
+    private fun createNativeMessagingPath(appSupportDir: String) =
+        Path(
+            AppProperties.userDir,
+            "Library/Application Support",
+            appSupportDir,
+            "NativeMessagingHosts",
+            nativeMessagingFileName
+        ).toOkioPath()
+
+    private val firefoxNativeMessagingPaths = listOf(
+        createNativeMessagingPath("Mozilla")
+    )
+
+    private val chromiumBasedNativeMessagingPaths = listOf(
+        createNativeMessagingPath("Google/Chrome"),
+        createNativeMessagingPath("Chromium"),
+    )
 
     override fun updateManifests(manifests: NativeMessagingManifests) {
-        listOf(
-            firefoxNativeMessagingPath,
-            chromeNativeMessagingPath,
-            chromiumNativeMessagingPath
-        ).forEach { it.createParentDirectories() }
+        val firefoxManifest = serialize(manifests.firefoxNativeMessagingManifest)
+        firefoxNativeMessagingPaths.forEach { path ->
+            writeManifestContent(path, firefoxManifest)
+        }
 
-        firefoxNativeMessagingPath.writeText(serialize(manifests.firefoxNativeMessagingManifest))
-        val chromeManifestString = serialize(manifests.chromeNativeMessagingManifest)
-        chromeNativeMessagingPath.writeText(chromeManifestString)
-        chromiumNativeMessagingPath.writeText(chromeManifestString)
+        val chromiumManifest = serialize(manifests.chromeNativeMessagingManifest)
+        chromiumBasedNativeMessagingPaths.forEach { path ->
+            writeManifestContent(path, chromiumManifest)
+        }
     }
 
     override fun removeManifests() {
-        firefoxNativeMessagingPath.deleteIfExists()
-        chromeNativeMessagingPath.deleteIfExists()
-        chromiumNativeMessagingPath.deleteIfExists()
+        firefoxNativeMessagingPaths.forEach { path ->
+            path.deleteIfExists()
+        }
+
+        chromiumBasedNativeMessagingPaths.forEach { path ->
+            path.deleteIfExists()
+        }
     }
 }
 
 class LinuxNativeMessagingManifestApplier(
     json: Json
-) : NativeMessagingManifestApplier(
-    json
-) {
-    private val firefoxNativeMessagingPath
-        get() = Path(AppProperties.userDir, ".mozilla/native-messaging-hosts", "${AppInfo.packageName}.json")
-    private val chromeNativeMessagingPath
-        get() = Path(AppProperties.userDir, ".config/google-chrome/NativeMessagingHosts", "${AppInfo.packageName}.json")
-    private val chromiumNativeMessagingPath
-        get() = Path(AppProperties.userDir, ".config/chromium/NativeMessagingHosts", "${AppInfo.packageName}.json")
+) : NativeMessagingManifestApplier(json) {
+
+    private val nativeMessagingFileName = "${AppInfo.packageName}.json"
+
+    private val firefoxNativeMessagingPaths
+        get() = listOf(
+            Path(
+                AppProperties.userDir,
+                ".mozilla/native-messaging-hosts",
+                nativeMessagingFileName
+            ).toOkioPath()
+        )
+
+
+    private fun createChromiumNativeMessagingPath(browserConfigDir: String) = Path(
+        AppProperties.userDir,
+        ".config",
+        browserConfigDir,
+        "NativeMessagingHosts",
+        nativeMessagingFileName
+    ).toOkioPath()
+
+    private val chromiumBasedNativeMessagingPaths
+        get() = listOf(
+            createChromiumNativeMessagingPath("google-chrome"),
+            createChromiumNativeMessagingPath("chromium"),
+            createChromiumNativeMessagingPath("BraveSoftware/Brave-Browser"),
+            createChromiumNativeMessagingPath("microsoft-edge"),
+            createChromiumNativeMessagingPath("vivaldi"),
+            createChromiumNativeMessagingPath("opera")
+        )
 
     override fun updateManifests(manifests: NativeMessagingManifests) {
-        listOf(
-            firefoxNativeMessagingPath,
-            chromeNativeMessagingPath,
-            chromiumNativeMessagingPath
-        ).forEach { it.createParentDirectories() }
+        val firefoxManifest = serialize(manifests.firefoxNativeMessagingManifest)
+        firefoxNativeMessagingPaths.forEach { path ->
+            writeManifestContent(path, firefoxManifest)
+        }
 
-        firefoxNativeMessagingPath.writeText(serialize(manifests.firefoxNativeMessagingManifest))
-        val chromeManifestString = serialize(manifests.chromeNativeMessagingManifest)
-        chromeNativeMessagingPath.writeText(chromeManifestString)
-        chromiumNativeMessagingPath.writeText(chromeManifestString)
+        val chromiumManifest = serialize(manifests.chromeNativeMessagingManifest)
+        chromiumBasedNativeMessagingPaths.forEach { path ->
+            writeManifestContent(path, chromiumManifest)
+        }
     }
 
     override fun removeManifests() {
-        firefoxNativeMessagingPath.deleteIfExists()
-        chromeNativeMessagingPath.deleteIfExists()
-        chromiumNativeMessagingPath.deleteIfExists()
+        firefoxNativeMessagingPaths.forEach { path ->
+            path.deleteIfExists()
+        }
+
+        chromiumBasedNativeMessagingPaths.forEach { path ->
+            path.deleteIfExists()
+        }
     }
 }
 
