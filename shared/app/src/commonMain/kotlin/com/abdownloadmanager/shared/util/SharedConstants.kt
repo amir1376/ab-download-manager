@@ -18,11 +18,17 @@ object SharedConstants : BaseConstants {
     override val projectGithubRepo: String = BuildConfig.PROJECT_GITHUB_REPO
     override val browserIntegrations: List<BrowserIntegrationModel> = listOf(
         BrowserIntegrationModel(
+            BrowserType.Firefox, BuildConfig.INTEGRATION_FIREFOX_LINK
+        ),
+        BrowserIntegrationModel(
             BrowserType.Chrome, BuildConfig.INTEGRATION_CHROME_LINK
         ),
         BrowserIntegrationModel(
-            BrowserType.Firefox, BuildConfig.INTEGRATION_FIREFOX_LINK
-        )
+            BrowserType.Edge, BuildConfig.INTEGRATION_CHROME_LINK
+        ),
+        BrowserIntegrationModel(
+            BrowserType.Opera, BuildConfig.INTEGRATION_CHROME_LINK
+        ),
     )
     override val telegramChannelUrl: String = BuildConfig.TELEGRAM_CHANNEL
     override val telegramGroupUrl: String = BuildConfig.TELEGRAM_GROUP
