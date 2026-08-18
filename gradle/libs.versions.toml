@@ -7,8 +7,8 @@ compose = "1.11.1"
 # This should be updated with [compose] version
 skiko = "0.144.6"
 kotlin-serialization = "1.11.0"
-okhttp = "5.4.0"
-okio = "3.18.0"
+okhttp = "5.5.0"
+okio = "3.18.1"
 coroutines = "1.11.0"
 koin = "4.2.2"
 koinAnnotation = "4.2.2"
@@ -27,11 +27,11 @@ semver = "3.0.0"
 jgit = "7.3.0.202506031305-r"
 osThemeDetector = "3.9.1"
 kotlinFileWatcher = "1.4.0"
-markdownRenderer = "0.41.0"
-proxyVole = "2.0.1"
+markdownRenderer = "0.44.0"
+proxyVole = "2.0.2"
 jbrApi = "1.10.1"
 gradleVersions = "0.54.0"
-handlebars = "4.5.3"
+handlebars = "4.5.4"
 composeNativeTray = "2.1.0"
 nucleus = "2.4.7"
 autoServiceKsp = "1.2.0"
@@ -42,7 +42,7 @@ androidx-core = "1.19.0"
 androidx-activity-compose = "1.13.0"
 slf4jApi = "2.0.18"
 kotlinRpc = "0.10.3"
-ktor = "3.5.1"
+ktor = "3.5.2"
 clikit = "5.1.0"
 androidCompileSdk = "37"
 
@@ -140,6 +140,7 @@ clikit = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikit" }
 composeNativeTray = { module = "dev.nucleusframework:composenativetray", version.ref = "composeNativeTray" }
 nucleus-plugin = { module = "dev.nucleusframework:dev.nucleusframework.gradle.plugin", version.ref = "nucleus" }
 nucleus-aot = { module = "dev.nucleusframework:nucleus.aot-runtime", version.ref = "nucleus" }
+nucleus-darkmodeDetector = { module = "dev.nucleusframework:nucleus.darkmode-detector", version.ref = "nucleus" }
 
 proxyVole = { module = "org.bidib.com.github.markusbernhardt:proxy-vole", version.ref = "proxyVole" }
 jbrApi = { module = "org.jetbrains.runtime:jbr-api", version.ref = "jbrApi" }

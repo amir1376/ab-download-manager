@@ -1,7 +1,7 @@
 package com.abdownloadmanager.shared.util
 
 import com.abdownloadmanager.shared.util.ui.theme.ISystemThemeDetector
-import com.jthemedetecor.OsThemeDetector
+import dev.nucleusframework.darkmodedetector.getPlatformDarkModeDetector
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
@@ -11,13 +11,8 @@ import java.util.function.Consumer
 actual typealias PlatformThemeDetector = DesktopSystemThemeDetector
 
 class DesktopSystemThemeDetector : ISystemThemeDetector {
-    override val isSupported by lazy {
-        runCatching {
-            OsThemeDetector.isSupported()
-        }.getOrElse { false }
-    }
-    private val detector by lazy { OsThemeDetector.getDetector() }
-
+    override val isSupported = true
+    private val detector by lazy { getPlatformDarkModeDetector() }
     private val isSystemDarkFlowByLibrary = callbackFlow<Boolean> {
         val listener = Consumer<Boolean> { isDark: Boolean ->
             trySend(isDark)
@@ -28,12 +23,12 @@ class DesktopSystemThemeDetector : ISystemThemeDetector {
         }
     }
 
-    override fun isDark() = detector.isDark
+    override fun isDark() = detector.isDark()
     override val systemThemeFlow = flow {
         if (!isSupported) {
             return@flow
         }
-        emit(detector.isDark)
+        emit(detector.isDark())
         emitAll(isSystemDarkFlowByLibrary)
     }
 }

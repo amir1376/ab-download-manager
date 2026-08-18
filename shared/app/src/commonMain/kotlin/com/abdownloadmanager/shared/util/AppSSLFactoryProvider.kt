@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.util
 
 import kotlinx.coroutines.flow.StateFlow
+import okhttp3.internal.OkHttpInternalApi
 import okhttp3.internal.platform.Platform
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLSocketFactory
@@ -9,6 +10,7 @@ import javax.net.ssl.X509TrustManager
 /**
  * at the moment we simply use okhttp ssl factory provider with a toggleable trust manager to ignore ssl certificates
  */
+@OptIn(OkHttpInternalApi::class)
 class AppSSLFactoryProvider(
     private val ignoreSSLCertificates: StateFlow<Boolean>,
 ) {
@@ -27,6 +29,7 @@ class AppSSLFactoryProvider(
 }
 
 
+@Suppress("CustomX509TrustManager")
 private class ToggleableTrustManager(
     private val trustManager: X509TrustManager,
     private val shouldCheck: () -> Boolean,

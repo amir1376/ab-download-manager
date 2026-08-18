@@ -60,9 +60,7 @@ kotlin {
         }
         val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
-            implementation(libs.osThemeDetector.get().toString()) {
-                exclude(group = "net.java.dev.jna")
-            }
+            implementation(libs.nucleus.darkmodeDetector)
         }
     }
 }
