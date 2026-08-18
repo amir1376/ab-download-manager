@@ -1,12 +1,12 @@
 package com.abdownloadmanager.desktop.ui
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.AppArguments
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.AppEffects
 import com.abdownloadmanager.desktop.actions.gotoSettingsAction
+import com.abdownloadmanager.desktop.actions.newDownloadFromClipboardAction
 import com.abdownloadmanager.desktop.actions.requestExitAction
 import com.abdownloadmanager.desktop.actions.showDownloadList
 import com.abdownloadmanager.desktop.pages.about.ShowAboutDialog
@@ -200,7 +200,7 @@ private fun HandleEffectsForApp(appComponent: AppComponent) {
 }
 
 @Composable
-private fun ApplicationScope.SystemTray(
+private fun SystemTray(
     component: AppComponent,
 ) {
     val useSystemTray by component.useSystemTray.collectAsState()
@@ -209,7 +209,11 @@ private fun ApplicationScope.SystemTray(
         val menu = remember {
             buildMenu {
                 +showDownloadList
+                separator()
+                +newDownloadFromClipboardAction
+                separator()
                 +gotoSettingsAction
+                separator()
                 +requestExitAction
             }
         }

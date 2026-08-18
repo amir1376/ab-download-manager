@@ -1,29 +1,24 @@
 package com.abdownloadmanager.desktop.ui.widget
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.window.ApplicationScope
-import com.kdroid.composetray.menu.api.TrayMenuBuilder
-import com.kdroid.composetray.tray.api.Tray
+import androidx.compose.runtime.getValue
+import dev.nucleusframework.composenativetray.menu.api.ComposableTrayMenuScope
+import dev.nucleusframework.composenativetray.tray.api.Tray
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
 
 @Composable
-fun ApplicationScope.Tray(
+fun Tray(
     icon: IconSource,
     tooltip: String,
     primaryAction: () -> Unit,
     menu: List<MenuItem>
 ) {
-    // use this composable to properly update menu item properties (State<T>,StateFlow<T> properties)
-    val immutableMenu = menu.toImmutableMenuItem()
-    val menuContent: TrayMenuBuilder.() -> Unit = {
-        for (item in immutableMenu) {
-            renderTrayItem(item)
-        }
+    val menuContent: @Composable ComposableTrayMenuScope.() -> Unit = {
+        MenuContent(menu)
     }
     val shouldBeMonochrome = when (Platform.asDesktop()) {
         Platform.Desktop.MacOS -> true
@@ -49,25 +44,28 @@ fun ApplicationScope.Tray(
     }
 }
 
-private fun TrayMenuBuilder.renderTrayItem(item: ImmutableMenuItem) {
+@Composable
+private fun ComposableTrayMenuScope.renderTrayItem(item: MenuItem) {
     when (item) {
-        is ImmutableMenuItem.SingleItem -> {
-            renderTraySingleItem(item)
+        is MenuItem.SingleItem -> {
+            RenderTraySingleItem(item)
         }
 
-        is ImmutableMenuItem.SubMenu -> {
-            renderTraySubMenu(item)
+        is MenuItem.SubMenu -> {
+            RenderTraySubMenu(item)
         }
 
-        is ImmutableMenuItem.Separator -> Divider()
+        MenuItem.Separator -> Divider()
     }
 }
 
-private fun TrayMenuBuilder.renderTraySingleItem(item: ImmutableMenuItem.SingleItem) {
-    val title = item.title
-    val isEnabled = item.enabled
-    val onClick = item.onAction
-    when (val iconSource = item.icon) {
+@Composable
+private fun ComposableTrayMenuScope.RenderTraySingleItem(item: MenuItem.SingleItem) {
+    val title = item.title.collectAsState().value.rememberString()
+    val isEnabled by item.isEnabled.collectAsState()
+    val iconSource = item.icon.collectAsState().value
+    val onClick = item::invoke
+    when (iconSource) {
         is IconSource.VectorIconSource -> Item(
             label = title,
             isEnabled = isEnabled,
@@ -90,15 +88,23 @@ private fun TrayMenuBuilder.renderTraySingleItem(item: ImmutableMenuItem.SingleI
     }
 }
 
-private fun TrayMenuBuilder.renderTraySubMenu(submenu: ImmutableMenuItem.SubMenu) {
-    val title = submenu.title
-    val isEnabled = submenu.enabled
-    val submenuContent: TrayMenuBuilder.() -> Unit = {
-        for (item in submenu.items) {
-            renderTrayItem(item)
-        }
+@Composable
+private fun ComposableTrayMenuScope.MenuContent(menu: List<MenuItem>) {
+    for (item in menu) {
+        renderTrayItem(item)
     }
-    when (val iconSource = submenu.icon) {
+}
+
+@Composable
+private fun ComposableTrayMenuScope.RenderTraySubMenu(submenu: MenuItem.SubMenu) {
+    val title = submenu.title.collectAsState().value.rememberString()
+    val isEnabled by submenu.isEnabled.collectAsState()
+    val iconSource = submenu.icon.collectAsState().value
+    val menu = submenu.items.collectAsState().value
+    val submenuContent: @Composable ComposableTrayMenuScope.() -> Unit = {
+        MenuContent(menu)
+    }
+    when (iconSource) {
         is IconSource.PainterIconSource -> {
             SubMenu(
                 label = title,
@@ -125,47 +131,4 @@ private fun TrayMenuBuilder.renderTraySubMenu(submenu: ImmutableMenuItem.SubMenu
             )
         }
     }
-}
-
-@Composable
-private fun List<MenuItem>.toImmutableMenuItem(): List<ImmutableMenuItem> {
-    return map {
-        when (it) {
-            MenuItem.Separator -> ImmutableMenuItem.Separator
-            is MenuItem.SingleItem -> {
-                ImmutableMenuItem.SingleItem(
-                    title = it.title.collectAsState().value.rememberString(),
-                    icon = it.icon.collectAsState().value,
-                    enabled = it.isEnabled.value,
-                    onAction = it::onClick
-                )
-            }
-
-            is MenuItem.SubMenu -> ImmutableMenuItem.SubMenu(
-                title = it.title.collectAsState().value.rememberString(),
-                icon = it.icon.value,
-                enabled = it.isEnabled.value,
-                items = it.items.collectAsState().value.toImmutableMenuItem()
-            )
-        }
-    }
-}
-
-
-@Immutable
-private sealed class ImmutableMenuItem {
-    data object Separator : ImmutableMenuItem()
-    data class SingleItem(
-        val title: String,
-        val icon: IconSource?,
-        val enabled: Boolean,
-        val onAction: () -> Unit,
-    ) : ImmutableMenuItem()
-
-    data class SubMenu(
-        val title: String,
-        val icon: IconSource?,
-        val enabled: Boolean,
-        val items: List<ImmutableMenuItem>
-    ) : ImmutableMenuItem()
 }
