@@ -8,10 +8,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.shared.settings.BaseSettingsComponent
+import com.abdownloadmanager.shared.util.rememberChild
 
 @Composable
 fun SettingWindow(
+    appComponent: AppComponent,
+) {
+    appComponent.showSettingSlot.rememberChild()?.let {
+        SettingWindow(it, appComponent::closeSettings)
+    }
+}
+
+@Composable
+private fun SettingWindow(
     settingsComponent: DesktopSettingsComponent,
     onRequestCloseWindow: () -> Unit,
 ) {

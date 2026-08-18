@@ -6,14 +6,23 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.shared.pages.batchdownload.BaseBatchDownloadComponent
-import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.rememberChild
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
-fun BatchDownloadWindow(desktopBatchDownloadComponent: DesktopBatchDownloadComponent) {
+fun BatchDownloadWindow(appComponent: AppComponent) {
+    appComponent.batchDownloadSlot.rememberChild()?.let {
+        BatchDownloadWindow(it)
+    }
+}
+
+@Composable
+private fun BatchDownloadWindow(desktopBatchDownloadComponent: DesktopBatchDownloadComponent) {
     CustomWindow(
         state = rememberWindowState(
             size = DpSize(500.dp, 420.dp)

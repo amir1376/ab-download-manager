@@ -6,11 +6,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.util.LocalShortCutManager
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -18,6 +20,15 @@ import java.awt.Dimension
 
 @Composable
 fun HomeWindow(
+    appComponent: AppComponent,
+) {
+    appComponent.showHomeSlot.rememberChild()?.let {
+        HomeWindow(it, appComponent::closeHome)
+    }
+}
+
+@Composable
+private fun HomeWindow(
     homeComponent: HomeComponent,
     onCLoseRequest: () -> Unit,
 ) {

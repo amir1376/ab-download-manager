@@ -1,11 +1,6 @@
 package com.abdownloadmanager.desktop.ui
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.AppArguments
@@ -18,27 +13,26 @@ import com.abdownloadmanager.desktop.pages.about.ShowAboutDialog
 import com.abdownloadmanager.desktop.pages.addDownload.ShowAddDownloadDialogs
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
 import com.abdownloadmanager.desktop.pages.category.ShowCategoryDialogs
+import com.abdownloadmanager.desktop.pages.checksum.FileChecksumWindow
 import com.abdownloadmanager.desktop.pages.confirmexit.ConfirmExit
 import com.abdownloadmanager.desktop.pages.credits.translators.ShowTranslators
+import com.abdownloadmanager.desktop.pages.downloaderror.DownloadErrorDialog
 import com.abdownloadmanager.desktop.pages.editdownload.EditDownloadWindow
 import com.abdownloadmanager.desktop.pages.enterurl.EnterNewDownloadWindow
 import com.abdownloadmanager.desktop.pages.extenallibs.ShowOpenSourceLibraries
-import com.abdownloadmanager.desktop.pages.checksum.FileChecksumWindow
-import com.abdownloadmanager.desktop.pages.downloaderror.DownloadErrorDialog
 import com.abdownloadmanager.desktop.pages.home.HomeWindow
 import com.abdownloadmanager.desktop.pages.newQueue.NewQueueDialog
 import com.abdownloadmanager.desktop.pages.perhostsettings.PerHostSettingsWindow
+import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionAlert
 import com.abdownloadmanager.desktop.pages.queue.QueuesWindow
 import com.abdownloadmanager.desktop.pages.settings.FontManager
 import com.abdownloadmanager.desktop.pages.settings.SettingWindow
-import com.abdownloadmanager.shared.ui.theme.ThemeManager
-import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionAlert
 import com.abdownloadmanager.desktop.pages.singleDownloadPage.ShowDownloadDialogs
 import com.abdownloadmanager.desktop.pages.updater.ShowUpdaterDialog
 import com.abdownloadmanager.desktop.ui.configurable.comon.CommonConfigurableRenderersForDesktop
 import com.abdownloadmanager.desktop.ui.configurable.platform.PlatformConfigurableRenderersForDesktop
-import com.abdownloadmanager.desktop.ui.widget.Tray
 import com.abdownloadmanager.desktop.ui.widget.ShowMessageDialogs
+import com.abdownloadmanager.desktop.ui.widget.Tray
 import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
 import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
@@ -47,6 +41,7 @@ import com.abdownloadmanager.shared.ui.ProvideCommonSettings
 import com.abdownloadmanager.shared.ui.ProvideSizeUnits
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRendererRegistry
 import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
+import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.ui.widget.NotificationManager
 import com.abdownloadmanager.shared.ui.widget.ProvideLanguageManager
 import com.abdownloadmanager.shared.ui.widget.ProvideNotificationManager
@@ -97,6 +92,7 @@ object Ui : KoinComponent {
             )
         }
     }
+
     fun start(
         globalAppExceptionHandler: GlobalAppExceptionHandler,
     ) {
@@ -111,31 +107,12 @@ object Ui : KoinComponent {
             ) {
                 HandleEffectsForApp(appComponent)
                 SystemTray(appComponent)
-                val showHomeSlot =
-                    appComponent.showHomeSlot.collectAsState().value
-                showHomeSlot.child?.instance?.let {
-                    HomeWindow(it, appComponent::closeHome)
-                }
-                val showSettingSlot =
-                    appComponent.showSettingSlot.collectAsState().value
-                showSettingSlot.child?.instance?.let {
-                    SettingWindow(it, appComponent::closeSettings)
-                }
-                val showQueuesSlot =
-                    appComponent.showQueuesSlot.collectAsState().value
-                showQueuesSlot.child?.instance?.let {
-                    QueuesWindow(it)
-                }
-                val batchDownloadSlot =
-                    appComponent.batchDownloadSlot.collectAsState().value
-                batchDownloadSlot.child?.instance?.let {
-                    BatchDownloadWindow(it)
-                }
-                val editDownloadSlot =
-                    appComponent.editDownloadSlot.collectAsState().value
-                editDownloadSlot.child?.instance?.let {
-                    EditDownloadWindow(it)
-                }
+
+                HomeWindow(appComponent)
+                SettingWindow(appComponent)
+                QueuesWindow(appComponent)
+                BatchDownloadWindow(appComponent)
+                EditDownloadWindow(appComponent)
                 EnterNewDownloadWindow(appComponent)
                 ShowAddDownloadDialogs(appComponent)
                 ShowDownloadDialogs(appComponent)

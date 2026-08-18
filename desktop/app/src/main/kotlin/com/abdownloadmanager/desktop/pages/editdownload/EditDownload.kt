@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
@@ -36,6 +37,7 @@ import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorReason
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
+import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
@@ -54,6 +56,15 @@ import ir.amirab.util.ifThen
 
 @Composable
 fun EditDownloadWindow(
+    appComponent: AppComponent,
+) {
+    appComponent.editDownloadSlot.rememberChild()?.let {
+        EditDownloadWindow(it)
+    }
+}
+
+@Composable
+private fun EditDownloadWindow(
     component: DesktopEditDownloadComponent,
 ) {
     CustomWindow(
