@@ -2,6 +2,7 @@ package com.abdownloadmanager.android.ui.configurable.comon
 
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.BooleanConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.DayOfWeekConfigurableRenderer
+import com.abdownloadmanager.android.ui.configurable.comon.renderer.DnsConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.EnumConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.FileChecksumConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.FloatConfigurableRenderer
@@ -32,5 +33,6 @@ val CommonConfigurableRenderersForAndroid = CommonConfigurableRenderers(
     themeConfigurableRenderer = ThemeConfigurableRenderer,
     timeConfigurableRenderer = TimeConfigurableRenderer,
     proxyConfigurableRenderer = ProxyConfigurableRenderer,
+    dnsConfigurableRenderer = DnsConfigurableRenderer,
     soundConfigurableRenderer = SoundConfigurableRenderer,
 )

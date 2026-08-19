@@ -44,6 +44,8 @@ kotlin {
 
             api(libs.androidx.datastore)
 
+            implementation(libs.okhttp.dnsoverhttps)
+
             implementation(libs.kotlinFileWatcher)
 
             //because we don't have material design, but we use ripple effect

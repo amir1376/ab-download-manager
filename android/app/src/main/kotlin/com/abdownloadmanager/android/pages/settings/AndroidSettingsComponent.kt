@@ -6,6 +6,7 @@ import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.settings.BaseSettingsComponent
 import com.abdownloadmanager.shared.settings.CommonSettings
+import com.abdownloadmanager.shared.storage.impl.DNSStorage
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
@@ -29,6 +30,7 @@ class AndroidSettingsComponent(
     //    private val pageStorage by inject<PageStatesStorage>()
     private val appRepository by inject<BaseAppRepository>()
     private val proxyManager by inject<ProxyManager>()
+    private val dnsStorage by inject<DNSStorage>()
     private val themeManager by inject<ThemeManager>()
     private val languageManager by inject<LanguageManager>()
     override val configurables: StateFlow<List<ConfigurableGroup>> = MutableStateFlow(
@@ -111,6 +113,7 @@ class AndroidSettingsComponent(
             ConfigurableGroup(
                 nestedConfigurable = listOf(
                     CommonSettings.proxyConfig(proxyManager),
+                    CommonSettings.dnsConfig(dnsStorage),
                     CommonSettings.userAgent(appSettings),
                     CommonSettings.ignoreSSLCertificates(appSettings),
                     CommonSettings.useServerLastModified(appRepository),

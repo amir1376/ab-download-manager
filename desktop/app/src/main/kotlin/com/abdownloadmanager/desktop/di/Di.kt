@@ -52,14 +52,17 @@ import com.abdownloadmanager.shared.downloaderinui.http.HttpDownloaderInUi
 import com.abdownloadmanager.shared.pagemanager.SettingsPageManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.DnsSettings
 import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
+import com.abdownloadmanager.shared.storage.IDNSSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraQueueSettingsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.storage.PerHostSettingsDatastoreStorage
 import com.abdownloadmanager.shared.storage.ProxyDatastoreStorage
 import com.abdownloadmanager.shared.storage.SelectQueueSettings
+import com.abdownloadmanager.shared.storage.impl.DNSStorage
 import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.ui.theme.ThemeSettingsStorage
 import com.abdownloadmanager.shared.ui.widget.NotificationManager
@@ -89,6 +92,9 @@ import ir.amirab.util.AppVersionTracker
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.util.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.shared.util.category.*
+import com.abdownloadmanager.shared.util.di.BaseOKHttpClientQualifier
+import com.abdownloadmanager.shared.util.dns.AppDns
+import com.abdownloadmanager.shared.util.dns.DnsOptionProvider
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegistryFactory
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
@@ -623,12 +629,24 @@ val appModule = module {
             ignoreHostNameVerification = appSettingsStorage.ignoreSSLCertificates
         )
     }
-    single<OkHttpClient> {
+    single {
+        val definedPaths = get<DefinedPaths>()
+        DNSStorage(
+            kotlinxSerializationDataStore(
+                definedPaths.dnsSettingsFile.toFile(),
+                get(),
+                ::DnsSettings
+            )
+        )
+    }.apply {
+        bind<IDNSSettingsStorage>()
+        bind<DnsOptionProvider>()
+    }
+    single<OkHttpClient>(BaseOKHttpClientQualifier) {
         val appSSLFactoryProvider: AppSSLFactoryProvider = get()
         val appHostNameVerifier: AppHostNameVerifier = get()
         OkHttpClient
             .Builder()
-            .protocols(listOf(Protocol.HTTP_1_1))
             .dispatcher(Dispatcher().apply {
                 //bypass limit on concurrent connections!
                 maxRequests = Int.MAX_VALUE
@@ -639,6 +657,17 @@ val appModule = module {
                 appSSLFactoryProvider.trustManager,
             )
             .hostnameVerifier(appHostNameVerifier)
+            .build()
+    }
+    single<AppDns> {
+        AppDns(get<OkHttpClient>(BaseOKHttpClientQualifier), get())
+    }
+    single<OkHttpClient> {
+        val baseClient = get<OkHttpClient>(BaseOKHttpClientQualifier)
+        val appDns: AppDns = get()
+        baseClient.newBuilder()
+            .protocols(listOf(Protocol.HTTP_1_1))
+            .dns(appDns)
             .build()
     }
     single {
