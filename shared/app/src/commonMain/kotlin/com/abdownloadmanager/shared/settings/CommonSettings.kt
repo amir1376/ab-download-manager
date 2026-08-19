@@ -4,7 +4,9 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.IDNSSettingsStorage
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.DnsConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.FolderConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
@@ -19,6 +21,7 @@ import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.MaximumDownloadRetriesLimitation
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
+import com.abdownloadmanager.shared.util.dns.DnsModes
 import com.abdownloadmanager.shared.util.notification.INotificationSound
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
@@ -730,6 +733,23 @@ object CommonSettings {
                                 )
                             )
                     }
+                }
+            }
+        )
+    }
+    fun dnsConfig(dnsStorage: IDNSSettingsStorage): DnsConfigurable {
+        return DnsConfigurable(
+            title = Res.string.settings_dns.asStringSource(),
+            description = Res.string.settings_dns_description.asStringSource(),
+            backedBy = dnsStorage.dnsSettingsFlow,
+            validate = {
+                true
+            },
+            describe = {
+                if (it.mode == DnsModes.System) {
+                    DnsModes.System.stringSource
+                } else {
+                    it.address.asStringSource()
                 }
             }
         )

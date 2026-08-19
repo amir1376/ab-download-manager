@@ -57,6 +57,7 @@ kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializat
 okhttp-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 okhttp-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-coroutines = { module = "com.squareup.okhttp3:okhttp-coroutines", version.ref = "okhttp" }
+okhttp-dnsoverhttps = { module = "com.squareup.okhttp3:okhttp-dnsoverhttps", version.ref = "okhttp" }
 okio-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }

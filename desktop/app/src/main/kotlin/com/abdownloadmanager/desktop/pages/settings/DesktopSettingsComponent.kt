@@ -11,6 +11,7 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.shared.settings.BaseSettingsComponent
 import com.abdownloadmanager.shared.settings.CommonSettings
+import com.abdownloadmanager.shared.storage.impl.DNSStorage
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
@@ -56,6 +57,7 @@ class DesktopSettingsComponent(
     private val pageStorage by inject<PageStatesStorage>()
     private val appRepository by inject<AppRepository>()
     private val proxyManager by inject<ProxyManager>()
+    private val dNSStorage by inject<DNSStorage>()
     private val themeManager by inject<ThemeManager>()
     private val languageManager by inject<LanguageManager>()
     private val fontManager by inject<FontManager>()
@@ -160,6 +162,7 @@ class DesktopSettingsComponent(
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
                             CommonSettings.proxyConfig(proxyManager),
+                            CommonSettings.dnsConfig(dNSStorage),
                             CommonSettings.userAgent(appSettings),
                             CommonSettings.ignoreSSLCertificates(appSettings),
                             CommonSettings.useServerLastModified(appRepository),

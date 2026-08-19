@@ -2,6 +2,7 @@ package com.abdownloadmanager.desktop.ui.configurable.comon
 
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.BooleanConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.DayOfWeekConfigurableRenderer
+import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.DnsConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.EnumConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.FileChecksumConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.FloatConfigurableRenderer
@@ -32,5 +33,6 @@ val CommonConfigurableRenderersForDesktop = CommonConfigurableRenderers(
     themeConfigurableRenderer = ThemeConfigurableRenderer,
     timeConfigurableRenderer = TimeConfigurableRenderer,
     proxyConfigurableRenderer = ProxyConfigurableRenderer,
+    dnsConfigurableRenderer = DnsConfigurableRenderer,
     soundConfigurableRenderer = SoundConfigurableRenderer,
 )
