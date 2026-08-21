@@ -92,8 +92,14 @@ abstract class BaseAddSingleDownloadComponent(
 
     private val _useCategory = MutableStateFlow(false)
     val useCategory = _useCategory.asStateFlow()
+    private val _rememberCategoryPath = MutableStateFlow(false)
+    val rememberCategoryPath = _rememberCategoryPath.asStateFlow()
+
     fun setUseCategory(useCategory: Boolean) {
         _useCategory.update { useCategory }
+        if (!useCategory) {
+            _rememberCategoryPath.update { false }
+        }
         if (useCategory) {
             val usedCategoryFolder = useCategoryFolder(_useCategory.value)
             if (!usedCategoryFolder) {
@@ -134,6 +140,7 @@ abstract class BaseAddSingleDownloadComponent(
 
     fun setSelectedCategory(category: Category) {
         _selectedCategory.update { category }
+        _rememberCategoryPath.update { false }
         val useCategory = useCategory.value
         if (useCategory) {
             val used = useCategoryFolder(useCategory)
@@ -143,11 +150,26 @@ abstract class BaseAddSingleDownloadComponent(
         }
     }
 
+    fun setRememberCategoryPath(value: Boolean) {
+        _rememberCategoryPath.value = value
+    }
+
 
     //inputs
     val credentials = downloadChecker.credentials.asStateFlow()
     val name = downloadChecker.name.asStateFlow()
     val folder = downloadChecker.folder.asStateFlow()
+    val shouldShowRememberCategoryPath = combineStateFlows(
+        useCategory,
+        selectedCategory,
+        folder,
+    ) { useCategory, selectedCategory, folder ->
+        if (!useCategory) {
+            return@combineStateFlows false
+        }
+        val categoryPath = selectedCategory?.getDownloadPath()
+        categoryPath != folder
+    }
     val onDuplicateStrategy: MutableStateFlow<OnDuplicateStrategy?> = MutableStateFlow(null)
 
     fun setCredentials(downloadCredentials: IDownloadCredentials) {
@@ -264,6 +286,7 @@ abstract class BaseAddSingleDownloadComponent(
         val downloadItem = this@BaseAddSingleDownloadComponent.downloadItem.value
         val downloadJobExtraConfig = downloadJobConfig.value
         consumeDialog {
+            rememberCategoryPathIfNecessary(downloadItem.folder)
             saveLocationIfNecessary(downloadItem.folder)
             onRequestDownload(
                 item = NewDownloadItemProps(
@@ -299,6 +322,32 @@ abstract class BaseAddSingleDownloadComponent(
         }
     }
 
+    private fun rememberCategoryPathIfNecessary(folder: String) {
+        if (!rememberCategoryPath.value) {
+            return
+        }
+        val category = getCategoryIfUseCategoryIsOn() ?: return
+        if (category.getDownloadPath() == folder) {
+            return
+        }
+        categoryManager.updateCategory(category.id) {
+            it.copy(
+                path = folder,
+                usePath = true,
+            )
+        }
+        _selectedCategory.update {
+            if (it?.id == category.id) {
+                it.copy(
+                    path = folder,
+                    usePath = true,
+                )
+            } else {
+                it
+            }
+        }
+    }
+
 
     override fun onRequestAddToQueue(
         queueId: Long?,
@@ -307,6 +356,7 @@ abstract class BaseAddSingleDownloadComponent(
         val downloadItem = downloadItem.value
         val downloadJobConfig = downloadJobConfig.value
         consumeDialog {
+            rememberCategoryPathIfNecessary(downloadItem.folder)
             saveLocationIfNecessary(downloadItem.folder)
             onRequestAddToQueue(
                 item = NewDownloadItemProps(
