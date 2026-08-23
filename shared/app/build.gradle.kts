@@ -11,6 +11,7 @@ plugins {
     id(Plugins.Kotlin.serialization)
     id(Plugins.Android.multiplatformLibrary)
     id(Plugins.buildConfig)
+    id(Plugins.ksp)
 }
 kotlin {
     jvm("desktop")
@@ -51,20 +52,31 @@ kotlin {
             //because we don't have material design, but we use ripple effect
             implementation(libs.compose.material.rippleEffect)
 
+            api(libs.schemakt)
+
             // multiplatform scrollbars
             api(libs.fastscroller.core)
             api(libs.markdownRenderer.core)
             api(libs.compose.reorderable)
         }
-        androidMain.dependencies {
-            api(libs.androidx.core.ktx)
-            api(libs.androidx.activity.compose)
+        androidMain {
+            dependencies {
+                api(libs.androidx.core.ktx)
+                api(libs.androidx.activity.compose)
+            }
         }
+        val androidMain = getByName("androidMain")
         val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
             implementation(libs.nucleus.darkmodeDetector)
         }
     }
+}
+
+
+dependencies {
+    add("kspAndroid", libs.arrow.opticKsp)
+    add("kspDesktop", libs.arrow.opticKsp)
 }
 
 // generate a file with these constants

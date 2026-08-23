@@ -8,7 +8,7 @@ import com.abdownloadmanager.android.ui.configurable.comon.CommonConfigurableRen
 import com.abdownloadmanager.android.ui.configurable.comon.ConfigurableRenderersForAndroid
 import com.abdownloadmanager.android.util.AppInfo
 import com.abdownloadmanager.shared.repository.BaseAppRepository
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.ui.ProvideCommonSettings
 import com.abdownloadmanager.shared.ui.ProvideSizeUnits
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRendererRegistry

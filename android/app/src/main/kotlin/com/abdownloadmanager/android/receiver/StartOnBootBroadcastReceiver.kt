@@ -3,11 +3,8 @@ package com.abdownloadmanager.android.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.abdownloadmanager.android.pages.onboarding.permissions.PermissionManager
 import com.abdownloadmanager.android.util.ABDMAppManager
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

@@ -5,7 +5,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.abdownloadmanager.shared.repository.BaseAppRepository
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRendererRegistry
 import com.abdownloadmanager.shared.ui.configurable.LocalConfigurationRendererRegistry
 import com.abdownloadmanager.shared.util.LocalUseRelativeDateTime

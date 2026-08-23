@@ -3,7 +3,6 @@ package com.abdownloadmanager.shared.util
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
 import ir.amirab.util.flow.mapTwoWayStateFlow
-import ir.amirab.util.config.MapConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -34,30 +33,6 @@ abstract class BaseStorage<T> : KoinComponent {
             .onEach { s ->
                 saveData(s)
             }.launchIn(scope)
-    }
-}
-
-abstract class ConfigBaseSettingsByMapConfig<T>(
-    private val dataStore: DataStore<MapConfig>,
-    private val lens: Lens<MapConfig, T>,
-) : BaseStorage<T>(), KoinComponent {
-    private val lastFileState = dataStore.data.let {
-        runBlocking { it.stateIn(scope) }
-    }
-
-    override val inMemoryState = MutableStateFlow(
-        lens.get(lastFileState.value)
-    )
-
-    override suspend fun saveData(data: T) {
-        dataStore.updateData {
-            val newData = lens.set(MapConfig(), data)
-            newData
-        }
-    }
-
-    init {
-        startPersistData()
     }
 }
 

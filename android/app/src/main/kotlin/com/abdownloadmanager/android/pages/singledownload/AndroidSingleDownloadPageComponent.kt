@@ -5,7 +5,7 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.singledownloadpage.BaseSingleDownloadComponent
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.util.DownloadItemOpener

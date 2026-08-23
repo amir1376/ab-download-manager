@@ -12,7 +12,7 @@ import com.abdownloadmanager.shared.pages.adddownload.single.OnRequestAddSingleI
 import com.abdownloadmanager.shared.pages.adddownload.single.OnRequestDownloadSingleItem
 import com.abdownloadmanager.shared.pages.category.CategoryComponent
 import com.abdownloadmanager.shared.repository.BaseAppRepository
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.util.DownloadItemOpener

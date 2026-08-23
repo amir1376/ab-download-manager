@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.util
 
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import ir.amirab.downloader.connection.UserAgentProvider
 
 class UserAgentProviderFromSettings(

@@ -1,6 +1,6 @@
 package com.abdownloadmanager.shared.repository
 
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import com.abdownloadmanager.shared.util.AutoStartManager
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider

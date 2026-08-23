@@ -51,7 +51,7 @@ import com.abdownloadmanager.shared.downloaderinui.hls.HLSDownloaderInUi
 import com.abdownloadmanager.shared.downloaderinui.http.HttpDownloaderInUi
 import com.abdownloadmanager.shared.pagemanager.SettingsPageManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.DnsSettings
 import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
@@ -62,6 +62,7 @@ import com.abdownloadmanager.shared.storage.ISelectQueueStorage
 import com.abdownloadmanager.shared.storage.PerHostSettingsDatastoreStorage
 import com.abdownloadmanager.shared.storage.ProxyDatastoreStorage
 import com.abdownloadmanager.shared.storage.SelectQueueSettings
+import com.abdownloadmanager.shared.storage.appsettings.DesktopSettingsSchema
 import com.abdownloadmanager.shared.storage.impl.DNSStorage
 import com.abdownloadmanager.shared.storage.impl.SelectQueueStorage
 import com.abdownloadmanager.shared.ui.theme.ThemeSettingsStorage
@@ -77,7 +78,6 @@ import com.abdownloadmanager.shared.util.*
 import com.abdownloadmanager.updateapplier.DesktopDirectLinkUpdateApplier
 import com.abdownloadmanager.updateapplier.UpdateApplier
 import ir.amirab.downloader.DownloadManager
-import ir.amirab.util.config.datastore.createMapConfigDatastore
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import okhttp3.Dispatcher
@@ -134,6 +134,7 @@ import ir.amirab.util.compose.IIconResolver
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.compose.localizationmanager.LanguageSourceProvider
 import ir.amirab.util.compose.localizationmanager.LanguageStorage
+import ir.amirab.util.config.datastore.createSchemaBasedDatastore
 import ir.amirab.util.config.datastore.kotlinxSerializationDataStore
 import ir.amirab.util.startup.AbstractStartupManager
 import ir.amirab.util.startup.Startup
@@ -551,9 +552,10 @@ val appModule = module {
     single {
         val definedPaths = get<DefinedPaths>()
         AppSettingsStorage(
-            createMapConfigDatastore(
+            createSchemaBasedDatastore(
                 definedPaths.appSettingsFile.toFile(),
                 get(),
+                DesktopSettingsSchema,
             )
         )
     }.apply {
@@ -565,9 +567,10 @@ val appModule = module {
     single {
         val definedPaths = get<DesktopDefinedPaths>()
         PageStatesStorage(
-            createMapConfigDatastore(
+            kotlinxSerializationDataStore(
                 definedPaths.pageStatesStorageFile.toFile(),
                 get(),
+                PageStatesModel::default,
             )
         )
     }

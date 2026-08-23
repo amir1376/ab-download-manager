@@ -1,6 +1,5 @@
 package com.abdownloadmanager.android.util.activity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,7 +19,7 @@ import com.abdownloadmanager.android.ui.ABDownloadManagerApplicationContent
 import com.abdownloadmanager.android.util.ABDMAppManager
 import com.abdownloadmanager.android.util.AndroidUi
 import com.abdownloadmanager.shared.repository.BaseAppRepository
-import com.abdownloadmanager.shared.storage.BaseAppSettingsStorage
+import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.ui.widget.NotificationManager
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
@@ -30,7 +29,6 @@ import com.arkivanov.decompose.retainedComponent
 import ir.amirab.util.compose.IIconResolver
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.getValue

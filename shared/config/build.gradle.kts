@@ -4,4 +4,5 @@ plugins {
 dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.schemakt)
 }

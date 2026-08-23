@@ -45,11 +45,14 @@ kotlinRpc = "0.10.3"
 ktor = "3.5.2"
 clikit = "5.1.0"
 androidCompileSdk = "37"
+schemakt = "0.2.3"
 
 [libraries]
 
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+schemakt = { module = "com.github.amir1376:SchemaKt", version.ref = "schemakt" }
 
 kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
