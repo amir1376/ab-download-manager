@@ -1,0 +1,81 @@
+name: ab-download-manager
+base: core22
+version: '1.10.2'
+summary: A Download Manager that speeds up your downloads
+description: |
+  AB Download Manager (ABD) is a download manager that speeds up your downloads.
+  This snap packages the official prebuilt Linux binaries from the project's
+  GitHub releases.
+
+grade: stable
+confinement: strict
+compression: lzo
+architectures:
+  - amd64
+  - arm64
+
+apps:
+  ab-download-manager:
+    command: ABDownloadManager/bin/ABDownloadManager
+    desktop: usr/share/applications/ab-download-manager.desktop
+    plugs:
+      - desktop
+      - desktop-legacy
+      - wayland
+      - x11
+      - network
+      - network-bind
+      - home
+      - removable-media
+      - audio-playback
+
+parts:
+  ab-download-manager:
+    plugin: dump
+    source: .
+    build-packages:
+      - curl
+      - tar
+      - gzip
+    stage-packages:
+      - libxtst6
+      - libxcb1
+      - libx11-6
+      - libxau6
+      - libxdmcp6
+      - libxext6
+      - libxi6
+      - libxrender1
+      - libasound2t64
+      - libwayland-client0
+      - libwayland-cursor0
+    override-build: |
+      set -eu
+      case "$CRAFT_ARCH_BUILD_FOR" in
+        amd64) TARBALL="ABDownloadManager_1.10.2_linux_x64.tar.gz" ;;
+        arm64) TARBALL="ABDownloadManager_1.10.2_linux_arm64.tar.gz" ;;
+        *) echo "unsupported architecture: $CRAFT_ARCH_BUILD_FOR" >&2; exit 1 ;;
+      esac
+      curl -fSL --retry 8 --retry-all-errors --retry-delay 3 -o app.tar.gz \
+        "https://github.com/amir1376/ab-download-manager/releases/download/v1.10.2/${TARBALL}"
+      mkdir -p app
+      tar -xzf app.tar.gz -C app
+
+      cp -r app/ABDownloadManager "$CRAFT_PART_INSTALL/ABDownloadManager"
+      mkdir -p "$CRAFT_PART_INSTALL/usr/share/applications"
+      cp "$CRAFT_PART_SRC/snap/local/ab-download-manager.desktop" \
+        "$CRAFT_PART_INSTALL/usr/share/applications/"
+      mkdir -p "$CRAFT_PART_INSTALL/usr/share/icons/hicolor/256x256/apps"
+      cp app/ABDownloadManager/lib/ABDownloadManager.png \
+        "$CRAFT_PART_INSTALL/usr/share/icons/hicolor/256x256/apps/ab-download-manager.png"
+
+    override-prime: |
+      craftctl default
+      cd "$CRAFT_PRIME"
+      find ABDownloadManager/bin -type f -exec chmod 755 {} \;
+      find ABDownloadManager -type f -not -path "*/bin/*" -exec chmod 644 {} \;
+      mkdir -p meta/gui
+      sed -i 's|^Icon=.*|Icon=/usr/share/icons/hicolor/256x256/apps/ab-download-manager.png|' \
+        usr/share/applications/ab-download-manager.desktop
+      cp usr/share/applications/ab-download-manager.desktop meta/gui/ab-download-manager.desktop
+      cp usr/share/icons/hicolor/256x256/apps/ab-download-manager.png meta/gui/icon.png

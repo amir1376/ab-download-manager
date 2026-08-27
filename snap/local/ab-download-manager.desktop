@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=AB Download Manager
+Comment=Download Manager that speeds up your downloads
+Exec=ABDownloadManager/bin/ABDownloadManager
+Icon=ab-download-manager
+Terminal=false
+Type=Application
+Categories=Network;FileTransfer;P2P;
+StartupNotify=true
+MimeType=x-scheme-handler/abd;
