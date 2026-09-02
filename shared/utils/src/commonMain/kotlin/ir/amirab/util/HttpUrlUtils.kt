@@ -13,22 +13,31 @@ object HttpUrlUtils {
     }
 
     fun extractNameFromLink(link: String): String? {
-        return runCatching {
-            createURL(link)
-        }.map { url ->
-            val foundName = url.pathSegments
+        fun extractNameFromQuery(url: HttpUrl): String? {
+            val fileNameQuery = url.queryParameterNames.firstOrNull {
+                it.equals("filename", ignoreCase = true)
+            } ?: return null
+            return url.queryParameter(fileNameQuery)
+                ?.takeIf { it.isNotBlank() }
+        }
+
+        fun extractNameFromLastPath(url: HttpUrl): String? {
+            return url.pathSegments
                 .lastOrNull { it.isNotBlank() }
                 ?.let {
-                    kotlin.runCatching {
+                    runCatching {
                         FilenameDecoder.decode(it, Charsets.UTF_8)
                     }.getOrNull()
                 }
-            if (foundName != null) {
-                return@map foundName
-            }
-            url.host.replace('.', '_')
         }
-            .getOrNull()
+
+        return runCatching {
+            createURL(link)
+        }.map { url ->
+            extractNameFromQuery(url)
+                ?: extractNameFromLastPath(url)
+                ?: url.host.replace('.', '_')
+        }.getOrNull()
     }
 
     fun getHost(url: String): String? {
