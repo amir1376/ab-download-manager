@@ -19,14 +19,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.rememberDialogState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberDialogState
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import ir.amirab.util.desktop.screen.applyUiScale
-import java.awt.Dimension
 import java.awt.MouseInfo
 
 @Composable
@@ -37,12 +38,20 @@ fun ExtraConfig(
     val h = 250
     val w = 350
     val state = rememberDialogState(
-        size = DpSize(
-            height = h.dp,
-            width = w.dp,
-        ).applyUiScale(LocalUiScale.current),
+        initialBoundsProvider = WindowBoundsProvider(
+            sizeProvider = WindowSizeProvider.Fixed(
+                size = DpSize(
+                    height = h.dp,
+                    width = w.dp,
+                ).applyUiScale(LocalUiScale.current),
+            )
+        ),
     )
-    BaseOptionDialog(onDismiss, state) {
+    BaseOptionDialog(
+        onCloseRequest = onDismiss,
+        state = state,
+        minSize = DpSize(w.dp, h.dp),
+    ) {
         LaunchedEffect(window){
             window.moveSafe(
                 MouseInfo.getPointerInfo().location.run {
@@ -71,9 +80,6 @@ fun ExtraConfig(
                 )
         ) {
             WithContentColor(myColors.onBackground) {
-                LaunchedEffect(w, h) {
-                    window.minimumSize = Dimension(w, h)
-                }
                 Column {
                     WindowDraggableArea(Modifier.fillMaxWidth()) {
                         Text(

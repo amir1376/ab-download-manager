@@ -6,11 +6,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.DesktopAddDownloadDialogManager
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.DesktopAddMultiDownloadComponent
 import com.abdownloadmanager.desktop.pages.addDownload.multiple.AddMultiItemPage
@@ -26,7 +27,6 @@ import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.PlatformAppActivator
 import ir.amirab.util.desktop.screen.applyUiScale
-import java.awt.Dimension
 
 @Composable
 fun ShowAddDownloadDialogs(component: DesktopAddDownloadDialogManager) {
@@ -63,16 +63,20 @@ private fun AddDownloadWindow(
             }
 
             val state = rememberWindowState(
-                size = size,
-                position = WindowPosition(Alignment.Center)
+                initialBoundsProvider = WindowBoundsProvider(
+                    sizeProvider = WindowSizeProvider.Fixed(
+                        size = size
+                    ),
+                    positionProvider = WindowPositionProvider.CenteredOnScreen
+                )
             )
             CustomWindow(
                 state = state,
                 onCloseRequest = onRequestClose,
                 alwaysOnTop = true,
+                minSize = DpSize(w.dp, h.dp),
             ) {
                 LaunchedEffect(Unit) {
-                    window.minimumSize = Dimension(w, h)
                     PlatformAppActivator.active()
                 }
 //                    BringToFront()
@@ -86,17 +90,21 @@ private fun AddDownloadWindow(
             val h = 450
             val w = 800
             val state = rememberWindowState(
-                height = h.dp,
-                width = w.dp,
-                position = WindowPosition(Alignment.Center)
+                initialBoundsProvider = WindowBoundsProvider(
+                    sizeProvider = WindowSizeProvider.Fixed(
+                        height = h.dp,
+                        width = w.dp,
+                    ),
+                    positionProvider = WindowPositionProvider.CenteredOnScreen
+                )
             )
             CustomWindow(
                 state = state,
                 onCloseRequest = onRequestClose,
                 alwaysOnTop = true,
+                minSize = DpSize(w.dp, h.dp),
             ) {
                 LaunchedEffect(Unit) {
-                    window.minimumSize = Dimension(w, h)
                     PlatformAppActivator.active()
                 }
 //                    BringToFront()

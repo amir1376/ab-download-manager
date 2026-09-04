@@ -1,11 +1,12 @@
 package com.abdownloadmanager.desktop.pages.enterurl
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowTitle
@@ -31,9 +32,13 @@ private fun EnterNewDownloadWindow(
     component: DesktopEnterNewURLComponent,
 ) {
     val windowState = rememberWindowState(
-        size = DpSize(400.dp, 150.dp)
-            .applyUiScale(LocalUiScale.current),
-        position = WindowPosition.Aligned(Alignment.Center)
+        initialBoundsProvider = WindowBoundsProvider(
+            sizeProvider = WindowSizeProvider.Fixed(
+                size = DpSize(400.dp, 150.dp)
+                    .applyUiScale(LocalUiScale.current),
+            ),
+            positionProvider = WindowPositionProvider.CenteredOnScreen
+        )
     )
     CustomWindow(
         state = windowState,
@@ -45,7 +50,7 @@ private fun EnterNewDownloadWindow(
         HandleEffects(component) {
             when (it) {
                 DesktopEnterNewURLComponent.Effects.BringToFront -> {
-                    windowState.isMinimized = false
+                    windowState.requestMinimized(false)
                     window.toFront()
                 }
                 else -> {}

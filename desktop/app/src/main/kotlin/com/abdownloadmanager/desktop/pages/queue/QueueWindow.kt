@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.pages.queue
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
@@ -24,7 +24,7 @@ private fun QueuesWindow(queuesComponent: QueuesComponent) {
     ) {
         HandleEffects(queuesComponent) {
             if (it == QueuesComponentEffects.ToFront) {
-                state.isMinimized = false
+                state.requestMinimized(false)
                 window.toFront()
             }
         }

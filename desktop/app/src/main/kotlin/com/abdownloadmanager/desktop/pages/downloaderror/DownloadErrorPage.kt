@@ -11,8 +11,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.ui.template.DialogFooter
 import com.abdownloadmanager.desktop.ui.template.DialogMainContent
@@ -51,9 +53,13 @@ private fun DownloadErrorDialog(
 ) {
     CustomWindow(
         state = rememberWindowState(
-            size = DpSize(400.dp, 300.dp)
-                .applyUiScale(LocalUiScale.current),
-            position = WindowPosition.Aligned(Alignment.Center),
+            initialBoundsProvider = WindowBoundsProvider(
+                sizeProvider = WindowSizeProvider.Fixed(
+                    size = DpSize(400.dp, 300.dp)
+                        .applyUiScale(LocalUiScale.current),
+                ),
+                positionProvider = WindowPositionProvider.CenteredOnScreen
+            )
         ),
         onCloseRequest = downloadErrorComponent.onClose,
         alwaysOnTop = true,

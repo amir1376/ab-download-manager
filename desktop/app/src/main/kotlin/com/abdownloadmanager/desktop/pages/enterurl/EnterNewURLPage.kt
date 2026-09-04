@@ -29,7 +29,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.rememberDialogState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberDialogState
 import com.abdownloadmanager.shared.ui.widget.MyTextFieldWithIcons
 import com.abdownloadmanager.shared.ui.widget.MyTextFieldIcon
 import com.abdownloadmanager.shared.util.ClipboardUtil
@@ -124,7 +126,9 @@ private fun DownloaderSelectionSection(
 
     if (isSelecting) {
         val state = rememberDialogState(
-            size = DpSize.Unspecified,
+            initialBoundsProvider = WindowBoundsProvider(
+                sizeProvider = WindowSizeProvider.Unconstrained,
+            ),
         )
         BaseOptionDialog(
             onCloseRequest = {

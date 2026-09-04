@@ -12,15 +12,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.ActionContainer
 import com.abdownloadmanager.shared.ui.widget.Text
@@ -29,7 +30,6 @@ import com.abdownloadmanager.resources.Res
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.screen.applyUiScale
-import java.awt.Dimension
 
 @Suppress("unused")
 sealed class ConfirmDialogType {
@@ -51,8 +51,14 @@ fun ConfirmDialog(
     val h = 180.applyUiScale(uiScale)
     val w = 400.applyUiScale(uiScale)
     val state = rememberWindowState(
-        size = DpSize(w.dp, h.dp),
-        position = WindowPosition.Aligned(Alignment.Center)
+        initialBoundsProvider = WindowBoundsProvider(
+            sizeProvider = WindowSizeProvider.Fixed(
+                size = DpSize(w.dp, h.dp),
+            ),
+            positionProvider = WindowPositionProvider.CenteredOnScreen
+        )
+
+
     )
     CustomWindow(
         state,
@@ -60,10 +66,8 @@ fun ConfirmDialog(
         onRequestToggleMaximize = null,
         onCloseRequest = onCancel,
         alwaysOnTop = true,
+        minSize = DpSize(w.dp, h.dp)
     ) {
-        LaunchedEffect(Unit) {
-            window.minimumSize = Dimension(w, h)
-        }
         val typeName = type.toString()
         WindowTitle(typeName)
         Column {

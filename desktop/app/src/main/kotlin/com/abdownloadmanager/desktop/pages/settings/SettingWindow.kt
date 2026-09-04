@@ -4,11 +4,15 @@ import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
+import com.abdownloadmanager.desktop.window.custom.isMinimizedOrNull
+import com.abdownloadmanager.desktop.window.custom.placementOrNull
+import com.abdownloadmanager.desktop.window.custom.sizeOrNull
 import com.abdownloadmanager.shared.settings.BaseSettingsComponent
 import com.abdownloadmanager.shared.util.rememberChild
 
@@ -27,12 +31,18 @@ private fun SettingWindow(
     onRequestCloseWindow: () -> Unit,
 ) {
     val windowState = rememberWindowState(
-        size = settingsComponent.windowSize.value,
-        position = WindowPosition.Aligned(Alignment.Center),
+        initialBoundsProvider = WindowBoundsProvider(
+            sizeProvider = WindowSizeProvider.Fixed(
+                size = settingsComponent.windowSize.value,
+            ),
+            positionProvider = WindowPositionProvider.CenteredOnScreen
+        )
     )
-    LaunchedEffect(windowState.size) {
-        if (!windowState.isMinimized && windowState.placement == WindowPlacement.Floating) {
-            settingsComponent.setWindowSize(windowState.size)
+    LaunchedEffect(windowState.sizeOrNull) {
+        if (windowState.isMinimizedOrNull == false && windowState.placementOrNull == WindowPlacement.Floating) {
+            windowState.sizeOrNull?.let {
+                settingsComponent.setWindowSize(it)
+            }
         }
     }
     CustomWindow(windowState, {
@@ -43,7 +53,7 @@ private fun SettingWindow(
                 is BaseSettingsComponent.Effects.Platform -> {
                     when (it as DesktopSettingsComponent.Effects) {
                         DesktopSettingsComponent.Effects.BringToFront -> {
-                            windowState.isMinimized = false
+                            windowState.requestMinimized(false)
                             window.toFront()
                         }
                     }

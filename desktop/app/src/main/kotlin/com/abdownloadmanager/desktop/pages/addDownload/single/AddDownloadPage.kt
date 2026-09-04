@@ -16,11 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.rememberDialogState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberDialogState
 import arrow.core.Some
 import com.abdownloadmanager.desktop.pages.addDownload.shared.*
 import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
@@ -196,13 +196,10 @@ fun AddDownloadPage(
 
 @Composable
 private fun ShowSolutionsOnDuplicateDownload(component: BaseAddSingleDownloadComponent) {
-    val h = 250
-    val w = 300
     val state = rememberDialogState(
-        size = DpSize(
-            height = Dp.Unspecified,
-            width = Dp.Unspecified,
-        ),
+        initialBoundsProvider = WindowBoundsProvider(
+            sizeProvider = WindowSizeProvider.Unconstrained
+        )
     )
     val close = {
         component.showSolutionsOnDuplicateDownloadUi = false

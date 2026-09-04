@@ -20,8 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
@@ -42,7 +44,6 @@ import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
@@ -51,7 +52,6 @@ import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
-import ir.amirab.util.desktop.screen.applyUiScale
 import ir.amirab.util.ifThen
 
 @Composable
@@ -69,9 +69,12 @@ private fun EditDownloadWindow(
 ) {
     CustomWindow(
         state = rememberWindowState(
-            size = DpSize(450.dp, 230.dp)
-                .applyUiScale(LocalUiScale.current),
-            position = WindowPosition.Aligned(Alignment.Center)
+            initialBoundsProvider = WindowBoundsProvider(
+                sizeProvider = WindowSizeProvider.Fixed(
+                    size = DpSize(450.dp, 230.dp)
+                ),
+                positionProvider = WindowPositionProvider.CenteredOnScreen
+            )
         ),
         alwaysOnTop = true,
         onCloseRequest = {

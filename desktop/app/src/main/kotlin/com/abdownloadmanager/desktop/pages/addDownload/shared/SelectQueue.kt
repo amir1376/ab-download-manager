@@ -11,7 +11,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.rememberDialogState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberDialogState
 import com.abdownloadmanager.desktop.actions.newQueueAction
 import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
 import com.abdownloadmanager.desktop.window.moveSafe
@@ -20,7 +22,6 @@ import com.abdownloadmanager.shared.pages.adddownload.addToQueue.SelectQueueComp
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
-import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
@@ -69,10 +70,14 @@ private fun ShowAddToQueueDialog(
     val h = 210
     val w = 250
     val state = rememberDialogState(
-        size = DpSize(
-            height = h.dp,
-            width = w.dp,
-        ).applyUiScale(LocalUiScale.current),
+        initialBoundsProvider = WindowBoundsProvider(
+            sizeProvider = WindowSizeProvider.Fixed(
+                size = DpSize(
+                    height = h.dp,
+                    width = w.dp,
+                ).applyUiScale(LocalUiScale.current),
+            )
+        )
     )
     val close = {
         onClose()

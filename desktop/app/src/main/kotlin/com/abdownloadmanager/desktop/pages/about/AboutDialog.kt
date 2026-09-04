@@ -9,7 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
@@ -46,9 +49,13 @@ fun AboutDialog(
         alwaysOnTop = false,
         onRequestMinimize = null,
         state = rememberWindowState(
-            position = WindowPosition.Aligned(Alignment.Center),
-            size = DpSize(600.dp, 310.dp)
-                .applyUiScale(LocalUiScale.current)
+            initialBoundsProvider = WindowBoundsProvider(
+                sizeProvider = WindowSizeProvider.Fixed(
+                    DpSize(600.dp, 310.dp)
+                        .applyUiScale(LocalUiScale.current)
+                ),
+                positionProvider = WindowPositionProvider.CenteredOnScreen
+            ),
         ),
         onCloseRequest = onClose
     ) {

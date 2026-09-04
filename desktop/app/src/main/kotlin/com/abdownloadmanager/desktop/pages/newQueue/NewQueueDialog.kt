@@ -4,11 +4,12 @@ import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
 
@@ -16,12 +17,16 @@ import ir.amirab.util.desktop.screen.applyUiScale
 fun NewQueueDialog(
     appComponent: AppComponent,
 ) {
-    if (appComponent.showCreateQueueDialog.collectAsState().value){
+    if (appComponent.showCreateQueueDialog.collectAsState().value) {
         CustomWindow(
             state = rememberWindowState(
-                size = DpSize(width = 300.dp, height = 130.dp)
-                    .applyUiScale(LocalUiScale.current),
-                position = WindowPosition.Aligned(Alignment.Center),
+                initialBoundsProvider = WindowBoundsProvider(
+                    sizeProvider = WindowSizeProvider.Fixed(
+                        size = DpSize(width = 300.dp, height = 130.dp)
+                            .applyUiScale(LocalUiScale.current),
+                    ),
+                    positionProvider = WindowPositionProvider.CenteredOnScreen
+                )
             ),
             resizable = false,
             onRequestToggleMaximize = null,

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.awt.toAwtColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.key.KeyEvent
@@ -27,9 +28,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowDecoration
+import androidx.compose.ui.window.v2.Window
 import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.v2.WindowState
 import com.abdownloadmanager.desktop.window.custom.titlebar.TitleBar
 import com.abdownloadmanager.shared.util.PopUpContainer
 import com.abdownloadmanager.shared.util.ResponsiveBox
@@ -107,14 +109,34 @@ fun isWindowFocused(): Boolean {
     return LocalWindowInfo.current.isWindowFocused
 }
 
+@PublishedApi
+internal inline fun <T> WindowState.windowInitializedOrNull(
+    selector: WindowState.() -> T,
+): T? {
+    return if (isInitialized) selector() else null
+}
+
+/**
+ * The new window api throws exception if the window is not initialized yet
+ * and require checking each time. so I think its better to safely call this
+ * DO NOT call the windowState properties directly in the code base as they may cause the app to crash
+ */
+val WindowState.placementOrNull: WindowPlacement?
+    get() = windowInitializedOrNull { placement }
+val WindowState.sizeOrNull: DpSize?
+    get() = windowInitializedOrNull { size }
+val WindowState.isMinimizedOrNull: Boolean?
+    get() = windowInitializedOrNull { isMinimized }
+
+
 @Composable
 fun isWindowMaximized(): Boolean {
-    return LocalWindowState.current.placement == WindowPlacement.Maximized
+    return LocalWindowState.current.placementOrNull == WindowPlacement.Maximized
 }
 
 @Composable
 fun isWindowFloating(): Boolean {
-    return LocalWindowState.current.placement == WindowPlacement.Floating
+    return LocalWindowState.current.placementOrNull == WindowPlacement.Floating
 }
 
 @Composable
@@ -317,23 +339,23 @@ private val defaultAppIcon: IconSource
         return MyIcons.appIcon
     }
 
-private fun Color.toWindowColorType() = java.awt.Color(
-    red, green, blue
-)
-
 @Composable
 fun CustomWindow(
     state: WindowState,
     onCloseRequest: () -> Unit,
     resizable: Boolean = true,
     onRequestMinimize: (() -> Unit)? = {
-        state.isMinimized = true
+        state.requestMinimized(true)
     },
     onRequestToggleMaximize: (() -> Unit)? = {
-        if (state.placement == WindowPlacement.Maximized) {
-            state.placement = WindowPlacement.Floating
-        } else {
-            state.placement = WindowPlacement.Maximized
+        val currentPlacement = state.placementOrNull
+        if (currentPlacement != null) {
+            val newPlacement = if (currentPlacement == WindowPlacement.Maximized) {
+                WindowPlacement.Floating
+            } else {
+                WindowPlacement.Maximized
+            }
+            state.requestPlacement(newPlacement)
         }
     },
     windowController: WindowController = remember {
@@ -341,6 +363,8 @@ fun CustomWindow(
     },
     onKeyEvent: (KeyEvent) -> Boolean = { false },
     alwaysOnTop: Boolean = false,
+    minSize: DpSize = DpSize.Unspecified,
+    maxSize: DpSize = DpSize.Unspecified,
     preventMinimize: Boolean = onRequestMinimize == null,
     content: @Composable FrameWindowScope.() -> Unit,
 ) {
@@ -351,25 +375,27 @@ fun CustomWindow(
     val icon = windowController.icon ?: defaultAppIcon.rememberPainter()
 
 
-    val undecorated: Boolean
+    val undecorated: WindowDecoration
     val isAeroSnapSupported = JBR.isWindowDecorationsSupported()
-    if (isAeroSnapSupported) {
+    undecorated = if (isAeroSnapSupported) {
         //we use aero snap
-        undecorated = false
+        WindowDecoration.SystemDefault
     } else {
         //we decorate window and add our custom layout
-        undecorated = true
+        WindowDecoration.Undecorated()
     }
     Window(
         state = state,
         transparent = false,
-        undecorated = undecorated,
+        decoration = undecorated,
         icon = icon,
         title = title,
         resizable = resizable,
         onCloseRequest = onCloseRequest,
         onKeyEvent = onKeyEvent,
         alwaysOnTop = alwaysOnTop,
+        minSize = minSize,
+        maxSize = maxSize,
     ) {
         val isLight = myColors.isLight
         val background = myColors.background
@@ -379,7 +405,7 @@ fun CustomWindow(
                 window.background = background.takeOrElse {
                     if (isLight) Color.White
                     else Color.Black
-                }.toWindowColorType()
+                }.toAwtColor()
             }
         }
         UiScaledContent {
@@ -422,9 +448,9 @@ fun CustomWindow(
 @Composable
 private fun PreventMinimize() {
     val state = LocalWindowState.current
-    LaunchedEffect(state.isMinimized) {
-        if (state.isMinimized) {
-            state.isMinimized = false
+    LaunchedEffect(state.isMinimizedOrNull) {
+        if (state.isMinimizedOrNull == true) {
+            state.requestMinimized(false)
         }
     }
 }

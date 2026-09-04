@@ -1,16 +1,19 @@
 package com.abdownloadmanager.desktop.pages.perhostsettings
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.shared.pages.perhostsettings.BasePerHostSettingsComponent
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberChild
+import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
+import ir.amirab.util.desktop.screen.applyUiScale
 
 @Composable
 fun PerHostSettingsWindow(
@@ -19,11 +22,16 @@ fun PerHostSettingsWindow(
     val component = appComponent.perHostSettingsSlot.rememberChild()
     if (component != null) {
         val windowState = rememberWindowState(
-            size = DpSize(
-                600.dp,
-                400.dp,
-            ),
-            position = WindowPosition.Aligned(Alignment.Center)
+            initialBoundsProvider = WindowBoundsProvider(
+                sizeProvider = WindowSizeProvider.Fixed(
+                    DpSize(
+                        600.dp,
+                        400.dp,
+                    )
+                        .applyUiScale(LocalUiScale.current)
+                ),
+                positionProvider = WindowPositionProvider.CenteredOnScreen
+            )
         )
         CustomWindow(
             state = windowState,
@@ -34,7 +42,7 @@ fun PerHostSettingsWindow(
                     is BasePerHostSettingsComponent.Effects.Platform -> {
                         when (it as DesktopPerHostSettingsComponent.Effects) {
                             DesktopPerHostSettingsComponent.Effects.BringToFront -> {
-                                windowState.isMinimized = false
+                                windowState.requestMinimized(false)
                                 window.toFront()
                             }
                         }

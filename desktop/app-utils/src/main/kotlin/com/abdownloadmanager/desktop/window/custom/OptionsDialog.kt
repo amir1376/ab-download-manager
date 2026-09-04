@@ -1,7 +1,11 @@
 package com.abdownloadmanager.desktop.window.custom
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.window.*
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.window.v2.*
+import androidx.compose.ui.window.DialogModalityType
+import androidx.compose.ui.window.WindowDecoration
+import androidx.compose.ui.window.WindowScope
 import com.abdownloadmanager.shared.util.ui.theme.UiScaledContent
 import java.awt.event.WindowEvent
 import java.awt.event.WindowFocusListener
@@ -12,6 +16,7 @@ fun BaseOptionDialog(
     onCloseRequest: () -> Unit,
     state: DialogState = rememberDialogState(),
     resizeable: Boolean = true,
+    minSize: DpSize = DpSize.Unspecified,
     content: @Composable WindowScope.() -> Unit,
 ) {
     DialogWindow(
@@ -23,6 +28,8 @@ fun BaseOptionDialog(
         //we need this to allow click outside
         modalityType = DialogModalityType.Modeless,
         onCloseRequest = onCloseRequest,
+        minSize = minSize,
+        alwaysOnTop = true,
     ) {
         val focusListener = remember {
             object : WindowFocusListener {
@@ -37,7 +44,6 @@ fun BaseOptionDialog(
         }
         DisposableEffect(window) {
             window.addWindowFocusListener(focusListener)
-            window.isAlwaysOnTop = true
             onDispose {
                 window.removeWindowFocusListener(focusListener)
             }

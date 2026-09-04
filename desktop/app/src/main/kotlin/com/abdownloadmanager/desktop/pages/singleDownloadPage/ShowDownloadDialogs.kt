@@ -7,13 +7,14 @@ import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.v2.WindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.shared.singledownloadpage.BaseSingleDownloadComponent
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
@@ -92,7 +93,7 @@ private fun FrameWindowScope.CommonContent(
                 it as DesktopSingleDownloadComponent.Effects
                 when (it) {
                     DesktopSingleDownloadComponent.Effects.BringToFront -> {
-                        state.isMinimized = false
+                        state.requestMinimized(false)
                         window.toFront()
                     }
                 }
@@ -116,11 +117,15 @@ private fun CompletedWindow(
     val defaultWidth = 450f
     val uiScale = LocalUiScale.current
     val state = rememberWindowState(
-        size = DpSize(
-            height = defaultHeight.dp,
-            width = defaultWidth.dp
-        ).applyUiScale(uiScale),
-        position = WindowPosition(Alignment.Center)
+        initialBoundsProvider = WindowBoundsProvider(
+            sizeProvider = WindowSizeProvider.Fixed(
+                size = DpSize(
+                    height = defaultHeight.dp,
+                    width = defaultWidth.dp
+                ).applyUiScale(uiScale)
+            ),
+            positionProvider = WindowPositionProvider.CenteredOnScreen
+        )
     )
     CustomWindow(
         state = state,
@@ -128,22 +133,22 @@ private fun CompletedWindow(
         resizable = false,
         alwaysOnTop = true,
         onCloseRequest = onRequestClose,
+        minSize = DpSize(defaultWidth.dp, defaultHeight.dp)
     ) {
         CommonContent(
             singleDownloadComponent = singleDownloadComponent,
             state = state,
             itemState = itemState,
         )
-        LaunchedEffect(Unit) {
-            window.minimumSize = Dimension(defaultWidth.toInt(), defaultHeight.toInt())
-        }
         var h = defaultHeight
         var w = defaultWidth
         LaunchedEffect(w, h) {
-            state.size = DpSize(
-                width = w.dp,
-                height = h.dp
-            ).applyUiScale(uiScale)
+            state.requestSize(
+                DpSize(
+                    width = w.dp,
+                    height = h.dp
+                ).applyUiScale(uiScale)
+            )
         }
         CompletedDownloadPage(
             singleDownloadComponent,
@@ -173,28 +178,32 @@ private fun ProgressWindow(
             .applyUiScale(uiScale)
     }
     val state = rememberWindowState(
-        height = h.dp,
-        width = w.dp,
-        position = WindowPosition(Alignment.Center)
+        initialBoundsProvider = WindowBoundsProvider(
+            sizeProvider = WindowSizeProvider.Fixed(
+                height = h.dp,
+                width = w.dp,
+            ),
+            positionProvider = WindowPositionProvider.CenteredOnScreen
+        )
     )
     CustomWindow(
         state = state,
         onRequestToggleMaximize = null,
         resizable = false,
         onCloseRequest = onRequestClose,
+        minSize = DpSize(defaultWidth.dp, defaultHeight.dp)
     ) {
         CommonContent(
             singleDownloadComponent = singleDownloadComponent,
             state = state,
             itemState = itemState,
         )
-        LaunchedEffect(Unit) {
-            window.minimumSize = Dimension(defaultWidth.toInt(), defaultHeight.toInt())
-        }
         LaunchedEffect(w, h) {
-            state.size = DpSize(
-                width = w.dp,
-                height = h.dp
+            state.requestSize(
+                DpSize(
+                    width = w.dp,
+                    height = h.dp
+                )
             )
         }
         CompositionLocalProvider(
