@@ -40,7 +40,11 @@ class SingleInstanceServer(
 
 
     private fun createServer(): ServerInfo {
-        val server = embeddedServer(CIO, port = 0) {
+        val server = embeddedServer(
+            factory = CIO,
+            port = 0,
+            host = "127.0.0.1"
+        ) {
             setupKtorKRpcServer()
         }
 

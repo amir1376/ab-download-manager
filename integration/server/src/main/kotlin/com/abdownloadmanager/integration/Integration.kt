@@ -80,7 +80,11 @@ class Integration(
 
 
     private fun createServer(settings: IntegrationSettings): MyServer {
-        val server = embeddedServer(CIO, settings.port) {
+        val server = embeddedServer(
+            factory = CIO,
+            port = settings.port,
+            host = "127.0.0.1",
+        ) {
             setupRouting(json, integrationHandler, settings)
         }
         return KtorServer(server)
