@@ -14,6 +14,7 @@ import com.abdownloadmanager.shared.downloaderinui.add.NewDownloadInputsUniqueId
 import com.abdownloadmanager.shared.downloaderinui.add.TANewDownloadInputs
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
+import com.abdownloadmanager.shared.pages.adddownload.FolderChangeResult
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.ILastSavedLocationsStorage
 import com.abdownloadmanager.shared.storage.ISelectQueueStorage
@@ -57,11 +58,11 @@ abstract class BaseAddMultiDownloadComponent(
     private val onRequestClose: () -> Unit,
     private val onRequestAddMultipleItem: OnRequestAddMultipleItem,
     private val onRequestDownloadMultipleItem: OnRequestDownloadMultipleItem,
-    private val appRepository: BaseAppRepository,
+    appRepository: BaseAppRepository,
     private val perHostSettingsManager: PerHostSettingsManager,
     val downloadSystem: DownloadSystem,
     val fileIconProvider: FileIconProvider,
-    private val categoryManager: CategoryManager,
+    categoryManager: CategoryManager,
     val downloaderInUiRegistry: DownloaderInUiRegistry,
     queueManager: QueueManager,
     lastSavedLocationsStorage: ILastSavedLocationsStorage,
@@ -71,7 +72,9 @@ abstract class BaseAddMultiDownloadComponent(
     id = id,
     lastSavedLocationsStorage = lastSavedLocationsStorage,
     queueManager = queueManager,
-    selectQueueStorage = selectQueueStorage
+    selectQueueStorage = selectQueueStorage,
+    appRepository = appRepository,
+    categoryManager = categoryManager,
 ) {
     override val shouldShowWindow: StateFlow<Boolean> = MutableStateFlow(true)
 
@@ -113,6 +116,28 @@ abstract class BaseAddMultiDownloadComponent(
     fun setFilterText(text: String) {
         _filterText.update { text }
     }
+
+    override val isFolderChangedResult: StateFlow<FolderChangeResult> = combine(
+        folder,
+        selectedCategory,
+        categories,
+        appRepository.saveLocation,
+        allInSameLocation,
+    ) { newSelectedFolder, selectedCat, allCategories, defaultLocation, allInSameLocation ->
+        val category = selectedCat?.let { cat -> allCategories.find { it.id == cat.id } ?: cat }
+        val categoryOrDefaultFolder = category?.getDownloadPath() ?: defaultLocation
+        if (!allInSameLocation) {
+            return@combine FolderChangeResult.of(
+                changed = false,
+                category = category,
+            )
+        }
+        FolderChangeResult.of(
+            category = category,
+            userSelectedFolder = newSelectedFolder,
+            currentFolder = categoryOrDefaultFolder,
+        )
+    }.stateIn(scope, SharingStarted.Eagerly, FolderChangeResult.default())
 
     private fun newCheckerWithInputs(
         addDownloadCredentialsInUiProps: AddDownloadCredentialsInUiProps
@@ -273,6 +298,7 @@ abstract class BaseAddMultiDownloadComponent(
     override fun onRequestAddToQueue(queueId: Long?, startQueue: Boolean) {
         requestAddDownloads(queueId, startQueue)
     }
+
     fun getCategorySelectionMode(): CategorySelectionMode? {
         return when {
             alsoAutoCategorize.value -> CategorySelectionMode.Auto
@@ -310,6 +336,16 @@ abstract class BaseAddMultiDownloadComponent(
             }
     }
 
+    private fun saveLocationIfNecessary(folder: String) {
+        if (allInSameLocation.value) {
+            if (rememberFolderAsDefault.value && isFolderChangedResult.value.isChanged) {
+                persistFolder(folder, selectedCategory.value)
+            } else {
+                addToLastUsedLocations(folder)
+            }
+        }
+    }
+
     fun requestDownloadAll() {
         val categorySelectionMode = getCategorySelectionMode()
         val itemsToAdd = getItemsToAdd(categorySelectionMode)
@@ -318,10 +354,7 @@ abstract class BaseAddMultiDownloadComponent(
                 items = itemsToAdd,
                 categorySelectionMode = categorySelectionMode
             ).invokeOnCompletion {
-                val folder = folder.value
-                if (allInSameLocation.value) {
-                    addToLastUsedLocations(folder)
-                }
+                saveLocationIfNecessary(folder.value)
             }
             requestClose()
         }
@@ -338,10 +371,7 @@ abstract class BaseAddMultiDownloadComponent(
                 queueId = queueId,
                 categorySelectionMode = categorySelectionMode
             ).invokeOnCompletion {
-                val folder = folder.value
-                if (allInSameLocation.value) {
-                    addToLastUsedLocations(folder)
-                }
+                saveLocationIfNecessary(folder.value)
                 if (startQueue && queueId != null) {
                     scope.launch {
                         downloadSystem.startQueue(queueId)

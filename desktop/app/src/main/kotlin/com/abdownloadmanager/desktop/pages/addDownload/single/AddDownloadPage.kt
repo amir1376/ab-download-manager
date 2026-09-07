@@ -27,6 +27,8 @@ import com.abdownloadmanager.desktop.window.custom.BaseOptionDialog
 import com.abdownloadmanager.desktop.window.moveSafe
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
+import com.abdownloadmanager.shared.pages.adddownload.shared.LastUsedLocationsProp
+import com.abdownloadmanager.shared.pages.adddownload.shared.RememberFolderProp
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ClipboardUtil
@@ -130,6 +132,8 @@ fun AddDownloadPage(
                         },
                     )
                 }
+                val isFolderChanged by component.isFolderChangedResult.collectAsState()
+                val rememberFolderAsDefault by component.rememberFolderAsDefault.collectAsState()
                 Spacer(Modifier.size(8.dp))
                 LocationTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -141,8 +145,16 @@ fun AddDownloadPage(
                         CanAddResult.CantWriteInThisFolder -> myStringResource(Res.string.cant_write_to_this_folder)
                         else -> null
                     },
-                    lastUsedLocations = component.lastUsedLocations.collectAsState().value,
-                    onRequestRemoveSaveLocation = component::removeFromLastDownloadLocation,
+                    lastUsedLocations = LastUsedLocationsProp(
+                        locations = component.lastUsedLocations.collectAsState().value,
+                        onRequestRemove = component::removeFromLastDownloadLocation,
+                    ),
+                    rememberFolderAsDefault = RememberFolderProp(
+                        isEnabled = isFolderChanged.isChanged,
+                        value = rememberFolderAsDefault,
+                        onValueChange = component::setRememberFolderAsDefault,
+                        categoryName = isFolderChanged.categoryOrNull()?.name,
+                    ),
                 )
                 val name by component.name.collectAsState()
                 Spacer(Modifier.size(8.dp))

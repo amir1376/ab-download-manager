@@ -8,6 +8,7 @@ import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
+import com.abdownloadmanager.shared.pages.adddownload.FolderChangeResult
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
 import com.abdownloadmanager.shared.pages.adddownload.SilentImportOptions
 import com.abdownloadmanager.shared.repository.BaseAppRepository
@@ -56,9 +57,9 @@ abstract class BaseAddSingleDownloadComponent(
     protected val lastSavedLocationsStorage: ILastSavedLocationsStorage,
     protected val appScope: CoroutineScope,
     protected val appSettings: BaseAppSettingsStorage,
-    protected val appRepository: BaseAppRepository,
+    appRepository: BaseAppRepository,
     protected val perHostSettingsManager: PerHostSettingsManager,
-    protected val categoryManager: CategoryManager,
+    categoryManager: CategoryManager,
     val downloadSystem: DownloadSystem,
     val iconProvider: FileIconProvider,
     selectQueueStorage: ISelectQueueStorage,
@@ -72,7 +73,9 @@ abstract class BaseAddSingleDownloadComponent(
     id = id,
     lastSavedLocationsStorage = lastSavedLocationsStorage,
     queueManager = queueManager,
-    selectQueueStorage = selectQueueStorage
+    selectQueueStorage = selectQueueStorage,
+    appRepository = appRepository,
+    categoryManager = categoryManager,
 ),
     ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects() {
     private val _shouldShowWindow = MutableStateFlow(importOptions.silentImport == null)
@@ -149,6 +152,24 @@ abstract class BaseAddSingleDownloadComponent(
     val name = downloadChecker.name.asStateFlow()
     val folder = downloadChecker.folder.asStateFlow()
     val onDuplicateStrategy: MutableStateFlow<OnDuplicateStrategy?> = MutableStateFlow(null)
+
+    override val isFolderChangedResult: StateFlow<FolderChangeResult> = combine(
+        folder,
+        useCategory,
+        selectedCategory,
+        categories,
+        appRepository.saveLocation,
+    ) { newSelectedFolder, useCategory, selectedCat, allCategories, defaultLocation ->
+        val category = if (useCategory) {
+            selectedCat?.let { cat -> allCategories.find { it.id == cat.id } ?: cat }
+        } else null
+        val categoryOrDefaultFolder = category?.getDownloadPath() ?: defaultLocation
+        FolderChangeResult.of(
+            category = category,
+            userSelectedFolder = newSelectedFolder,
+            currentFolder = categoryOrDefaultFolder,
+        )
+    }.stateIn(scope, SharingStarted.Eagerly, FolderChangeResult.default())
 
     fun setCredentials(downloadCredentials: IDownloadCredentials) {
         downloadChecker.credentials.update { downloadCredentials }
@@ -287,15 +308,19 @@ abstract class BaseAddSingleDownloadComponent(
 
     private fun saveLocationIfNecessary(folder: String) {
         val category = getCategoryIfUseCategoryIsOn()
-        val shouldAdd = if (category == null) {
-            // always add if user don't use category
-            true
+        if (rememberFolderAsDefault.value && isFolderChangedResult.value.isChanged) {
+            persistFolder(folder, category)
         } else {
-            // only add if category path is not the same as provided path
-            category.getDownloadPath() != folder
-        }
-        if (shouldAdd) {
-            addToLastUsedLocations(folder)
+            val shouldAdd = if (category == null) {
+                // always add if user don't use category
+                true
+            } else {
+                // only add if category path is not the same as provided path
+                category.getDownloadPath() != folder
+            }
+            if (shouldAdd) {
+                addToLastUsedLocations(folder)
+            }
         }
     }
 

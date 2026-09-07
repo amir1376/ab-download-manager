@@ -14,6 +14,8 @@ import com.abdownloadmanager.desktop.pages.home.sections.SearchBox
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.DownloadSize
 import com.abdownloadmanager.shared.downloaderinui.rememberString
+import com.abdownloadmanager.shared.pages.adddownload.shared.LastUsedLocationsProp
+import com.abdownloadmanager.shared.pages.adddownload.shared.RememberFolderProp
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.div
@@ -243,14 +245,23 @@ private fun RowScope.LocationSaveOption(
             component.setAllItemsInSameLocation(it)
         },
         selectedContent = {
+            val folderChangeResult = component.isFolderChangedResult.collectAsState().value
             LocationTextField(
                 text = folder,
                 setText = {
                     component.setFolder(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                lastUsedLocations = component.lastUsedLocations.collectAsState().value,
-                onRequestRemoveSaveLocation = component::removeFromLastDownloadLocation
+                lastUsedLocations = LastUsedLocationsProp(
+                    locations = component.lastUsedLocations.collectAsState().value,
+                    onRequestRemove = component::removeFromLastDownloadLocation,
+                ),
+                rememberFolderAsDefault = RememberFolderProp(
+                    isEnabled = folderChangeResult.isChanged,
+                    value = component.rememberFolderAsDefault.collectAsState().value,
+                    onValueChange = component::setRememberFolderAsDefault,
+                    categoryName = folderChangeResult.categoryOrNull()?.name,
+                ),
             )
         }
     )

@@ -23,6 +23,8 @@ import com.abdownloadmanager.android.ui.SheetTitleWithDescription
 import com.abdownloadmanager.android.ui.SheetUI
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
+import com.abdownloadmanager.shared.pages.adddownload.shared.LastUsedLocationsProp
+import com.abdownloadmanager.shared.pages.adddownload.shared.RememberFolderProp
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.*
@@ -149,6 +151,7 @@ fun ResponsiveDialogScope.AddSingleDownloadPage(
                                 }
                             }
                             Spacer(Modifier.size(8.dp))
+                            val folderChangeResult = component.isFolderChangedResult.collectAsState().value
                             LocationTextField(
                                 modifier = Modifier.fillMaxWidth(),
                                 text = component.folder.collectAsState().value,
@@ -159,8 +162,16 @@ fun ResponsiveDialogScope.AddSingleDownloadPage(
                                     CanAddResult.CantWriteInThisFolder -> myStringResource(Res.string.cant_write_to_this_folder)
                                     else -> null
                                 },
-                                lastUsedLocations = component.lastUsedLocations.collectAsState().value,
-                                onRequestRemoveSaveLocation = component::removeFromLastDownloadLocation,
+                                lastUsedLocations = LastUsedLocationsProp(
+                                    locations = component.lastUsedLocations.collectAsState().value,
+                                    onRequestRemove = component::removeFromLastDownloadLocation,
+                                ),
+                                rememberFolder = RememberFolderProp(
+                                    isEnabled = folderChangeResult.isChanged,
+                                    value = component.rememberFolderAsDefault.collectAsState().value,
+                                    onValueChange = component::setRememberFolderAsDefault,
+                                    categoryName = folderChangeResult.categoryOrNull()?.name,
+                                ),
                             )
                         }
                     }
