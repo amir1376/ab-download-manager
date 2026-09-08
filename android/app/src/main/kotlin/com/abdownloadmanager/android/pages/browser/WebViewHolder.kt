@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Message
+import android.webkit.ValueCallback
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
@@ -34,7 +35,8 @@ class WebViewRegistry(
     }
 
     fun getWebViewHolder(
-        tab: ABDMBrowserTab
+        tab: ABDMBrowserTab,
+        onChooseFile: (Intent, ValueCallback<Array<out Uri?>?>) -> Unit
     ): WebViewHolder {
         return viewHolders.getOrPut(tab.tabId, {
             WebViewHolder(
@@ -42,7 +44,16 @@ class WebViewRegistry(
                 navigator = WebViewNavigator(scope),
                 webView = null,
                 client = ABDMWebViewClient(browserComponent.downloadInterceptor, scope),
-                chromeClient = ABDMChromeClient(browserComponent, ::getWebViewHolder),
+                chromeClient = ABDMChromeClient(
+                    browserComponent = browserComponent,
+                    createWebViewHolder = {
+                        getWebViewHolder(
+                            tab = it,
+                            onChooseFile = onChooseFile
+                        )
+                    },
+                    onChooseFile = onChooseFile
+                ),
                 webViewFactory = this,
             )
         })
@@ -216,6 +227,7 @@ class ABDMWebViewClient(
 class ABDMChromeClient(
     private val browserComponent: BrowserComponent,
     private val createWebViewHolder: (tab: ABDMBrowserTab) -> WebViewHolder,
+    private val onChooseFile: (Intent, ValueCallback<Array<out Uri?>?>) -> Unit
 ) : AccompanistWebChromeClient() {
     override fun onCreateWindow(
         view: WebView?,
@@ -235,6 +247,21 @@ class ABDMChromeClient(
         newWebView.openedBy = view.originalUrl ?: view.url
         transport.webView = newWebView
         resultMsg.sendToTarget()
+        return true
+    }
+
+    override fun onShowFileChooser(
+        webView: WebView?,
+        filePathCallback: ValueCallback<Array<out Uri?>?>?,
+        fileChooserParams: FileChooserParams?
+    ): Boolean {
+        val intent = fileChooserParams?.createIntent() ?: Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "*/*"
+            addCategory(Intent.CATEGORY_OPENABLE)
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        }
+        if (filePathCallback == null) return false
+        onChooseFile(intent, filePathCallback)
         return true
     }
 }
