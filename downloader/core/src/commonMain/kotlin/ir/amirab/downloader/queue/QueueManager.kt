@@ -1,6 +1,7 @@
 package ir.amirab.downloader.queue
 
 import ir.amirab.downloader.DownloadManagerMinimalControl
+import ir.amirab.downloader.connection.QueueNetworkPolicy
 import ir.amirab.downloader.db.IDownloadQueueDatabase
 import ir.amirab.downloader.db.DownloadQueuePersistedDataAccess
 import ir.amirab.downloader.db.QueueModel
@@ -18,6 +19,7 @@ object DefaultQueueInfo {
 class QueueManager(
     private val queueDb: IDownloadQueueDatabase,
     private val listOfJobs: DownloadManagerMinimalControl,
+    private val networkPolicy: QueueNetworkPolicy? = null,
 ) {
     companion object {
 
@@ -146,6 +148,7 @@ class QueueManager(
             downloadEvents = listOfJobs,
             persistedModel = queueModel,
             onQueueEvent = ::onQueueEvent,
+            networkPolicy = networkPolicy,
         )
     }
 
