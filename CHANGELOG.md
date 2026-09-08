@@ -14,6 +14,16 @@
 
 ### Security
 
+## 1.10.4
+
+### Fixed
+
+- Fixed an issue where some settings, including UI Scale, were not saved properly (#1409)
+
+### Improved
+
+- Updated translations
+
 ## 1.10.3
 
 ### Added
