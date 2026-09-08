@@ -1,6 +1,8 @@
 package com.abdownloadmanager.desktop.utils
 
 import com.abdownloadmanager.desktop.AppArguments
+import com.abdownloadmanager.shared.util.schemakt.initializeForABDM
+import io.github.amir1376.schemakt.Schema
 import ir.amirab.util.guardedEntry
 import ir.amirab.util.logger.AppLogger
 
@@ -36,6 +38,7 @@ object EntrypointInitializer {
                         AppInfo.isInDebugMode()
                     },
             )
+            Schema.initializeForABDM()
         }
     }
 }
