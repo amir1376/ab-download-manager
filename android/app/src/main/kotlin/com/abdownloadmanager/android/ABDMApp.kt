@@ -9,13 +9,14 @@ import com.abdownloadmanager.android.util.AppInfo
 import com.abdownloadmanager.android.util.ApplicationBackgroundTracker
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
+import com.abdownloadmanager.shared.util.schemakt.initializeForABDM
+import io.github.amir1376.schemakt.Schema
 import ir.amirab.util.logger.AppLogger
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class ABDMApp : Application(), KoinComponent {
-    val TAG_NAME = ABDMApp::class.simpleName!!
     val appManager: ABDMAppManager by inject()
     val appRepository: BaseAppRepository by inject()
     val previousVersion: PreviousVersion by inject()
@@ -29,6 +30,7 @@ class ABDMApp : Application(), KoinComponent {
             minSeverity = Severity.Verbose,
         )
         Di.boot(this)
+        Schema.initializeForABDM()
         ApplicationBackgroundTracker.startTracking(this)
         appRepository.boot()
         previousVersion.boot()
