@@ -14,6 +14,22 @@
 
 ### Security
 
+## 1.10.3
+
+### Added
+
+- Added an option to use the newly entered path on the Add Download page as the default download location (#1406)
+
+### Fixed
+
+- Restricted the integration server to local connections only (#1442)
+
+### Improved
+
+- Updated translations
+- Improved system tray icon sizing on Windows
+- Improved filename detection when extracting filenames from links (#1393)
+
 ## 1.10.2
 
 ### Added
