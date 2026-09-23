@@ -31,8 +31,8 @@ class DownloaderInUiRegistry
     private val componentHashes = hashMapOf<Any, TADownloaderInUI>()
     fun add(downloaderInUi: DownloaderInUi<*, *, *, *, *, *, *, *, *, *>) {
         // the compiler gave me error when I add these two generics (TDownloadJob, TDownloader) into the DownloaderInUi
-        val element = downloaderInUi as TADownloaderInUI
         @Suppress("UNCHECKED_CAST")
+        val element = downloaderInUi as TADownloaderInUI
         list.add(element)
         getComponentsOf(element).forEach {
             componentHashes[it] = element

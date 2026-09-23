@@ -26,7 +26,7 @@ sealed class DownloadSize : Comparable<DownloadSize> {
             return if (other !is Bytes || other.bytes == 0L) {
                 this
             } else {
-                return Bytes(bytes + other.bytes)
+                Bytes(bytes + other.bytes)
             }
         }
 
@@ -36,7 +36,8 @@ sealed class DownloadSize : Comparable<DownloadSize> {
             }
             return super.compareTo(other)
         }
-        companion object{
+
+        companion object {
             val Zero = Bytes(0)
         }
     }
@@ -61,7 +62,8 @@ sealed class DownloadSize : Comparable<DownloadSize> {
             }
             return super.compareTo(other)
         }
-        companion object{
+
+        companion object {
             val Zero = Duration(0.0)
         }
     }
