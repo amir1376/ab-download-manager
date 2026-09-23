@@ -22,8 +22,8 @@ object DetachedLauncher {
         try {
             when (Platform.asDesktop()) {
                 Platform.Desktop.Windows -> execViaWmi(absExecutable, args.toList())
-                Platform.Desktop.Linux,
-                Platform.Desktop.MacOS -> execViaSetsid(absExecutable, args.toList())
+                Platform.Desktop.Linux -> execViaSetsid(absExecutable, args.toList())
+                Platform.Desktop.MacOS -> execViaOpen(absExecutable, args.toList())
             }
         } catch (e: IOException) {
             throw IllegalStateException(
@@ -98,7 +98,7 @@ object DetachedLauncher {
 
     private fun String.psSingleQuoteEscape(): String = replace("'", "''")
 
-    // Linux/macOS: browsers sandbox native hosts with a process group /
+    // Linux: browsers sandbox native hosts with a process group /
     // session too. setsid detaches into a brand-new session so the child
     // isn't in the browser's session and survives it exiting/killing.
     // No shell involved -> no quoting needed, argv passed directly.
@@ -115,6 +115,39 @@ object DetachedLauncher {
             .redirectInput(redirectToNull())
             .withoutJPackageEnvVariable()
             .start()
+    }
+
+    // macOS: there is no setsid command (only the setsid(2) syscall).
+    // `open` asks launchd to start the app, so the child's parent is
+    // launchd, not the browser, and it survives the browser exiting/killing.
+    // `open` always starts the bundle's CFBundleExecutable (the main app).
+    // -n is needed, otherwise args are dropped if an instance is already running.
+    private fun execViaOpen(exePath: File, args: List<String>) {
+        val appBundle = generateSequence(exePath) { it.parentFile }
+            .firstOrNull { it.name.endsWith(".app") }
+            ?: throw IOException("'${exePath.path}' is not inside an .app bundle")
+        val command = buildList {
+            add("/usr/bin/open")
+            add("-n")
+            add(appBundle.path)
+            add("--args")
+            addAll(args)
+        }
+        val process = ProcessBuilder(command)
+            .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+            .redirectError(ProcessBuilder.Redirect.DISCARD)
+            .redirectInput(redirectToNull())
+            .withoutJPackageEnvVariable()
+            .start()
+        val finished = process.waitFor(10, TimeUnit.SECONDS)
+        if (!finished) {
+            process.destroyForcibly()
+            throw IOException("open did not respond within timeout while launching '${appBundle.path}'")
+        }
+        val exitCode = process.exitValue()
+        if (exitCode != 0) {
+            throw IOException("open failed for '${appBundle.path}' with exit code $exitCode")
+        }
     }
 
     private fun redirectToNull(): ProcessBuilder.Redirect? {
