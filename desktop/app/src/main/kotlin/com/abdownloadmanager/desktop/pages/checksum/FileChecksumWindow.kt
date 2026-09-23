@@ -10,10 +10,13 @@ import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.pages.checksum.BaseFileChecksumComponent
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun FileChecksumWindow(
@@ -39,7 +42,10 @@ fun FileChecksumWindow(
     )
     CustomWindow(
         state = state,
-        onCloseRequest = component::onRequestClose
+        onCloseRequest = component::onRequestClose,
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.file_checksum_page),
+        ),
     ) {
         HandleEffects(component) {
             when (it) {

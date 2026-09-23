@@ -27,7 +27,7 @@ import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.pages.addDownload.shared.ExtraConfig
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditDownloadResult
 import com.abdownloadmanager.shared.downloaderinui.edit.CanEditWarnings
@@ -80,6 +80,9 @@ private fun EditDownloadWindow(
         onCloseRequest = {
             component.onRequestClose()
         },
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.edit_download_title),
+        ),
     ) {
         HandleEffects(component) {
             when (it) {
@@ -96,7 +99,6 @@ private fun EditDownloadWindow(
 fun EditDownloadPage(
     component: DesktopEditDownloadComponent,
 ) {
-    WindowTitle(myStringResource(Res.string.edit_download_title))
     component.editDownloadInputsFlow.collectAsState().value?.let { editDownloadUiChecker ->
         Column(
             Modifier

@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
@@ -53,7 +52,6 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 fun QueuePage(component: QueuesComponent) {
     val queues = component.queuesState
     val activeItem: DownloadQueue = component.selectedItem
-    WindowTitle(myStringResource(Res.string.queues))
     val borderShape = myShapes.defaultRounded
     val borderColor = myColors.surface
     Column {

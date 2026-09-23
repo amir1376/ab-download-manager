@@ -11,7 +11,7 @@ import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.resources.Res
 import ir.amirab.util.compose.resources.myStringResource
 
@@ -42,9 +42,11 @@ private fun TranslatorsWindow(
                     size = DpSize(650.dp, 500.dp)
                 ),
             )
-        )
+        ),
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.meet_the_translators),
+        ),
     ) {
-        WindowTitle(myStringResource(Res.string.meet_the_translators))
         Translators(
             modifier = Modifier.fillMaxSize(),
         )

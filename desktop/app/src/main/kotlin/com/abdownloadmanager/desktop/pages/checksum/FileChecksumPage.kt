@@ -19,7 +19,6 @@ import com.abdownloadmanager.shared.ui.configurable.item.FileChecksumConfigurabl
 import com.abdownloadmanager.shared.ui.configurable.RenderSpinner
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurable
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.checksum.ChecksumStatus
 import com.abdownloadmanager.shared.pages.checksum.DownloadItemWithChecksum
@@ -54,7 +53,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun FileChecksumPage(component: DesktopFileChecksumComponent) {
-    WindowTitle(myStringResource(Res.string.file_checksum_page))
     val horizontalPadding = 16.dp
     Column {
         Table(

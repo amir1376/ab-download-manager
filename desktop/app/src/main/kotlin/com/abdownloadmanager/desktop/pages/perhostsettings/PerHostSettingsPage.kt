@@ -5,7 +5,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import androidx.compose.foundation.background
@@ -44,7 +43,6 @@ import kotlinx.coroutines.*
 fun PerHostSettingsPage(component: DesktopPerHostSettingsComponent) {
     val perHostSettings by component.editedPerHostSettings.collectAsState()
     val selectedItemId by component.selectedId.collectAsState()
-    WindowTitle(myStringResource(Res.string.settings_per_host_settings))
     Column {
         Row(
             Modifier.weight(1f)

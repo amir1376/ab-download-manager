@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.pages.extenallibs
 
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.DpSize
@@ -40,9 +40,11 @@ fun ShowOpenSourceLibraries(
                         .applyUiScale(LocalUiScale.current)
                 ),
             )
-        )
+        ),
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.open_source_software_used_in_this_app),
+        ),
     ) {
-        WindowTitle(myStringResource(Res.string.open_source_software_used_in_this_app))
         ExternalLibsPage()
     }
 }

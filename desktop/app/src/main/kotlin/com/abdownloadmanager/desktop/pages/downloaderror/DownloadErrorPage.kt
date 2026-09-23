@@ -20,7 +20,7 @@ import com.abdownloadmanager.desktop.ui.template.DialogFooter
 import com.abdownloadmanager.desktop.ui.template.DialogMainContent
 import com.abdownloadmanager.desktop.ui.template.DialogUi
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.downloaderror.DownloadErrorComponent
 import com.abdownloadmanager.shared.ui.widget.ActionButton
@@ -63,10 +63,10 @@ private fun DownloadErrorDialog(
         ),
         onCloseRequest = downloadErrorComponent.onClose,
         alwaysOnTop = true,
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.download_error),
+        ),
     ) {
-        WindowTitle(
-            myStringResource(Res.string.download_error)
-        )
         DownloadErrorDialog(
             downloadErrorComponent.downloadItem.link,
             downloadErrorComponent.reason,

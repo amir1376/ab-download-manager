@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.pages.newQueue
 
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.MyTextField
 import androidx.compose.foundation.layout.*
@@ -17,7 +16,6 @@ fun NewQueue(
     onQueueCreate: (String) -> Unit,
     onCloseRequest: () -> Unit,
 ) {
-    WindowTitle(myStringResource(Res.string.add_new_queue))
     var name by remember {
         mutableStateOf("")
     }

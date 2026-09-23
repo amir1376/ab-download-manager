@@ -9,11 +9,14 @@ import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.pages.perhostsettings.BasePerHostSettingsComponent
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun PerHostSettingsWindow(
@@ -36,6 +39,9 @@ fun PerHostSettingsWindow(
         CustomWindow(
             state = windowState,
             onCloseRequest = appComponent::closePerHostSettings,
+            windowController = rememberWindowController(
+                title = myStringResource(Res.string.settings_per_host_settings),
+            ),
         ) {
             HandleEffects(component) {
                 when (it) {

@@ -19,7 +19,7 @@ import com.abdownloadmanager.desktop.pages.addDownload.single.AddDownloadPage
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadComponent
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
@@ -75,12 +75,14 @@ private fun AddDownloadWindow(
                 onCloseRequest = onRequestClose,
                 alwaysOnTop = true,
                 minSize = DpSize(w.dp, h.dp),
+                windowController = rememberWindowController(
+                    title = myStringResource(Res.string.add_download),
+                ),
             ) {
                 LaunchedEffect(Unit) {
                     PlatformAppActivator.active()
                 }
 //                    BringToFront()
-                WindowTitle(myStringResource(Res.string.add_download))
                 WindowIcon(MyIcons.appIcon)
                 AddDownloadPage(addDownloadComponent)
             }
@@ -103,12 +105,14 @@ private fun AddDownloadWindow(
                 onCloseRequest = onRequestClose,
                 alwaysOnTop = true,
                 minSize = DpSize(w.dp, h.dp),
+                windowController = rememberWindowController(
+                    title = myStringResource(Res.string.add_download),
+                ),
             ) {
                 LaunchedEffect(Unit) {
                     PlatformAppActivator.active()
                 }
 //                    BringToFront()
-                WindowTitle(myStringResource(Res.string.add_download))
                 WindowIcon(MyIcons.appIcon)
                 AddMultiItemPage(addDownloadComponent)
             }

@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
@@ -43,7 +42,6 @@ fun NewUpdatePage(
     update: () -> Unit,
     cancel: () -> Unit,
 ) {
-    WindowTitle(myStringResource(Res.string.update_updater))
     WindowIcon(MyIcons.refresh)
     val contentHorizontalPadding = 16.dp
     Box {

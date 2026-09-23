@@ -13,8 +13,11 @@ import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.isMinimizedOrNull
 import com.abdownloadmanager.desktop.window.custom.placementOrNull
 import com.abdownloadmanager.desktop.window.custom.sizeOrNull
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.settings.BaseSettingsComponent
 import com.abdownloadmanager.shared.util.rememberChild
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun SettingWindow(
@@ -45,9 +48,15 @@ private fun SettingWindow(
             }
         }
     }
-    CustomWindow(windowState, {
-        onRequestCloseWindow()
-    }) {
+    CustomWindow(
+        state = windowState,
+        onCloseRequest = {
+            onRequestCloseWindow()
+        },
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.settings),
+        ),
+    ) {
         HandleEffects(settingsComponent) {
             when (it) {
                 is BaseSettingsComponent.Effects.Platform -> {

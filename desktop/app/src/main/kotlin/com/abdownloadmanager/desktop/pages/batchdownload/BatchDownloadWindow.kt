@@ -9,11 +9,14 @@ import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.pages.batchdownload.BaseBatchDownloadComponent
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberChild
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun BatchDownloadWindow(appComponent: AppComponent) {
@@ -34,7 +37,10 @@ private fun BatchDownloadWindow(desktopBatchDownloadComponent: DesktopBatchDownl
                 positionProvider = WindowPositionProvider.CenteredOnScreen
             )
         ),
-        onCloseRequest = desktopBatchDownloadComponent.onClose
+        onCloseRequest = desktopBatchDownloadComponent.onClose,
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.batch_download),
+        ),
     ) {
         HandleEffects(desktopBatchDownloadComponent) {
             when (it) {

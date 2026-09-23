@@ -27,7 +27,7 @@ import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.LoadingIndicatorWithBrush
@@ -70,6 +70,9 @@ private fun PowerActionAlertWindow(
         resizable = false,
         onRequestMinimize = null,
         onRequestToggleMaximize = null,
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.shutdown_alert),
+        ),
     ) {
         PowerActionAlertPage(component)
     }
@@ -83,7 +86,6 @@ private fun PowerActionAlertPage(component: PowerActionComponent) {
     val cancel = component::performCancel
     val performPowerActionNow = component::performPowerAction
     val remainingSeconds = remainingTime / 1000
-    WindowTitle(myStringResource(Res.string.shutdown_alert))
     Column {
         Row(
             Modifier
