@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.widget.MyTextFieldIcon
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ui.myColors
@@ -27,15 +26,6 @@ import java.io.File
 fun NewCategory(
     categoryComponent: CategoryComponent,
 ) {
-    WindowTitle(
-        myStringResource(
-            if (categoryComponent.isEditMode) {
-                Res.string.edit_category
-            } else {
-                Res.string.add_category
-            }
-        )
-    )
     Column(
         modifier = Modifier
             .padding(horizontal = 32.dp)

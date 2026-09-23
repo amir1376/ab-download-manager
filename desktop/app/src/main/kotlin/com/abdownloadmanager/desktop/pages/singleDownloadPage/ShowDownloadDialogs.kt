@@ -3,7 +3,7 @@ package com.abdownloadmanager.desktop.pages.singleDownloadPage
 import com.abdownloadmanager.desktop.DesktopDownloadDialogManager
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import androidx.compose.runtime.*
@@ -100,7 +100,6 @@ private fun FrameWindowScope.CommonContent(
             }
         }
     }
-    WindowTitle(getDownloadTitle(itemState))
     WindowIcon(MyIcons.appIcon)
     UpdateTaskBar(window, itemState)
 }
@@ -133,7 +132,10 @@ private fun CompletedWindow(
         resizable = false,
         alwaysOnTop = true,
         onCloseRequest = onRequestClose,
-        minSize = DpSize(defaultWidth.dp, defaultHeight.dp)
+        minSize = DpSize(defaultWidth.dp, defaultHeight.dp),
+        windowController = rememberWindowController(
+            title = getDownloadTitle(itemState),
+        ),
     ) {
         CommonContent(
             singleDownloadComponent = singleDownloadComponent,
@@ -191,7 +193,10 @@ private fun ProgressWindow(
         onRequestToggleMaximize = null,
         resizable = false,
         onCloseRequest = onRequestClose,
-        minSize = DpSize(defaultWidth.dp, defaultHeight.dp)
+        minSize = DpSize(defaultWidth.dp, defaultHeight.dp),
+        windowController = rememberWindowController(
+            title = getDownloadTitle(itemState),
+        ),
     ) {
         CommonContent(
             singleDownloadComponent = singleDownloadComponent,

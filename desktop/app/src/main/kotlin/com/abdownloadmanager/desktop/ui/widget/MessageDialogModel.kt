@@ -2,7 +2,7 @@ package com.abdownloadmanager.desktop.ui.widget
 
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
@@ -76,10 +76,9 @@ fun MessageDialog(
         onRequestToggleMaximize = null,
         onCloseRequest = onConfirm,
         alwaysOnTop = true,
-        minSize = DpSize(w.dp, h.dp)
+        minSize = DpSize(w.dp, h.dp),
+        windowController = rememberWindowController(title = msgContent.type.toString()),
     ) {
-        val typeName = msgContent.type.toString()
-        WindowTitle(typeName)
         Row(
             Modifier.padding(8.dp),
         ) {

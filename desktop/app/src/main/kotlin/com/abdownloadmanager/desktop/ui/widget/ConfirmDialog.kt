@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.ui.widget
 
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
@@ -66,10 +66,9 @@ fun ConfirmDialog(
         onRequestToggleMaximize = null,
         onCloseRequest = onCancel,
         alwaysOnTop = true,
-        minSize = DpSize(w.dp, h.dp)
+        minSize = DpSize(w.dp, h.dp),
+        windowController = rememberWindowController(title = type.toString()),
     ) {
-        val typeName = type.toString()
-        WindowTitle(typeName)
         Column {
             Row(
                 Modifier

@@ -12,7 +12,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.desktop.pages.batchdownload.WildcardSelect.*
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.util.ui.myColors
@@ -31,7 +30,6 @@ import ir.amirab.util.compose.asStringSource
 fun BatchDownload(
     component: DesktopBatchDownloadComponent,
 ) {
-    WindowTitle(myStringResource(Res.string.batch_download))
     val link by component.link.collectAsState()
     val setLink = component::setLink
     val start by component.start.collectAsState()

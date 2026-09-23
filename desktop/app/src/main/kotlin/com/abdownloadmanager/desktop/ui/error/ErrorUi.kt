@@ -1,7 +1,7 @@
 package com.abdownloadmanager.desktop.ui.error
 
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.ScreenSurface
@@ -41,6 +41,7 @@ fun ErrorWindow(
             )
         ),
         alwaysOnTop = true,
+        windowController = rememberWindowController(title = "Error"),
     ) {
         ErrorUi(throwable, close)
     }
@@ -51,7 +52,6 @@ private fun ErrorUi(
     e: Throwable,
     close: () -> Unit,
 ) {
-    WindowTitle("Error")
     ScreenSurface(
         modifier = Modifier.fillMaxSize(),
         contentColor = myColors.onBackground,

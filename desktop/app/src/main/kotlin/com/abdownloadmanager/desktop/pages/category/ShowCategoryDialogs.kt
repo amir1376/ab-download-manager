@@ -10,9 +10,12 @@ import androidx.compose.ui.window.v2.WindowPositionProvider
 import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.pages.category.CategoryComponent
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.desktop.screen.applyUiScale
+import com.abdownloadmanager.resources.Res
+import ir.amirab.util.compose.resources.myStringResource
 
 @Composable
 fun ShowCategoryDialogs(dialogManager: DesktopCategoryDialogManager) {
@@ -38,7 +41,16 @@ private fun CategoryDialog(
                 ),
                 positionProvider = WindowPositionProvider.CenteredOnScreen
             )
-        )
+        ),
+        windowController = rememberWindowController(
+            title = myStringResource(
+                if (component.isEditMode) {
+                    Res.string.edit_category
+                } else {
+                    Res.string.add_category
+                }
+            ),
+        ),
     ) {
         NewCategory(component)
     }

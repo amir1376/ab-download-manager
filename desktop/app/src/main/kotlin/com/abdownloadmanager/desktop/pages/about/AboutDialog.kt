@@ -2,7 +2,6 @@ package com.abdownloadmanager.desktop.pages.about
 
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -14,6 +13,7 @@ import androidx.compose.ui.window.v2.WindowPositionProvider
 import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import com.abdownloadmanager.resources.Res
@@ -57,9 +57,11 @@ fun AboutDialog(
                 positionProvider = WindowPositionProvider.CenteredOnScreen
             ),
         ),
-        onCloseRequest = onClose
+        onCloseRequest = onClose,
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.about),
+        ),
     ) {
-        WindowTitle(myStringResource(Res.string.about))
         WindowIcon(MyIcons.info)
         AboutPage(
             onRequestShowOpenSourceLibraries = onRequestShowOpenSourceLibraries,

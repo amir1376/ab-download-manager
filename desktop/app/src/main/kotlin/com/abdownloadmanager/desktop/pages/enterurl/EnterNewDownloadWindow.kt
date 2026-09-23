@@ -9,7 +9,7 @@ import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.rememberWindowState
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.window.custom.CustomWindow
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
+import com.abdownloadmanager.desktop.window.custom.rememberWindowController
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberChild
@@ -42,11 +42,11 @@ private fun EnterNewDownloadWindow(
     )
     CustomWindow(
         state = windowState,
-        onCloseRequest = component::close
+        onCloseRequest = component::close,
+        windowController = rememberWindowController(
+            title = myStringResource(Res.string.new_download),
+        ),
     ) {
-        WindowTitle(
-            myStringResource(Res.string.new_download)
-        )
         HandleEffects(component) {
             when (it) {
                 DesktopEnterNewURLComponent.Effects.BringToFront -> {

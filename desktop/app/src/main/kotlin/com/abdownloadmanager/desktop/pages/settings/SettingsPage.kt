@@ -2,7 +2,6 @@ package com.abdownloadmanager.desktop.pages.settings
 
 import com.abdownloadmanager.shared.util.ui.WithContentAlpha
 import com.abdownloadmanager.desktop.window.custom.WindowIcon
-import com.abdownloadmanager.desktop.window.custom.WindowTitle
 import ir.amirab.util.compose.IconSource
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
@@ -28,14 +27,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.configurable.RenderConfigurableGroup
-import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.ui.MultiplatformVerticalScrollbar
 import com.abdownloadmanager.shared.util.ui.needScroll
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import io.github.oikvpqya.compose.fastscroller.rememberScrollbarAdapter
-import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 
 @Composable
@@ -160,7 +157,6 @@ fun SettingsPage(
     settingsComponent: DesktopSettingsComponent,
     onDismissRequest: () -> Unit,
 ) {
-    WindowTitle(myStringResource(Res.string.settings))
 //    WindowIcon(MyIcons.settings)
     WindowIcon(MyIcons.appIcon)
     Column {
