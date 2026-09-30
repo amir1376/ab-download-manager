@@ -50,6 +50,7 @@ import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuBar
 import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInPopup
 import com.abdownloadmanager.shared.ui.widget.menu.native.NativeMenuBar
+import com.abdownloadmanager.shared.util.LocalSizeUnit
 import com.abdownloadmanager.shared.util.LocalSpeedUnit
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.rememberIconPainter
@@ -160,6 +161,7 @@ fun HomePage(component: HomeComponent) {
                     }
                 }
             }
+
             else -> {}
         }
     }
@@ -766,7 +768,7 @@ private fun Categories(
                 onRequestOpenOptionMenu = {
                     showCategoryOption(it)
                 },
-                onCategoryReorderRequest = {fromIndex, delta ->
+                onCategoryReorderRequest = { fromIndex, delta ->
                     component.reorderCategory(fromIndex, delta)
                 }
             )
@@ -822,14 +824,39 @@ private fun Footer(component: HomeComponent) {
         modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        val selectionCount = component.selectionList.collectAsState().value.size
+        val totalCount = component.downloadList.collectAsState().value.size
+
+        val selectionSize by component.selectionContentSize.collectAsState()
+
+        if (selectionCount > 0) {
+            FooterItem(
+                MyIcons.check,
+                value = "$selectionCount",
+                unit = "/ $totalCount"
+            )
+
+            Spacer(Modifier.width(4.dp))
+            val sizeWithUnit = convertPositiveBytesToSizeUnit(selectionSize, LocalSizeUnit.current)
+            if (sizeWithUnit != null) {
+                FooterItem(
+                    MyIcons.data,
+                    value = sizeWithUnit.formatedValue(),
+                    unit = sizeWithUnit.unit.toString()
+                )
+            }
+        }
+
+
         Spacer(Modifier.weight(1f))
         val activeCount by component.activeDownloadCountFlow.collectAsState()
         FooterItem(MyIcons.activeCount, activeCount.toString(), "")
-        val size by component.globalSpeedFlow.collectAsState(0)
-        val speed = convertPositiveBytesToSizeUnit(size, LocalSpeedUnit.current)
-        if (speed != null) {
-            val speedText = speed.formatedValue()
-            val unitText = speed.unit.toString() + "/s"
+        val speed by component.globalSpeedFlow.collectAsState(0)
+        val speedWithUnit = convertPositiveBytesToSizeUnit(speed, LocalSpeedUnit.current)
+        if (speedWithUnit != null) {
+            Spacer(Modifier.width(4.dp))
+            val speedText = speedWithUnit.formatedValue()
+            val unitText = speedWithUnit.unit.toString() + "/s"
             FooterItem(MyIcons.speed, speedText, unitText)
         }
     }
@@ -838,15 +865,15 @@ private fun Footer(component: HomeComponent) {
 @Composable
 private fun FooterItem(icon: IconSource, value: String, unit: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        WithContentAlpha(0.25f) {
+        WithContentAlpha(0.50f) {
             MyIcon(icon, null, Modifier.size(16.dp))
         }
         Spacer(Modifier.width(8.dp))
-        WithContentAlpha(0.75f) {
+        WithContentAlpha(1f) {
             Text(value, maxLines = 1, fontSize = myTextSizes.base)
         }
         Spacer(Modifier.width(8.dp))
-        WithContentAlpha(0.25f) {
+        WithContentAlpha(0.5f) {
             Text(unit, maxLines = 1, fontSize = myTextSizes.base)
         }
     }
