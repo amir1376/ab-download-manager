@@ -1,7 +1,10 @@
 package com.abdownloadmanager.desktop.utils
 
+import com.abdownloadmanager.desktop.NativeExtractor
+import ir.amirab.util.desktop.mac.native.MacOSNativeFilesInResources
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
+import ir.amirab.util.platform.isMac
 import ir.amirab.util.platform.isWindows
 import ir.amirab.util.withoutJPackageEnvVariable
 import java.io.File
@@ -98,13 +101,24 @@ object DetachedLauncher {
 
     private fun String.psSingleQuoteEscape(): String = replace("'", "''")
 
+    private val macSetSidPath by lazy {
+        NativeExtractor
+            .getFromResource(MacOSNativeFilesInResources.setsid)
+            .absolutePath
+    }
+
+    private fun getSetsidExecutablePath(): String {
+        return if (Platform.isMac()) macSetSidPath
+        else "setsid"
+    }
+
     // Linux/macOS: browsers sandbox native hosts with a process group /
     // session too. setsid detaches into a brand-new session so the child
     // isn't in the browser's session and survives it exiting/killing.
     // No shell involved -> no quoting needed, argv passed directly.
     private fun execViaSetsid(exePath: File, args: List<String>) {
         val command = buildList {
-            add("setsid")
+            add(getSetsidExecutablePath())
             add(exePath.path)
             addAll(args)
         }
