@@ -78,6 +78,7 @@ fun LocationTextField(
                         icon = MyIcons.folder,
                         contentDescription = myStringResource(Res.string.download_location),
                     ) {
+                        downloadLauncherFolderPickerLauncher
                         downloadLauncherFolderPickerLauncher.launch()
                     }
                     MyTextFieldIcon(

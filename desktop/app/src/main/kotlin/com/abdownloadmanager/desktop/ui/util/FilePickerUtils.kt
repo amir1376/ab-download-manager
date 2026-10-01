@@ -2,11 +2,14 @@ package com.abdownloadmanager.desktop.ui.util
 
 import androidx.compose.runtime.Composable
 import com.abdownloadmanager.shared.ui.util.LocalWindow
-import io.github.vinceglb.filekit.compose.PickerResultLauncher
-import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
-import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.core.FileKitPlatformSettings
-import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitDialogParent
+import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.PickerResultLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.path
 
 @Composable
 fun rememberMyDirectoryPickerLauncher(
@@ -16,11 +19,11 @@ fun rememberMyDirectoryPickerLauncher(
     onResult: (String?) -> Unit,
 ): PickerResultLauncher {
     return rememberDirectoryPickerLauncher(
-        title = title,
-        initialDirectory = initialDirectory,
-        platformSettings = createPlatformSettings(
-            attachToWindow = attachToWindow
+        dialogSettings = createPlatformSettings(
+            title = title,
+            attachToWindow = attachToWindow,
         ),
+        directory = initialDirectory?.let(::PlatformFile),
         onResult = {
             onResult(it?.path)
         },
@@ -33,24 +36,31 @@ fun rememberMyFilePickerLauncher(
     initialDirectory: String? = null,
     attachToWindow: Boolean = true,
     onResult: (String?) -> Unit,
-    fileTypes: PickerType.File = PickerType.File()
+    fileTypes: FileKitType = FileKitType.File()
 ): PickerResultLauncher {
     return rememberFilePickerLauncher(
-        title = title,
-        initialDirectory = initialDirectory,
-        platformSettings = createPlatformSettings(
-            attachToWindow = attachToWindow
-        ),
         type = fileTypes,
         onResult = {
             onResult(it?.path)
         },
+        dialogSettings = createPlatformSettings(
+            title = title,
+            attachToWindow = attachToWindow,
+        ),
+        directory = initialDirectory?.let(::PlatformFile),
     )
 }
 
 @Composable
-fun createPlatformSettings(attachToWindow: Boolean): FileKitPlatformSettings {
-    return FileKitPlatformSettings(
-        parentWindow = LocalWindow.current.takeIf { attachToWindow }
+fun createPlatformSettings(
+    attachToWindow: Boolean,
+    title: String?,
+): FileKitDialogSettings {
+    val window = LocalWindow.current
+    return FileKitDialogSettings(
+        title = title,
+        parent = if (attachToWindow) {
+            FileKitDialogParent.awt(window)
+        } else null
     )
 }

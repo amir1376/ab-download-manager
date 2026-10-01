@@ -22,7 +22,7 @@ import com.abdownloadmanager.shared.util.notification.platformNotificationSound
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
-import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.dialogs.FileKitType
 import java.io.File
 
 object SoundConfigurableRenderer : ConfigurableRenderer<SoundConfigurable> {
@@ -47,7 +47,7 @@ object SoundConfigurableRenderer : ConfigurableRenderer<SoundConfigurable> {
                     }.getOrNull()
                 }
             },
-            fileTypes = PickerType.File(listOf("wav")),
+            fileTypes = FileKitType.File(listOf("wav")),
             onResult = { file ->
                 file?.let(setValue)
             }

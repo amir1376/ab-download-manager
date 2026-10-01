@@ -44,7 +44,7 @@ dependencies {
 
     implementation(libs.aboutLibraries.core)
     implementation(libs.markdownRenderer.core)
-    implementation(libs.composeFileKit) {
+    implementation(libs.filekit.dialogs.compose) {
         exclude(group = "net.java.dev.jna")
     }
     implementation(libs.proxyVole) {
