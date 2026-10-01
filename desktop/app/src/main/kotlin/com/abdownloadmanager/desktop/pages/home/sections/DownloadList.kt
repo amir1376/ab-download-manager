@@ -307,6 +307,14 @@ fun DownloadList(
                     DateAddedCell(item)
                 }
 
+                DownloadListCells.DateStarted -> {
+                    DateStartedCell(item)
+                }
+
+                DownloadListCells.DateFinished -> {
+                    DateFinishedCell(item)
+                }
+
                 DownloadListCells.Size -> {
                     SizeCell(item)
                 }
@@ -409,6 +417,44 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
         override val id: String = "Date Added"
         override val name: StringSource = Res.string.date_added.asStringSource()
         override val size: CellSize = CellSize.Resizeable(90.dp..150.dp, 100.dp)
+    }
+
+    data object DateStarted : DownloadListCells,
+        SortableCell<IDownloadItemState> {
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.startTime }
+
+        override val id: String = "Date Started"
+        override val name: StringSource = Res.string.date_started.asStringSource()
+        override val size: CellSize = CellSize.Resizeable(90.dp..150.dp, 100.dp)
+    }
+
+    data object DateFinished : DownloadListCells,
+        SortableCell<IDownloadItemState> {
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.completeTime }
+
+        override val id: String = "Date Finished"
+        override val name: StringSource = Res.string.date_finished.asStringSource()
+        override val size: CellSize = CellSize.Resizeable(90.dp..150.dp, 100.dp)
+    }
+
+    companion object {
+        val allCells: List<DownloadListCells> = listOf(
+            Check,
+            Name,
+            Size,
+            Status,
+            Speed,
+            TimeLeft,
+            DateAdded,
+            DateStarted,
+            DateFinished,
+        )
+        private val disabledByDefault = listOf(
+            DateStarted,
+            DateFinished,
+        )
+        val initiallyVisibleCells: List<DownloadListCells> = allCells
+            .filterNot { it in disabledByDefault }
     }
 }
 
