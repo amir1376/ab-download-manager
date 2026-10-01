@@ -23,6 +23,7 @@ data class CommonConfigurableRenderers(
     val proxyConfigurableRenderer: ConfigurableRenderer<ProxyConfigurable>,
     val dnsConfigurableRenderer: ConfigurableRenderer<DnsConfigurable>,
     val soundConfigurableRenderer: ConfigurableRenderer<SoundConfigurable>,
+    val networkInterfacesConfigurableRenderer: ConfigurableRenderer<NetworkInterfacesConfigurable>,
 ) : ContainsConfigurableRenderers {
     override fun getAllRenderers(): Map<Configurable.Key, ConfigurableRenderer<*>> {
         return mapOf(
@@ -42,6 +43,7 @@ data class CommonConfigurableRenderers(
             ProxyConfigurable.Key to proxyConfigurableRenderer,
             DnsConfigurable.Key to dnsConfigurableRenderer,
             SoundConfigurable.Key to soundConfigurableRenderer,
+            NetworkInterfacesConfigurable.Key to networkInterfacesConfigurableRenderer,
         )
     }
 }

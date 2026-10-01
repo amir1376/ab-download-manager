@@ -7,11 +7,13 @@ import ir.amirab.util.flow.mapStateFlow
 import com.abdownloadmanager.shared.util.newScopeBasedOn
 import androidx.compose.runtime.toMutableStateList
 import com.abdownloadmanager.desktop.storage.DesktopExtraQueueSettings
+import com.abdownloadmanager.desktop.utils.net.NetworkInterfaceProvider
 import com.abdownloadmanager.shared.storage.ExtraQueueSettingsStorage
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.DayOfWeekConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.NetworkInterfacesConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.TimeConfigurable
 import com.arkivanov.decompose.ComponentContext
@@ -48,6 +50,7 @@ class QueueInfoComponent(
     private val lastSelectedItem = MutableStateFlow(null as Long?)
 
     val extraQueueSettingsStorage by inject<ExtraQueueSettingsStorage<DesktopExtraQueueSettings>>()
+    private val networkInterfaceProvider by inject<NetworkInterfaceProvider>()
     val extraDownloadItemSettingsFlow = createMutableStateFlowFromFlow(
         flow = extraQueueSettingsStorage.getExternalQueueSettingsAsFlow(
             id = id,
@@ -141,6 +144,25 @@ class QueueInfoComponent(
         createConfigurableList(downloadQueue, scope)
 
 
+    private fun networkInterfaceConfigurable(): NetworkInterfacesConfigurable {
+        return NetworkInterfacesConfigurable(
+            title = Res.string.queue_network_interface.asStringSource(),
+            description = Res.string.queue_network_interface_description.asStringSource(),
+            availableOptions = networkInterfaceProvider.discoverInterfaces(),
+            backedBy = extraDownloadItemSettingsFlow.mapTwoWayStateFlow(
+                map = { it.networkInterface },
+                unMap = { copy(networkInterface = it) },
+            ),
+            describe = {
+                if (it == null) {
+                    Res.string.queue_network_interface_default.asStringSource()
+                } else {
+                    it.asStringSource()
+                }
+            },
+        )
+    }
+
     private fun createConfigurableList(
         downloadQueue: DownloadQueue, parentScope: CoroutineScope,
     ): List<ConfigurableGroup> {
@@ -198,6 +220,7 @@ class QueueInfoComponent(
                         range = 1..32,
                         renderMode = IntConfigurable.RenderMode.TextField,
                     ),
+                    networkInterfaceConfigurable(),
                 ),
             ),
             ConfigurableGroup(
