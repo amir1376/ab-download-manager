@@ -30,6 +30,8 @@ val compileMacOsSetsid = tasks.register<Exec>("compileMacOsSetsid") {
         "-Werror",
         "-arch", "arm64",
         "-arch", "x86_64",
+        // same minimum as the app launcher, otherwise clang uses the build machine's macOS version
+        "-mmacosx-version-min=10.13",
         "-o", setsidBinary.get().asFile.absolutePath,
     )
 }
