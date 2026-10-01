@@ -128,29 +128,57 @@ fun TimeLeftCell(
 fun DateAddedCell(
     itemState: IDownloadItemState,
 ) {
-    var dateAddedString by remember { mutableStateOf("") }
+    DateCell(itemState, dateSelector = IDownloadItemState::dateAdded)
+}
+
+@Composable
+fun DateStartedCell(
+    itemState: IDownloadItemState,
+) {
+    DateCell(itemState, dateSelector = IDownloadItemState::startTime)
+}
+
+@Composable
+fun DateFinishedCell(
+    itemState: IDownloadItemState,
+) {
+    DateCell(itemState, dateSelector = IDownloadItemState::completeTime)
+}
+
+@Composable
+fun DateCell(
+    itemState: IDownloadItemState,
+    dateSelector: (IDownloadItemState) -> Long
+) {
+    var dateString by remember { mutableStateOf("") }
     val useRelativeDateTime = LocalUseRelativeDateTime.current
 
+    val date = dateSelector(itemState)
     LaunchedEffect(
-        itemState.dateAdded,
+        date,
         useRelativeDateTime,
     ) {
-        val instant = Instant.fromEpochMilliseconds(itemState.dateAdded)
+        if (date <= 0L) {
+            // don't show date for 0 and negative values
+            dateString = ""
+            return@LaunchedEffect
+        }
+        val instant = Instant.fromEpochMilliseconds(date)
         if (useRelativeDateTime) {
             while (isActive) {
                 val now = Clock.System.now()
                 val period = now.periodUntil(instant, TimeZone.UTC)
                 val relativeTime = prettifyRelativeTime(period)
-                dateAddedString = relativeTime
+                dateString = relativeTime
                 delay(1.seconds)
             }
         } else {
             val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-            dateAddedString = dateTime.format(MyDateAndTimeFormats.fullDateTime)
+            dateString = dateTime.format(MyDateAndTimeFormats.fullDateTime)
         }
     }
     Text(
-        text = dateAddedString,
+        text = dateString,
         maxLines = 1,
         fontSize = myTextSizes.base,
         overflow = TextOverflow.Ellipsis,
