@@ -18,9 +18,8 @@ import io.github.amir1376.schemakt.schema.primitive.string
 object BaseAppSettingsDefinition {
     context(builder: TypeSafeObjectSchemaBuilder<PlatformAppSettingsModel>)
     fun sharedAppSettingsTypeSafeDefinition() = builder.run {
-        prop(IAppSettingsModel::theme) bind S.string().catch(PlatformDefaultSettings::theme)
-        prop(IAppSettingsModel::defaultDarkTheme) bind S.string().catch(PlatformDefaultSettings::defaultDarkTheme)
-        prop(IAppSettingsModel::defaultLightTheme) bind S.string().catch(PlatformDefaultSettings::defaultLightTheme)
+        prop(IAppSettingsModel::themePack) bind S.string().catch(PlatformDefaultSettings::themePack)
+        prop(IAppSettingsModel::darkMode) bind S.string().catch(PlatformDefaultSettings::darkMode)
         prop(IAppSettingsModel::language) bind S.string().nullable().catch(PlatformDefaultSettings::language)
         prop(IAppSettingsModel::font) bind S.string().nullable().catch(PlatformDefaultSettings::font)
         prop(IAppSettingsModel::uiScale) bind S.float().nullable().catch(PlatformDefaultSettings::uiScale)

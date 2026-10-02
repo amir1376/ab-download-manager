@@ -29,7 +29,6 @@ open class BaseAppRepository(
     protected val removedDownloadsFromDiskTracker: RemovedDownloadsFromDiskTracker,
     protected val categoryManager: CategoryManager,
 ) : SizeAndSpeedUnitProvider {
-    val theme = appSettings.theme
     val uiScale = appSettings.uiScale
     private val downloadManager: DownloadManager = downloadSystem.downloadManager
     private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor

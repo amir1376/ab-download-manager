@@ -63,6 +63,7 @@ kotlin {
             dependencies {
                 api(libs.androidx.core.ktx)
                 api(libs.androidx.activity.compose)
+                implementation(libs.androidx.material3)
             }
         }
         val androidMain = getByName("androidMain")

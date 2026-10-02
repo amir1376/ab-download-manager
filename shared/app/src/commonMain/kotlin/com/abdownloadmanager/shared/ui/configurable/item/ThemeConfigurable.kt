@@ -2,7 +2,7 @@ package com.abdownloadmanager.shared.ui.configurable.item
 
 import com.abdownloadmanager.shared.ui.configurable.BaseEnumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.Configurable
-import com.abdownloadmanager.shared.ui.theme.ThemeInfo
+import com.abdownloadmanager.shared.ui.theme.ThemePackInfo
 import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.StateFlow
 class ThemeConfigurable(
     title: StringSource,
     description: StringSource,
-    backedBy: MutableStateFlow<ThemeInfo>,
-    describe: (ThemeInfo) -> StringSource,
-    possibleValues: List<ThemeInfo>,
-    valueToString: (ThemeInfo) -> List<String> = {
+    backedBy: MutableStateFlow<ThemePackInfo>,
+    describe: (ThemePackInfo) -> StringSource,
+    possibleValues: List<ThemePackInfo>,
+    valueToString: (ThemePackInfo) -> List<String> = {
         listOf(it.name.getString())
     },
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
-) : BaseEnumConfigurable<ThemeInfo>(
+) : BaseEnumConfigurable<ThemePackInfo>(
     title = title,
     description = description,
     backedBy = backedBy,
@@ -32,4 +32,3 @@ class ThemeConfigurable(
 
     override fun getKey() = Key
 }
-

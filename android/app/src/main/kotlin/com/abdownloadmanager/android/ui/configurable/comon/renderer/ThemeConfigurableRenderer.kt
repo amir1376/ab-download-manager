@@ -33,6 +33,7 @@ import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
+import com.abdownloadmanager.shared.ui.theme.ThemePackInfo
 import ir.amirab.util.ifThen
 
 object ThemeConfigurableRenderer : ConfigurableRenderer<ThemeConfigurable> {

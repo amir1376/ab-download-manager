@@ -11,9 +11,8 @@ interface BaseAppSettingsStorage :
     LanguageStorage,
     ThemeSettingsStorage,
     INotificationSettingsStorage {
-    override val theme: MutableStateFlow<String>
-    override val defaultDarkTheme: MutableStateFlow<String>
-    override val defaultLightTheme: MutableStateFlow<String>
+    override val themePack: MutableStateFlow<String>
+    override val darkMode: MutableStateFlow<String>
     override val selectedLanguage: MutableStateFlow<String?>
     val font: MutableStateFlow<String?>
     val uiScale: MutableStateFlow<Float>

@@ -13,9 +13,8 @@ import kotlinx.serialization.Serializable
 @optics([arrow.optics.OpticsTarget.LENS])
 @Serializable
 data class AppSettingsModel(
-    override val theme: String,
-    override val defaultDarkTheme: String,
-    override val defaultLightTheme: String,
+    override val themePack: String,
+    override val darkMode: String,
     override val language: String?,
     override val font: String?,
     override val uiScale: Float?,
@@ -68,9 +67,8 @@ val DesktopSettingsSchema = S.typeSafeObject(
     },
     factory = {
         PlatformAppSettingsModel(
-            theme = it[AppSettingsModel::theme],
-            defaultDarkTheme = it[AppSettingsModel::defaultDarkTheme],
-            defaultLightTheme = it[AppSettingsModel::defaultLightTheme],
+            themePack = it[AppSettingsModel::themePack],
+            darkMode = it[AppSettingsModel::darkMode],
             language = it[AppSettingsModel::language],
             font = it[AppSettingsModel::font],
             uiScale = it[AppSettingsModel::uiScale],

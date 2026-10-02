@@ -36,13 +36,9 @@ class AndroidSettingsComponent(
     override val configurables: StateFlow<List<ConfigurableGroup>> = MutableStateFlow(
         listOf(
             ConfigurableGroup(
-                mainConfigurable = CommonSettings.themeConfig(themeManager, scope),
-                nestedVisible = themeManager.currentThemeInfo.mapStateFlow {
-                    it.id == ThemeManager.systemThemeInfo.id
-                },
                 nestedConfigurable = listOfNotNull(
-                    CommonSettings.defaultDarkThemeConfig(themeManager, scope),
-                    CommonSettings.defaultLightThemeConfig(themeManager, scope),
+                    CommonSettings.darkModeConfig(themeManager, scope),
+                    CommonSettings.themePackConfig(themeManager, scope),
                 )
             ),
             ConfigurableGroup(

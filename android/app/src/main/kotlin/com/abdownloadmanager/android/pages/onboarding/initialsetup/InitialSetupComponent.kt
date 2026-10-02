@@ -1,7 +1,6 @@
 package com.abdownloadmanager.android.pages.onboarding.initialsetup
 
 import com.abdownloadmanager.shared.settings.CommonSettings
-import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.BaseComponent
 import com.arkivanov.decompose.ComponentContext
@@ -15,7 +14,8 @@ class InitialSetupComponent(
 ) : BaseComponent(ctx) {
     val configurables = listOf(
             CommonSettings.languageConfig(languageManager, scope),
-            CommonSettings.themeConfig(themeManager, scope),
+            CommonSettings.darkModeConfig(themeManager, scope),
+            CommonSettings.themePackConfig(themeManager, scope),
         )
 
     fun onUserPressFinish() {

@@ -1253,7 +1253,6 @@ class AppComponent(
     val showAboutPage = MutableStateFlow(false)
     val showOpenSourceLibraries = MutableStateFlow(false)
     val showTranslators = MutableStateFlow(false)
-    val theme = appRepository.theme
     val uiScale = appRepository.uiScale
 }
 

@@ -42,9 +42,8 @@ class AppSettingsStorage(
     settings: DataStore<AppSettingsModel>,
 ) : BaseAppSettingsStorage,
     ConfigBaseSettingsByJson<AppSettingsModel>(settings) {
-    override val theme = from(AppSettingsModel.theme)
-    override val defaultDarkTheme = from(AppSettingsModel.defaultDarkTheme)
-    override val defaultLightTheme = from(AppSettingsModel.defaultLightTheme)
+    override val themePack = from(AppSettingsModel.themePack)
+    override val darkMode = from(AppSettingsModel.darkMode)
 
     override val selectedLanguage = from(languageLens)
     override val font = from(fontLens)

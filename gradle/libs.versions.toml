@@ -39,6 +39,7 @@ kermit = "2.2.0"
 agp = "9.1.1"
 androidx-core = "1.19.1"
 androidx-activity-compose = "1.13.0"
+material3 = "1.3.2"
 slf4jApi = "2.0.20"
 kotlinRpc = "0.10.4"
 ktor = "3.6.0"
@@ -120,6 +121,7 @@ arrow-opticKsp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref =
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 
 markdownRenderer-core = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "markdownRenderer" }
 handlebarsJava = { module = "com.github.jknack:handlebars", version.ref = "handlebars" }

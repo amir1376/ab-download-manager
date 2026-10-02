@@ -8,9 +8,8 @@ expect class PlatformAppSettingsModel : IAppSettingsModel
 expect val PlatformAppSettingsSchema: SettingsTypeSafeSchema<PlatformAppSettingsModel>
 
 interface IAppSettingsModel {
-    val theme: String
-    val defaultDarkTheme: String
-    val defaultLightTheme: String
+    val themePack: String
+    val darkMode: String
     val language: String?
     val font: String?
     val uiScale: Float?

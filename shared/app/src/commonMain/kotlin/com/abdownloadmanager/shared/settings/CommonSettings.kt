@@ -16,6 +16,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.SoundConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
+import com.abdownloadmanager.shared.ui.theme.DarkModePreference
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.MaximumDownloadRetriesLimitation
@@ -416,69 +417,45 @@ object CommonSettings {
         )
     }
 
-    fun themeConfig(
+    fun darkModeConfig(
         themeManager: ThemeManager,
         scope: CoroutineScope,
-    ): ThemeConfigurable {
-        val currentThemeInfo = themeManager.currentThemeInfo
-        val themes = themeManager.selectableThemes
-        return ThemeConfigurable(
+    ): EnumConfigurable<DarkModePreference> {
+        return EnumConfigurable(
             title = Res.string.settings_theme.asStringSource(),
             description = Res.string.settings_theme_description.asStringSource(),
             backedBy = createMutableStateFlowFromStateFlow(
-                flow = currentThemeInfo,
+                flow = themeManager.currentDarkMode,
                 updater = {
-                    themeManager.setTheme(it.id)
+                    themeManager.setDarkMode(it)
                 },
                 scope = scope,
             ),
-            possibleValues = themes.value,
+            possibleValues = themeManager.selectableDarkModes,
+            renderMode = EnumConfigurable.RenderMode.Spinner,
             describe = {
-                it.name
+                it.name.asStringSource()
             },
         )
     }
 
-    fun defaultDarkThemeConfig(
+    fun themePackConfig(
         themeManager: ThemeManager,
         scope: CoroutineScope,
     ): ThemeConfigurable {
-        val currentDefaultDarkThemeInfo = themeManager.selectedDarkThemeInfo
-        val darkThemes = themeManager.selectableDarkThemes
+        val currentPackInfo = themeManager.currentThemePackInfo
+        val packs = themeManager.selectableThemePacks
         return ThemeConfigurable(
             title = Res.string.settings_default_dark_theme.asStringSource(),
             description = Res.string.settings_default_dark_theme_description.asStringSource(),
             backedBy = createMutableStateFlowFromStateFlow(
-                flow = currentDefaultDarkThemeInfo,
+                flow = currentPackInfo,
                 updater = {
-                    themeManager.setDarkTheme(it.id)
+                    themeManager.setThemePack(it.id)
                 },
                 scope = scope,
             ),
-            possibleValues = darkThemes.value,
-            describe = {
-                it.name
-            },
-        )
-    }
-
-    fun defaultLightThemeConfig(
-        themeManager: ThemeManager,
-        scope: CoroutineScope,
-    ): ThemeConfigurable {
-        val currentDefaultLightThemeInfo = themeManager.selectedLightThemeInfo
-        val lightThemes = themeManager.selectableLightThemes
-        return ThemeConfigurable(
-            title = Res.string.settings_default_light_theme.asStringSource(),
-            description = Res.string.settings_default_light_theme_description.asStringSource(),
-            backedBy = createMutableStateFlowFromStateFlow(
-                flow = currentDefaultLightThemeInfo,
-                updater = {
-                    themeManager.setLightTheme(it.id)
-                },
-                scope = scope,
-            ),
-            possibleValues = lightThemes.value,
+            possibleValues = packs.value,
             describe = {
                 it.name
             },
