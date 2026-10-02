@@ -38,6 +38,13 @@ android {
             applicationIdSuffix = ".debug"
             resValue("string", "app_short_name", "AB DM - Debug")
         }
+        create("profile") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".profile"
+            resValue("string", "app_short_name", "AB DM - Profile")
+        }
     }
     buildFeatures {
         compose = true
