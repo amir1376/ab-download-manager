@@ -461,6 +461,7 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
             }
         } else {
             val canAddToDownloads by component.canAddToDownloads.collectAsState()
+            val canSubmitDownload by component.canSubmitDownload.collectAsState()
             ActionButton(
                 text = myStringResource(Res.string.add),
                 modifier = Modifier,
@@ -477,7 +478,7 @@ private fun MainActionButtons(component: BaseAddSingleDownloadComponent) {
             PrimaryMainActionButton(
                 text = myStringResource(Res.string.download),
                 modifier = Modifier,
-                enabled = canAddToDownloads,
+                enabled = canSubmitDownload,
                 onClick = {
                     component.onRequestDownload()
                 },

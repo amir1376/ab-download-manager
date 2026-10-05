@@ -86,6 +86,7 @@ class AndroidSettingsComponent(
                 nestedConfigurable = listOf(
                     CommonSettings.autoShowDownloadProgressWindow(appSettings),
                     CommonSettings.showDownloadFinishWindow(appSettings),
+                    CommonSettings.backgroundAddExternalDownloads(appSettings),
                 )
             ),
             // download engine

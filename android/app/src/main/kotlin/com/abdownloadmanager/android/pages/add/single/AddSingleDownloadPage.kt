@@ -477,6 +477,7 @@ private fun MainActionButtons(component: AndroidAddSingleDownloadComponent) {
         }
     } else {
         val canAddToDownloads by component.canAddToDownloads.collectAsState()
+        val canSubmitDownload by component.canSubmitDownload.collectAsState()
         Column {
             if (onDuplicateStrategy != null) {
                 ActionButton(
@@ -516,7 +517,7 @@ private fun MainActionButtons(component: AndroidAddSingleDownloadComponent) {
                     PrimaryMainActionButton(
                         text = myStringResource(Res.string.download),
                         modifier = buttonModifier,
-                        enabled = canAddToDownloads,
+                        enabled = canSubmitDownload,
                         onClick = {
                             component.onRequestDownload()
                         },

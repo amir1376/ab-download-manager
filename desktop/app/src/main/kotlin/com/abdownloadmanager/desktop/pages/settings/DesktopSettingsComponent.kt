@@ -117,6 +117,7 @@ class DesktopSettingsComponent(
                         nestedConfigurable = listOf(
                             CommonSettings.autoShowDownloadProgressWindow(appSettings),
                             CommonSettings.showDownloadFinishWindow(appSettings),
+                            CommonSettings.backgroundAddExternalDownloads(appSettings),
                         )
                     ),
                     ConfigurableGroup(

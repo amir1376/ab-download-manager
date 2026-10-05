@@ -120,6 +120,14 @@ abstract class AddDownloadComponent(
         dialogUsed = true
     }
 
+    /**
+     * Allows the dialog to be consumed again, needed when the same dialog is shown more than once
+     * (e.g. it was re-opened so the user can fix an invalid input).
+     */
+    protected fun makeDialogConsumableAgain() {
+        dialogUsed = false
+    }
+
     private val _lastUsedLocations = lastSavedLocationsStorage.lastUsedSaveLocations
     val lastUsedLocations: StateFlow<List<String>> = _lastUsedLocations.asStateFlow()
     fun addToLastUsedLocations(saveLocation: String) {

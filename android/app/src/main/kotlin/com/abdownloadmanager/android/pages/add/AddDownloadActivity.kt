@@ -45,7 +45,7 @@ class AddDownloadActivity : ABDMActivity() {
                 this,
                 AddDownloadConfig.MultipleAddConfig(
                     newDownloads = credentials.map(::createDownloaderInUiProps),
-                    importOptions = ImportOptions(),
+                    importOptions = ImportOptions(externalRequest = true),
                 ),
                 json = json,
             )
@@ -57,7 +57,7 @@ class AddDownloadActivity : ABDMActivity() {
                         .firstOrNone()
                         .getOrElse { HttpDownloadCredentials("") }
                         .let(::createDownloaderInUiProps),
-                    importOptions = ImportOptions(),
+                    importOptions = ImportOptions(externalRequest = true),
                 ),
                 json = json,
             )

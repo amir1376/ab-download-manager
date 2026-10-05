@@ -323,6 +323,17 @@ object CommonSettings {
         )
     }
 
+    fun backgroundAddExternalDownloads(settingsStorage: BaseAppSettingsStorage): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = Res.string.settings_background_add_external_downloads.asStringSource(),
+            description = Res.string.settings_background_add_external_downloads_description.asStringSource(),
+            backedBy = settingsStorage.backgroundAddExternalDownloads,
+            describe = {
+                (if (it) Res.string.enabled else Res.string.disabled).asStringSource()
+            },
+        )
+    }
+
     fun perHostSettings(perHostSettingsPageManager: PerHostSettingsPageManager): NavigatableConfigurable {
         return NavigatableConfigurable(
             title = Res.string.settings_per_host_settings.asStringSource(),

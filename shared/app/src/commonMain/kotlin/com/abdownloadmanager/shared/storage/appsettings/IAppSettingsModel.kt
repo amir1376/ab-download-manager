@@ -25,6 +25,7 @@ interface IAppSettingsModel {
     val useSparseFileAllocation: Boolean
     val useAverageSpeed: Boolean
     val showDownloadProgressDialog: Boolean
+    val backgroundAddExternalDownloads: Boolean
     val showDownloadCompletionDialog: Boolean
     val speedLimit: Long
     val autoStartOnBoot: Boolean

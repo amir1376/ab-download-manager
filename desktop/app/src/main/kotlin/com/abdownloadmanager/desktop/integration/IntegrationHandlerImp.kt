@@ -40,7 +40,8 @@ class IntegrationHandlerImp : IntegrationHandler, KoinComponent {
                     SilentImportOptions(
                         silentDownload = options.silentStart
                     )
-                } else null
+                } else null,
+                externalRequest = !options.silentAdd,
             )
         )
     }

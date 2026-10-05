@@ -3,8 +3,10 @@ package com.abdownloadmanager.android.pages.add.single
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.abdownloadmanager.android.pages.browser.BrowserActivity
 import com.abdownloadmanager.android.pages.category.CategorySheet
 import com.abdownloadmanager.android.pages.newqueue.NewQueueSheet
@@ -73,13 +75,15 @@ class AddSingleDownloadActivity : ABDMActivity() {
             val closeAddDownloadDialog = {
                 this@myRetainedComponent.finishActivityAction()
             }
+            val backgroundAdd = config.importOptions.externalRequest &&
+                appSettingsStorage.backgroundAddExternalDownloads.value
             AndroidAddSingleDownloadComponent(
                 ctx = it,
                 onRequestClose = closeAddDownloadDialog,
                 onRequestDownload = { item, categoryId ->
                     scope.launch {
                         val id = appManager.startNewDownload(item, categoryId).await()
-                        if (appSettingsStorage.showDownloadProgressDialog.value) {
+                        if (!backgroundAdd && appSettingsStorage.showDownloadProgressDialog.value) {
                             runCatching {
                                 appContext.startActivity(
                                     SingleDownloadPageActivity.createIntent(
@@ -128,6 +132,7 @@ class AddSingleDownloadActivity : ABDMActivity() {
                 appSettings = appSettingsStorage,
                 iconProvider = iconProvider,
                 appScope = applicationScope,
+                notificationSender = appManager,
                 appRepository = appRepository,
                 perHostSettingsManager = perHostSettingsManager,
             )
@@ -147,6 +152,19 @@ class AddSingleDownloadActivity : ABDMActivity() {
             dialogState.OnFullyDismissed {
                 addDownloadComponent.onRequestClose()
             }
+            val shouldShowWindow by addDownloadComponent.shouldShowWindow.collectAsState()
+            // the window is hidden while an external download is submitted in the background,
+            // then it must not intercept the user's touches (the activity is kept alive to be able
+            // to show the dialog again when the download turns out to be invalid)
+            LaunchedEffect(shouldShowWindow) {
+                val hiddenWindowFlags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                if (shouldShowWindow) {
+                    window.clearFlags(hiddenWindowFlags)
+                } else {
+                    window.addFlags(hiddenWindowFlags)
+                }
+            }
             LaunchedEffect(Unit) {
                 // animate open after activity becomes fully open
                 // is there a better way?
@@ -154,11 +172,13 @@ class AddSingleDownloadActivity : ABDMActivity() {
                 dialogState.show()
             }
             val onDismiss = { dialogState.hide() }
-            ResponsiveDialog(
-                dialogState,
-                onDismiss
-            ) {
-                AddSingleDownloadPage(addDownloadComponent, onDismiss)
+            if (shouldShowWindow) {
+                ResponsiveDialog(
+                    dialogState,
+                    onDismiss
+                ) {
+                    AddSingleDownloadPage(addDownloadComponent, onDismiss)
+                }
             }
             CategorySheet(
                 categoryComponent = addDownloadComponent.categorySlot.rememberChild(),

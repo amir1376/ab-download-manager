@@ -366,6 +366,7 @@ class AppComponent(
                         lastSavedLocationsStorage = pageStatesStorage,
                         selectQueueStorage = selectQueueStorage,
                         appScope = applicationScope,
+                        notificationSender = this@AppComponent,
                         appSettings = appSettings,
                         appRepository = appRepository,
                         perHostSettingsManager = perHostSettingsManager,

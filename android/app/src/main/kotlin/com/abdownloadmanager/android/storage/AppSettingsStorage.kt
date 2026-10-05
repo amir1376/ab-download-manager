@@ -61,6 +61,7 @@ class AppSettingsStorage(
     override val useAverageSpeed = from(AppSettingsModel.useAverageSpeed)
     override val maxDownloadRetryCount = from(AppSettingsModel.maxDownloadRetryCount)
     override val showDownloadProgressDialog = from(AppSettingsModel.showDownloadProgressDialog)
+    override val backgroundAddExternalDownloads = from(AppSettingsModel.backgroundAddExternalDownloads)
     override val showDownloadCompletionDialog = from(AppSettingsModel.showDownloadCompletionDialog)
     override val speedLimit = from(AppSettingsModel.speedLimit)
     override val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)

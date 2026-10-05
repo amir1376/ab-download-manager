@@ -24,6 +24,7 @@ abstract class DefaultAppSettings {
     abstract val useSparseFileAllocation: Boolean
     open val useAverageSpeed: Boolean get() = true
     open val showDownloadProgressDialog: Boolean get() = true
+    open val backgroundAddExternalDownloads: Boolean get() = true
     open val showDownloadCompletionDialog: Boolean get() = true
     open val speedLimit: Long get() = 0
     open val autoStartOnBoot: Boolean get() = true

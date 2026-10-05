@@ -46,6 +46,8 @@ object BaseAppSettingsDefinition {
         prop(IAppSettingsModel::useAverageSpeed) bind S.boolean().catch(PlatformDefaultSettings::useAverageSpeed)
         prop(IAppSettingsModel::showDownloadProgressDialog) bind S.boolean()
             .catch(PlatformDefaultSettings::showDownloadProgressDialog)
+        prop(IAppSettingsModel::backgroundAddExternalDownloads) bind S.boolean()
+            .catch(PlatformDefaultSettings::backgroundAddExternalDownloads)
         prop(IAppSettingsModel::showDownloadCompletionDialog) bind S.boolean()
             .catch(PlatformDefaultSettings::showDownloadCompletionDialog)
         prop(IAppSettingsModel::speedLimit) bind S.long().min(0L).catch(PlatformDefaultSettings::speedLimit)

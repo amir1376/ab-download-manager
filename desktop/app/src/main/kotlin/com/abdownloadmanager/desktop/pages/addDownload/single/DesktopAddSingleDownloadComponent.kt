@@ -3,6 +3,7 @@ package com.abdownloadmanager.desktop.pages.addDownload.single
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.pagemanager.CategoryDialogManager
 import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
+import com.abdownloadmanager.shared.pagemanager.NotificationSender
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.adddownload.ImportOptions
 import com.abdownloadmanager.shared.pages.adddownload.single.BaseAddSingleDownloadComponent
@@ -39,6 +40,7 @@ class DesktopAddSingleDownloadComponent(
     appSettings: BaseAppSettingsStorage,
     iconProvider: FileIconProvider,
     appScope: CoroutineScope,
+    notificationSender: NotificationSender,
     appRepository: BaseAppRepository,
     perHostSettingsManager: PerHostSettingsManager,
     importOptions: ImportOptions,
@@ -68,6 +70,7 @@ class DesktopAddSingleDownloadComponent(
     iconProvider = iconProvider,
     downloadErrorDialogManager = downloadErrorDialogManager,
     appScope = appScope,
+    notificationSender = notificationSender,
     appRepository = appRepository,
     perHostSettingsManager = perHostSettingsManager,
 ) {

@@ -84,6 +84,28 @@ abstract class NewDownloadUiChecker<
         refreshResponseInfoImmediately.tryEmit(Unit)
     }
 
+    /**
+     * Checks the link and returns the file name resolved by the server (if any).
+     * Unlike [refresh] this doesn't rely on the scope this checker was created with,
+     * so it can be awaited by background work that outlives the dialog.
+     */
+    suspend fun checkLinkNow(): String? {
+        linkChecker.check()
+        return linkChecker.suggestedName.value
+            ?.takeIf { it.isNotBlank() }
+    }
+
+    /**
+     * Re-validates the current inputs (url, file name, folder and duplicate detection).
+     * The result is exposed by [canAddToDownloadResult].
+     */
+    suspend fun revalidateNow() {
+        // these values are normally synced by collectors that live in the (maybe already cancelled) component scope
+        newDownloadChecker.name.update { name.value }
+        newDownloadChecker.folder.update { folder.value }
+        newDownloadChecker.check()
+    }
+
     private fun scheduleRefresh(
         alsoRecheckLink: Boolean
     ) {
