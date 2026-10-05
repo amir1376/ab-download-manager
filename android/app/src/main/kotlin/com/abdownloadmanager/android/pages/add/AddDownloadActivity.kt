@@ -69,7 +69,17 @@ class AddDownloadActivity : ABDMActivity() {
     private fun getDownloadCredentialsFromIntent(intent: Intent): List<IDownloadCredentials> {
         val links = when (intent.action) {
             Intent.ACTION_SEND -> {
-                intent.getStringExtra(Intent.EXTRA_TEXT).orEmpty()
+                intent.getStringExtra(Intent.EXTRA_TEXT)
+                    ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
+                        .orEmpty()
+            }
+
+            Intent.ACTION_SEND_MULTIPLE -> {
+                intent.getCharSequenceArrayListExtra(Intent.EXTRA_TEXT)
+                    ?.joinToString("\n")
+                    ?: intent.getStringExtra(Intent.EXTRA_TEXT)
+                    ?: intent.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
+                        .orEmpty()
             }
 
             else -> {

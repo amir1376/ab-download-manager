@@ -33,6 +33,15 @@ object AndroidSettings {
         )
     }
 
+    fun installUnknownApps(): PermissionConfigurable {
+        val permission = ABDMPermissions.InstallUnknownAppsPermission
+        return PermissionConfigurable(
+            title = permission.title,
+            description = permission.description,
+            backedBy = MutableStateFlow(permission),
+        )
+    }
+
     fun browserIconInLauncher(
         appSettingsStorage: AppSettingsStorage
     ): BooleanConfigurable {

@@ -75,6 +75,24 @@ object ABDMPermissions {
     }
 
     // these are not introduced in the main screen.
+    // it is only required to hand downloaded apk files over to the system package installer
+    val InstallUnknownAppsPermission = AppPermission(
+        title = Res.string.permissions_install_unknown_apps_title.asStringSource(),
+        description = Res.string.permissions_install_unknown_apps_reason.asStringSource(),
+        icon = MyIcons.applicationFile,
+        isOptional = true,
+        permissions = listOf(),
+        permissionRequestFactory = CustomPermissionActivityLauncher(::requestInstallUnknownAppsPermission),
+        permissionChecker = object : PermissionRequestChecker {
+            override fun isGranted(
+                context: Context,
+                appPermission: AppPermission
+            ): Boolean {
+                return canInstallUnknownApps(context)
+            }
+        }
+    )
+
     val BatteryOptimizationPermission = AppPermission(
         title = Res.string.permissions_ignore_battery_optimization_title.asStringSource(),
         description = Res.string.permissions_ignore_battery_optimization_reason.asStringSource(),

@@ -136,6 +136,7 @@ class AndroidSettingsComponent(
                 nestedConfigurable = listOf(
                     AndroidSettings.permissionSettings(permissionsPageManager),
                     AndroidSettings.ignoreBatteryOptimizations(),
+                    AndroidSettings.installUnknownApps(),
                 )
             ),
 

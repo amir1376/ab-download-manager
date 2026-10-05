@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.abdownloadmanager.android.R
+import com.abdownloadmanager.android.pages.installapk.InstallApkTrampolineActivity
 import com.abdownloadmanager.android.pages.singledownload.SingleDownloadPageActivity
 import com.abdownloadmanager.android.service.KeepAliveServiceReason
 import com.abdownloadmanager.android.storage.AppSettingsStorage
@@ -326,6 +327,41 @@ class ABDMServiceNotificationManager(
             .build()
     }
 
+    private fun isApkDownload(downloadItemState: IDownloadItem): Boolean {
+        return downloadItemState.name.endsWith(".apk", ignoreCase = true)
+    }
+
+    private fun createOpenDownloadPagePendingIntent(
+        downloadId: Long,
+        flagOfPendingIntent: Int,
+    ): PendingIntent {
+        return PendingIntent.getActivity(
+            context,
+            // the request code must be per download: the extras are ignored by Intent.filterEquals,
+            // so a shared request code would make all completed downloads share one PendingIntent
+            getNotificationIdForDownloadItem(downloadId),
+            SingleDownloadPageActivity.createIntent(
+                context, downloadId, true
+            ),
+            flagOfPendingIntent
+        )
+    }
+
+    private fun createInstallApkPendingIntent(
+        downloadId: Long,
+        flagOfPendingIntent: Int,
+    ): PendingIntent {
+        return PendingIntent.getActivity(
+            context,
+            // see createOpenDownloadPagePendingIntent: one PendingIntent per download
+            getNotificationIdForDownloadItem(downloadId),
+            InstallApkTrampolineActivity.createIntent(
+                context, downloadId
+            ),
+            flagOfPendingIntent
+        )
+    }
+
     fun createFinishedDownloadItemNotification(
         downloadItemState: IDownloadItem
     ): Notification {
@@ -334,14 +370,13 @@ class ABDMServiceNotificationManager(
         val title = downloadItemState.name
 
         val statusString = Res.string.download_page_download_completed.asStringSource().getString()
-        val openSingleDownloadActivityIntent = PendingIntent.getActivity(
-            context,
-            AndroidConstants.SERVICE_NOTIFICATION_ID,
-            SingleDownloadPageActivity.createIntent(
-                context, downloadItemState.id, true
-            ),
-            flagOfPendingIntent
-        )
+        val isApk = isApkDownload(downloadItemState)
+        // a completed apk can be handed over to the system installer right away
+        val contentIntent = if (isApk) {
+            createInstallApkPendingIntent(downloadItemState.id, flagOfPendingIntent)
+        } else {
+            createOpenDownloadPagePendingIntent(downloadItemState.id, flagOfPendingIntent)
+        }
         return NotificationCompat
             .Builder(context, AndroidConstants.NOTIFICATION_DOWNLOAD_CHANEL_ID)
             .setContentTitle(title)
@@ -357,7 +392,16 @@ class ABDMServiceNotificationManager(
                 }
             }
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setContentIntent(openSingleDownloadActivityIntent)
+            .apply {
+                if (isApk) {
+                    addAction(
+                        0,
+                        Res.string.install.asStringSource().getString(),
+                        contentIntent,
+                    )
+                }
+            }
+            .setContentIntent(contentIntent)
             .setAutoCancel(true)
             .build()
     }

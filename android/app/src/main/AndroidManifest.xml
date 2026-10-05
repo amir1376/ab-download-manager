@@ -81,6 +81,13 @@
                 android:theme="@style/Theme.ABDownloadManager.Transparent"
         />
 
+        <!--        Hand a completed apk download over to the system package installer (no UI)-->
+        <activity
+                android:name=".pages.installapk.InstallApkTrampolineActivity"
+                android:exported="false"
+                android:theme="@style/Theme.ABDownloadManager.Transparent"
+        />
+
         <activity
                 android:name=".pages.add.single.AddSingleDownloadActivity"
                 android:exported="false"
