@@ -60,6 +60,7 @@ class DesktopDownloadActions(
         +openFolderAction
         +(resumeAction)
         +pauseAction
+        +pauseForMenu
         separator()
         +(deleteAction)
         +(reDownloadAction)
