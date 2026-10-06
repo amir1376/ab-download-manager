@@ -23,21 +23,28 @@ import ir.amirab.downloader.monitor.statusOrFinished
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.simpleAction
+import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.isNotNull
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
+const val MAX_CUSTOM_PAUSE_MINUTES = 525_600L
+
+data class PauseForDurationDialogRequest(val downloadIds: List<Long>)
+
 abstract class AbstractDownloadActions(
     private val scope: CoroutineScope,
-    downloadSystem: DownloadSystem,
+    private val downloadSystem: DownloadSystem,
     downloadDialogManager: DownloadDialogManager,
     editDownloadDialogManager: EditDownloadDialogManager,
     fileChecksumDialogManager: FileChecksumDialogManager,
@@ -48,6 +55,10 @@ abstract class AbstractDownloadActions(
     private val openFile: (Long) -> Unit,
     private val requestDelete: (List<Long>) -> Unit,
 ) {
+    private val _pauseForDurationDialogRequest = MutableStateFlow<PauseForDurationDialogRequest?>(null)
+    val pauseForDurationDialogRequest: StateFlow<PauseForDurationDialogRequest?> =
+        _pauseForDurationDialogRequest.asStateFlow()
+
     val defaultItem = combineStateFlows(
         selections,
         mainItem,
@@ -150,6 +161,75 @@ abstract class AbstractDownloadActions(
             }
         }
     )
+
+    private fun createPauseForAction(title: StringSource, delayMillis: Long) = simpleAction(
+        title = title,
+        icon = MyIcons.pause,
+        checkEnable = pausableSelections.mapStateFlow { it.isNotEmpty() },
+        onActionPerformed = {
+            scope.launch {
+                pausableSelections.value.forEach { item ->
+                    runCatching {
+                        downloadSystem.pauseAndResumeLater(item.id, delayMillis)
+                    }
+                }
+            }
+        }
+    )
+
+    private val pauseForTwoMinutesAction = createPauseForAction(
+        Res.string.pause_for_2_minutes.asStringSource(),
+        2 * 60 * 1000L,
+    )
+
+    private val pauseForFiveMinutesAction = createPauseForAction(
+        Res.string.pause_for_5_minutes.asStringSource(),
+        5 * 60 * 1000L,
+    )
+
+    private val pauseForCustomDurationAction = simpleAction(
+        title = Res.string.pause_for_custom_duration.asStringSource(),
+        icon = MyIcons.pause,
+        checkEnable = pausableSelections.mapStateFlow { it.isNotEmpty() },
+        onActionPerformed = { openPauseForDurationDialog() },
+    )
+
+    protected val pauseForMenu = MenuItem.SubMenu(
+        title = Res.string.pause_for.asStringSource(),
+        items = listOf(
+            pauseForTwoMinutesAction,
+            pauseForFiveMinutesAction,
+            pauseForCustomDurationAction,
+        ),
+        icon = MyIcons.pause,
+    )
+
+    fun openPauseForDurationDialog() {
+        val ids = pausableSelections.value.map { it.id }
+        if (ids.isNotEmpty()) {
+            _pauseForDurationDialogRequest.value = PauseForDurationDialogRequest(ids)
+        }
+    }
+
+    fun dismissPauseForDurationDialog() {
+        _pauseForDurationDialogRequest.value = null
+    }
+
+    fun pauseForCustomDuration(minutes: Long): Boolean {
+        if (minutes !in 1L..MAX_CUSTOM_PAUSE_MINUTES) return false
+        val request = _pauseForDurationDialogRequest.value ?: return false
+        _pauseForDurationDialogRequest.value = null
+        val delayMillis = minutes * 60_000L
+        scope.launch {
+            request.downloadIds.forEach { id ->
+                runCatching {
+                    downloadSystem.pauseAndResumeLater(id, delayMillis)
+                }
+            }
+        }
+        return true
+    }
+
     val editDownloadAction = simpleAction(
         title = Res.string.edit.asStringSource(),
         icon = MyIcons.edit,
