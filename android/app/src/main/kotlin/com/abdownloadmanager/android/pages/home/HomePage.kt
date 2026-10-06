@@ -60,6 +60,7 @@ import com.abdownloadmanager.shared.pages.home.BaseHomeComponent
 import com.abdownloadmanager.shared.pages.home.CategoryDeletePromptState
 import com.abdownloadmanager.shared.pages.home.ConfirmPromptState
 import com.abdownloadmanager.shared.pages.home.DeletePromptState
+import com.abdownloadmanager.shared.pages.home.PauseForDurationDialog
 import com.abdownloadmanager.shared.ui.widget.rememberMyComponentCustomRectPositionProvider
 import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialog
@@ -79,6 +80,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomePage(component: HomeComponent) {
     val selectionList by component.selectionList.collectAsState()
+    val pauseForDurationRequest by component.downloadActions.pauseForDurationDialogRequest.collectAsState()
     val density = LocalDensity.current
     var contentPaddingValues by remember {
         mutableStateOf(PaddingValues.Zero)
@@ -306,6 +308,15 @@ fun HomePage(component: HomeComponent) {
         enterNewURLComponent?.let {
             EnterNewURLPage(it, onDismissEnterNewURLComponent)
         }
+    }
+    pauseForDurationRequest?.let { request ->
+        PauseForDurationDialog(
+            request = request,
+            onDismiss = component.downloadActions::dismissPauseForDurationDialog,
+            onConfirm = { minutes ->
+                component.downloadActions.pauseForCustomDuration(minutes)
+            },
+        )
     }
     RenderPrompts(
         component = component,
