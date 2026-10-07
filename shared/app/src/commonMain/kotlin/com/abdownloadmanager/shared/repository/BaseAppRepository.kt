@@ -15,6 +15,7 @@ import ir.amirab.util.datasize.ConvertSizeConfig
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.withPrevious
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -35,6 +36,7 @@ open class BaseAppRepository(
     private val downloadMonitor: IDownloadMonitor = downloadSystem.downloadMonitor
 
     val maxConcurrentDownloads = appSettings.maxConcurrentDownloads
+    val useSpeedLimit = appSettings.useSpeedLimit
     val speedLimiter = appSettings.speedLimit
     val threadCount = appSettings.threadCount
     val dynamicPartCreation = appSettings.dynamicPartCreation
@@ -103,7 +105,16 @@ open class BaseAppRepository(
             .onEach { enabled ->
                 AutoStartManager.startOnBoot(enabled)
             }.launchIn(scope)
-        speedLimiter
+        combine(
+            useSpeedLimit,
+            speedLimiter,
+        ) { useSpeedLimit, speedLimit ->
+            if (useSpeedLimit) {
+                speedLimit.coerceAtLeast(1)
+            } else {
+                0
+            }
+        }
             .debounce(500.milliseconds)
             .onEach {
                 downloadSettings.globalSpeedLimit = it

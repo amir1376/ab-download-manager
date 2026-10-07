@@ -21,6 +21,10 @@ sealed interface MenuItem {
         fun setTitle(title: StringSource)
     }
 
+    interface CanBeToggled {
+        val isToggled: StateFlow<Boolean>
+    }
+
     interface HasEnable {
         //compose aware property
         val isEnabled: StateFlow<Boolean>
@@ -98,6 +102,14 @@ sealed interface MenuItem {
             it.isNotEmpty()
         }
     }
+
+    abstract class ToggleableItem(
+        title: StringSource,
+        icon: IconSource? = null,
+    ) : SingleItem(
+        title = title,
+        icon = icon,
+    ), CanBeToggled
 
     data object Separator : MenuItem
 }

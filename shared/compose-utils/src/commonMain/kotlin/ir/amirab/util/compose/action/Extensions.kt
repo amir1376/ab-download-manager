@@ -29,3 +29,33 @@ inline fun simpleAction(
         override fun actionPerformed() = onActionPerformed()
     }
 }
+
+inline fun toggleableAction(
+    title: StringSource,
+    icon: IconSource? = null,
+    isToggled: StateFlow<Boolean>,
+    crossinline onActionPerformed: AToggleableAction.() -> Unit,
+): AToggleableAction {
+    return object : AToggleableAction(
+        title = title, icon = icon,
+    ) {
+        override fun actionPerformed() = onActionPerformed()
+        override val isToggled: StateFlow<Boolean> = isToggled
+    }
+}
+
+inline fun toggleableAction(
+    title: StringSource,
+    icon: IconSource? = null,
+    checkEnable: StateFlow<Boolean>,
+    isToggled: StateFlow<Boolean>,
+    crossinline onActionPerformed: AToggleableAction.() -> Unit,
+): AToggleableAction {
+    return object : AToggleableAction(
+        title = title, icon = icon,
+    ) {
+        override val isEnabled: StateFlow<Boolean> = checkEnable
+        override fun actionPerformed() = onActionPerformed()
+        override val isToggled: StateFlow<Boolean> = isToggled
+    }
+}

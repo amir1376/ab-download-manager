@@ -10,12 +10,13 @@ import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.FolderConfig
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.IntConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.LongConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.PerHostSettingsConfigurableRenderer
-import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.SpeedLimitConfigurableRenderer
+import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.ToggleableSpeedLimitConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.StringConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.ThemeConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.TimeConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.ProxyConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.SoundConfigurableRenderer
+import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.SpeedConfigurableRenderer
 import com.abdownloadmanager.shared.ui.configurable.CommonConfigurableRenderers
 
 val CommonConfigurableRenderersForDesktop = CommonConfigurableRenderers(
@@ -28,7 +29,8 @@ val CommonConfigurableRenderersForDesktop = CommonConfigurableRenderers(
     longConfigurableRenderer = LongConfigurableRenderer,
     perHostSettingsConfigurableRenderer = PerHostSettingsConfigurableRenderer,
     enumConfigurableRenderer = EnumConfigurableRenderer,
-    speedConfigurableRenderer = SpeedLimitConfigurableRenderer,
+    speedConfigurableRenderer = SpeedConfigurableRenderer,
+    toggleableSpeedLimitConfigurableRenderer = ToggleableSpeedLimitConfigurableRenderer,
     stringConfigurableRenderer = StringConfigurableRenderer,
     themeConfigurableRenderer = ThemeConfigurableRenderer,
     timeConfigurableRenderer = TimeConfigurableRenderer,

@@ -6,11 +6,12 @@ import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class SpeedLimitConfigurable(
+class SpeedConfigurable(
     title: StringSource,
     description: StringSource,
     backedBy: MutableStateFlow<Long>,
     describe: (Long) -> StringSource,
+    range: LongRange = 0..Long.MAX_VALUE,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : BaseLongConfigurable(
@@ -18,7 +19,7 @@ class SpeedLimitConfigurable(
     description = description,
     backedBy = backedBy,
     describe = describe,
-    range = 0..Long.MAX_VALUE,
+    range = range,
     enabled = enabled,
     visible = visible,
 ) {

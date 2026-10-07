@@ -10,7 +10,7 @@ import com.abdownloadmanager.shared.downloaderinui.http.HttpCredentialsToItemMap
 import com.abdownloadmanager.shared.downloaderinui.http.add.HttpLinkChecker
 import com.abdownloadmanager.shared.ui.configurable.item.FileChecksumConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.ToggleableSpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
@@ -49,7 +49,7 @@ class HttpEditDownloadInputs(
 ) {
 
     override val configurableList = listOf(
-        SpeedLimitConfigurable(
+        ToggleableSpeedLimitConfigurable(
             Res.string.download_item_settings_speed_limit.asStringSource(),
             Res.string.download_item_settings_speed_limit_description.asStringSource(),
             backedBy = editedDownloadItem.mapTwoWayStateFlow(
