@@ -1,6 +1,7 @@
 package com.abdownloadmanager.desktop.utils
 
 import com.abdownloadmanager.desktop.AppArguments
+import com.abdownloadmanager.desktop.NativeExtractor
 import com.abdownloadmanager.shared.util.schemakt.initializeForABDM
 import io.github.amir1376.schemakt.Schema
 import io.github.vinceglb.filekit.FileKit
@@ -32,7 +33,10 @@ object EntrypointInitializer {
             FileKit.init(
                 appId = AppInfo.packageName,
                 filesDir = AppInfo.definedPaths.configDir.toFile(),
-                cacheDir = AppInfo.definedPaths.configDir.toFile(),
+                cacheDir = AppInfo.definedPaths.systemDir.toFile(),
+            )
+            NativeExtractor.init(
+                cacheDir = AppInfo.definedPaths.nativeCacheDir
             )
 
             AppLogger.init(

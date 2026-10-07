@@ -1,3 +1,4 @@
+import buildlogic.HashUtils
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 
@@ -9,6 +10,7 @@ val generatedResources = layout.buildDirectory.dir("generated/resources")
 
 val setsidSource = layout.projectDirectory.file("src/main/native/setsid.c")
 val setsidBinary = generatedResources.map { it.file("native/macos/setsid") }
+val setsidHash = generatedResources.map { it.file("native/macos/setsid.sig") }
 
 val compileMacOsSetsid = tasks.register<Exec>("compileMacOsSetsid") {
     description = "Compile the macOS setsid helper"
@@ -36,8 +38,28 @@ val compileMacOsSetsid = tasks.register<Exec>("compileMacOsSetsid") {
     )
 }
 
+val generateMacOsSetsidHash = tasks.register("generateMacOsSetsidHash") {
+    description = "Generate SHA-256 hash for the macOS setsid helper"
+    onlyIf { Platform.isMac() }
+    dependsOn(compileMacOsSetsid)
+
+    inputs.file(setsidBinary)
+    outputs.file(setsidHash)
+
+    doLast {
+        val binaryFile = setsidBinary.get().asFile
+        if (binaryFile.exists()) {
+            val hash = HashUtils.sha256(binaryFile)
+            val hashFile = setsidHash.get().asFile
+            hashFile.parentFile.mkdirs()
+            hashFile.writeText(hash.trim())
+        }
+    }
+}
+
 tasks.named("processResources") {
     dependsOn(compileMacOsSetsid)
+    dependsOn(generateMacOsSetsidHash)
 }
 
 sourceSets {

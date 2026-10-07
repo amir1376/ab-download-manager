@@ -14,4 +14,7 @@ class DesktopDefinedPaths(
 
     // optional read only properties file
     val appPropertiesFile = configDir.resolve("app.properties")
+
+    // cached binaries or dlls should be saved here
+    val nativeCacheDir: Path = systemDir.resolve("native-cache")
 }

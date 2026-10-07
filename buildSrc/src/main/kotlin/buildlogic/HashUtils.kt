@@ -11,4 +11,10 @@ object HashUtils {
         val digest = md.digest(file.readBytes())
         return digest.toHexString()
     }
+
+    fun sha256(file: File): String {
+        val md = MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(file.readBytes())
+        return digest.toHexString()
+    }
 }

@@ -3,6 +3,7 @@ package ir.amirab.util
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
+import java.io.File
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.NotDirectoryException
 import kotlin.io.path.createDirectories
@@ -92,3 +93,6 @@ fun Path.startsWith(other: Path) = normalized().run {
                     .isEmpty()
     }
 }
+
+val Path.nameWithoutExtension: String
+    get() = name.substringBeforeLast(".", missingDelimiterValue = name)
