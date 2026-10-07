@@ -29,6 +29,7 @@ interface BaseAppSettingsStorage :
     val maxDownloadRetryCount: MutableStateFlow<Int>
     val showDownloadProgressDialog: MutableStateFlow<Boolean>
     val showDownloadCompletionDialog: MutableStateFlow<Boolean>
+    val useSpeedLimit: MutableStateFlow<Boolean>
     val speedLimit: MutableStateFlow<Long>
     val autoStartOnBoot: MutableStateFlow<Boolean>
     override val notificationSound: MutableStateFlow<Boolean>

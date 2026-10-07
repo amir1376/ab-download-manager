@@ -28,6 +28,7 @@ import com.abdownloadmanager.shared.action.createPerHostSettingsPage
 import com.abdownloadmanager.shared.action.createRequestExitAction
 import com.abdownloadmanager.shared.action.createStartQueueGroupAction
 import com.abdownloadmanager.shared.action.createStopQueueGroupAction
+import com.abdownloadmanager.shared.action.createUseSpeedLimiterAction
 import ir.amirab.downloader.queue.activeQueuesFlow
 import ir.amirab.util.URLOpener
 import ir.amirab.util.compose.asStringSource
@@ -95,6 +96,7 @@ val openTranslators = createOpenTranslatorsPageAction(appComponent)
 val openAboutAction = createOpenAboutPage(appComponent)
 val checkForUpdateAction = createCheckForUpdateAction(appComponent.updater)
 val gotoSettingsAction = createOpenSettingsAction(appComponent)
+val useSpeedLimiterAction = createUseSpeedLimiterAction(appComponent.appRepository)
 val perHostSettings = createPerHostSettingsPage(appComponent)
 val requestExitAction = createRequestExitAction(scope, appComponent)
 val startQueueGroupAction = createStartQueueGroupAction(scope, appComponent.downloadSystem.queueManager)

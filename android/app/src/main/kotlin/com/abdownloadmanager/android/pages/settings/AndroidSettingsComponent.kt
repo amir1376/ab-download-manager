@@ -98,6 +98,7 @@ class AndroidSettingsComponent(
             ),
             ConfigurableGroup(
                 nestedConfigurable = listOf(
+                    CommonSettings.useSpeedLimitConfig(appRepository),
                     CommonSettings.speedLimitConfig(appRepository),
                     CommonSettings.threadCountConfig(appRepository),
                     CommonSettings.maxConcurrentDownloads(appRepository),

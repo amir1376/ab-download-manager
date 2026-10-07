@@ -7,7 +7,7 @@ import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.ExtraDownloadSettingsStorage
 import com.abdownloadmanager.shared.storage.IExtraDownloadItemSettings
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.ToggleableSpeedLimitConfigurable
 import com.abdownloadmanager.shared.util.*
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
@@ -146,90 +146,6 @@ abstract class BaseSingleDownloadComponent<
         _showPartInfo.value = value
     }
 
-    // TODO this can be moved to a nested component to reduce system resource usage
-    val extraDownloadProgressInfo: StateFlow<List<SingleDownloadPagePropertyItem>> = itemStateFlow
-        .filterIsInstance<ProcessingDownloadItemState>()
-        .map {
-            buildList {
-                add(SingleDownloadPagePropertyItem(Res.string.name.asStringSource(), it.name.asStringSource()))
-                val errorReason = lastError.value
-                add(
-                    SingleDownloadPagePropertyItem(
-                        Res.string.status.asStringSource(), createStatusString(it).ifThen(
-                            it.status is DownloadJobStatus.Canceled && errorReason != null
-                        ) {
-                            StringSource.CombinedStringSource(
-                                listOf(
-                                    this,
-                                    errorReason.title.asStringSource(),
-                                ), " - "
-                            )
-                        })
-                )
-                if (it is DurationBasedProcessingDownloadItemState) {
-                    add(
-                        SingleDownloadPagePropertyItem(
-                            Res.string.size.asStringSource(),
-                            it.duration
-                                ?.let(::convertDurationToHumanReadable)
-                                ?: Res.string.unknown.asStringSource()
-                        )
-                    )
-                } else {
-                    add(
-                        SingleDownloadPagePropertyItem(
-                            Res.string.size.asStringSource(),
-                            convertPositiveSizeToHumanReadable(it.contentLength, appRepository.sizeUnit.value)
-                        )
-                    )
-                }
-                add(
-                    SingleDownloadPagePropertyItem(
-                        Res.string.download_page_downloaded_size.asStringSource(),
-                        StringSource.CombinedStringSource(
-                            buildList {
-                                add(convertPositiveSizeToHumanReadable(it.progress, appRepository.sizeUnit.value))
-                                if (it.percent != null) {
-                                    add("(${it.percent}%)".asStringSource())
-                                }
-                            },
-                            " "
-                        )
-                    )
-                )
-                add(
-                    SingleDownloadPagePropertyItem(
-                        Res.string.speed.asStringSource(),
-                        convertPositiveSpeedToHumanReadable(it.speed, appRepository.speedUnit.value).asStringSource()
-                    )
-                )
-                add(
-                    SingleDownloadPagePropertyItem(
-                        Res.string.time_left.asStringSource(),
-                        (it.remainingTime?.let { remainingTime ->
-                            convertTimeRemainingToHumanReadable(remainingTime, TimeNames.ShortNames)
-                        }.orEmpty()).asStringSource()
-                    )
-                )
-                add(
-                    SingleDownloadPagePropertyItem(
-                        Res.string.resume_support.asStringSource(),
-                        when (it.supportResume) {
-                            true -> Res.string.yes.asStringSource()
-                            false -> Res.string.no.asStringSource()
-                            null -> Res.string.unknown.asStringSource()
-                        },
-                        when (it.supportResume) {
-                            true -> SingleDownloadPagePropertyItem.ValueType.Success
-                            false -> SingleDownloadPagePropertyItem.ValueType.Error
-                            null -> SingleDownloadPagePropertyItem.ValueType.Normal
-                        }
-                    )
-                )
-            }
-        }.stateIn(scope, SharingStarted.Eagerly, emptyList())
-
-
     fun openFolder() {
         val itemState = itemStateFlow.value
         applicationScope.launch {
@@ -356,6 +272,110 @@ abstract class BaseSingleDownloadComponent<
     }
 
 
+    // TODO this can be moved to a nested component to reduce system resource usage
+    val extraDownloadProgressInfo: StateFlow<List<SingleDownloadPagePropertyItem>> =
+        combine(
+            itemStateFlow
+                .filterIsInstance<ProcessingDownloadItemState>(),
+            speedLimit,
+            appRepository.useSpeedLimit
+        ) { it, itemSpeedLimit, globalSpeedLimit ->
+            val isSpeedLimited = itemSpeedLimit > 0 || globalSpeedLimit
+
+            buildList {
+                add(SingleDownloadPagePropertyItem(Res.string.name.asStringSource(), it.name.asStringSource()))
+                val errorReason = lastError.value
+                add(
+                    SingleDownloadPagePropertyItem(
+                        Res.string.status.asStringSource(), createStatusString(it).ifThen(
+                            it.status is DownloadJobStatus.Canceled && errorReason != null
+                        ) {
+                            StringSource.CombinedStringSource(
+                                listOf(
+                                    this,
+                                    errorReason.title.asStringSource(),
+                                ), " - "
+                            )
+                        })
+                )
+                if (it is DurationBasedProcessingDownloadItemState) {
+                    add(
+                        SingleDownloadPagePropertyItem(
+                            Res.string.size.asStringSource(),
+                            it.duration
+                                ?.let(::convertDurationToHumanReadable)
+                                ?: Res.string.unknown.asStringSource()
+                        )
+                    )
+                } else {
+                    add(
+                        SingleDownloadPagePropertyItem(
+                            Res.string.size.asStringSource(),
+                            convertPositiveSizeToHumanReadable(it.contentLength, appRepository.sizeUnit.value)
+                        )
+                    )
+                }
+                add(
+                    SingleDownloadPagePropertyItem(
+                        Res.string.download_page_downloaded_size.asStringSource(),
+                        StringSource.CombinedStringSource(
+                            buildList {
+                                add(convertPositiveSizeToHumanReadable(it.progress, appRepository.sizeUnit.value))
+                                if (it.percent != null) {
+                                    add("(${it.percent}%)".asStringSource())
+                                }
+                            },
+                            " "
+                        )
+                    )
+                )
+                add(
+                    SingleDownloadPagePropertyItem(
+                        Res.string.speed.asStringSource(),
+                        StringSource.CombinedStringSource(
+                            buildList {
+                                add(
+                                    convertPositiveSpeedToHumanReadable(
+                                        it.speed,
+                                        appRepository.speedUnit.value
+                                    ).asStringSource()
+                                )
+                                if (isSpeedLimited) {
+                                    add(" (".asStringSource())
+                                    add(Res.string.limited.asStringSource())
+                                    add(")".asStringSource())
+                                }
+                            },
+                            ""
+                        )
+                    )
+                )
+                add(
+                    SingleDownloadPagePropertyItem(
+                        Res.string.time_left.asStringSource(),
+                        (it.remainingTime?.let { remainingTime ->
+                            convertTimeRemainingToHumanReadable(remainingTime, TimeNames.ShortNames)
+                        }.orEmpty()).asStringSource()
+                    )
+                )
+                add(
+                    SingleDownloadPagePropertyItem(
+                        Res.string.resume_support.asStringSource(),
+                        when (it.supportResume) {
+                            true -> Res.string.yes.asStringSource()
+                            false -> Res.string.no.asStringSource()
+                            null -> Res.string.unknown.asStringSource()
+                        },
+                        when (it.supportResume) {
+                            true -> SingleDownloadPagePropertyItem.ValueType.Success
+                            false -> SingleDownloadPagePropertyItem.ValueType.Error
+                            null -> SingleDownloadPagePropertyItem.ValueType.Normal
+                        }
+                    )
+                )
+            }
+        }.stateIn(scope, SharingStarted.Eagerly, emptyList())
+
     val settings by lazy {
         listOf(
             IntConfigurable(
@@ -377,7 +397,7 @@ abstract class BaseSingleDownloadComponent<
                 range = 0..ThreadCountLimitation.MAX_ALLOWED_THREAD_COUNT,
                 renderMode = IntConfigurable.RenderMode.TextField,
             ),
-            SpeedLimitConfigurable(
+            ToggleableSpeedLimitConfigurable(
                 title = Res.string.download_item_settings_speed_limit.asStringSource(),
                 description = Res.string.download_item_settings_speed_limit_description.asStringSource(),
                 backedBy = speedLimit,

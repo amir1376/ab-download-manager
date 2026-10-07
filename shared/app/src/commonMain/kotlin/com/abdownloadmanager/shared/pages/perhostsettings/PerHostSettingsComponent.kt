@@ -3,7 +3,7 @@ package com.abdownloadmanager.shared.pages.perhostsettings
 import arrow.core.prependTo
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.ToggleableSpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
@@ -156,7 +156,7 @@ abstract class BasePerHostSettingsComponent(
             ),
             ConfigurableGroup(
                 nestedConfigurable = listOf(
-                    SpeedLimitConfigurable(
+                    ToggleableSpeedLimitConfigurable(
                         title = Res.string.download_item_settings_speed_limit.asStringSource(),
                         description = Res.string.download_item_settings_speed_limit_description.asStringSource(),
                         backedBy = state.mapTwoWayStateFlow(

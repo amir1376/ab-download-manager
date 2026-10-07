@@ -13,7 +13,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.SoundConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SpeedConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
@@ -70,6 +70,7 @@ object CommonSettings {
             },
         )
     }
+
     fun maxConcurrentDownloads(appRepository: BaseAppRepository): IntConfigurable {
         return IntConfigurable(
             title = Res.string.settings_download_max_concurrent_downloads.asStringSource(),
@@ -333,20 +334,29 @@ object CommonSettings {
         )
     }
 
-    fun speedLimitConfig(appRepository: BaseAppRepository): SpeedLimitConfigurable {
-        return SpeedLimitConfigurable(
+    fun useSpeedLimitConfig(appRepository: BaseAppRepository): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = Res.string.settings_global_speed_limiter_enabled.asStringSource(),
+            description = Res.string.settings_global_speed_limiter_enabled_description.asStringSource(),
+            backedBy = appRepository.useSpeedLimit,
+            describe = {
+                (if (it) Res.string.limited else Res.string.unlimited).asStringSource()
+            }
+        )
+    }
+
+    fun speedLimitConfig(appRepository: BaseAppRepository): SpeedConfigurable {
+        return SpeedConfigurable(
             title = Res.string.settings_global_speed_limiter.asStringSource(),
             description = Res.string.settings_global_speed_limiter_description.asStringSource(),
             backedBy = appRepository.speedLimiter,
+            enabled = appRepository.useSpeedLimit,
+            range = 1..Long.MAX_VALUE,
             describe = {
-                if (it == 0L) {
-                    Res.string.unlimited.asStringSource()
-                } else {
-                    convertPositiveSpeedToHumanReadable(
-                        it,
-                        appRepository.speedUnit.value
-                    ).asStringSource()
-                }
+                convertPositiveSpeedToHumanReadable(
+                    it,
+                    appRepository.speedUnit.value
+                ).asStringSource()
             }
         )
     }
@@ -369,7 +379,7 @@ object CommonSettings {
             description = Res.string.settings_default_download_folder_description.asStringSource(),
             backedBy = appSettings.defaultDownloadFolder,
             validate = {
-                FileUtils.Companion.canWriteInThisFolder(it)
+                FileUtils.canWriteInThisFolder(it)
             },
             describe = {
                 Res.string
@@ -524,7 +534,7 @@ object CommonSettings {
                 val language = it ?: languageManager.systemLanguageOrDefault
                 val languageName = language.nativeName
                 if (isAuto) {
-                    // always use english here!
+                    // always use English here!
                     "System ($languageName)".asStringSource()
                 } else {
                     languageName.asStringSource()
@@ -595,6 +605,7 @@ object CommonSettings {
             }
         )
     }
+
     fun generalNotificationSound(appSettings: BaseAppSettingsStorage): SoundConfigurable {
         return SoundConfigurable(
             title = Res.string.settings_notification_sound_general.asStringSource(),
@@ -737,6 +748,7 @@ object CommonSettings {
             }
         )
     }
+
     fun dnsConfig(dnsStorage: IDNSSettingsStorage): DnsConfigurable {
         return DnsConfigurable(
             title = Res.string.settings_dns.asStringSource(),

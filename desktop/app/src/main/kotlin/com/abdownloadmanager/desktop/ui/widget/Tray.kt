@@ -9,6 +9,7 @@ import ir.amirab.util.compose.IconSource
 import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
+import ir.amirab.util.platform.isWindows
 
 @Composable
 fun Tray(
@@ -47,6 +48,10 @@ fun Tray(
 @Composable
 private fun ComposableTrayMenuScope.renderTrayItem(item: MenuItem) {
     when (item) {
+        is MenuItem.ToggleableItem -> {
+            RenderTrayToggleableItem(item)
+        }
+
         is MenuItem.SingleItem -> {
             RenderTraySingleItem(item)
         }
@@ -84,6 +89,44 @@ private fun ComposableTrayMenuScope.RenderTraySingleItem(item: MenuItem.SingleIt
             label = title,
             isEnabled = isEnabled,
             onClick = onClick,
+        )
+    }
+}
+
+@Composable
+private fun ComposableTrayMenuScope.RenderTrayToggleableItem(item: MenuItem.ToggleableItem) {
+    val title = item.title.collectAsState().value.rememberString()
+    val isEnabled by item.isEnabled.collectAsState()
+    val iconSource = if (Platform.isWindows()) {
+        // on Windows icons not supported
+        null
+    } else {
+        item.icon.collectAsState().value
+    }
+    val isToggled = item.isToggled.collectAsState().value
+    val onClick = item::invoke
+    when (iconSource) {
+        is IconSource.VectorIconSource -> Item(
+            label = title,
+            isEnabled = isEnabled,
+            onClick = onClick,
+            icon = iconSource.value,
+        )
+
+        is IconSource.PainterIconSource -> Item(
+            label = title,
+            isEnabled = isEnabled,
+            onClick = onClick,
+            icon = iconSource.value,
+        )
+
+        null -> CheckableItem(
+            label = title,
+            isEnabled = isEnabled,
+            checked = isToggled,
+            onCheckedChange = {
+                onClick()
+            }
         )
     }
 }

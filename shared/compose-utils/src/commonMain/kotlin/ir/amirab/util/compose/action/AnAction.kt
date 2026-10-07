@@ -15,4 +15,16 @@ abstract class AnAction(
     abstract fun actionPerformed()
 }
 
+abstract class AToggleableAction(
+    title: StringSource,
+    icon: IconSource? = null,
+) : MenuItem.ToggleableItem(
+    title = title,
+    icon = icon,
+) {
+    override fun onClick() = actionPerformed()
+
+    abstract fun actionPerformed()
+}
+
 

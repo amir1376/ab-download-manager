@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.ui.configurable.comon.renderer
+package com.abdownloadmanager.android.ui.configurable.comon.renderer
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -16,13 +16,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.ui.configurable.ConfigTemplate
+import com.abdownloadmanager.android.ui.configurable.ConfigTemplate
+import com.abdownloadmanager.android.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRenderer
-import com.abdownloadmanager.shared.ui.configurable.RenderSpinner
-import com.abdownloadmanager.desktop.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
+import com.abdownloadmanager.shared.ui.configurable.RenderSpinner
 import com.abdownloadmanager.shared.ui.configurable.isConfigEnabled
-import com.abdownloadmanager.shared.ui.configurable.item.SpeedLimitConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.ToggleableSpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.widget.CheckBox
 import com.abdownloadmanager.shared.ui.widget.DoubleTextField
 import com.abdownloadmanager.shared.ui.widget.Text
@@ -33,17 +33,17 @@ import ir.amirab.util.datasize.SizeUnit
 import ir.amirab.util.datasize.SizeWithUnit
 import ir.amirab.util.datasize.asConverterConfig
 
-object SpeedLimitConfigurableRenderer : ConfigurableRenderer<SpeedLimitConfigurable> {
+object ToggleableSpeedLimitConfigurableRenderer : ConfigurableRenderer<ToggleableSpeedLimitConfigurable> {
     @Composable
     override fun RenderConfigurable(
-        configurable: SpeedLimitConfigurable,
+        configurable: ToggleableSpeedLimitConfigurable,
         configurableUiProps: ConfigurableUiProps
     ) {
         RenderSpeedConfig(configurable, configurableUiProps)
     }
 
     @Composable
-    private fun RenderSpeedConfig(cfg: SpeedLimitConfigurable, configurableUiProps: ConfigurableUiProps) {
+    private fun RenderSpeedConfig(cfg: ToggleableSpeedLimitConfigurable, configurableUiProps: ConfigurableUiProps) {
         val value by cfg.stateFlow.collectAsState()
         val setValue = cfg::set
 
@@ -96,7 +96,7 @@ object SpeedLimitConfigurableRenderer : ConfigurableRenderer<SpeedLimitConfigura
                         Row(
                             Modifier
                                 .padding(vertical = 8.dp)
-                                .width(200.dp)
+                                .width(250.dp)
                         ) {
                             DoubleTextField(
                                 value = currentValue,
@@ -108,7 +108,7 @@ object SpeedLimitConfigurableRenderer : ConfigurableRenderer<SpeedLimitConfigura
                                 unit = 1.0,
                                 modifier = Modifier.weight(1f),
                             )
-                            Spacer(Modifier.width(2.dp))
+                            Spacer(Modifier.width(8.dp))
                             RenderSpinner(
                                 possibleValues = units,
                                 value = currentUnit,
@@ -121,7 +121,7 @@ object SpeedLimitConfigurableRenderer : ConfigurableRenderer<SpeedLimitConfigura
                                 val prettified = remember(it) {
                                     "$it/s"
                                 }
-                                Text(prettified)
+                                Text(prettified, Modifier.padding(horizontal = 4.dp))
                             }
                         }
                     }
@@ -133,13 +133,7 @@ object SpeedLimitConfigurableRenderer : ConfigurableRenderer<SpeedLimitConfigura
                     enabled = enabled,
                     onValueChange = {
                         if (it) {
-                            setValue(
-                                SizeConverter.sizeToBytes(
-                                    SizeWithUnit(
-                                        256.0, currentUnit
-                                    )
-                                )
-                            )
+                            setValue(cfg.defaultSpeed(currentUnit))
                         } else {
                             setValue(0)
                         }

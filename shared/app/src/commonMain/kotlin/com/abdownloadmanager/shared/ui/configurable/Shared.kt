@@ -5,9 +5,7 @@ import com.abdownloadmanager.shared.util.ui.WithContentColor
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import ir.amirab.util.ifThen
-import com.abdownloadmanager.shared.ui.widget.Text
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -17,17 +15,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
@@ -101,7 +97,7 @@ fun <T> RenderSpinner(
     val verticalPadding = 4.dp
     val horizontalPadding = 4.dp
 
-    var isOpen by remember { mutableStateOf(false) }
+    var isOpen by remember(enabled) { mutableStateOf(false) }
     val shape = myShapes.defaultRounded
     val borderWidth = 1.dp
     val borderColor = myColors.onBackground / 10
@@ -119,6 +115,9 @@ fun <T> RenderSpinner(
                     widthForPopup = with(density) {
                         it.size.width.toDp()
                     }
+                }
+                .ifThen(!enabled) {
+                    alpha(0.5f)
                 }
                 .background(myColors.surface)
                 .border(borderWidth, borderColor, shape)

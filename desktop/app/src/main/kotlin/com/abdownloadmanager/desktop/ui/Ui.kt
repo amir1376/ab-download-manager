@@ -9,6 +9,7 @@ import com.abdownloadmanager.desktop.actions.gotoSettingsAction
 import com.abdownloadmanager.desktop.actions.newDownloadFromClipboardAction
 import com.abdownloadmanager.desktop.actions.requestExitAction
 import com.abdownloadmanager.desktop.actions.showDownloadList
+import com.abdownloadmanager.desktop.actions.useSpeedLimiterAction
 import com.abdownloadmanager.desktop.pages.about.ShowAboutDialog
 import com.abdownloadmanager.desktop.pages.addDownload.ShowAddDownloadDialogs
 import com.abdownloadmanager.desktop.pages.batchdownload.BatchDownloadWindow
@@ -37,6 +38,7 @@ import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
 import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
 import com.abdownloadmanager.desktop.utils.isInDebugMode
+import com.abdownloadmanager.shared.settings.CommonSettings
 import com.abdownloadmanager.shared.ui.ProvideCommonSettings
 import com.abdownloadmanager.shared.ui.ProvideSizeUnits
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRendererRegistry
@@ -212,6 +214,7 @@ private fun SystemTray(
                 separator()
                 +newDownloadFromClipboardAction
                 separator()
+                +useSpeedLimiterAction
                 +gotoSettingsAction
                 separator()
                 +requestExitAction
