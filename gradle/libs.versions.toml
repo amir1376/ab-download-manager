@@ -20,6 +20,7 @@ arrow = "2.2.3"
 datastore = "1.2.1"
 aboutLibraries = "15.2.0"
 jna = "5.19.1"
+dbus-java = "5.2.0"
 datetime = "0.8.0"
 fileKit = "0.16.0"
 reorderable = "3.1.0"
@@ -102,6 +103,10 @@ aboutLibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 
 jna-core = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
+
+dbusJava-core = { module = "com.github.hypfvieh:dbus-java-core", version.ref = "dbus-java" }
+dbusJava-unixSocket = { module = "com.github.hypfvieh:dbus-java-transport-junixsocket", version.ref = "dbus-java" }
+
 pluginAndroidGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 pluginComposeMultiplatform = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
 pluginComposeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }

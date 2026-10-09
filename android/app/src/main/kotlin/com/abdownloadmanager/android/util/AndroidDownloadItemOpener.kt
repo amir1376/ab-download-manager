@@ -23,6 +23,20 @@ class AndroidDownloadItemOpener(
         }
     }
 
+    override suspend fun openDownloadItemWith(id: Long) {
+        downloadSystem.getDownloadItemById(id)?.let {
+            openDownloadItemWith(it)
+        }
+    }
+
+    override suspend fun openDownloadItemWith(downloadItem: IDownloadItem) {
+        try {
+            FileUtils.openFileWith(File(downloadItem.folder, downloadItem.name))
+        } catch (e: Exception) {
+            // toast something
+        }
+    }
+
     override suspend fun openDownloadItemFolder(id: Long) {
         downloadSystem.getDownloadItemById(id)?.let {
             openDownloadItemFolder(it)

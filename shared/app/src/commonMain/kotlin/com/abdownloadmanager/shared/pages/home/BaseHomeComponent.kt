@@ -337,6 +337,22 @@ abstract class BaseHomeComponent(
         }
     }
 
+    fun openWith(id: Long) {
+        scope.launch {
+            val dItem = downloadSystem.getDownloadItemById(id) ?: return@launch
+            if (dItem.status != DownloadStatus.Completed) {
+                notificationSender.sendNotification(
+                    Res.string.open_with,
+                    Res.string.cant_open_file.asStringSource(),
+                    Res.string.not_finished.asStringSource(),
+                    NotificationType.Error,
+                )
+                return@launch
+            }
+            downloadItemOpener.openDownloadItemWith(dItem)
+        }
+    }
+
     val queueActions = MutableStateFlow(null as QueueActions?)
 
     fun showCategoryOptions(queue: DownloadQueue?) {

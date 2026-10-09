@@ -385,11 +385,17 @@ abstract class BaseAddSingleDownloadComponent(
         } else false
     }.stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
-    fun openExistingFile() {
+    fun openExistingFile(
+        useAppChooser: Boolean = false
+    ) {
         val itemId = (canAddResult.value as? CanAddResult.DownloadAlreadyExists)?.itemId ?: return
         consumeDialog {
             appScope.launch {
-                downloadItemOpener.openDownloadItem(itemId)
+                if (useAppChooser) {
+                    downloadItemOpener.openDownloadItemWith(itemId)
+                } else {
+                    downloadItemOpener.openDownloadItem(itemId)
+                }
             }
             onRequestClose()
         }

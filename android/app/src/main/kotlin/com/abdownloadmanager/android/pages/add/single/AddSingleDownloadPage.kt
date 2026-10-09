@@ -472,6 +472,7 @@ private fun MainActionButtons(component: AndroidAddSingleDownloadComponent) {
                     text = myStringResource(Res.string.open_file),
                     modifier = buttonModifier,
                     onClick = { component.openExistingFile() },
+                    onLongClick = { component.openExistingFile(useAppChooser = true) },
                 )
             }
         }

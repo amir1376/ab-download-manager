@@ -33,6 +33,7 @@ class AndroidDownloadActions(
     queueManager: QueueManager,
     categoryManager: CategoryManager,
     openFile: (Long) -> Unit,
+    openWith: (Long) -> Unit,
     requestDelete: (List<Long>) -> Unit,
     onRequestShareFiles: (ids: List<CompletedDownloadItemState>) -> Unit,
 ) : AbstractDownloadActions(
@@ -46,6 +47,7 @@ class AndroidDownloadActions(
     queueManager = queueManager,
     categoryManager = categoryManager,
     openFile = openFile,
+    openWith = openWith,
     requestDelete = requestDelete,
 ) {
     val shareAction = simpleAction(
@@ -68,6 +70,7 @@ class AndroidDownloadActions(
     }
     private val extraMenu = buildMenu {
         +openFileAction
+        +openWithAction
         +shareAction
         separator()
         +reDownloadAction

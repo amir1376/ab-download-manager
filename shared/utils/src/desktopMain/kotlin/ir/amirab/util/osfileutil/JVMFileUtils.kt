@@ -30,4 +30,8 @@ internal class JVMFileUtils : DesktopFileUtils() {
         }
         return false
     }
+
+    override fun openWithFileInternal(file: File): Boolean {
+        return openFileInternal(file)
+    }
 }

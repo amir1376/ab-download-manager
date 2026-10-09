@@ -46,6 +46,7 @@ abstract class AbstractDownloadActions(
     private val queueManager: QueueManager,
     private val categoryManager: CategoryManager,
     private val openFile: (Long) -> Unit,
+    private val openWith: (Long) -> Unit,
     private val requestDelete: (List<Long>) -> Unit,
 ) {
     val defaultItem = combineStateFlows(
@@ -86,6 +87,20 @@ abstract class AbstractDownloadActions(
             scope.launch {
                 val d = defaultItem.value ?: return@launch
                 openFile(d.id)
+            }
+        }
+    )
+
+    val openWithAction = simpleAction(
+        title = Res.string.open_with.asStringSource(),
+        icon = MyIcons.fileOpen,
+        checkEnable = defaultItem.mapStateFlow {
+            it?.statusOrFinished() is DownloadJobStatus.Finished
+        },
+        onActionPerformed = {
+            scope.launch {
+                val d = defaultItem.value ?: return@launch
+                openWith(d.id)
             }
         }
     )

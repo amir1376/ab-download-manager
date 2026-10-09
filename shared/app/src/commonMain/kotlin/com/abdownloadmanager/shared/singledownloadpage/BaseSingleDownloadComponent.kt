@@ -156,12 +156,19 @@ abstract class BaseSingleDownloadComponent<
         onDismiss()
     }
 
-    fun openFile(alsoClose: Boolean = true) {
+    fun openFile(
+        alsoClose: Boolean = true,
+        useChooser: Boolean = false,
+    ) {
         val itemState = itemStateFlow.value
         applicationScope.launch {
             if (itemState is CompletedDownloadItemState) {
                 runCatching {
-                    downloadItemOpener.openDownloadItem(downloadId)
+                    if (useChooser) {
+                        downloadItemOpener.openDownloadItemWith(downloadId)
+                    } else {
+                        downloadItemOpener.openDownloadItem(downloadId)
+                    }
                 }
             }
         }
