@@ -1,4 +1,4 @@
-package com.abdownloadmanager.android.util
+package com.abdownloadmanager.shared
 
 import android.app.Activity
 import android.app.Application
@@ -7,15 +7,14 @@ import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-object ApplicationBackgroundTracker {
-    fun startTracking(application: Application) {
+
+object ApplicationBackgroundTracker : IApplicationBackgroundTracker {
+    fun boot(application: Application) {
         application.registerActivityLifecycleCallbacks(Tracker)
     }
-    val isInBackgroundFlow = Tracker.count.mapStateFlow {
+
+    override val isInBackgroundFlow = Tracker.count.mapStateFlow {
         it == 0
-    }
-    fun isInBackground(): Boolean {
-        return isInBackgroundFlow.value
     }
 }
 
@@ -45,3 +44,5 @@ private object Tracker : Application.ActivityLifecycleCallbacks {
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
     }
 }
+
+actual fun platformApplicationBackgroundTracker(): IApplicationBackgroundTracker = ApplicationBackgroundTracker

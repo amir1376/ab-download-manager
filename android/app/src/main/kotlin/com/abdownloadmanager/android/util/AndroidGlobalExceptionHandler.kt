@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.abdownloadmanager.android.R
 import com.abdownloadmanager.android.pages.crashreport.CrashReportActivity
+import com.abdownloadmanager.shared.ApplicationBackgroundTracker
 import kotlin.system.exitProcess
 
 class AndroidGlobalExceptionHandler(

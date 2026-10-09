@@ -15,6 +15,7 @@ import com.abdownloadmanager.android.service.DownloadSystemService
 import com.abdownloadmanager.android.service.KeepAliveServiceReason
 import com.abdownloadmanager.android.storage.AppSettingsStorage
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ApplicationBackgroundTracker
 import com.abdownloadmanager.shared.pagemanager.NotificationSender
 import com.abdownloadmanager.shared.ui.widget.MessageDialogType
 import com.abdownloadmanager.shared.ui.widget.NotificationManager
@@ -40,7 +41,6 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import java.util.*
 import kotlin.system.exitProcess
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class ABDMAppManager(

@@ -6,7 +6,7 @@ import com.abdownloadmanager.android.di.Di
 import com.abdownloadmanager.android.util.ABDMAppManager
 import com.abdownloadmanager.android.util.AndroidGlobalExceptionHandler
 import com.abdownloadmanager.android.util.AppInfo
-import com.abdownloadmanager.android.util.ApplicationBackgroundTracker
+import com.abdownloadmanager.shared.ApplicationBackgroundTracker
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.util.appinfo.PreviousVersion
 import com.abdownloadmanager.shared.util.schemakt.initializeForABDM
@@ -31,7 +31,7 @@ class ABDMApp : Application(), KoinComponent {
         )
         Di.boot(this)
         Schema.initializeForABDM()
-        ApplicationBackgroundTracker.startTracking(this)
+        ApplicationBackgroundTracker.boot(this)
         appRepository.boot()
         previousVersion.boot()
         Thread.setDefaultUncaughtExceptionHandler(
