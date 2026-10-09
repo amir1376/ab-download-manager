@@ -113,6 +113,8 @@ import com.abdownloadmanager.shared.util.ui.IMyIcons
 import com.abdownloadmanager.shared.util.proxy.IProxyStorage
 import com.abdownloadmanager.shared.util.proxy.ProxyData
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
+import com.abdownloadmanager.shared.util.systemusage.SystemUsageMonitor
+import com.abdownloadmanager.shared.util.systemusage.platformSystemUsageMonitor
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import ir.amirab.downloader.DownloaderRegistry
 import ir.amirab.downloader.connection.UserAgentProvider
@@ -679,6 +681,9 @@ val appModule = module {
             get(),
             get(),
         )
+    }
+    single<SystemUsageMonitor> {
+        platformSystemUsageMonitor()
     }
     single<IPerHostSettingsStorage> {
         val definedPaths = get<DefinedPaths>()

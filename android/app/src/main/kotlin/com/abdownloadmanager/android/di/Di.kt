@@ -106,6 +106,8 @@ import com.abdownloadmanager.shared.util.ui.IMyIcons
 import com.abdownloadmanager.shared.util.proxy.IProxyStorage
 import com.abdownloadmanager.shared.util.proxy.ProxyData
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
+import com.abdownloadmanager.shared.util.systemusage.SystemUsageMonitor
+import com.abdownloadmanager.shared.util.systemusage.platformSystemUsageMonitor
 import ir.amirab.downloader.DownloaderRegistry
 import ir.amirab.downloader.connection.UserAgentProvider
 import ir.amirab.downloader.connection.proxy.AutoConfigurableProxyProvider
@@ -626,6 +628,9 @@ fun getAppModule(context: ABDMApp) = module {
             get(),
             get(),
         )
+    }
+    single<SystemUsageMonitor> {
+        platformSystemUsageMonitor()
     }
     single<IPerHostSettingsStorage> {
         val definedPaths = get<DefinedPaths>()
