@@ -16,6 +16,12 @@ abstract class FileUtilsBase : FileUtils {
         )
     }
 
+    override fun openFileWith(file: File): Boolean {
+        return openWithFileInternal(
+            file = preparedFile(file)
+        )
+    }
+
     override fun openFolder(folder: File): Boolean {
         return openFolderInternal(
             folder = preparedFile(folder)
@@ -51,4 +57,6 @@ abstract class FileUtilsBase : FileUtils {
     protected abstract fun openFileInternal(file: File): Boolean
     protected abstract fun openFolderOfFileInternal(file: File): Boolean
     protected abstract fun openFolderInternal(folder: File): Boolean
+    protected abstract fun openWithFileInternal(file: File): Boolean
+
 }

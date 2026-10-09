@@ -14,6 +14,7 @@ import ir.amirab.util.compose.action.MenuItem
 import ir.amirab.util.compose.action.buildMenu
 import ir.amirab.util.compose.action.simpleAction
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -28,6 +29,7 @@ class DesktopDownloadActions(
     queueManager: QueueManager,
     categoryManager: CategoryManager,
     openFile: (Long) -> Unit,
+    openWith: (Long) -> Unit,
     requestDelete: (List<Long>) -> Unit,
     mainItem: StateFlow<Long?>,
     private val openFolder: (Long) -> Unit,
@@ -41,6 +43,7 @@ class DesktopDownloadActions(
     queueManager = queueManager,
     categoryManager = categoryManager,
     openFile = openFile,
+    openWith = openWith,
     requestDelete = requestDelete,
     mainItem = mainItem,
 ) {
@@ -57,6 +60,9 @@ class DesktopDownloadActions(
 
     val menu: List<MenuItem> = buildMenu {
         +openFileAction
+        if (FileUtils.isOpenFileWithSupported) {
+            +openWithAction
+        }
         +openFolderAction
         +(resumeAction)
         +pauseAction

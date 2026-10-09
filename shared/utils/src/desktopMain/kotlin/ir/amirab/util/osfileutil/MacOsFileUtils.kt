@@ -8,6 +8,10 @@ internal class MacOsFileUtils : DesktopFileUtils() {
         return execAndWait(arrayOf("open", file.path))
     }
 
+    override fun openWithFileInternal(file: File): Boolean {
+        TODO("openWith not yet implemented on macOS yet")
+    }
+
     override fun openFolderOfFileInternal(file: File): Boolean {
         return execAndWait(arrayOf("open", "-R", file.path))
     }
@@ -16,4 +20,6 @@ internal class MacOsFileUtils : DesktopFileUtils() {
         return execAndWait(arrayOf("open", folder.path))
     }
 
+    // TODO remove it when its implemented
+    override val isOpenFileWithSupported: Boolean = false
 }

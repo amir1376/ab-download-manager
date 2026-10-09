@@ -41,6 +41,33 @@ class AndroidFileUtil : FileUtilsBase(), KoinComponent {
             .getOrElse { false }
     }
 
+    override fun openWithFileInternal(file: File): Boolean {
+        val mimeType = MimeTypeMap
+            .getSingleton()
+            .getMimeTypeFromExtension(file.extension.lowercase())
+            ?: "*/*"
+
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, mimeType)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        val chooserIntent = Intent.createChooser(viewIntent, null).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        return runCatching {
+            context.startActivity(chooserIntent)
+            true
+        }
+            .onFailure {
+                it.printStackTrace()
+                (it.localizedMessage ?: it::class.qualifiedName)?.let { message ->
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .getOrElse { false }
+    }
+
     override fun openFolderOfFileInternal(file: File): Boolean {
         return file.parentFile?.let {
             openFolderInternal(it)

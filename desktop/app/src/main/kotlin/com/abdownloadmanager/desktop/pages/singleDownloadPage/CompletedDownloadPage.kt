@@ -90,6 +90,9 @@ private fun Actions(
                 onClick = {
                     component.openFile()
                 },
+                onLongClick = {
+                    component.openFile(useChooser = true)
+                }
             )
             Spacer(Modifier.width(8.dp))
             ActionButton(

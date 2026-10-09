@@ -6,6 +6,9 @@ interface DownloadItemOpener {
     suspend fun openDownloadItem(id:Long)
     suspend fun openDownloadItem(downloadItem: IDownloadItem)
 
+    suspend fun openDownloadItemWith(id: Long)
+    suspend fun openDownloadItemWith(downloadItem: IDownloadItem)
+
     suspend fun openDownloadItemFolder(id:Long)
     suspend fun openDownloadItemFolder(downloadItem: IDownloadItem)
 }

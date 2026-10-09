@@ -25,6 +25,9 @@ kotlin {
         val desktopMain = getByName("desktopMain")
         desktopMain.dependencies {
             api(libs.jna.platform)
+
+            api(libs.dbusJava.core)
+            runtimeOnly(libs.dbusJava.unixSocket)
         }
         androidMain.dependencies {
             implementation(libs.koin.core)

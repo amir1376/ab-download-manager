@@ -735,6 +735,36 @@ class AppComponent(
         }
     }
 
+    override suspend fun openDownloadItemWith(id: Long) {
+        val item = downloadSystem.getDownloadItemById(id)
+        if (item == null) {
+            sendNotification(
+                Res.string.open_with,
+                Res.string.cant_open_file.asStringSource(),
+                Res.string.download_item_not_found.asStringSource(),
+                NotificationType.Error,
+            )
+            return
+        }
+        openDownloadItemWith(item)
+    }
+
+    override suspend fun openDownloadItemWith(downloadItem: IDownloadItem) {
+        runCatching {
+            withContext(Dispatchers.IO) {
+                FileUtils.openFileWith(downloadSystem.getDownloadFile(downloadItem))
+            }
+        }.onFailure {
+            sendNotification(
+                Res.string.open_with,
+                Res.string.cant_open_file.asStringSource(),
+                it.localizedMessage?.asStringSource() ?: Res.string.unknown_error.asStringSource(),
+                NotificationType.Error,
+            )
+            println("Can't open with file:${it.message}")
+        }
+    }
+
     override suspend fun openDownloadItemFolder(id: Long) {
         val item = downloadSystem.getDownloadItemById(id)
         if (item == null) {

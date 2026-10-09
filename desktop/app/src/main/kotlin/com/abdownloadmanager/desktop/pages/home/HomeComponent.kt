@@ -389,6 +389,7 @@ class HomeComponent(
         queueManager = queueManager,
         categoryManager = categoryManager,
         openFile = this::openFile,
+        openWith = this::openWith,
         openFolder = this::openFolder,
         requestDelete = this::requestDelete,
     )

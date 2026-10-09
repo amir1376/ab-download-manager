@@ -171,6 +171,7 @@ class HomeComponent(
         queueManager = queueManager,
         categoryManager = categoryManager,
         openFile = ::openFile,
+        openWith = ::openWith,
         requestDelete = ::requestDelete,
         onRequestShareFiles = ::shareFiles,
     )
