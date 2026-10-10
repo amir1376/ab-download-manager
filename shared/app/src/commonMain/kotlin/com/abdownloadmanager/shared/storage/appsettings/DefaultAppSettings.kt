@@ -27,7 +27,7 @@ abstract class DefaultAppSettings {
     open val showDownloadProgressDialog: Boolean get() = true
     open val showDownloadCompletionDialog: Boolean get() = true
     open val useSpeedLimit: SpeedLimitMode get() = SpeedLimitMode.Disabled
-    open val speedLimit: Long get() = 256 * 1024 * 1024
+    open val speedLimit: Long get() = 256 * 1024
     open val autoStartOnBoot: Boolean get() = true
     open val notificationSound: Boolean get() = true
     open val generalNotificationSound: String get() = ""

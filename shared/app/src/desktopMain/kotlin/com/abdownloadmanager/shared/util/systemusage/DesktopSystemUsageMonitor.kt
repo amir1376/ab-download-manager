@@ -2,10 +2,20 @@ package com.abdownloadmanager.shared.util.systemusage
 
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.asDesktop
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
-import java.util.concurrent.atomic.AtomicLong
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.isActive
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -13,28 +23,25 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Desktop implementation of [SystemUsageMonitor].
  *
- * Combines:
- * 1. **Native OS-level Idle Time Detection**:
- *    - Windows: `GetLastInputInfo` from `User32.dll`.
- *    - macOS: `CGEventSourceSecondsSinceLastEventType` from `CoreGraphics.framework` + `ioreg` fallback.
- *    - Linux: D-Bus `org.gnome.Mutter.IdleMonitor` & `org.freedesktop.ScreenSaver` + X11 `XScreenSaver`.
- * 2. **In-App AWT Event Listener**:
- *    Captures immediate user interactions (mouse clicks, movement, key presses, wheel) occurring
- *    directly inside the application window with zero latency.
+ * Uses native OS-level idle-time detection:
+ * - Windows: GetLastInputInfo
+ * - macOS: CoreGraphics, with an optional native fallback
+ * - Linux: D-Bus and/or X11
  *
- * Flow Lifecycle:
- * - Shared via [SharingStarted.WhileSubscribed], meaning the background polling coroutine and
- *   the AWT listener are active ONLY while there are collectors.
- * - When all collectors unsubscribe, the AWT listener is unregistered and polling terminates.
- * - Consecutive duplicate emissions are conflated.
+ * Monitoring is active only while the shared flow has subscribers.
+ * No AWT listeners are used.
  */
 class DesktopSystemUsageMonitor(
     override val idleThreshold: Duration = SystemUsageMonitor.DEFAULT_IDLE_THRESHOLD,
+    private val defaultIsUserInteractingIfItsNotSupported: () -> Boolean = SystemUsageMonitor::defaultInteractingWhenIdleTimeNotSupportedByOS,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + coroutineDispatcher),
 ) : SystemUsageMonitor, AutoCloseable {
 
-    private val idleTimeProvider: DesktopIdleTimeProvider by lazy {
+    private val closed = AtomicBoolean(false)
+
+    private val scope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
+
+    private val idleTimeProviderDelegate = lazy {
         when (Platform.asDesktop()) {
             Platform.Desktop.Windows -> WindowsIdleTimeProvider()
             Platform.Desktop.MacOS -> MacIdleTimeProvider()
@@ -42,66 +49,79 @@ class DesktopSystemUsageMonitor(
         }
     }
 
-    private val lastInAppActivityTime = AtomicLong(System.currentTimeMillis())
+    private val idleTimeProvider by idleTimeProviderDelegate
 
-    private val rawInteractionFlow: Flow<Boolean> = callbackFlow {
-        // 1. Launch background polling loop for system-wide idle detection
-        val checkInterval = minOf(1.seconds, maxOf(100.milliseconds, idleThreshold / 2))
-        val thresholdMillis = idleThreshold.inWholeMilliseconds
+    private val checkInterval = minOf(
+        1.seconds,
+        maxOf(
+            250.milliseconds,
+            idleThreshold / 2
+        )
+    )
 
-        val pollingJob = launch(coroutineDispatcher) {
-            while (isActive) {
-                val systemIdleMillis = idleTimeProvider.getIdleTimeMillis()
-                val inAppIdleMillis = System.currentTimeMillis() - lastInAppActivityTime.get()
-
-                val effectiveIdleMillis = if (systemIdleMillis != null) {
-                    minOf(systemIdleMillis, inAppIdleMillis)
-                } else {
-                    inAppIdleMillis
-                }
-
-                val isInteracting = effectiveIdleMillis < thresholdMillis
-                trySend(isInteracting)
-
-                delay(checkInterval)
-            }
-        }
-
-        awaitClose {
-            pollingJob.cancel()
+    init {
+        require(idleThreshold.isFinite() && idleThreshold > Duration.ZERO) {
+            "idleThreshold must be finite and greater than zero"
         }
     }
 
-    override val isUserInteractingWithSystemFlow: Flow<Boolean> = rawInteractionFlow
-        .distinctUntilChanged()
-        .shareIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 0, replayExpirationMillis = 0),
-            replay = 1,
-        )
-
+    /**
+     * Returns true when the native provider reports recent user input.
+     *
+     * Throws if native idle-time detection is unavailable.
+     */
     override val isUserInteracting: Boolean
         get() {
-            val systemIdleMillis = idleTimeProvider.getIdleTimeMillis()
-            val inAppIdleMillis = System.currentTimeMillis() - lastInAppActivityTime.get()
-            val effectiveIdleMillis = if (systemIdleMillis != null) {
-                minOf(systemIdleMillis, inAppIdleMillis)
-            } else {
-                inAppIdleMillis
+            check(!closed.get()) {
+                "SystemUsageMonitor has been closed"
             }
-            return effectiveIdleMillis < idleThreshold.inWholeMilliseconds
+
+            val idleMillis = idleTimeProvider.getIdleTimeMillis()
+            // Native system idle-time detection is unavailable
+            // using default supplied value
+                ?: return defaultIsUserInteractingIfItsNotSupported()
+
+            return idleMillis < idleThreshold.inWholeMilliseconds
         }
 
-    override fun close() {
-        if (idleTimeProvider is AutoCloseable) {
-            (idleTimeProvider as AutoCloseable).close()
+    private val rawInteractionFlow: Flow<Boolean> = flow {
+        while (currentCoroutineContext().isActive) {
+            emit(isUserInteracting)
+            delay(checkInterval)
         }
-        scope.cancel()
+    }
+
+    override val isUserInteractingWithSystemFlow: Flow<Boolean> =
+        rawInteractionFlow
+            .distinctUntilChanged()
+            .shareIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(
+                    stopTimeoutMillis = 0,
+                    replayExpirationMillis = 0,
+                ),
+                replay = 1,
+            )
+
+    override fun close() {
+        if (!closed.compareAndSet(false, true)) {
+            return
+        }
+
+        try {
+            if (idleTimeProviderDelegate.isInitialized()) {
+                (idleTimeProvider as? AutoCloseable)?.close()
+            }
+        } finally {
+            scope.cancel()
+        }
     }
 }
 
 actual fun platformSystemUsageMonitor(
     idleThreshold: Duration,
 ): SystemUsageMonitor {
-    return DesktopSystemUsageMonitor(idleThreshold = idleThreshold)
+    return DesktopSystemUsageMonitor(
+        idleThreshold = idleThreshold,
+    )
 }

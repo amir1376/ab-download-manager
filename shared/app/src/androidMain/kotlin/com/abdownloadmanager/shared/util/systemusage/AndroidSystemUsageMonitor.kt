@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -80,7 +81,12 @@ class AndroidSystemUsageMonitor(
         }
 
         runCatching {
-            this@AndroidSystemUsageMonitor.context.registerReceiver(receiver, filter)
+            ContextCompat.registerReceiver(
+                this@AndroidSystemUsageMonitor.context,
+                receiver,
+                filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
         }
 
         awaitClose {

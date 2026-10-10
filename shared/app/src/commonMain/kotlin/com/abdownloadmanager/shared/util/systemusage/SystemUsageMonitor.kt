@@ -40,9 +40,14 @@ interface SystemUsageMonitor {
 
     companion object {
         /**
-         * Default inactivity duration before transitioning to idle state (5 seconds).
+         * Default inactivity duration before transitioning to idle state (30 seconds).
          */
-        val DEFAULT_IDLE_THRESHOLD: Duration = 5.seconds
+        val DEFAULT_IDLE_THRESHOLD: Duration = 30.seconds
+
+        fun defaultInteractingWhenIdleTimeNotSupportedByOS(): Boolean {
+            // by default, we assume that user is not interacting
+            return false
+        }
     }
 }
 
