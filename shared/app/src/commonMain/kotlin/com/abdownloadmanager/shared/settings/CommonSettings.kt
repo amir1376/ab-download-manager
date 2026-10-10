@@ -16,7 +16,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.SoundConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.SpeedConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SizeConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
@@ -29,6 +29,7 @@ import com.abdownloadmanager.shared.util.notification.INotificationSound
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
 import com.abdownloadmanager.shared.util.ui.theme.DEFAULT_UI_SCALE
+import ir.amirab.downloader.DownloadSettings
 import ir.amirab.util.compose.StringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.asStringSourceWithARgs
@@ -124,6 +125,21 @@ object CommonSettings {
                 } else {
                     Res.string.disabled.asStringSource()
                 }
+            },
+        )
+    }
+    fun minPartSize(appRepository: BaseAppRepository): SizeConfigurable {
+        return SizeConfigurable(
+            title = Res.string.settings_min_part_size.asStringSource(),
+            description = Res.string.settings_min_part_size_description.asStringSource(),
+            backedBy = appRepository.minPartSize,
+            range = DownloadSettings.MIN_ALLOWED_MIN_PART_SIZE..DownloadSettings.MAX_ALLOWED_MIN_PART_SIZE,
+            isSpeed = false,
+            describe = {
+                convertPositiveSpeedToHumanReadable(
+                    it,
+                    appRepository.speedUnit.value
+                ).asStringSource()
             },
         )
     }
@@ -352,14 +368,15 @@ object CommonSettings {
         )
     }
 
-    fun speedLimitConfig(appRepository: BaseAppRepository): SpeedConfigurable {
-        return SpeedConfigurable(
+    fun speedLimitConfig(appRepository: BaseAppRepository): SizeConfigurable {
+        return SizeConfigurable(
             title = Res.string.settings_global_speed_limiter.asStringSource(),
             description = Res.string.settings_global_speed_limiter_description.asStringSource(),
             backedBy = appRepository.speedLimiter,
             enabled = appRepository.speedLimitMode.mapStateFlow {
                 it != SpeedLimitMode.Disabled
             },
+            isSpeed = true,
             range = 1..Long.MAX_VALUE,
             describe = {
                 convertPositiveSpeedToHumanReadable(

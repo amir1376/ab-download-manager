@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.ui.configurable.comon.renderer
+package com.abdownloadmanager.android.ui.configurable.comon.renderer
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,21 +8,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.abdownloadmanager.desktop.ui.configurable.ConfigTemplate
+import com.abdownloadmanager.android.ui.configurable.ConfigTemplate
+import com.abdownloadmanager.android.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRenderer
-import com.abdownloadmanager.shared.ui.configurable.RenderSpinner
-import com.abdownloadmanager.desktop.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
+import com.abdownloadmanager.shared.ui.configurable.RenderSpinner
 import com.abdownloadmanager.shared.ui.configurable.isConfigEnabled
-import com.abdownloadmanager.shared.ui.configurable.item.SpeedConfigurable
+import com.abdownloadmanager.shared.ui.configurable.item.SizeConfigurable
 import com.abdownloadmanager.shared.ui.widget.DoubleTextField
 import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.util.LocalSizeUnit
 import com.abdownloadmanager.shared.util.LocalSpeedUnit
 import ir.amirab.util.datasize.SizeConverter
 import ir.amirab.util.datasize.SizeFactors
@@ -30,21 +32,27 @@ import ir.amirab.util.datasize.SizeUnit
 import ir.amirab.util.datasize.SizeWithUnit
 import ir.amirab.util.datasize.asConverterConfig
 
-object SpeedConfigurableRenderer : ConfigurableRenderer<SpeedConfigurable> {
+object SizeConfigurableRenderer : ConfigurableRenderer<SizeConfigurable> {
     @Composable
     override fun RenderConfigurable(
-        configurable: SpeedConfigurable,
+        configurable: SizeConfigurable,
         configurableUiProps: ConfigurableUiProps
     ) {
         RenderSpeedConfig(configurable, configurableUiProps)
     }
 
     @Composable
-    private fun RenderSpeedConfig(cfg: SpeedConfigurable, configurableUiProps: ConfigurableUiProps) {
+    private fun RenderSpeedConfig(cfg: SizeConfigurable, configurableUiProps: ConfigurableUiProps) {
         val value by cfg.stateFlow.collectAsState()
         val setValue = cfg::set
 
+        val sizeUnit = LocalSizeUnit.current
         val speedUnit = LocalSpeedUnit.current
+        val valueUnit = if (cfg.isSpeed) {
+            speedUnit
+        } else {
+            sizeUnit
+        }
         val allowedFactors = listOf(
             SizeFactors.FactorValue.Kilo,
             SizeFactors.FactorValue.Mega,
@@ -52,8 +60,8 @@ object SpeedConfigurableRenderer : ConfigurableRenderer<SpeedConfigurable> {
         val units = allowedFactors.map {
             SizeUnit(
                 factorValue = it,
-                baseSize = speedUnit.baseSize,
-                factors = speedUnit.factors
+                baseSize = valueUnit.baseSize,
+                factors = valueUnit.factors
             )
         }
         val enabled = isConfigEnabled()
@@ -62,7 +70,7 @@ object SpeedConfigurableRenderer : ConfigurableRenderer<SpeedConfigurable> {
             mutableStateOf(
                 SizeConverter.bytesToSize(
                     value,
-                    speedUnit.copy(acceptedFactors = allowedFactors)
+                    valueUnit.copy(acceptedFactors = allowedFactors)
                 ).unit
             )
         }
@@ -70,7 +78,7 @@ object SpeedConfigurableRenderer : ConfigurableRenderer<SpeedConfigurable> {
             val v = SizeConverter.bytesToSize(
                 value, currentUnit.asConverterConfig()
             ).formatedValue().toDouble()
-            mutableStateOf(v)
+            mutableDoubleStateOf(v)
         }
         LaunchedEffect(currentValue, currentUnit) {
             setValue(
@@ -87,22 +95,38 @@ object SpeedConfigurableRenderer : ConfigurableRenderer<SpeedConfigurable> {
                 }
             },
             value = {
+
+            },
+            nestedContent = {
                 Row(
                     Modifier
+                        .align(Alignment.End)
                         .padding(vertical = 8.dp)
-                        .width(200.dp)
+                        .width(250.dp)
                 ) {
+                    val range = remember(cfg.range, currentUnit) {
+                        val converter = currentUnit.asConverterConfig()
+                        val first = SizeConverter.bytesToSize(
+                            cfg.range.first,
+                            converter,
+                        ).value
+                        val last = SizeConverter.bytesToSize(
+                            cfg.range.last,
+                            converter,
+                        ).value
+                        first..last
+                    }
                     DoubleTextField(
                         value = currentValue,
                         onValueChange = {
                             currentValue = it
                         },
                         enabled = enabled,
-                        range = cfg.range.first.toDouble()..cfg.range.last.toDouble(),
+                        range = range,
                         unit = 1.0,
                         modifier = Modifier.weight(1f),
                     )
-                    Spacer(Modifier.width(2.dp))
+                    Spacer(Modifier.width(8.dp))
                     RenderSpinner(
                         possibleValues = units,
                         value = currentUnit,
@@ -113,9 +137,14 @@ object SpeedConfigurableRenderer : ConfigurableRenderer<SpeedConfigurable> {
                         }
                     ) {
                         val prettified = remember(it) {
-                            "$it/s"
+                            buildString {
+                                append("$it")
+                                if (cfg.isSpeed) {
+                                    append("/s")
+                                }
+                            }
                         }
-                        Text(prettified)
+                        Text(prettified, Modifier.padding(horizontal = 4.dp))
                     }
                 }
             }

@@ -6,11 +6,16 @@ import ir.amirab.util.compose.StringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class SpeedConfigurable(
+/**
+ * speed or size
+ * for speed we simply add a /s after the size
+ */
+class SizeConfigurable(
     title: StringSource,
     description: StringSource,
     backedBy: MutableStateFlow<Long>,
     describe: (Long) -> StringSource,
+    val isSpeed: Boolean = false,
     range: LongRange = 0..Long.MAX_VALUE,
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,

@@ -68,6 +68,7 @@ class AppSettingsStorage(
     override val showDownloadCompletionDialog = from(AppSettingsModel.showDownloadCompletionDialog)
     override val useSpeedLimit: MutableStateFlow<SpeedLimitMode> = from(AppSettingsModel.useSpeedLimit)
     override val speedLimit = from(AppSettingsModel.speedLimit)
+    override val minPartSize = from(AppSettingsModel.minPartSize)
     override val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)
     override val notificationSound = from(AppSettingsModel.notificationSound)
     override val generalNotificationSound = from(AppSettingsModel.generalNotificationSound)

@@ -64,6 +64,7 @@ open class BaseAppRepository(
     val isSpeedLimitApplied = MutableStateFlow(false)
 
     val threadCount = appSettings.threadCount
+    val minPartSize = appSettings.minPartSize
     val dynamicPartCreation = appSettings.dynamicPartCreation
     val useServerLastModifiedTime = appSettings.useServerLastModifiedTime
     val appendExtensionToIncompleteDownloads = appSettings.appendExtensionToIncompleteDownloads
@@ -155,6 +156,12 @@ open class BaseAppRepository(
             .debounce(500.milliseconds)
             .onEach {
                 downloadSettings.defaultThreadCount = it
+                downloadManager.reloadSetting()
+            }.launchIn(scope)
+        minPartSize
+            .debounce(500.milliseconds)
+            .onEach {
+                downloadSettings.minPartSize = it
                 downloadManager.reloadSetting()
             }.launchIn(scope)
         dynamicPartCreation

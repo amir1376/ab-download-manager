@@ -35,6 +35,7 @@ class HttpPartDownloader(
     val speedLimiters: List<SpeedLimiter>,
     val strictMode: Boolean,
     partSplitLock: Any,
+    minPartProvider: MinPartSizeProvider,
 ) : PartDownloader<RangedPart>(
     part = part,
     getDestWriter = getDestWriter
@@ -74,7 +75,11 @@ class HttpPartDownloader(
         super.onFinish()
     }
 
-    private val partSplitSupport = PartSplitSupport(part, partSplitLock)
+    private val partSplitSupport = PartSplitSupport(
+        part = part,
+        partEndLock = partSplitLock,
+        minPartSizeProvider = minPartProvider,
+    )
 
     //this method is invoked only in one thread for every instance
     override fun howMuchCanRead(maxAllowed: Long): Long {

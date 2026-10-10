@@ -7,6 +7,7 @@ import com.abdownloadmanager.shared.util.schemakt.enum
 import io.github.amir1376.schemakt.S
 import io.github.amir1376.schemakt.schema.composite.TypeSafeObjectSchemaBuilder
 import io.github.amir1376.schemakt.schema.modifier.catch
+import io.github.amir1376.schemakt.schema.modifier.max
 import io.github.amir1376.schemakt.schema.modifier.min
 import io.github.amir1376.schemakt.schema.modifier.nullable
 import io.github.amir1376.schemakt.schema.modifier.range
@@ -15,6 +16,7 @@ import io.github.amir1376.schemakt.schema.primitive.float
 import io.github.amir1376.schemakt.schema.primitive.int
 import io.github.amir1376.schemakt.schema.primitive.long
 import io.github.amir1376.schemakt.schema.primitive.string
+import ir.amirab.downloader.DownloadSettings
 
 object BaseAppSettingsDefinition {
     context(builder: TypeSafeObjectSchemaBuilder<PlatformAppSettingsModel>)
@@ -52,6 +54,10 @@ object BaseAppSettingsDefinition {
         prop(IAppSettingsModel::useSpeedLimit) bind S.enum<SpeedLimitMode>()
             .catch(PlatformDefaultSettings::useSpeedLimit)
         prop(IAppSettingsModel::speedLimit) bind S.long().min(1L).catch(PlatformDefaultSettings::speedLimit)
+        prop(IAppSettingsModel::minPartSize) bind S.long()
+            .min(DownloadSettings.MIN_ALLOWED_MIN_PART_SIZE)
+            .max(DownloadSettings.MAX_ALLOWED_MIN_PART_SIZE)
+            .catch(PlatformDefaultSettings::minPartSize)
         prop(IAppSettingsModel::autoStartOnBoot) bind S.boolean().catch(PlatformDefaultSettings::autoStartOnBoot)
         prop(IAppSettingsModel::notificationSound) bind S.boolean().catch(PlatformDefaultSettings::notificationSound)
         prop(IAppSettingsModel::generalNotificationSound) bind S.string()

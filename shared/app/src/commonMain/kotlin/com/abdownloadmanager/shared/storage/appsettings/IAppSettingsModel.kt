@@ -29,6 +29,7 @@ interface IAppSettingsModel {
     val showDownloadCompletionDialog: Boolean
     val useSpeedLimit: SpeedLimitMode
     val speedLimit: Long
+    val minPartSize: Long
     val autoStartOnBoot: Boolean
     val notificationSound: Boolean
     val generalNotificationSound: String

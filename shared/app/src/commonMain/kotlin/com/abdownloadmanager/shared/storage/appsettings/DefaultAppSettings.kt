@@ -4,6 +4,7 @@ import com.abdownloadmanager.shared.storage.SpeedLimitMode
 import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.downloadlocation.PlatformDownloadLocationProvider
+import ir.amirab.downloader.DownloadSettings
 
 expect object PlatformDefaultSettings : DefaultAppSettings
 
@@ -16,7 +17,7 @@ abstract class DefaultAppSettings {
     open val uiScale: Float? get() = null
     open val showIconLabels: Boolean get() = true
     open val useRelativeDateTime: Boolean get() = true
-    open val threadCount: Int get() = 8
+    open val threadCount: Int get() = DownloadSettings.DEFAULT_THREAD_COUNT
     open val maxConcurrentDownloads: Int get() = 3
     open val maxDownloadRetryCount: Int get() = 3
     open val dynamicPartCreation: Boolean get() = true
@@ -28,6 +29,7 @@ abstract class DefaultAppSettings {
     open val showDownloadCompletionDialog: Boolean get() = true
     open val useSpeedLimit: SpeedLimitMode get() = SpeedLimitMode.Disabled
     open val speedLimit: Long get() = 256 * 1024
+    open val minPartSize: Long get() = DownloadSettings.DEFAULT_MIN_PART_SIZE
     open val autoStartOnBoot: Boolean get() = true
     open val notificationSound: Boolean get() = true
     open val generalNotificationSound: String get() = ""

@@ -15,6 +15,7 @@ import kotlin.math.min
 class PartSplitSupport(
     val part: RangedPart,
     private val partEndLock: Any = Any(),
+    private val minPartSizeProvider: MinPartSizeProvider,
 ) {
     //initial remainingSafe will be 0
     @Volatile
@@ -50,7 +51,7 @@ class PartSplitSupport(
     fun extendSafeZone(): Boolean {
         synchronized(partEndLock) {
             //remaining
-            val remaining = part.remainingLength?:Long.MAX_VALUE
+            val remaining = part.remainingLength ?: Long.MAX_VALUE
             if (remaining == 0L) {
                 return false
             }
@@ -58,13 +59,17 @@ class PartSplitSupport(
             val newSafeZone = (oldSafeZone + min(remaining, SAFE_ZONE_SIZE))
                 .coerceAtMost(part.to ?: Long.MAX_VALUE)
 
-            if (oldSafeZone==newSafeZone){
+            if (oldSafeZone == newSafeZone) {
                 return false
             }
-            safeZone=newSafeZone
+            safeZone = newSafeZone
 //            require(safeZone<=part.to)
             return true
         }
+    }
+
+    private fun divideDelta(delta: Long): Long {
+        return (delta / 2) + delta % 2
     }
 
     fun splitPart(): RangedPart? {
@@ -72,7 +77,7 @@ class PartSplitSupport(
             if (!canSplit()) return null
 
             val delta = part.to!! - safeZone
-            val safeZoneToEnd = safeZone + (delta / 2) + delta % 2
+            val safeZoneToEnd = safeZone + divideDelta(delta)
 //            val oldPart = part.copy()
             if (safeZoneToEnd + 1 > part.to!!) {
                 //new part will exceed current part boundaries
@@ -102,8 +107,9 @@ class PartSplitSupport(
             return false
         }
         val delta = part.to!! - safeZone
+        val possibleNewPartSize = divideDelta(delta)
         //We only want split a part that worth it!
-        return delta >= SAFE_ZONE_SIZE
+        return possibleNewPartSize >= minPartSizeProvider.getMinPartSize()
     }
 
     override fun toString(): String {
