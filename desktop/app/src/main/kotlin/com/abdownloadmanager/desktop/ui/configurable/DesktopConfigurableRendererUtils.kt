@@ -30,8 +30,8 @@ import ir.amirab.util.ifThen
 @Composable
 fun <T> TitleAndDescription(
     cfg: Configurable<T>,
-    describe: Boolean = true,
     modifier: Modifier = Modifier.padding(8.dp),
+    describe: Boolean = true,
 ) {
     val enabled = isConfigEnabled()
     Column(

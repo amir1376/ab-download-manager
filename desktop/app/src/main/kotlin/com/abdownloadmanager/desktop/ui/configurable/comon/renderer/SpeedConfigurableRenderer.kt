@@ -83,7 +83,7 @@ object SpeedConfigurableRenderer : ConfigurableRenderer<SpeedConfigurable> {
             configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    TitleAndDescription(cfg, true)
+                    TitleAndDescription(cfg)
                 }
             },
             value = {

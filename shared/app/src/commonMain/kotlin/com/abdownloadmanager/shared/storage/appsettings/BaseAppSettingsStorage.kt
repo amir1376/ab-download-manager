@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.storage.appsettings
 
+import com.abdownloadmanager.shared.storage.SpeedLimitMode
 import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import com.abdownloadmanager.shared.ui.theme.ThemeSettingsStorage
 import com.abdownloadmanager.shared.util.notification.INotificationSettingsStorage
@@ -29,7 +30,7 @@ interface BaseAppSettingsStorage :
     val maxDownloadRetryCount: MutableStateFlow<Int>
     val showDownloadProgressDialog: MutableStateFlow<Boolean>
     val showDownloadCompletionDialog: MutableStateFlow<Boolean>
-    val useSpeedLimit: MutableStateFlow<Boolean>
+    val useSpeedLimit: MutableStateFlow<SpeedLimitMode>
     val speedLimit: MutableStateFlow<Long>
     val autoStartOnBoot: MutableStateFlow<Boolean>
     override val notificationSound: MutableStateFlow<Boolean>

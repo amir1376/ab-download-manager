@@ -33,7 +33,7 @@ object FloatConfigurableRenderer : ConfigurableRenderer<FloatConfigurable> {
         ConfigTemplate(
             modifier = configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 when (cfg.renderMode) {

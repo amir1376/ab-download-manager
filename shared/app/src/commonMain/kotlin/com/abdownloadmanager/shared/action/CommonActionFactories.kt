@@ -5,6 +5,8 @@ import com.abdownloadmanager.shared.pagemanager.*
 import com.abdownloadmanager.shared.pages.adddownload.AddDownloadCredentialsInUiProps
 import com.abdownloadmanager.shared.pages.updater.UpdateComponent
 import com.abdownloadmanager.shared.repository.BaseAppRepository
+import com.abdownloadmanager.shared.storage.SpeedLimitMode
+import com.abdownloadmanager.shared.storage.asShortStringSource
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.SharedConstants
@@ -23,6 +25,7 @@ import ir.amirab.util.compose.action.simpleAction
 import ir.amirab.util.compose.action.toggleableAction
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.combineStateFlows
+import ir.amirab.util.flow.mapStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -141,17 +144,29 @@ fun createPerHostSettingsPage(
     }
 }
 
+fun createSpeedLimitGroupAction(
+    appRepository: BaseAppRepository
+): MenuItem.SubMenu {
+    return MenuItem.SubMenu(
+        title = Res.string.settings_global_speed_limiter.asStringSource(),
+        items = SpeedLimitMode.entries.map {
+            createUseSpeedLimiterAction(appRepository, it)
+        }
+    )
+}
 
 fun createUseSpeedLimiterAction(
-    appRepository: BaseAppRepository
+    appRepository: BaseAppRepository,
+    target: SpeedLimitMode,
 ): AToggleableAction {
     return toggleableAction(
-        Res.string.settings_global_speed_limiter_enabled.asStringSource(),
+        target.asShortStringSource(),
         MyIcons.speed,
-        isToggled = appRepository.useSpeedLimit
+        isToggled = appRepository.speedLimitMode.mapStateFlow {
+            it == target
+        }
     ) {
-        val currentValue = appRepository.useSpeedLimit.value
-        appRepository.useSpeedLimit.value = !currentValue
+        appRepository.speedLimitMode.value = target
     }
 }
 

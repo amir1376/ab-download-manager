@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Modifier
 import com.abdownloadmanager.android.ui.configurable.ConfigTemplate
 import com.abdownloadmanager.android.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRenderer
@@ -38,7 +37,7 @@ object BooleanConfigurableRenderer : ConfigurableRenderer<BooleanConfigurable> {
                 }
                 .padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 when (cfg.renderMode) {

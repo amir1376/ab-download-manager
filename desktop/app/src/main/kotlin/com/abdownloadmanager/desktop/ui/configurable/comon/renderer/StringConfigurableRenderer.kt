@@ -29,7 +29,7 @@ object StringConfigurableRenderer : ConfigurableRenderer<StringConfigurable> {
         ConfigTemplate(
             modifier = configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 MyTextField(

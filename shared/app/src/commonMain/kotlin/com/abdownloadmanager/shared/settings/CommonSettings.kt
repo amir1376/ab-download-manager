@@ -5,6 +5,9 @@ import com.abdownloadmanager.shared.pagemanager.PerHostSettingsPageManager
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.IDNSSettingsStorage
+import com.abdownloadmanager.shared.storage.SpeedLimitMode
+import com.abdownloadmanager.shared.storage.asLongStringSource
+import com.abdownloadmanager.shared.storage.asShortStringSource
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.DnsConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
@@ -261,7 +264,7 @@ object CommonSettings {
                 CommonSizeConvertConfigs.BinaryBytes,
                 CommonSizeConvertConfigs.DecimalBytes,
             ),
-            describe = {
+            itemTitle = {
                 val sizeUnit = SizeUnit(
                     SizeFactors.FactorValue.Kilo,
                     it.baseSize,
@@ -290,7 +293,7 @@ object CommonSettings {
                 CommonSizeConvertConfigs.BinaryBits,
                 CommonSizeConvertConfigs.DecimalBits,
             ),
-            describe = {
+            itemTitle = {
                 val sizeUnit = SizeUnit(
                     SizeFactors.FactorValue.Kilo,
                     it.baseSize,
@@ -334,13 +337,17 @@ object CommonSettings {
         )
     }
 
-    fun useSpeedLimitConfig(appRepository: BaseAppRepository): BooleanConfigurable {
-        return BooleanConfigurable(
+    fun useSpeedLimitConfig(appRepository: BaseAppRepository): EnumConfigurable<SpeedLimitMode> {
+        return EnumConfigurable(
             title = Res.string.settings_global_speed_limiter_enabled.asStringSource(),
             description = Res.string.settings_global_speed_limiter_enabled_description.asStringSource(),
-            backedBy = appRepository.useSpeedLimit,
+            backedBy = appRepository.speedLimitMode,
+            possibleValues = SpeedLimitMode.entries,
+            itemTitle = {
+                it.asShortStringSource()
+            },
             describe = {
-                (if (it) Res.string.limited else Res.string.unlimited).asStringSource()
+                it.asLongStringSource()
             }
         )
     }
@@ -350,7 +357,9 @@ object CommonSettings {
             title = Res.string.settings_global_speed_limiter.asStringSource(),
             description = Res.string.settings_global_speed_limiter_description.asStringSource(),
             backedBy = appRepository.speedLimiter,
-            enabled = appRepository.useSpeedLimit,
+            enabled = appRepository.speedLimitMode.mapStateFlow {
+                it != SpeedLimitMode.Disabled
+            },
             range = 1..Long.MAX_VALUE,
             describe = {
                 convertPositiveSpeedToHumanReadable(
@@ -409,7 +418,7 @@ object CommonSettings {
                 2f,
             ),
             renderMode = EnumConfigurable.RenderMode.Spinner,
-            describe = {
+            itemTitle = {
                 val percent = (it * 100).roundToInt()
                 if (it == DEFAULT_UI_SCALE) {
                     StringSource.CombinedStringSource(
@@ -529,7 +538,7 @@ object CommonSettings {
                 }
             },
             possibleValues = listOf(null).plus(allLanguages),
-            describe = {
+            itemTitle = {
                 val isAuto = it == null
                 val language = it ?: languageManager.systemLanguageOrDefault
                 val languageName = language.nativeName

@@ -37,9 +37,11 @@ import ir.amirab.downloader.db.*
 import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.utils.IDiskStat
 import com.abdownloadmanager.resources.ABDMLanguageResources
+import com.abdownloadmanager.shared.IApplicationBackgroundTracker
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.downloaderinui.hls.HLSDownloaderInUi
 import com.abdownloadmanager.shared.downloaderinui.http.HttpDownloaderInUi
+import com.abdownloadmanager.shared.platformApplicationBackgroundTracker
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.DnsSettings
@@ -106,6 +108,8 @@ import com.abdownloadmanager.shared.util.ui.IMyIcons
 import com.abdownloadmanager.shared.util.proxy.IProxyStorage
 import com.abdownloadmanager.shared.util.proxy.ProxyData
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
+import com.abdownloadmanager.shared.util.systemusage.SystemUsageMonitor
+import com.abdownloadmanager.shared.util.systemusage.platformSystemUsageMonitor
 import ir.amirab.downloader.DownloaderRegistry
 import ir.amirab.downloader.connection.UserAgentProvider
 import ir.amirab.downloader.connection.proxy.AutoConfigurableProxyProvider
@@ -473,6 +477,8 @@ fun getAppModule(context: ABDMApp) = module {
             get(),
             get(),
             get(),
+            get(),
+            get(),
         )
     }.apply {
         bind<BaseAppRepository>()
@@ -626,6 +632,12 @@ fun getAppModule(context: ABDMApp) = module {
             get(),
             get(),
         )
+    }
+    single<SystemUsageMonitor> {
+        platformSystemUsageMonitor()
+    }
+    single<IApplicationBackgroundTracker> {
+        platformApplicationBackgroundTracker()
     }
     single<IPerHostSettingsStorage> {
         val definedPaths = get<DefinedPaths>()

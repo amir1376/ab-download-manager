@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.abdownloadmanager.android.ui.configurable.ConfigTemplate
-import com.abdownloadmanager.android.ui.configurable.NextIcon
 import com.abdownloadmanager.android.ui.configurable.SheetInput
 import com.abdownloadmanager.android.ui.configurable.TitleAndDescription
 import com.abdownloadmanager.resources.Res
@@ -52,7 +51,7 @@ object SoundConfigurableRenderer : ConfigurableRenderer<SoundConfigurable> {
                 .clickable { isOpened = true }
                 .padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 Row(

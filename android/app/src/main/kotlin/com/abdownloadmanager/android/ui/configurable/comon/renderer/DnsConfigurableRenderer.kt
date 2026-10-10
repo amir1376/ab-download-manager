@@ -86,7 +86,7 @@ object DnsConfigurableRenderer : ConfigurableRenderer<DnsConfigurable> {
                 )
                 .padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 NextIcon()

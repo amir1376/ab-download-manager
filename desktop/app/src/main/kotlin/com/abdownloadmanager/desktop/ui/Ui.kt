@@ -38,7 +38,6 @@ import com.abdownloadmanager.desktop.utils.AppInfo
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
 import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
 import com.abdownloadmanager.desktop.utils.isInDebugMode
-import com.abdownloadmanager.shared.settings.CommonSettings
 import com.abdownloadmanager.shared.ui.ProvideCommonSettings
 import com.abdownloadmanager.shared.ui.ProvideSizeUnits
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableRendererRegistry

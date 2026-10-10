@@ -5,12 +5,14 @@ import ir.amirab.downloader.DownloadSettings
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.integration.IntegrationResult
 import com.abdownloadmanager.integration.IntegrationSettings
+import com.abdownloadmanager.shared.IApplicationBackgroundTracker
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.autoremove.RemovedDownloadsFromDiskTracker
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
+import com.abdownloadmanager.shared.util.systemusage.SystemUsageMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlin.time.Duration.Companion.milliseconds
@@ -24,6 +26,8 @@ class AppRepository(
     removedDownloadsFromDiskTracker: RemovedDownloadsFromDiskTracker,
     categoryManager: CategoryManager,
     private val integration: Integration,
+    appUsageMonitor: SystemUsageMonitor,
+    backgroundTracker: IApplicationBackgroundTracker,
 ) : BaseAppRepository(
     scope = scope,
     appSettings = appSettings,
@@ -32,6 +36,8 @@ class AppRepository(
     downloadSettings = downloadSettings,
     removedDownloadsFromDiskTracker = removedDownloadsFromDiskTracker,
     categoryManager = categoryManager,
+    appUsageMonitor = appUsageMonitor,
+    backgroundTracker = backgroundTracker,
 ) {
     init {
         combine(

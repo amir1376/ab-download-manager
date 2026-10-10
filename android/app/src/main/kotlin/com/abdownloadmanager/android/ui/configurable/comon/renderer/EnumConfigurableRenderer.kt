@@ -3,15 +3,12 @@ package com.abdownloadmanager.android.ui.configurable.comon.renderer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.android.ui.configurable.ConfigTemplate
 import com.abdownloadmanager.android.ui.configurable.NextIcon
 import com.abdownloadmanager.android.ui.configurable.RenderSpinnerInSheet
@@ -21,8 +18,6 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.ui.configurable.isConfigEnabled
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 
 object EnumConfigurableRenderer : ConfigurableRenderer<EnumConfigurable<Any>> {
     @Composable
@@ -38,6 +33,11 @@ object EnumConfigurableRenderer : ConfigurableRenderer<EnumConfigurable<Any>> {
             cfg.possibleValues.indexOf(value)
         }
         val enabled = isConfigEnabled()
+        val describeShort = remember(value) {
+            cfg.itemTitle(value)
+        }.rememberString()
+
+        val shouldShowDescribe = cfg.itemTitle != cfg.describe
 
         var isOpened by remember { mutableStateOf(false) }
         val onDismiss = {
@@ -51,7 +51,16 @@ object EnumConfigurableRenderer : ConfigurableRenderer<EnumConfigurable<Any>> {
                 .padding(configurableUiProps.itemPaddingValues),
             title = {
                 Column {
-                    TitleAndDescription(cfg, true)
+                    val describeLong = remember(cfg, value, shouldShowDescribe) {
+                        if (shouldShowDescribe) {
+                            cfg.describe(value)
+                        } else null
+                    }?.rememberString()
+                    TitleAndDescription(
+                        cfg = cfg,
+                        describeContent = describeShort,
+                        describeSecondContent = describeLong,
+                    )
                 }
             },
             value = {
@@ -70,7 +79,10 @@ object EnumConfigurableRenderer : ConfigurableRenderer<EnumConfigurable<Any>> {
             },
             valueToString = cfg.valueToString,
             render = {
-                Text(cfg.describe(it).rememberString())
+                val title = remember(cfg, it) {
+                    cfg.itemTitle(it)
+                }
+                Text(title.rememberString())
             })
     }
 }

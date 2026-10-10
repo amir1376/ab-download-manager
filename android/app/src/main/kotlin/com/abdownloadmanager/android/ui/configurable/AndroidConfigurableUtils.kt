@@ -24,7 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.configurable.Configurable
 import com.abdownloadmanager.shared.ui.configurable.Help
@@ -79,7 +83,6 @@ fun ConfigTemplate(
 @Composable
 fun <T> TitleAndDescription(
     cfg: Configurable<T>,
-    describe: Boolean = true,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(8.dp),
 ) {
@@ -90,9 +93,8 @@ fun <T> TitleAndDescription(
     val describeContent = describedStringSource.rememberString()
     TitleAndDescription(
         cfg = cfg,
-        describe = describe,
-        modifier = modifier,
         describeContent = describeContent,
+        modifier = modifier,
         contentPadding = contentPadding,
     )
 }
@@ -100,10 +102,10 @@ fun <T> TitleAndDescription(
 @Composable
 fun <T> TitleAndDescription(
     cfg: Configurable<T>,
-    describe: Boolean = true,
     describeContent: String,
-    describeWrapper: @Composable (@Composable () -> Unit) -> Unit = { it() },
     modifier: Modifier = Modifier,
+    describeSecondContent: String? = null,
+    describeWrapper: @Composable (@Composable () -> Unit) -> Unit = { it() },
     contentPadding: PaddingValues = PaddingValues(8.dp),
 ) {
     val enabled = isConfigEnabled()
@@ -129,26 +131,38 @@ fun <T> TitleAndDescription(
                 )
             }
         }
-        if (describe) {
             if (describeContent.isNotBlank()) {
                 Spacer(Modifier.size(4.dp))
                 describeWrapper {
                     WithContentAlpha(0.75f) {
                         AnimatedContent(
-                            targetState = describeContent,
+                            targetState = describeContent to describeSecondContent,
                             transitionSpec = {
                                 scaleIn() + fadeIn() togetherWith scaleOut() + fadeOut()
                             }
-                        ) { content ->
-                            Text(
-                                content,
-                                fontSize = myTextSizes.base,
-                            )
+                        ) { (content, secondContent) ->
+                            Column {
+                                Text(
+                                    buildAnnotatedString {
+                                        withStyle(
+                                            style = SpanStyle(
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                        ) {
+                                            append(content)
+                                        }
+                                        if (!secondContent.isNullOrBlank()) {
+                                            append(" - ")
+                                            append(secondContent)
+                                        }
+                                    },
+                                    fontSize = myTextSizes.base,
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
     }
 }
 

@@ -54,7 +54,7 @@ object TimeConfigurableRenderer : ConfigurableRenderer<TimeConfigurable> {
         ConfigTemplate(
             modifier = configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 Row(

@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.storage.appsettings
 
+import com.abdownloadmanager.shared.storage.SpeedLimitMode
 import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import com.abdownloadmanager.shared.util.MaximumDownloadRetriesLimitation
 import com.abdownloadmanager.shared.util.schemakt.enum
@@ -48,7 +49,8 @@ object BaseAppSettingsDefinition {
             .catch(PlatformDefaultSettings::showDownloadProgressDialog)
         prop(IAppSettingsModel::showDownloadCompletionDialog) bind S.boolean()
             .catch(PlatformDefaultSettings::showDownloadCompletionDialog)
-        prop(IAppSettingsModel::useSpeedLimit) bind S.boolean().catch(PlatformDefaultSettings::useSpeedLimit)
+        prop(IAppSettingsModel::useSpeedLimit) bind S.enum<SpeedLimitMode>()
+            .catch(PlatformDefaultSettings::useSpeedLimit)
         prop(IAppSettingsModel::speedLimit) bind S.long().min(1L).catch(PlatformDefaultSettings::speedLimit)
         prop(IAppSettingsModel::autoStartOnBoot) bind S.boolean().catch(PlatformDefaultSettings::autoStartOnBoot)
         prop(IAppSettingsModel::notificationSound) bind S.boolean().catch(PlatformDefaultSettings::notificationSound)
