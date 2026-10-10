@@ -32,6 +32,7 @@ interface BaseAppSettingsStorage :
     val showDownloadCompletionDialog: MutableStateFlow<Boolean>
     val useSpeedLimit: MutableStateFlow<SpeedLimitMode>
     val speedLimit: MutableStateFlow<Long>
+    val minPartSize: MutableStateFlow<Long>
     val autoStartOnBoot: MutableStateFlow<Boolean>
     override val notificationSound: MutableStateFlow<Boolean>
     override val generalNotificationSound: MutableStateFlow<String>

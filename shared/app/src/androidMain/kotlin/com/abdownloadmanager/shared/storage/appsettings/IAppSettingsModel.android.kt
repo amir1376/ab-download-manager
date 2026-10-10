@@ -10,6 +10,7 @@ import io.github.amir1376.schemakt.schema.modifier.catch
 import io.github.amir1376.schemakt.schema.primitive.boolean
 import ir.amirab.util.config.datastore.asSettingsSchema
 import kotlinx.serialization.Serializable
+import kotlin.math.min
 
 
 @optics([arrow.optics.OpticsTarget.LENS])
@@ -35,6 +36,7 @@ data class AppSettingsModel(
     override val showDownloadCompletionDialog: Boolean,
     override val useSpeedLimit: SpeedLimitMode,
     override val speedLimit: Long,
+    override val minPartSize: Long,
     override val autoStartOnBoot: Boolean,
     override val notificationSound: Boolean,
     override val generalNotificationSound: String,
@@ -87,6 +89,7 @@ private val AndroidSettingsSchema = S.typeSafeObject(
             showDownloadCompletionDialog = it[AppSettingsModel::showDownloadCompletionDialog],
             useSpeedLimit = it[AppSettingsModel::useSpeedLimit],
             speedLimit = it[AppSettingsModel::speedLimit],
+            minPartSize = it[AppSettingsModel::minPartSize],
             autoStartOnBoot = it[AppSettingsModel::autoStartOnBoot],
             notificationSound = it[AppSettingsModel::notificationSound],
             generalNotificationSound = it[AppSettingsModel::generalNotificationSound],

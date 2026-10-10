@@ -12,7 +12,7 @@ import com.abdownloadmanager.android.ui.configurable.comon.renderer.LongConfigur
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.NavigatableConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.ProxyConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.SoundConfigurableRenderer
-import com.abdownloadmanager.android.ui.configurable.comon.renderer.SpeedConfigurableRenderer
+import com.abdownloadmanager.android.ui.configurable.comon.renderer.SizeConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.ToggleableSpeedLimitConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.StringConfigurableRenderer
 import com.abdownloadmanager.android.ui.configurable.comon.renderer.ThemeConfigurableRenderer
@@ -29,7 +29,7 @@ val CommonConfigurableRenderersForAndroid = CommonConfigurableRenderers(
     longConfigurableRenderer = LongConfigurableRenderer,
     perHostSettingsConfigurableRenderer = NavigatableConfigurableRenderer,
     enumConfigurableRenderer = EnumConfigurableRenderer,
-    speedConfigurableRenderer = SpeedConfigurableRenderer,
+    sizeConfigurableRenderer = SizeConfigurableRenderer,
     toggleableSpeedLimitConfigurableRenderer = ToggleableSpeedLimitConfigurableRenderer,
     stringConfigurableRenderer = StringConfigurableRenderer,
     themeConfigurableRenderer = ThemeConfigurableRenderer,

@@ -603,7 +603,8 @@ class HttpDownloadJob(
                         jobThrottler,
                     ),
                     strictMode = strictDownload,
-                    partSplitLock = partSplitLock
+                    partSplitLock = partSplitLock,
+                    minPartProvider = { downloadManager.settings.minPartSize }
                 ).also { partDownloader: HttpPartDownloader ->
                     partDownloader.onTooManyErrors = {
                         onPartHaveToManyError(it)

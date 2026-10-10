@@ -153,6 +153,7 @@ class DesktopSettingsComponent(
                             CommonSettings.maxConcurrentDownloads(appRepository),
                             CommonSettings.maxDownloadRetryCount(appRepository),
                             CommonSettings.dynamicPartDownloadConfig(appRepository),
+                            CommonSettings.minPartSize(appRepository),
                         )
                     ),
                     ConfigurableGroup(

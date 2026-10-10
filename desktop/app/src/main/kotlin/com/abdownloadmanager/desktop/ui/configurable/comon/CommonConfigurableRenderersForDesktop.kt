@@ -16,7 +16,7 @@ import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.ThemeConfigu
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.TimeConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.ProxyConfigurableRenderer
 import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.SoundConfigurableRenderer
-import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.SpeedConfigurableRenderer
+import com.abdownloadmanager.desktop.ui.configurable.comon.renderer.SizeConfigurableRenderer
 import com.abdownloadmanager.shared.ui.configurable.CommonConfigurableRenderers
 
 val CommonConfigurableRenderersForDesktop = CommonConfigurableRenderers(
@@ -29,7 +29,7 @@ val CommonConfigurableRenderersForDesktop = CommonConfigurableRenderers(
     longConfigurableRenderer = LongConfigurableRenderer,
     perHostSettingsConfigurableRenderer = PerHostSettingsConfigurableRenderer,
     enumConfigurableRenderer = EnumConfigurableRenderer,
-    speedConfigurableRenderer = SpeedConfigurableRenderer,
+    sizeConfigurableRenderer = SizeConfigurableRenderer,
     toggleableSpeedLimitConfigurableRenderer = ToggleableSpeedLimitConfigurableRenderer,
     stringConfigurableRenderer = StringConfigurableRenderer,
     themeConfigurableRenderer = ThemeConfigurableRenderer,
