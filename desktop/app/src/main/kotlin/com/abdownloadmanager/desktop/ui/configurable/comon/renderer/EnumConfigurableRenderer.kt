@@ -30,11 +30,12 @@ object EnumConfigurableRenderer : ConfigurableRenderer<EnumConfigurable<Any>> {
         val index = remember(cfg.possibleValues, value) {
             cfg.possibleValues.indexOf(value)
         }
+        val shouldShowDescribe = cfg.describe != cfg.itemTitle
         val enabled = isConfigEnabled()
         ConfigTemplate(
             modifier = configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, false)
+                TitleAndDescription(cfg, describe = shouldShowDescribe)
             },
             value = {
                 when (cfg.renderMode) {
@@ -48,7 +49,10 @@ object EnumConfigurableRenderer : ConfigurableRenderer<EnumConfigurable<Any>> {
                         modifier = Modifier.widthIn(min = 160.dp),
                         enabled = enabled,
                         render = {
-                            Text(cfg.describe(it).rememberString())
+                            val itemTitle = remember(cfg, it) {
+                                cfg.itemTitle(it)
+                            }
+                            Text(itemTitle.rememberString())
                         })
                 }
             }

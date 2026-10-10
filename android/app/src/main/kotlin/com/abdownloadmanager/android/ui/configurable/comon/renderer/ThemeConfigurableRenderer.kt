@@ -30,9 +30,7 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.ui.configurable.isConfigEnabled
 import com.abdownloadmanager.shared.ui.configurable.item.ThemeConfigurable
 import com.abdownloadmanager.shared.ui.widget.Text
-import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
-import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.ifThen
 
 object ThemeConfigurableRenderer : ConfigurableRenderer<ThemeConfigurable> {
@@ -57,7 +55,7 @@ object ThemeConfigurableRenderer : ConfigurableRenderer<ThemeConfigurable> {
                 }
                 .padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 Row(

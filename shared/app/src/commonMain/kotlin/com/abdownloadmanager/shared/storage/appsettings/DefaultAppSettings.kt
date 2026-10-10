@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.storage.appsettings
 
+import com.abdownloadmanager.shared.storage.SpeedLimitMode
 import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.downloadlocation.PlatformDownloadLocationProvider
@@ -25,7 +26,7 @@ abstract class DefaultAppSettings {
     open val useAverageSpeed: Boolean get() = true
     open val showDownloadProgressDialog: Boolean get() = true
     open val showDownloadCompletionDialog: Boolean get() = true
-    open val useSpeedLimit: Boolean get() = false
+    open val useSpeedLimit: SpeedLimitMode get() = SpeedLimitMode.Disabled
     open val speedLimit: Long get() = 256 * 1024 * 1024
     open val autoStartOnBoot: Boolean get() = true
     open val notificationSound: Boolean get() = true

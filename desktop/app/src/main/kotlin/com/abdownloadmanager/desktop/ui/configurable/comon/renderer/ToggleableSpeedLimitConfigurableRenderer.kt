@@ -87,7 +87,7 @@ object ToggleableSpeedLimitConfigurableRenderer : ConfigurableRenderer<Toggleabl
             configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    TitleAndDescription(cfg, true)
+                    TitleAndDescription(cfg)
                 }
             },
             nestedContent = {

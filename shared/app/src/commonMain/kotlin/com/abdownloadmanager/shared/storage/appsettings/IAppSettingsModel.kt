@@ -1,5 +1,6 @@
 package com.abdownloadmanager.shared.storage.appsettings
 
+import com.abdownloadmanager.shared.storage.SpeedLimitMode
 import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import ir.amirab.util.config.datastore.SettingsTypeSafeSchema
 
@@ -26,7 +27,7 @@ interface IAppSettingsModel {
     val useAverageSpeed: Boolean
     val showDownloadProgressDialog: Boolean
     val showDownloadCompletionDialog: Boolean
-    val useSpeedLimit: Boolean
+    val useSpeedLimit: SpeedLimitMode
     val speedLimit: Long
     val autoStartOnBoot: Boolean
     val notificationSound: Boolean

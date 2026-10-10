@@ -1,6 +1,7 @@
 package com.abdownloadmanager.shared.storage.appsettings
 
 import arrow.optics.optics
+import com.abdownloadmanager.shared.storage.SpeedLimitMode
 import com.abdownloadmanager.shared.storage.SupportedSizeUnits
 import io.github.amir1376.schemakt.S
 import io.github.amir1376.schemakt.schema.composite.TypeSafeObjectSchema
@@ -31,7 +32,7 @@ data class AppSettingsModel(
     override val useAverageSpeed: Boolean,
     override val showDownloadProgressDialog: Boolean,
     override val showDownloadCompletionDialog: Boolean,
-    override val useSpeedLimit: Boolean,
+    override val useSpeedLimit: SpeedLimitMode,
     override val speedLimit: Long,
     override val autoStartOnBoot: Boolean,
     override val notificationSound: Boolean,

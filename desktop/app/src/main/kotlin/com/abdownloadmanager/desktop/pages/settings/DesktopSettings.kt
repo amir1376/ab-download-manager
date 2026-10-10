@@ -1,6 +1,5 @@
 package com.abdownloadmanager.desktop.pages.settings
 
-import com.abdownloadmanager.desktop.repository.AppRepository
 import com.abdownloadmanager.desktop.storage.AppSettingsStorage
 import com.abdownloadmanager.desktop.ui.configurable.platform.item.FontConfigurable
 import com.abdownloadmanager.desktop.utils.renderapi.CustomRenderApi
@@ -8,11 +7,7 @@ import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
-import com.abdownloadmanager.shared.ui.configurable.item.ProxyConfigurable
-import com.abdownloadmanager.shared.util.proxy.ProxyManager
-import com.abdownloadmanager.shared.util.proxy.ProxyMode
 import ir.amirab.util.compose.asStringSource
-import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
@@ -97,7 +92,7 @@ object DesktopSettings {
                 add(null)
                 addAll(customRenderApi.getSupportedRenderApiForThisPlatform())
             },
-            describe = {
+            itemTitle = {
                 it?.prettyName?.asStringSource()?: Res.string.default.asStringSource()
             }
         )

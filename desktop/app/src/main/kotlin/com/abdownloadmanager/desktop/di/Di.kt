@@ -46,10 +46,12 @@ import ir.amirab.downloader.monitor.DownloadMonitor
 import ir.amirab.downloader.utils.IDiskStat
 import com.abdownloadmanager.integration.Integration
 import com.abdownloadmanager.resources.ABDMLanguageResources
+import com.abdownloadmanager.shared.IApplicationBackgroundTracker
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import com.abdownloadmanager.shared.downloaderinui.hls.HLSDownloaderInUi
 import com.abdownloadmanager.shared.downloaderinui.http.HttpDownloaderInUi
 import com.abdownloadmanager.shared.pagemanager.SettingsPageManager
+import com.abdownloadmanager.shared.platformApplicationBackgroundTracker
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.DnsSettings
@@ -515,6 +517,8 @@ val appModule = module {
             get(),
             get(),
             get(),
+            get(),
+            get(),
         )
     }.apply {
         bind<BaseAppRepository>()
@@ -684,6 +688,9 @@ val appModule = module {
     }
     single<SystemUsageMonitor> {
         platformSystemUsageMonitor()
+    }
+    single<IApplicationBackgroundTracker> {
+        platformApplicationBackgroundTracker()
     }
     single<IPerHostSettingsStorage> {
         val definedPaths = get<DefinedPaths>()

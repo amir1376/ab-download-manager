@@ -52,7 +52,6 @@ object PermissionConfigurableRenderer : ConfigurableRenderer<PermissionConfigura
             title = {
                 TitleAndDescription(
                     cfg = cfg,
-                    describe = true,
                     describeContent = if (permissionState.isGranted) {
                         Res.string.permission_granted
                     } else {

@@ -57,7 +57,7 @@ object SoundConfigurableRenderer : ConfigurableRenderer<SoundConfigurable> {
         ConfigTemplate(
             modifier = configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 MyTextField(

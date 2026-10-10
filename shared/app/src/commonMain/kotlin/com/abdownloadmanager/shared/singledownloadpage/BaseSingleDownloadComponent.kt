@@ -285,7 +285,7 @@ abstract class BaseSingleDownloadComponent<
             itemStateFlow
                 .filterIsInstance<ProcessingDownloadItemState>(),
             speedLimit,
-            appRepository.useSpeedLimit
+            appRepository.isSpeedLimitApplied
         ) { it, itemSpeedLimit, globalSpeedLimit ->
             val isSpeedLimited = itemSpeedLimit > 0 || globalSpeedLimit
 

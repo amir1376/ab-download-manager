@@ -44,7 +44,7 @@ object FileChecksumConfigurableRenderer : ConfigurableRenderer<FileChecksumConfi
             configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    TitleAndDescription(cfg, true)
+                    TitleAndDescription(cfg)
                 }
             },
             nestedContent = {

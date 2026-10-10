@@ -42,7 +42,7 @@ object LongConfigurableRenderer : ConfigurableRenderer<LongConfigurable> {
         ConfigTemplate(
             modifier = configurableUiProps.modifier.padding(configurableUiProps.itemPaddingValues),
             title = {
-                TitleAndDescription(cfg, true)
+                TitleAndDescription(cfg)
             },
             value = {
                 when (cfg.renderMode) {

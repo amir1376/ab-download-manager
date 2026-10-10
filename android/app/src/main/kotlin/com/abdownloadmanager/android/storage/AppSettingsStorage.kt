@@ -2,11 +2,13 @@ package com.abdownloadmanager.android.storage
 
 import androidx.datastore.core.DataStore
 import arrow.optics.Lens
+import com.abdownloadmanager.shared.storage.SpeedLimitMode
 import com.abdownloadmanager.shared.storage.appsettings.BaseAppSettingsStorage
 import com.abdownloadmanager.shared.storage.appsettings.AppSettingsModel
 import com.abdownloadmanager.shared.storage.appsettings.*
 import com.abdownloadmanager.shared.util.ConfigBaseSettingsByJson
 import com.abdownloadmanager.shared.util.ui.theme.DEFAULT_UI_SCALE
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 private val fontLens: Lens<AppSettingsModel, String?>
@@ -62,7 +64,7 @@ class AppSettingsStorage(
     override val maxDownloadRetryCount = from(AppSettingsModel.maxDownloadRetryCount)
     override val showDownloadProgressDialog = from(AppSettingsModel.showDownloadProgressDialog)
     override val showDownloadCompletionDialog = from(AppSettingsModel.showDownloadCompletionDialog)
-    override val useSpeedLimit = from(AppSettingsModel.useSpeedLimit)
+    override val useSpeedLimit: MutableStateFlow<SpeedLimitMode> = from(AppSettingsModel.useSpeedLimit)
     override val speedLimit = from(AppSettingsModel.speedLimit)
     override val autoStartOnBoot = from(AppSettingsModel.autoStartOnBoot)
     override val notificationSound = from(AppSettingsModel.notificationSound)
