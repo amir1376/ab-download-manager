@@ -1,3 +1,5 @@
+name: Publish to GitHub Releases
+
 on:
   push:
     tags:
