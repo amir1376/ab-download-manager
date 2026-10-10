@@ -3,7 +3,7 @@ RequestExecutionLevel user
 SetCompressor /SOLID lzma
 !include "LogicLib.nsh"
 !include "MUI2.nsh"
-!addplugindir "plugins\x86-unicode"
+!addplugindir /x86-ansi "plugins\x86-ansi"
 
 !define APP_PUBLISHER "{{ app_publisher }}"
 !define APP_NAME "{{ app_name }}"

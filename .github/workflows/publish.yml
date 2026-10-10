@@ -69,9 +69,9 @@ jobs:
         run: |
           git clone https://github.com/nsis-community/plugin-nsprocess.git
           cd plugin-nsprocess\Contrib\nsProcess
-          cl /O1 /GS- /D_UNICODE /DUNICODE nsProcess.c /LD /link kernel32.lib user32.lib /NODEFAULTLIB /ENTRY:DllMain /OUT:nsProcess.dll
-          mkdir ..\..\..\desktop\app\resources\installer\plugins\x86-unicode
-          copy nsProcess.dll ..\..\..\desktop\app\resources\installer\plugins\x86-unicode\nsProcess.dll
+          cl /O1 /GS- nsProcess.c /LD /link kernel32.lib user32.lib /ENTRY:DllMain /OUT:nsProcess.dll
+          mkdir ..\..\..\desktop\app\resources\installer\plugins\x86-ansi
+          copy nsProcess.dll ..\..\..\desktop\app\resources\installer\plugins\x86-ansi\nsProcess.dll
       - name: Gradle
         run: |
           ./gradlew
