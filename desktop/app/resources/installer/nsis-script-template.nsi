@@ -3,7 +3,7 @@ RequestExecutionLevel user
 SetCompressor /SOLID lzma
 !include "LogicLib.nsh"
 !include "MUI2.nsh"
-
+!addplugindir "plugins\x86-unicode"
 
 !define APP_PUBLISHER "{{ app_publisher }}"
 !define APP_NAME "{{ app_name }}"
@@ -100,14 +100,14 @@ FunctionEnd
 
 ; a macro clear files to cleanup installation folder
 !macro clearFiles
-    RmDir /r "${INSTALL_DIR}\app"
-    RmDir /r "${INSTALL_DIR}\runtime"
-    Delete "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe"
-    Delete "${INSTALL_DIR}\${MAIN_BINARY_NAME}.ico"
-    Delete "${INSTALL_DIR}\${CLI_BINARY_NAME}.exe"
-    Delete "${INSTALL_DIR}\${NATIVE_MESSAGING_HOST_BINARY_NAME}.exe"
-    Delete "${INSTALL_DIR}\uninstall.exe"
-    RmDir "${INSTALL_DIR}"
+    RmDir /r /REBOOTOK "${INSTALL_DIR}\app"
+    RmDir /r /REBOOTOK "${INSTALL_DIR}\runtime"
+    Delete /REBOOTOK "${INSTALL_DIR}\${MAIN_BINARY_NAME}.exe"
+    Delete /REBOOTOK "${INSTALL_DIR}\${MAIN_BINARY_NAME}.ico"
+    Delete /REBOOTOK "${INSTALL_DIR}\${CLI_BINARY_NAME}.exe"
+    Delete /REBOOTOK "${INSTALL_DIR}\${NATIVE_MESSAGING_HOST_BINARY_NAME}.exe"
+    Delete /REBOOTOK "${INSTALL_DIR}\uninstall.exe"
+    RmDir /REBOOTOK "${INSTALL_DIR}"
 !macroend
 
 Function RunMainBinary
@@ -118,7 +118,8 @@ FunctionEnd
     DetailPrint "Stopping Executable ${executableName}"
 
     ${If} "$EXEFILE" != "${executableName}"
-        ExecWait 'taskkill /F /IM "${executableName}"' $0
+        nsProcess::KillProcess "${executableName}"
+        Pop $0
     ${Else}
         DetailPrint "It seems that installer file name is same as executable name"
         DetailPrint "Please close app manually"
@@ -169,6 +170,11 @@ FunctionEnd
 !macroend
 
 Function .onInstSuccess
+    IfRebootFlag 0 no_reboot
+        MessageBox MB_YESNO "A system restart is required to complete the installation. Restart now?" IDNO no_reboot
+        Reboot
+    no_reboot:
+
     ; Check if the installer is running in silent mode
     ${If} ${Silent}
         ; In silent mode, always run the app

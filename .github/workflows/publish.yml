@@ -57,6 +57,21 @@ jobs:
         run: |
           brew install create-dmg
 
+      - name: Setup MSVC (Windows)
+        if: startsWith(matrix.os, 'windows-')
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+
+      - name: Compile nsProcess plugin (Windows)
+        if: startsWith(matrix.os, 'windows-')
+        shell: cmd
+        run: |
+          git clone https://github.com/nsis-community/plugin-nsprocess.git
+          cd plugin-nsprocess\Contrib\nsProcess
+          cl /O1 /GS- /D_UNICODE /DUNICODE nsProcess.c /LD /link kernel32.lib user32.lib /NODEFAULTLIB /ENTRY:DllMain /OUT:nsProcess.dll
+          mkdir ..\..\..\desktop\app\resources\installer\plugins\x86-unicode
+          copy nsProcess.dll ..\..\..\desktop\app\resources\installer\plugins\x86-unicode\nsProcess.dll
       - name: Gradle
         run: |
           ./gradlew
