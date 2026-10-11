@@ -14,6 +14,28 @@
 
 ### Security
 
+## 1.11.0
+
+### Added
+
+- Show the selected item count and total content size in the desktop download list (#1445)
+- Add start and finish dates to the desktop download list (#1447)
+- Add an **Open With** option to the download menu and Download Complete dialog (long-press the **Open** button) (#1465)
+- Add an option to limit download speed while using other apps (#1466)
+- Add an option to configure the minimum download part size (#1467)
+- Add a speed limiter toggle to the system tray (#1458)
+
+### Fixed
+
+- Fix launching the app through browser integration on macOS (#1434)
+- Set window titles when creating windows (#1432)
+- Fix flickering when the NSIS installer closes the app on Windows (#1471)
+
+### Improved
+
+- Update translations
+- UI/UX improvements
+
 ## 1.10.4
 
 ### Fixed
