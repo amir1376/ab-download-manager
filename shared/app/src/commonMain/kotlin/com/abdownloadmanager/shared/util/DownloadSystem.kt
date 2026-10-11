@@ -27,10 +27,16 @@ import ir.amirab.downloader.queue.ManualDownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.suspendGuardedEntry
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 
 /**
@@ -55,6 +61,8 @@ class DownloadSystem(
     private val foldersRegistry: DownloadFoldersRegistry,
 ) {
     private val booted = suspendGuardedEntry()
+    private val scheduledResumeJobs = mutableMapOf<Long, Job>()
+    private val scheduledResumeJobsMutex = Mutex()
 
     val downloadEvents = downloadManager.listOfJobsEvents
 
@@ -68,7 +76,59 @@ class DownloadSystem(
             failedDownloads.boot()
             onDownloadCompletionActionRunner.startListening()
             onQueueEventActionRunner.startListening()
+            restoreScheduledResumes()
         }
+    }
+
+    private suspend fun restoreScheduledResumes() {
+        for (state in downloadMonitor.downloadListFlow.value) {
+            val resumeAtMillis = extraDownloadSettingsStorage.getScheduledResumeAt(state.id) ?: continue
+            if (state is ProcessingDownloadItemState && state.canBeResumed()) {
+                scheduleResumeAt(state.id, resumeAtMillis)
+            } else {
+                extraDownloadSettingsStorage.setScheduledResumeAt(state.id, null)
+            }
+        }
+    }
+
+    private suspend fun cancelScheduledResume(id: Long) {
+        val job = scheduledResumeJobsMutex.withLock {
+            scheduledResumeJobs.remove(id)
+        }
+        job?.cancel()
+        extraDownloadSettingsStorage.setScheduledResumeAt(id, null)
+    }
+
+    private suspend fun scheduleResumeAt(id: Long, resumeAtMillis: Long) {
+        extraDownloadSettingsStorage.setScheduledResumeAt(id, resumeAtMillis)
+        val job = scope.launch(start = CoroutineStart.LAZY) {
+            try {
+                delay((resumeAtMillis - System.currentTimeMillis()).coerceAtLeast(0L))
+                val thisJob = currentCoroutineContext()[Job]
+                val isCurrentSchedule = scheduledResumeJobsMutex.withLock {
+                    scheduledResumeJobs[id] === thisJob
+                }
+                if (!isCurrentSchedule) return@launch
+
+                val state = downloadMonitor.downloadListFlow.value.firstOrNull { it.id == id }
+                if (state is ProcessingDownloadItemState && state.canBeResumed()) {
+                    manualDownloadQueue.resume(id)
+                }
+                extraDownloadSettingsStorage.setScheduledResumeAt(id, null)
+            } finally {
+                val thisJob = currentCoroutineContext()[Job]
+                scheduledResumeJobsMutex.withLock {
+                    if (scheduledResumeJobs[id] === thisJob) {
+                        scheduledResumeJobs.remove(id)
+                    }
+                }
+            }
+        }
+        val oldJob = scheduledResumeJobsMutex.withLock {
+            scheduledResumeJobs.put(id, job)
+        }
+        oldJob?.cancel()
+        job.start()
     }
 
     suspend fun addDownload(
@@ -135,6 +195,7 @@ class DownloadSystem(
         alsoRemoveFile: Boolean,
         context: DownloadItemContext,
     ) {
+        cancelScheduledResume(id)
         downloadManager.deleteDownload(
             id = id,
             alsoRemoveFile = {
@@ -147,6 +208,7 @@ class DownloadSystem(
     }
 
     suspend fun userManualResume(id: Long): Boolean {
+        cancelScheduledResume(id)
         manualDownloadQueue.resume(id)
         return true
     }
@@ -159,12 +221,22 @@ class DownloadSystem(
     }
 
     suspend fun reset(id: Long): Boolean {
+        cancelScheduledResume(id)
         downloadManager.reset(id)
         return true
     }
 
     suspend fun manualPause(id: Long): Boolean {
+        cancelScheduledResume(id)
         manualDownloadQueue.pause(id)
+        return true
+    }
+
+    suspend fun pauseAndResumeLater(id: Long, delayMillis: Long): Boolean {
+        require(delayMillis > 0L) { "delayMillis must be greater than zero" }
+        cancelScheduledResume(id)
+        manualDownloadQueue.pause(id)
+        scheduleResumeAt(id, System.currentTimeMillis() + delayMillis)
         return true
     }
 
