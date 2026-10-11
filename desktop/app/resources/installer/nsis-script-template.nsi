@@ -118,7 +118,8 @@ FunctionEnd
     DetailPrint "Stopping Executable ${executableName}"
 
     ${If} "$EXEFILE" != "${executableName}"
-        ExecWait 'taskkill /F /IM "${executableName}"' $0
+        nsExec::ExecToLog 'taskkill /F /IM "${executableName}"'
+        Pop $0
     ${Else}
         DetailPrint "It seems that installer file name is same as executable name"
         DetailPrint "Please close app manually"
