@@ -3,6 +3,7 @@ RequestExecutionLevel user
 SetCompressor /SOLID lzma
 !include "LogicLib.nsh"
 !include "MUI2.nsh"
+!include "x64.nsh"
 
 
 !define APP_PUBLISHER "{{ app_publisher }}"
@@ -21,6 +22,8 @@ SetCompressor /SOLID lzma
 !define MAIN_BINARY_NAME "${APP_NAME}"
 !define NATIVE_MESSAGING_HOST_BINARY_NAME "{{ native_messaging_host_binary_name }}"
 !define CLI_BINARY_NAME "{{ cli_binary_name }}"
+!define CHROME_EXTENSION_ID "{{ chrome_extension_id }}"
+!define CHROME_EXTENSION_UPDATE_URL "{{ chrome_extension_update_url }}"
 
 !define SIDEBAR_IMAGE "{{ sidebar_image_file }}"
 !define HEADER_IMAGE "{{ header_image_file }}"
@@ -177,6 +180,44 @@ Function .onInstSuccess
     ${Endif}
 FunctionEnd
 
+!macro InstallChromeExtensionInKey rootKey
+    WriteRegStr ${rootKey} "Software\Google\Chrome\Extensions\${CHROME_EXTENSION_ID}" "update_url" "${CHROME_EXTENSION_UPDATE_URL}"
+    WriteRegStr ${rootKey} "Software\Microsoft\Edge\Extensions\${CHROME_EXTENSION_ID}" "update_url" "${CHROME_EXTENSION_UPDATE_URL}"
+    WriteRegStr ${rootKey} "Software\BraveSoftware\Brave-Browser\Extensions\${CHROME_EXTENSION_ID}" "update_url" "${CHROME_EXTENSION_UPDATE_URL}"
+    WriteRegStr ${rootKey} "Software\Chromium\Extensions\${CHROME_EXTENSION_ID}" "update_url" "${CHROME_EXTENSION_UPDATE_URL}"
+    WriteRegStr ${rootKey} "Software\Vivaldi\Extensions\${CHROME_EXTENSION_ID}" "update_url" "${CHROME_EXTENSION_UPDATE_URL}"
+    WriteRegStr ${rootKey} "Software\Opera Software\Opera Stable\Extensions\${CHROME_EXTENSION_ID}" "update_url" "${CHROME_EXTENSION_UPDATE_URL}"
+!macroend
+
+!macro UninstallChromeExtensionInKey rootKey
+    DeleteRegKey ${rootKey} "Software\Google\Chrome\Extensions\${CHROME_EXTENSION_ID}"
+    DeleteRegKey ${rootKey} "Software\Microsoft\Edge\Extensions\${CHROME_EXTENSION_ID}"
+    DeleteRegKey ${rootKey} "Software\BraveSoftware\Brave-Browser\Extensions\${CHROME_EXTENSION_ID}"
+    DeleteRegKey ${rootKey} "Software\Chromium\Extensions\${CHROME_EXTENSION_ID}"
+    DeleteRegKey ${rootKey} "Software\Vivaldi\Extensions\${CHROME_EXTENSION_ID}"
+    DeleteRegKey ${rootKey} "Software\Opera Software\Opera Stable\Extensions\${CHROME_EXTENSION_ID}"
+!macroend
+
+!macro InstallChromeExtension
+    DetailPrint "Configuring Chrome extension integration"
+    !insertmacro InstallChromeExtensionInKey SHCTX
+    ${If} ${RunningX64}
+        SetRegView 64
+        !insertmacro InstallChromeExtensionInKey SHCTX
+        SetRegView 32
+    ${EndIf}
+!macroend
+
+!macro UninstallChromeExtension
+    DetailPrint "Removing Chrome extension integration"
+    !insertmacro UninstallChromeExtensionInKey SHCTX
+    ${If} ${RunningX64}
+        SetRegView 64
+        !insertmacro UninstallChromeExtensionInKey SHCTX
+        SetRegView 32
+    ${EndIf}
+!macroend
+
 Section "${APP_DISPLAY_NAME}"
     SectionInstType RO
 
@@ -206,6 +247,9 @@ Section "${APP_DISPLAY_NAME}"
     ; Registry keys for app installation path and version
     WriteRegStr SHCTX "${REG_APP_KEY}" "InstallPath" "${INSTALL_DIR}"
     WriteRegStr SHCTX "${REG_APP_KEY}" "Version" "${APP_VERSION}"
+
+    ; Silently configure Chrome extension for Chromium-based browsers
+    !insertmacro InstallChromeExtension
 SectionEnd
 
 Section "Start Menu"
@@ -234,4 +278,7 @@ Section "Uninstall"
 
     ; remove auto start on boot registry
     DeleteRegValue SHCTX "${REG_RUN_KEY}" "${APP_NAME}"
+
+    ; remove Chrome extension integration from Chromium-based browsers
+    !insertmacro UninstallChromeExtension
 SectionEnd

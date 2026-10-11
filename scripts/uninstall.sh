@@ -96,12 +96,31 @@ delete_app() {
     logger "removing $APP_NAME autostart at boot file ..."
     remove_if_exists "$HOME/.config/autostart/com.abdownloadmanager.desktop"
 
+    # Remove Chrome extension integration from Chromium-based browsers
+    remove_chrome_extension
+
     if [ -e "$HOME/.abdm" ]; then
         logger "removing $APP_NAME settings and download lists $HOME/.abdm"
         delete_app_config_dir
     fi
 
     logger "AB Download Manager completely removed"
+}
+
+remove_chrome_extension() {
+    local ext_id="bbobopahenonfdgjgaleledndnnfhooj"
+    local browser_dirs=(
+        "$HOME/.config/google-chrome"
+        "$HOME/.config/chromium"
+        "$HOME/.config/BraveSoftware/Brave-Browser"
+        "$HOME/.config/microsoft-edge"
+        "$HOME/.config/vivaldi"
+        "$HOME/.config/opera"
+    )
+
+    for bdir in "${browser_dirs[@]}"; do
+        remove_if_exists "$bdir/External Extensions/${ext_id}.json"
+    done
 }
 
 main() {

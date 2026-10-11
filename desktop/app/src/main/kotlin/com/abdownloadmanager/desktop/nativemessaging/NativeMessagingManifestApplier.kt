@@ -8,11 +8,21 @@ import ir.amirab.util.deleteIfExists
 import ir.amirab.util.desktop.WindowsRegistry
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.writeText
+import com.abdownloadmanager.shared.util.SharedConstants
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.Path
 import okio.Path.Companion.toOkioPath
 import org.koin.core.component.KoinComponent
 import kotlin.io.path.Path
+
+@Serializable
+data class ExternalExtensionManifest(
+    @SerialName("external_update_url")
+    val externalUpdateUrl: String,
+)
 
 abstract class NativeMessagingManifestApplier(val json: Json) : KoinComponent {
     protected inline fun <reified T : Any> serialize(data: T): String {
@@ -56,6 +66,16 @@ class WindowsNativeMessagingManifestApplier(json: Json) : NativeMessagingManifes
     private val firefoxRegistryPath get() = "HKCU\\SOFTWARE\\Mozilla\\NativeMessagingHosts\\${AppInfo.packageName}"
     private val chromeRegistryPath get() = "HKCU\\SOFTWARE\\Google\\Chrome\\NativeMessagingHosts\\${AppInfo.packageName}"
 
+    private val chromiumExtensionRegistryPaths
+        get() = listOf(
+            "HKCU\\SOFTWARE\\Google\\Chrome\\Extensions\\${SharedConstants.chromeExtensionId}",
+            "HKCU\\SOFTWARE\\Microsoft\\Edge\\Extensions\\${SharedConstants.chromeExtensionId}",
+            "HKCU\\SOFTWARE\\BraveSoftware\\Brave-Browser\\Extensions\\${SharedConstants.chromeExtensionId}",
+            "HKCU\\SOFTWARE\\Chromium\\Extensions\\${SharedConstants.chromeExtensionId}",
+            "HKCU\\SOFTWARE\\Vivaldi\\Extensions\\${SharedConstants.chromeExtensionId}",
+            "HKCU\\SOFTWARE\\Opera Software\\Opera Stable\\Extensions\\${SharedConstants.chromeExtensionId}",
+        )
+
     override fun updateManifests(
         manifests: NativeMessagingManifests
     ) {
@@ -72,6 +92,14 @@ class WindowsNativeMessagingManifestApplier(json: Json) : NativeMessagingManifes
             key = null,
             value = chromeManifestFile.toString()
         )
+
+        chromiumExtensionRegistryPaths.forEach { regPath ->
+            WindowsRegistry.setValueInRegistry(
+                path = regPath,
+                key = "update_url",
+                value = SharedConstants.chromeExtensionUpdateUrl,
+            )
+        }
     }
 
     override fun removeManifests() {
@@ -83,6 +111,11 @@ class WindowsNativeMessagingManifestApplier(json: Json) : NativeMessagingManifes
         WindowsRegistry.removePathInRegistry(
             path = chromeRegistryPath,
         )
+        chromiumExtensionRegistryPaths.forEach { regPath ->
+            WindowsRegistry.removePathInRegistry(
+                path = regPath,
+            )
+        }
     }
 
 }
@@ -110,6 +143,28 @@ class MacosNativeMessagingManifestApplier(
     private val chromiumBasedNativeMessagingPaths = listOf(
         createNativeMessagingPath("Google/Chrome"),
         createNativeMessagingPath("Chromium"),
+        createNativeMessagingPath("BraveSoftware/Brave-Browser"),
+        createNativeMessagingPath("Microsoft Edge"),
+        createNativeMessagingPath("Vivaldi"),
+        createNativeMessagingPath("com.operasoftware.Opera"),
+    )
+
+    private fun createChromiumExternalExtensionPath(appSupportDir: String) =
+        Path(
+            AppProperties.userDir,
+            "Library/Application Support",
+            appSupportDir,
+            "External Extensions",
+            "${SharedConstants.chromeExtensionId}.json"
+        ).toOkioPath()
+
+    private val chromiumBasedExternalExtensionPaths = listOf(
+        createChromiumExternalExtensionPath("Google/Chrome"),
+        createChromiumExternalExtensionPath("Chromium"),
+        createChromiumExternalExtensionPath("BraveSoftware/Brave-Browser"),
+        createChromiumExternalExtensionPath("Microsoft Edge"),
+        createChromiumExternalExtensionPath("Vivaldi"),
+        createChromiumExternalExtensionPath("com.operasoftware.Opera"),
     )
 
     override fun updateManifests(manifests: NativeMessagingManifests) {
@@ -122,6 +177,11 @@ class MacosNativeMessagingManifestApplier(
         chromiumBasedNativeMessagingPaths.forEach { path ->
             writeManifestContent(path, chromiumManifest)
         }
+
+        val externalExtManifest = serialize(ExternalExtensionManifest(SharedConstants.chromeExtensionUpdateUrl))
+        chromiumBasedExternalExtensionPaths.forEach { path ->
+            writeManifestContent(path, externalExtManifest)
+        }
     }
 
     override fun removeManifests() {
@@ -130,6 +190,10 @@ class MacosNativeMessagingManifestApplier(
         }
 
         chromiumBasedNativeMessagingPaths.forEach { path ->
+            path.deleteIfExists()
+        }
+
+        chromiumBasedExternalExtensionPaths.forEach { path ->
             path.deleteIfExists()
         }
     }
@@ -169,6 +233,24 @@ class LinuxNativeMessagingManifestApplier(
             createChromiumNativeMessagingPath("opera")
         )
 
+    private fun createChromiumExternalExtensionPath(browserConfigDir: String) = Path(
+        AppProperties.userDir,
+        ".config",
+        browserConfigDir,
+        "External Extensions",
+        "${SharedConstants.chromeExtensionId}.json"
+    ).toOkioPath()
+
+    private val chromiumBasedExternalExtensionPaths
+        get() = listOf(
+            createChromiumExternalExtensionPath("google-chrome"),
+            createChromiumExternalExtensionPath("chromium"),
+            createChromiumExternalExtensionPath("BraveSoftware/Brave-Browser"),
+            createChromiumExternalExtensionPath("microsoft-edge"),
+            createChromiumExternalExtensionPath("vivaldi"),
+            createChromiumExternalExtensionPath("opera")
+        )
+
     override fun updateManifests(manifests: NativeMessagingManifests) {
         val firefoxManifest = serialize(manifests.firefoxNativeMessagingManifest)
         firefoxNativeMessagingPaths.forEach { path ->
@@ -179,6 +261,11 @@ class LinuxNativeMessagingManifestApplier(
         chromiumBasedNativeMessagingPaths.forEach { path ->
             writeManifestContent(path, chromiumManifest)
         }
+
+        val externalExtManifest = serialize(ExternalExtensionManifest(SharedConstants.chromeExtensionUpdateUrl))
+        chromiumBasedExternalExtensionPaths.forEach { path ->
+            writeManifestContent(path, externalExtManifest)
+        }
     }
 
     override fun removeManifests() {
@@ -187,6 +274,10 @@ class LinuxNativeMessagingManifestApplier(
         }
 
         chromiumBasedNativeMessagingPaths.forEach { path ->
+            path.deleteIfExists()
+        }
+
+        chromiumBasedExternalExtensionPaths.forEach { path ->
             path.deleteIfExists()
         }
     }
