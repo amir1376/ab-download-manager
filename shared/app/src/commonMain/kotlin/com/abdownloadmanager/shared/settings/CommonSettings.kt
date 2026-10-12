@@ -23,6 +23,7 @@ import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.ApiKeyUtil
 import com.abdownloadmanager.shared.util.MaximumDownloadRetriesLimitation
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
+import com.abdownloadmanager.shared.util.convertPositiveSizeToHumanReadable
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.util.dns.DnsModes
 import com.abdownloadmanager.shared.util.notification.INotificationSound
@@ -128,6 +129,7 @@ object CommonSettings {
             },
         )
     }
+
     fun minPartSize(appRepository: BaseAppRepository): SizeConfigurable {
         return SizeConfigurable(
             title = Res.string.settings_min_part_size.asStringSource(),
@@ -136,10 +138,10 @@ object CommonSettings {
             range = DownloadSettings.MIN_ALLOWED_MIN_PART_SIZE..DownloadSettings.MAX_ALLOWED_MIN_PART_SIZE,
             isSpeed = false,
             describe = {
-                convertPositiveSpeedToHumanReadable(
+                convertPositiveSizeToHumanReadable(
                     it,
-                    appRepository.speedUnit.value
-                ).asStringSource()
+                    appRepository.sizeUnit.value
+                )
             },
         )
     }
