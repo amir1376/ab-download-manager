@@ -65,7 +65,9 @@ scoop install extras/abdownloadmanager
 #### Homebrew (for macOS & Linux)
 
 ```bash
-brew tap amir1376/tap && brew install --cask ab-download-manager
+brew tap amir1376/tap
+brew trust amir1376/tap
+brew install --cask ab-download-manager
 ```
 
 > ⚠️ **Warning:** This software is NOT on Google Play or other app stores unless listed here. Any version **claiming to be or related to this project** should be considered SCAM and UNSAFE.
