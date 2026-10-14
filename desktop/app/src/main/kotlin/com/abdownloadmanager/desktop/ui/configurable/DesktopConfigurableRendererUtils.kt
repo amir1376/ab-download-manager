@@ -85,17 +85,17 @@ fun ConfigTemplate(
         Row(
             Modifier
                 .height(IntrinsicSize.Max),
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(
-                Modifier.weight(2f, true),
+                Modifier.weight(3f, true),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start,
             ) {
                 title()
             }
             Column(
-                Modifier.fillMaxHeight().weight(1f, true),
+                Modifier.fillMaxHeight().weight(2f, true),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.End,
             ) {
