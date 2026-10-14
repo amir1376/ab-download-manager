@@ -378,7 +378,7 @@ class HomeComponent(
         }
     }
 
-    private val downloadActions = DesktopDownloadActions(
+    val downloadActions = DesktopDownloadActions(
         scope = scope,
         downloadSystem = downloadSystem,
         downloadDialogManager = downloadDialogManager,

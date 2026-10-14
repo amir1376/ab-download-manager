@@ -65,6 +65,7 @@ class AndroidDownloadActions(
     private val mainOptions = buildMenu {
         +resumeAction
         +pauseAction
+        +pauseForMenu
         +deleteAction
         +openDownloadDialogAction
     }

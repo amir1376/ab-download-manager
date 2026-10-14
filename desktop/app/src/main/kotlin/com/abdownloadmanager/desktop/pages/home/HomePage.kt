@@ -46,6 +46,7 @@ import com.abdownloadmanager.shared.pages.home.CategoryActions
 import com.abdownloadmanager.shared.pages.home.CategoryDeletePromptState
 import com.abdownloadmanager.shared.pages.home.ConfirmPromptState
 import com.abdownloadmanager.shared.pages.home.DeletePromptState
+import com.abdownloadmanager.shared.pages.home.PauseForDurationDialog
 import com.abdownloadmanager.shared.ui.widget.*
 import com.abdownloadmanager.shared.ui.widget.menu.custom.MenuBar
 import com.abdownloadmanager.shared.ui.widget.menu.custom.ShowOptionsInPopup
@@ -81,6 +82,7 @@ import java.io.File
 @Composable
 fun HomePage(component: HomeComponent) {
     val listState by component.downloadList.collectAsState()
+    val pauseForDurationRequest by component.downloadActions.pauseForDurationDialogRequest.collectAsState()
     var isDragging by remember { mutableStateOf(false) }
 
     var showDeletePromptState by remember {
@@ -98,6 +100,16 @@ fun HomePage(component: HomeComponent) {
     val coroutineScope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
     val tableState = component.tableState
+
+    pauseForDurationRequest?.let { request ->
+        PauseForDurationDialog(
+            request = request,
+            onDismiss = component.downloadActions::dismissPauseForDurationDialog,
+            onConfirm = { minutes ->
+                component.downloadActions.pauseForCustomDuration(minutes)
+            },
+        )
+    }
 
     HandleEffects(component) { effect ->
         when (effect) {

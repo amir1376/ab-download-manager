@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.builtins.serializer
 import java.io.File
 
 class ExtraDownloadSettingsStorage<T : IExtraDownloadItemSettings>(
@@ -19,6 +20,9 @@ class ExtraDownloadSettingsStorage<T : IExtraDownloadItemSettings>(
 ) : IExtraDownloadSettingsStorage<T> {
     private fun getFileOf(id: Long) = folder
         .resolve("${id}.json")
+
+    private fun getScheduledResumeFileOf(id: Long) = folder
+        .resolve("${id}.scheduled-resume.json")
 
     private val updateLocks = SuspendLockList<Long>()
     private val lastEmits = MutableSharedFlow<T>(
@@ -33,6 +37,7 @@ class ExtraDownloadSettingsStorage<T : IExtraDownloadItemSettings>(
             dataClassDefinitions.createDefault(downloadId)
         )
         getFileOf(downloadId).delete()
+        getScheduledResumeFileOf(downloadId).delete()
     }
 
     override suspend fun setExtraDownloadItemSettings(
@@ -70,5 +75,24 @@ class ExtraDownloadSettingsStorage<T : IExtraDownloadItemSettings>(
             }
             emitAll(lastEmits.filter { it.id == id })
         }
+    }
+
+    override suspend fun setScheduledResumeAt(downloadId: Long, resumeAtMillis: Long?) {
+        require(downloadId >= 0) { "downloadId must be >= 0" }
+        val file = getScheduledResumeFileOf(downloadId)
+        withContext(Dispatchers.IO) {
+            updateLocks.withLock(downloadId) {
+                if (resumeAtMillis == null) {
+                    file.delete()
+                } else {
+                    transactionalFileSaver.writeObject(file, resumeAtMillis, Long.serializer())
+                }
+            }
+        }
+    }
+
+    override fun getScheduledResumeAt(downloadId: Long): Long? {
+        val file = getScheduledResumeFileOf(downloadId)
+        return transactionalFileSaver.readObject(file, Long.serializer())
     }
 }

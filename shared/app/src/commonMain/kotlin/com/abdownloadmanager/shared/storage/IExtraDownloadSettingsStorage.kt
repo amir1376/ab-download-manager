@@ -8,6 +8,8 @@ interface IExtraDownloadSettingsStorage<T : IExtraDownloadItemSettings> {
     suspend fun setExtraDownloadItemSettings(extraDownloadItemSettings: T)
     fun getExtraDownloadItemSettings(downloadId: Long): T
     fun getExternalDownloadItemSettingsAsFlow(id: Long, initialEmit: Boolean = false): Flow<T>
+    suspend fun setScheduledResumeAt(downloadId: Long, resumeAtMillis: Long?)
+    fun getScheduledResumeAt(downloadId: Long): Long?
 }
 
 interface IExtraDownloadItemSettings {
