@@ -105,7 +105,7 @@ jna-core = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 
 dbusJava-core = { module = "com.github.hypfvieh:dbus-java-core", version.ref = "dbus-java" }
-dbusJava-unixSocket = { module = "com.github.hypfvieh:dbus-java-transport-junixsocket", version.ref = "dbus-java" }
+dbusJava-unixSocket = { module = "com.github.hypfvieh:dbus-java-transport-native-unixsocket", version.ref = "dbus-java" }
 
 pluginAndroidGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 pluginComposeMultiplatform = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
