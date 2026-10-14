@@ -14,6 +14,18 @@
 
 ### Security
 
+## 1.11.1
+
+### Fixed
+
+- Directory picker crash on Linux (#1479)
+- Idle detection not working properly on Linux (#1479)
+
+### Improved
+
+- Updated translations
+- Minor improvements to the desktop settings UI
+
 ## 1.11.0
 
 ### Added
