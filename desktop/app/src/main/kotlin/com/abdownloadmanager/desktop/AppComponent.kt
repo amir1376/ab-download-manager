@@ -60,6 +60,7 @@ import ir.amirab.downloader.destination.IncompleteFileUtil
 import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
+import ir.amirab.downloader.downloaditem.contexts.ResumingInfo
 import ir.amirab.downloader.downloaditem.contexts.User
 import ir.amirab.downloader.monitor.isDownloadActiveFlow
 import ir.amirab.downloader.queue.DefaultQueueInfo
@@ -645,7 +646,8 @@ class AppComponent(
             }
         }
         if (it is DownloadManagerEvents.OnJobStarting) {
-            if (appSettings.showDownloadProgressDialog.value) {
+            val isFirstAttempt = it.context[ResumingInfo]?.isFirstAttempt ?: true
+            if (isFirstAttempt && appSettings.showDownloadProgressDialog.value) {
                 openDownloadDialog(it.downloadItem.id)
             }
         }

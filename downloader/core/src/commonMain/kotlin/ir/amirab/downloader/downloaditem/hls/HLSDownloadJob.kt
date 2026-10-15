@@ -141,7 +141,7 @@ class HLSDownloadJob(
                 onDownloadFinished()
                 return@launch
             }
-            onDownloadResuming()
+            onDownloadResuming(isInFirstResume)
             try {
                 fetchDownloadInfoAndValidate()
                 createPartDownloaderList()

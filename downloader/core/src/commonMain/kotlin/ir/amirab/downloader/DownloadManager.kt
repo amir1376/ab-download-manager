@@ -8,6 +8,7 @@ import ir.amirab.downloader.downloaditem.contexts.DuplicateRemoval
 import ir.amirab.downloader.downloaditem.contexts.RemovedBy
 import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.downloaditem.DownloadStatus
+import ir.amirab.downloader.downloaditem.contexts.ResumingInfo
 import ir.amirab.downloader.utils.DuplicateFilterByPath
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.downloader.utils.FileNameUtil
@@ -242,7 +243,8 @@ class DownloadManager(
         return dlListDb.getAll()
     }
 
-    fun onDownloadResuming(downloadItem: IDownloadItem) {
+    fun onDownloadResuming(downloadItem: IDownloadItem, resumeInfo: ResumingInfo) {
+        contextContainer.updateContext(downloadItem.id) { it + resumeInfo }
         listOfJobsEvents.tryEmit(
             DownloadManagerEvents.OnJobStarting(
                 downloadItem,
@@ -273,7 +275,8 @@ class DownloadManager(
         listOfJobsEvents.tryEmit(
             DownloadManagerEvents.OnJobCanceled(
                 downloadItem,
-                contextContainer.getContext(downloadItem.id), throwable
+                contextContainer.getContext(downloadItem.id),
+                throwable,
             )
         )
     }
