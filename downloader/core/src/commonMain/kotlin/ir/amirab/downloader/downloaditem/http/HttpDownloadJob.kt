@@ -161,7 +161,7 @@ class HttpDownloadJob(
                 onDownloadFinished()
                 return@launch
             }
-            onDownloadResuming()
+            onDownloadResuming(isInFirstResume)
             try {
                 fetchDownloadInfoAndValidate()
                 createPartsIfNotCreated()

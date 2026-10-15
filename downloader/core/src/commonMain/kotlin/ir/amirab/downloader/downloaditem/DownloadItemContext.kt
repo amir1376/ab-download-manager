@@ -28,7 +28,7 @@ interface DownloadItemContext {
         fun getKey(): Key<*>
         override fun <T : Element> get(key: Key<T>): T? {
             @Suppress("UNCHECKED_CAST")
-            return if (getKey() === key) return this as T
+            return if (getKey() === key) this as T
             else null
         }
 
