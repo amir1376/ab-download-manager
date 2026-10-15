@@ -331,6 +331,10 @@ fun DownloadList(
                 DownloadListCells.TimeLeft -> {
                     TimeLeftCell(item)
                 }
+
+                DownloadListCells.Location -> {
+                    LocationCell(item)
+                }
             }
         }
     }
@@ -437,6 +441,15 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
         override val size: CellSize = CellSize.Resizeable(90.dp..150.dp, 100.dp)
     }
 
+    data object Location : DownloadListCells,
+        SortableCell<IDownloadItemState> {
+        override fun comparator(): Comparator<IDownloadItemState> = compareBy { it.folder }
+
+        override val id: String = "Location"
+        override val name: StringSource = Res.string.location.asStringSource()
+        override val size: CellSize = CellSize.Resizeable(50.dp..1000.dp, 200.dp)
+    }
+
     companion object {
         val allCells: List<DownloadListCells> = listOf(
             Check,
@@ -448,10 +461,12 @@ sealed interface DownloadListCells : TableCell<IDownloadItemState> {
             DateAdded,
             DateStarted,
             DateFinished,
+            Location,
         )
         private val disabledByDefault = listOf(
             DateStarted,
             DateFinished,
+            Location,
         )
         val initiallyVisibleCells: List<DownloadListCells> = allCells
             .filterNot { it in disabledByDefault }

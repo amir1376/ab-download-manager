@@ -187,6 +187,19 @@ fun DateCell(
 }
 
 @Composable
+fun LocationCell(
+    itemState: IDownloadItemState,
+) {
+    Text(
+        text = itemState.folder,
+        maxLines = 1,
+        fontSize = myTextSizes.base,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
+
+
+@Composable
 fun SpeedCell(
     itemState: IDownloadItemState,
 ) {
