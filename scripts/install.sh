@@ -220,11 +220,41 @@ install_app() {
     # Create a .desktop file in ~/.local/share/applications
     generate_desktop_file
 
+    # Silently configure Chrome extension for Chromium-based browsers
+    install_chrome_extension
+
     logger "AB Download Manager installed successfully"
     logger "it can be found in Applications menu or run '$APP_NAME' in terminal"
     logger "Make sure $HOME/.local/bin exists in PATH"
     logger "installation logs saved in: ${LOG_FILE}"
     
+}
+
+CHROME_EXTENSION_ID="bbobopahenonfdgjgaleledndnnfhooj"
+CHROME_EXTENSION_UPDATE_URL="https://clients2.google.com/service/update2/crx"
+
+# --- Install Chrome extension for Chromium-based browsers
+install_chrome_extension() {
+    logger "Installing Chrome extension integration..."
+    local json_payload="{\"external_update_url\": \"${CHROME_EXTENSION_UPDATE_URL}\"}"
+    local browser_dirs=(
+        "$HOME/.config/google-chrome"
+        "$HOME/.config/chromium"
+        "$HOME/.config/BraveSoftware/Brave-Browser"
+        "$HOME/.config/microsoft-edge"
+        "$HOME/.config/vivaldi"
+        "$HOME/.config/opera"
+    )
+
+    for bdir in "${browser_dirs[@]}"; do
+        if [ -d "$bdir" ]; then
+            local ext_dir="$bdir/External Extensions"
+            mkdir -p "$ext_dir"
+            echo "$json_payload" > "$ext_dir/${CHROME_EXTENSION_ID}.json"
+            chmod 644 "$ext_dir/${CHROME_EXTENSION_ID}.json"
+            logger "Configured Chrome extension for $(basename "$bdir")"
+        fi
+    done
 }
 
 # --- Check if the app is installed

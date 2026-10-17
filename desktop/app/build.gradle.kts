@@ -211,7 +211,9 @@ installerPlugin {
             "project_website" to "www.abdownloadmanager.com",
             "copyright" to "© 2024-present AB Download Manager App",
             "header_image_file" to project.file("resources/installer/abdm-header-image.bmp"),
-            "sidebar_image_file" to project.file("resources/installer/abdm-sidebar-image.bmp")
+            "sidebar_image_file" to project.file("resources/installer/abdm-sidebar-image.bmp"),
+            "chrome_extension_id" to getChromeExtensionId(),
+            "chrome_extension_update_url" to getChromeExtensionUpdateUrl(),
         )
     }
     macos {

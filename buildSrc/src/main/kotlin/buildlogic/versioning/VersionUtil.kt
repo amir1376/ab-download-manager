@@ -43,3 +43,11 @@ fun Project.getAppVersionStringForPackaging(targetFormat: TargetFormat? = null):
 //    val forRpm = { semantic().replace("-", "_") }
     return simple()
 }
+
+fun Project.getChromeExtensionId(): String {
+    return "bbobopahenonfdgjgaleledndnnfhooj"
+}
+
+fun Project.getChromeExtensionUpdateUrl(): String {
+    return "https://clients2.google.com/service/update2/crx"
+}

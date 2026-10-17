@@ -2,6 +2,8 @@ import buildlogic.versioning.getAppDataDirName
 import buildlogic.versioning.getAppName
 import buildlogic.versioning.getAppVersionString
 import buildlogic.versioning.getApplicationPackageName
+import buildlogic.versioning.getChromeExtensionId
+import buildlogic.versioning.getChromeExtensionUpdateUrl
 import buildlogic.versioning.getPrettifiedAppName
 
 
@@ -143,7 +145,7 @@ buildConfig {
     buildConfigField(
         "INTEGRATION_CHROME_LINK",
         provider {
-            "https://chromewebstore.google.com/detail/ab-download-manager-brows/bbobopahenonfdgjgaleledndnnfhooj"
+            "https://chromewebstore.google.com/detail/ab-download-manager-brows/${getChromeExtensionId()}"
         }
     )
     buildConfigField(
@@ -161,7 +163,19 @@ buildConfig {
     buildConfigField(
         "INTEGRATION_CHROME_EXTENSION_ID",
         provider {
-            "chrome-extension://bbobopahenonfdgjgaleledndnnfhooj/"
+            "chrome-extension://${getChromeExtensionId()}/"
+        }
+    )
+    buildConfigField(
+        "INTEGRATION_CHROME_EXTENSION_RAW_ID",
+        provider {
+            getChromeExtensionId()
+        }
+    )
+    buildConfigField(
+        "INTEGRATION_CHROME_EXTENSION_UPDATE_URL",
+        provider {
+            getChromeExtensionUpdateUrl()
         }
     )
     buildConfigField(
