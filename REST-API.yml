@@ -92,6 +92,21 @@ paths:
                 queueId:
                   type: integer
                   description: Optional queue ID to associate the task with
+                categoryId:
+                  type: integer
+                  description: Optional category ID to put the task in
+                startDownload:
+                  type: boolean
+                  default: false
+                  description: >-
+                    Start the download right away. Without it the download is only added to
+                    the list (status "Added") and waits to be started.
+                startQueue:
+                  type: boolean
+                  default: false
+                  description: >-
+                    Start the queue given in queueId instead of the download itself (used
+                    only with queueId; takes precedence over startDownload).
       responses:
         "200":
           description: Successfully added the download task
