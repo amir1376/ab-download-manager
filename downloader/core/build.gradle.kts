@@ -25,5 +25,10 @@ kotlin {
                 api("io.lindstrom:m3u8-parser:0.29")
             }
         }
+        val desktopTest by getting {
+            dependencies {
+                implementation("junit:junit:4.13.2")
+            }
+        }
     }
 }

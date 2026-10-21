@@ -165,6 +165,7 @@ class HomeComponent(
     val menu: List<MenuItem.SubMenu> = buildMenu {
         subMenu(Res.string.file.asStringSource()) {
             +newDownloadAction
+            +multipleDownloadsAction
             +newDownloadFromClipboardAction
             +batchDownloadAction
             separator()
@@ -403,6 +404,7 @@ class HomeComponent(
             "DELETE" to downloadActions.deleteAction
         }
         "$metaKey N" to newDownloadAction
+        "$metaKey shift N" to multipleDownloadsAction
         "$metaKey V" to newDownloadFromClipboardAction
         "$metaKey C" to downloadActions.copyDownloadLinkAction
         "$metaKey alt S" to gotoSettingsAction
@@ -416,6 +418,7 @@ class HomeComponent(
     }
     val showLabels = appSettings.showIconLabels
     val headerActions = buildMenu {
+        +multipleDownloadsAction
         separator()
         +downloadActions.resumeAction
         +downloadActions.pauseAction

@@ -53,6 +53,9 @@ private val activeQueuesFlow = downloadSystem
 // desktop
 val stopAllAction = createDesktopStopAllAction(scope, downloadSystem, appComponent, activeQueuesFlow)
 val newDownloadAction = createNewDownloadAction(appComponent)
+val multipleDownloadsAction = simpleAction(Res.string.download_multiple_files.asStringSource(), MyIcons.download) {
+    appComponent.openMultipleDownloads()
+}
 val newDownloadFromClipboardAction = createDownloadFromClipboardAction(appComponent)
 val createDesktopEntryAction = simpleAction(
     Res.string.create_desktop_entry.asStringSource(),

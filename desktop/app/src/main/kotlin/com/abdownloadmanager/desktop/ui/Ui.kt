@@ -3,6 +3,7 @@ package com.abdownloadmanager.desktop.ui
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.application
 import com.abdownloadmanager.desktop.AppArguments
+import com.abdownloadmanager.desktop.pages.multipledownloads.MultipleDownloadsWindow
 import com.abdownloadmanager.desktop.AppComponent
 import com.abdownloadmanager.desktop.AppEffects
 import com.abdownloadmanager.desktop.actions.gotoSettingsAction
@@ -113,6 +114,7 @@ object Ui : KoinComponent {
                 SettingWindow(appComponent)
                 QueuesWindow(appComponent)
                 BatchDownloadWindow(appComponent)
+                MultipleDownloadsWindow(appComponent)
                 EditDownloadWindow(appComponent)
                 EnterNewDownloadWindow(appComponent)
                 ShowAddDownloadDialogs(appComponent)

@@ -62,10 +62,10 @@ fun MyTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
+    focusRequester: FocusRequester = remember { FocusRequester() },
     start: @Composable (RowScope.() -> Unit)? = null,
     end: @Composable (RowScope.() -> Unit)? = null,
 ) {
-    val focusRequester = remember { FocusRequester() }
     val fm = LocalFocusManager.current
     val isFocused by interactionSource.collectIsFocusedAsState()
 

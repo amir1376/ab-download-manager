@@ -3,6 +3,7 @@ package ir.amirab.downloader.connection
 import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.http.IHttpBasedDownloadCredentials
 import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
+import ir.amirab.downloader.exception.DownloadLinkResolutionException
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.downloader.utils.throwIf
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,7 @@ abstract class HttpDownloaderClient {
             }
         } catch (e: Exception) {
             e.throwIf { ExceptionUtils.isNormalCancellation(e) }
+            if (e is DownloadLinkResolutionException) throw e
             // some servers may reset the connection (ECONNRESET) if we ask for bytes=0-255
             // so we don't provide resume support for them
         }

@@ -9,6 +9,15 @@ import com.abdownloadmanager.desktop.pages.checksum.DesktopFileChecksumComponent
 import com.abdownloadmanager.desktop.pages.editdownload.DesktopEditDownloadComponent
 import com.abdownloadmanager.desktop.pages.enterurl.DesktopEnterNewURLComponent
 import com.abdownloadmanager.desktop.pages.home.HomeComponent
+import com.abdownloadmanager.desktop.pages.multipledownloads.MultipleDownloadsController
+import com.abdownloadmanager.shared.downloaderinui.BasicDownloadItem
+import com.abdownloadmanager.shared.downloaderinui.DownloadSize
+import ir.amirab.downloader.downloaditem.EmptyContext
+import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import ir.amirab.downloader.utils.OnDuplicateStrategy
+import ir.amirab.util.FileNameValidator
+import ir.amirab.util.HttpUrlUtils
+import com.abdownloadmanager.shared.util.perhostsettings.getSettingsForURL
 import com.abdownloadmanager.desktop.pages.perhostsettings.DesktopPerHostSettingsComponent
 import com.abdownloadmanager.desktop.pages.poweractionalert.PowerActionComponent
 import com.abdownloadmanager.desktop.pages.queue.QueuesComponent
@@ -119,6 +128,58 @@ class AppComponent(
     val updaterManager: UpdateManager by inject()
     val extraDownloadSettingStorage: ExtraDownloadSettingsStorage<DesktopExtraDownloadItemSettings> by inject()
     val useSystemTray = appSettings.useSystemTray
+    private val _showMultipleDownloads = MutableStateFlow(false)
+    val showMultipleDownloads = _showMultipleDownloads.asStateFlow()
+    val multipleDownloads by lazy {
+        MultipleDownloadsController(
+            scope = scope,
+            initialFolder = appRepository.saveLocation.value,
+            prepare = { link, folder ->
+                withContext(Dispatchers.IO) {
+                    require(FileUtils.canWriteInThisFolder(folder)) { "Cannot use this download folder: $folder" }
+                    val downloader = requireNotNull(downloaderInUiRegistry.bestMatchForThisLink(link)) { "Unsupported download link" }
+                    val hostSettings = perHostSettingsManager.getSettingsForURL(link)
+                    val originalCredentials = downloader.createMinimumCredentials(link)
+                    val credentials = if (originalCredentials is HttpDownloadCredentials && hostSettings != null) {
+                        originalCredentials.copy(username = hostSettings.username, password = hostSettings.password, userAgent = hostSettings.userAgent)
+                    } else originalCredentials
+                    val checker = downloader.createLinkChecker(credentials)
+                    val response = checker.actualCheck(credentials)
+                    response.unsuccessFullException?.let { throw it }
+                    check(!response.isWebPage) { "This link returned a web page instead of a downloadable file" }
+                    checker.infoUpdated(response)
+                    val name = FilenameFixer.fix(checker.suggestedName.value
+                        ?: HttpUrlUtils.extractNameFromLink(link) ?: "download")
+                    require(FileNameValidator.isValidFileName(name)) { "Invalid file name: $name" }
+                    NewDownloadItemProps(
+                        downloadItem = downloader.createBareDownloadItem(credentials, BasicDownloadItem(
+                            folder = folder,
+                            name = name,
+                            contentLength = (checker.downloadSize.value as? DownloadSize.Bytes)?.bytes ?: -1,
+                            preferredConnectionCount = hostSettings?.threadCount,
+                            speedLimit = hostSettings?.speedLimit ?: 0,
+                        )),
+                        extraConfig = null,
+                        onDuplicateStrategy = OnDuplicateStrategy.AddNumbered,
+                        context = EmptyContext,
+                    )
+                }
+            },
+            enqueue = { item ->
+                val id = downloadSystem.addDownload(item, DefaultQueueInfo.ID, null)
+                downloadSystem.userManualResume(id)
+                item.downloadItem.name
+            },
+        )
+    }
+
+    fun openMultipleDownloads() { _showMultipleDownloads.value = true }
+
+    fun closeMultipleDownloads() {
+        multipleDownloads.stop()
+        _showMultipleDownloads.value = false
+    }
+
     fun openHome() {
         scope.launch {
             showHomeSlot.value.child?.instance.let {

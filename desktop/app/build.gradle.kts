@@ -22,6 +22,7 @@ plugins {
 
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     implementation(libs.decompose)
     implementation(libs.decompose.jbCompose)
 
