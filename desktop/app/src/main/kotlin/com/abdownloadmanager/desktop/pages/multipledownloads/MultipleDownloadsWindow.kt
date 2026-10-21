@@ -35,6 +35,8 @@ import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.desktop.screen.applyUiScale
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun MultipleDownloadsWindow(appComponent: AppComponent) {
@@ -48,6 +50,12 @@ fun MultipleDownloadsWindow(appComponent: AppComponent) {
     val linksLabel = myStringResource(Res.string.links)
     val locationLabel = myStringResource(Res.string.download_location)
     val focus = remember { FocusRequester() }
+    LaunchedEffect(controller) {
+        while (isActive) {
+            controller.refreshActiveDownloads()
+            delay(500)
+        }
+    }
     CustomWindow(
         state = rememberWindowState(
             initialBoundsProvider = WindowBoundsProvider(
@@ -100,7 +108,7 @@ fun MultipleDownloadsWindow(appComponent: AppComponent) {
             }
             val queued = items.count { it.status == MultipleDownloadsController.Status.Queued }
             val failed = items.count { it.status == MultipleDownloadsController.Status.Failed }
-            Text("${items.size} $linksLabel · $queued ${myStringResource(Res.string.added)} · $failed ${myStringResource(Res.string.error)}",
+            Text("${items.size} $linksLabel · $queued ${myStringResource(Res.string.multiple_downloads_active)} · $failed ${myStringResource(Res.string.error)}",
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
             if (text.isNotBlank() && items.isEmpty()) {
                 Text(myStringResource(Res.string.nothing_will_be_imported), color = myColors.error)
@@ -116,7 +124,8 @@ fun MultipleDownloadsWindow(appComponent: AppComponent) {
                             val status = when (item.status) {
                                 MultipleDownloadsController.Status.Pending -> myStringResource(Res.string.multiple_downloads_pending)
                                 MultipleDownloadsController.Status.Resolving -> myStringResource(Res.string.multiple_downloads_resolving)
-                                MultipleDownloadsController.Status.Queued -> myStringResource(Res.string.added)
+                                MultipleDownloadsController.Status.Queued -> myStringResource(Res.string.multiple_downloads_active)
+                                MultipleDownloadsController.Status.Ready -> myStringResource(Res.string.multiple_downloads_ready)
                                 MultipleDownloadsController.Status.Failed -> myStringResource(Res.string.error)
                             }
                             Text("${index + 1}. $status · ${item.detail.ifBlank { item.url }}", maxLines = 2, overflow = TextOverflow.Ellipsis,

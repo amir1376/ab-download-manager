@@ -1,6 +1,7 @@
 package com.abdownloadmanager.desktop.pages.multipledownloads
 
 import com.abdownloadmanager.shared.util.extractors.linkextractor.StringUrlExtractor
+import ir.amirab.util.HttpUrlUtils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -19,8 +20,9 @@ class MultipleDownloadsController<T>(
     initialFolder: String,
     private val prepare: suspend (String, String) -> T,
     private val enqueue: suspend (T) -> String,
+    private val activeDownloads: () -> Map<String, String>,
 ) {
-    enum class Status { Pending, Resolving, Queued, Failed }
+    enum class Status { Pending, Resolving, Queued, Ready, Failed }
     data class Item(val url: String, val status: Status = Status.Pending, val detail: String = "")
 
     private val _text = MutableStateFlow("")
@@ -32,15 +34,16 @@ class MultipleDownloadsController<T>(
     private val _running = MutableStateFlow(false)
     val running = _running.asStateFlow()
     private var job: Job? = null
-    private val queued = mutableMapOf<String, Item>()
 
     fun setText(value: String) {
         if (_running.value) return
+        val previous = _items.value.associateBy { linkKey(it.url) }
         _text.value = value
         _items.value = value.lineSequence().flatMap { StringUrlExtractor.extract(it).asSequence() }
             .distinctBy(::linkKey)
-            .map { queued[linkKey(it)] ?: Item(it) }
+            .map { previous[linkKey(it)]?.copy(url = it) ?: Item(it) }
             .toList()
+        refreshActiveDownloads()
     }
 
     fun setFolder(value: String) {
@@ -49,6 +52,7 @@ class MultipleDownloadsController<T>(
 
     fun start() {
         if (_running.value || _folder.value.isBlank()) return
+        refreshActiveDownloads()
         val pending = _items.value.filter { it.status != Status.Queued }
         if (pending.isEmpty()) return
         val destination = _folder.value.trim()
@@ -57,15 +61,19 @@ class MultipleDownloadsController<T>(
             try {
                 for (item in pending) {
                     currentCoroutineContext().ensureActive()
+                    val activeName = activeDownloadNames()[linkKey(item.url)]
+                    if (activeName != null) {
+                        update(item.url, Status.Queued, activeName)
+                        continue
+                    }
                     update(item.url, Status.Resolving)
                     try {
                         val prepared = prepare(item.url, destination)
                         currentCoroutineContext().ensureActive()
                         // Finish recording an accepted item even if Stop is pressed during the local enqueue.
                         withContext(NonCancellable) {
-                            val name = enqueue(prepared)
-                            val accepted = Item(item.url, Status.Queued, name)
-                            queued[linkKey(item.url)] = accepted
+                            // Another app window may have started this link during metadata lookup.
+                            val name = activeDownloadNames()[linkKey(item.url)] ?: enqueue(prepared)
                             update(item.url, Status.Queued, name)
                         }
                     } catch (error: CancellationException) {
@@ -87,9 +95,31 @@ class MultipleDownloadsController<T>(
         job?.cancel()
     }
 
+    /** The queue is authoritative; an earlier import never permanently blocks a link. */
+    fun refreshActiveDownloads() {
+        val active = activeDownloadNames()
+        _items.update { items ->
+            items.map { item ->
+                val name = active[linkKey(item.url)]
+                when {
+                    item.status == Status.Resolving -> item
+                    name != null -> item.copy(status = Status.Queued, detail = name)
+                    item.status == Status.Queued -> item.copy(status = Status.Ready)
+                    else -> item
+                }
+            }
+        }
+    }
+
+    private fun activeDownloadNames() = activeDownloads().mapKeys { linkKey(it.key) }
+
     private fun update(url: String, status: Status, detail: String = "") {
         _items.update { items -> items.map { if (it.url == url) it.copy(status = status, detail = detail) else it } }
     }
 
-    private fun linkKey(url: String) = url.substringBefore('#')
+    companion object {
+        fun linkKey(url: String): String = runCatching {
+            HttpUrlUtils.createURL(url).newBuilder().fragment(null).build().toString()
+        }.getOrElse { url.substringBefore('#') }
+    }
 }

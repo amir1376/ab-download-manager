@@ -14,6 +14,21 @@
 
 ### Security
 
+## 1.11.2-multilink.1
+
+### Added
+
+- Download multiple files from a popup by pasting plain links or Markdown links.
+- Automatically resolve FuckingFast share pages to direct download links.
+
+### Fixed
+
+- Allow downloading the same links again after earlier downloads finish, fail, pause, or are removed.
+- Skip links that are currently running or queued, including links started from another window.
+- Refresh the popup's live status and make Download available again when links can be repeated.
+- Keep existing files by assigning numbered filenames to repeated downloads.
+- Allow HTTP/2 for FuckingFast without changing other hosts' connection settings.
+
 ## 1.11.1
 
 ### Fixed

@@ -67,6 +67,7 @@ import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.NewDownloadItemProps
 import ir.amirab.downloader.destination.IncompleteFileUtil
 import ir.amirab.downloader.downloaditem.DownloadStatus
+import ir.amirab.downloader.downloaditem.DownloadJobStatus
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.downloaditem.contexts.ResumedBy
 import ir.amirab.downloader.downloaditem.contexts.User
@@ -81,6 +82,8 @@ import ir.amirab.util.desktop.poweraction.PowerActionConfig
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
@@ -130,6 +133,24 @@ class AppComponent(
     val useSystemTray = appSettings.useSystemTray
     private val _showMultipleDownloads = MutableStateFlow(false)
     val showMultipleDownloads = _showMultipleDownloads.asStateFlow()
+    private val multipleDownloadsEnqueueMutex = Mutex()
+
+    private fun activeMultipleDownloadLinks(): Map<String, String> {
+        val manager = downloadSystem.downloadManager
+        val activeQueues = queueManager.getAll().filter { it.isQueueActive }
+        return manager.downloadJobs.filter { job ->
+            val status = job.status.value
+            job.downloadItem.status != DownloadStatus.Completed &&
+                status != DownloadJobStatus.Finished &&
+                (status is DownloadJobStatus.IsActive ||
+                    downloadSystem.manualDownloadQueue.getOrder(job.id) >= 0 ||
+                    (status == DownloadJobStatus.IDLE &&
+                        activeQueues.any { it.getOrder(job.id) >= 0 }))
+        }.associate { job ->
+            MultipleDownloadsController.linkKey(job.downloadItem.link) to job.downloadItem.name
+        }
+    }
+
     val multipleDownloads by lazy {
         MultipleDownloadsController(
             scope = scope,
@@ -166,10 +187,16 @@ class AppComponent(
                 }
             },
             enqueue = { item ->
-                val id = downloadSystem.addDownload(item, DefaultQueueInfo.ID, null)
-                downloadSystem.userManualResume(id)
-                downloadSystem.getDownloadItemById(id)?.name ?: item.downloadItem.name
+                multipleDownloadsEnqueueMutex.withLock {
+                    activeMultipleDownloadLinks()[MultipleDownloadsController.linkKey(item.downloadItem.link)]
+                        ?: run {
+                            val id = downloadSystem.addDownload(item, DefaultQueueInfo.ID, null)
+                            downloadSystem.userManualResume(id)
+                            downloadSystem.getDownloadItemById(id)?.name ?: item.downloadItem.name
+                        }
+                }
             },
+            activeDownloads = ::activeMultipleDownloadLinks,
         )
     }
 
