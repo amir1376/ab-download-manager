@@ -20,6 +20,7 @@ plugins {
 //    id(MyPlugins.proguardDesktop)
 }
 
+val windowsBuildPublisher = "Akshat Singh Baghel"
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
@@ -154,7 +155,7 @@ nucleus {
             }
             packageVersion = getAppVersionStringForPackaging()
             packageName = getAppName()
-            vendor = "abdownloadmanager.com"
+            vendor = windowsBuildPublisher
             appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
             val menuGroupName = getPrettifiedAppName()
             licenseFile.set(rootProject.file("LICENSE"))
@@ -206,7 +207,7 @@ installerPlugin {
         extraParams = mapOf(
             "native_messaging_host_binary_name" to nativeMessagingHostBinaryName,
             "cli_binary_name" to cliBinaryName,
-            "app_publisher" to "abdownloadmanager.com",
+            "app_publisher" to windowsBuildPublisher,
             "app_version_with_build" to "${getAppVersionStringForPackaging(TargetFormat.Exe)}.0",
             "source_code_url" to "https://github.com/amir1376/ab-download-manager",
             "project_website" to "www.abdownloadmanager.com",

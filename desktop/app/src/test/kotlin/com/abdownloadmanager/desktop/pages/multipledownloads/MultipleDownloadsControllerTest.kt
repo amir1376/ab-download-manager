@@ -1,4 +1,4 @@
-package com.abdownloadmanager.desktop.pages.multipledownloads
+﻿package com.abdownloadmanager.desktop.pages.multipledownloads
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -17,110 +17,95 @@ class MultipleDownloadsControllerTest {
 
     @Test
     fun processesThirtyLinksInOrderAndStartsEveryFileWithoutAnotherDialog() = runBlocking {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        try {
-            val prepared = mutableListOf<String>()
-            val started = mutableListOf<String>()
-            val controller = MultipleDownloadsController(scope, folder,
-                prepare = { url, destination -> assertEquals(folder, destination); prepared.add(url); url },
-                enqueue = { url -> started.add(url); url.substringAfterLast('/') })
+        QueueFixture().use { fixture ->
+            val controller = fixture.controller
             controller.setText((1..30).joinToString("\n", transform = ::link))
             controller.start()
             controller.awaitIdle()
-            assertEquals((1..30).map(::link), prepared)
-            assertEquals(prepared, started)
+            assertEquals((1..30).map(::link), fixture.prepared)
+            assertEquals(fixture.prepared, fixture.started)
             assertEquals(30, controller.items.value.count { it.status == MultipleDownloadsController.Status.Queued })
             controller.start()
-            assertEquals(30, started.size)
-        } finally { scope.cancel() }
+            controller.awaitIdle()
+            assertEquals(30, fixture.started.size)
+            assertEquals(30, fixture.prepared.size)
+        }
     }
 
     @Test
     fun parsesMixedMarkdownAndPlainLinksAndRemovesDuplicatesIncludingFragments() {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        try {
-            val controller = MultipleDownloadsController(scope, folder, { url, _ -> url }, { it })
-            controller.setText("${link(1)}#name\n[Second file](${link(2)})\n${link(1)}#other-name\nnot a link\n")
-            assertEquals(listOf("${link(1)}#name", link(2)), controller.items.value.map { it.url })
-        } finally { scope.cancel() }
+        QueueFixture().use { fixture ->
+            fixture.controller.setText("${link(1)}#name\n[Second file](${link(2)})\n${link(1)}#other-name\nnot a link\n")
+            assertEquals(listOf("${link(1)}#name", link(2)), fixture.controller.items.value.map { it.url })
+        }
     }
 
     @Test
     fun continuesAfterFailureAndRetryOnlyProcessesTheFailedFile() = runBlocking {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        try {
+        QueueFixture().use { fixture ->
             var fail = true
-            val started = mutableListOf<String>()
-            val controller = MultipleDownloadsController(scope, folder,
-                prepare = { url, _ -> if (url == link(2) && fail) error("File unavailable"); url },
-                enqueue = { started.add(it); it })
+            fixture.beforePrepare = { url -> if (url == link(2) && fail) error("File unavailable") }
+            val controller = fixture.controller
             controller.setText((1..3).joinToString("\n", transform = ::link))
             controller.start()
             controller.awaitIdle()
-            assertEquals(listOf(link(1), link(3)), started)
+            assertEquals(listOf(link(1), link(3)), fixture.started)
             assertEquals(MultipleDownloadsController.Status.Failed, controller.items.value[1].status)
             assertEquals("File unavailable", controller.items.value[1].detail)
             fail = false
             controller.start()
             controller.awaitIdle()
-            assertEquals(listOf(link(1), link(3), link(2)), started)
-        } finally { scope.cancel() }
+            assertEquals(listOf(link(1), link(3), link(2)), fixture.started)
+            assertEquals(listOf(link(1), link(2), link(3), link(2)), fixture.prepared)
+        }
     }
 
     @Test
     fun stoppingDuringResolutionLeavesTheCurrentLinkPendingAndKeepsAlreadyQueuedFiles() = runBlocking {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        try {
+        QueueFixture().use { fixture ->
             var hold = true
             val blocked = CompletableDeferred<Unit>()
-            val started = mutableListOf<String>()
-            val controller = MultipleDownloadsController(scope, folder,
-                prepare = { url, _ -> if (url == link(2) && hold) blocked.await(); url },
-                enqueue = { started.add(it); it })
+            fixture.beforePrepare = { url -> if (url == link(2) && hold) blocked.await() }
+            val controller = fixture.controller
             controller.setText((1..3).joinToString("\n", transform = ::link))
             controller.start()
             assertEquals(MultipleDownloadsController.Status.Resolving, controller.items.value[1].status)
             controller.stop()
             controller.awaitIdle()
-            assertEquals(listOf(link(1)), started)
+            assertEquals(listOf(link(1)), fixture.started)
             assertEquals(MultipleDownloadsController.Status.Pending, controller.items.value[1].status)
             hold = false
             controller.start()
             controller.awaitIdle()
-            assertEquals((1..3).map(::link), started)
-        } finally { scope.cancel() }
+            assertEquals((1..3).map(::link), fixture.started)
+        }
     }
 
     @Test
     fun stoppingDuringEnqueueRecordsThatFileOnceAndDoesNotStartTheNextLink() = runBlocking {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        try {
+        QueueFixture().use { fixture ->
             val accepted = CompletableDeferred<Unit>()
-            val started = mutableListOf<String>()
-            val controller = MultipleDownloadsController(scope, folder,
-                prepare = { url, _ -> url },
-                enqueue = { started.add(it); if (it == link(1)) accepted.await(); it })
+            fixture.afterAccept = { transfer -> if (transfer.url == link(1)) accepted.await() }
+            val controller = fixture.controller
             controller.setText("${link(1)}\n${link(2)}")
             controller.start()
             controller.stop()
             accepted.complete(Unit)
             controller.awaitIdle()
-            assertEquals(listOf(link(1)), started)
+            assertEquals(listOf(link(1)), fixture.started)
             assertEquals(MultipleDownloadsController.Status.Queued, controller.items.value[0].status)
             controller.start()
             controller.awaitIdle()
-            assertEquals(listOf(link(1), link(2)), started)
-        } finally { scope.cancel() }
+            assertEquals(listOf(link(1), link(2)), fixture.started)
+        }
     }
 
     @Test
     fun preventsDoubleStartAndInputChangesWhileProcessing() = runBlocking {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        try {
+        QueueFixture().use { fixture ->
             val gate = CompletableDeferred<Unit>()
-            var prepareCount = 0
-            val controller = MultipleDownloadsController(scope, folder,
-                prepare = { url, _ -> prepareCount++; gate.await(); url }, enqueue = { it })
+            fixture.beforePrepare = { gate.await() }
+            val controller = fixture.controller
             controller.setText(link(1))
             controller.start()
             controller.start()
@@ -130,40 +115,198 @@ class MultipleDownloadsControllerTest {
             assertEquals(folder, controller.folder.value)
             gate.complete(Unit)
             controller.awaitIdle()
-            assertEquals(1, prepareCount)
-        } finally { scope.cancel() }
+            assertEquals(listOf(link(1)), fixture.prepared)
+            assertEquals(listOf(link(1)), fixture.started)
+        }
     }
 
     @Test
-    fun addingMoreLinksAfterACompletedImportDoesNotDownloadPreviousLinksAgain() = runBlocking {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        try {
-            val started = mutableListOf<String>()
-            val controller = MultipleDownloadsController(scope, folder, { url, _ -> url }, { started.add(it); it })
+    fun addingMoreLinksSkipsPreviousLinksThatAreStillActive() = runBlocking {
+        QueueFixture().use { fixture ->
+            val controller = fixture.controller
             controller.setText(link(1))
             controller.start()
             controller.awaitIdle()
             controller.setText("${link(1)}\n${link(2)}")
             controller.start()
             controller.awaitIdle()
-            assertEquals(listOf(link(1), link(2)), started)
-        } finally { scope.cancel() }
+            assertEquals(listOf(link(1), link(2)), fixture.started)
+            assertEquals(listOf(link(1), link(2)), fixture.prepared)
+        }
     }
 
     @Test
     fun emptyOrInvalidInputAndBlankDestinationDoNotStartDownloads() {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        try {
-            var started = false
-            val controller = MultipleDownloadsController(scope, folder, { url, _ -> started = true; url }, { it })
+        QueueFixture().use { fixture ->
+            val controller = fixture.controller
             controller.setText("not a URL")
             controller.start()
-            assertFalse(started)
             controller.setText(link(1))
             controller.setFolder("   ")
             controller.start()
-            assertFalse(started)
-        } finally { scope.cancel() }
+            assertTrue(fixture.prepared.isEmpty())
+            assertTrue(fixture.started.isEmpty())
+        }
+    }
+
+    @Test
+    fun completedFailedPausedAndDeletedDownloadsCanBeDownloadedAgain() = runBlocking {
+        for (state in listOf(TransferState.Finished, TransferState.Failed, TransferState.Paused, TransferState.Deleted)) {
+            QueueFixture().use { fixture ->
+                val controller = fixture.controller
+                controller.setText(link(1))
+                repeat(3) { attempt ->
+                    controller.start()
+                    controller.awaitIdle()
+                    assertEquals("Retry $attempt after $state", attempt + 1, fixture.started.size)
+                    val latest = fixture.transfers.last()
+                    if (state == TransferState.Deleted) fixture.transfers.remove(latest) else latest.state = state
+                }
+                assertEquals(listOf(link(1), link(1), link(1)), fixture.prepared)
+            }
+        }
+    }
+
+    @Test
+    fun refreshMakesAFormerlyActiveLinkReadyForAnotherDownload() = runBlocking {
+        QueueFixture().use { fixture ->
+            val controller = fixture.controller
+            controller.setText(link(1))
+            controller.start()
+            controller.awaitIdle()
+            fixture.transfers.single().state = TransferState.Finished
+            controller.refreshActiveDownloads()
+            assertEquals(MultipleDownloadsController.Status.Ready, controller.items.value.single().status)
+            assertEquals(listOf(link(1)), fixture.started)
+            controller.start()
+            controller.awaitIdle()
+            assertEquals(listOf(link(1), link(1)), fixture.started)
+        }
+    }
+
+    @Test
+    fun reopenedWindowRecognizesAnActiveDownloadWithoutResolvingItAgain() = runBlocking {
+        QueueFixture().use { fixture ->
+            fixture.addTransfer(link(1), "already-running.zip")
+            val reopened = fixture.newController()
+            reopened.setText(link(1))
+            reopened.start()
+            reopened.awaitIdle()
+            assertEquals(MultipleDownloadsController.Status.Queued, reopened.items.value.single().status)
+            assertEquals("already-running.zip", reopened.items.value.single().detail)
+            assertTrue(fixture.prepared.isEmpty())
+            assertTrue(fixture.started.isEmpty())
+        }
+    }
+
+    @Test
+    fun activeDownloadWithADifferentFragmentDoesNotCreateAnotherCopy() = runBlocking {
+        QueueFixture().use { fixture ->
+            fixture.addTransfer("${link(1)}#old-name", "running.zip")
+            val controller = fixture.controller
+            controller.setText("${link(1)}#new-name\n${link(1)}#another-name")
+            controller.start()
+            controller.awaitIdle()
+            assertEquals(1, controller.items.value.size)
+            assertEquals(MultipleDownloadsController.Status.Queued, controller.items.value.single().status)
+            assertEquals("running.zip", controller.items.value.single().detail)
+            assertTrue(fixture.prepared.isEmpty())
+            assertTrue(fixture.started.isEmpty())
+        }
+    }
+
+    @Test
+    fun downloadStartedElsewhereDuringResolutionIsNotEnqueuedAgain() = runBlocking {
+        QueueFixture().use { fixture ->
+            val metadata = CompletableDeferred<Unit>()
+            fixture.beforePrepare = { metadata.await() }
+            val controller = fixture.controller
+            controller.setText(link(1))
+            controller.start()
+            assertEquals(MultipleDownloadsController.Status.Resolving, controller.items.value.single().status)
+            fixture.addTransfer(link(1), "started-in-another-window.zip")
+            metadata.complete(Unit)
+            controller.awaitIdle()
+            assertEquals(listOf(link(1)), fixture.prepared)
+            assertTrue(fixture.started.isEmpty())
+            assertEquals(MultipleDownloadsController.Status.Queued, controller.items.value.single().status)
+            assertEquals("started-in-another-window.zip", controller.items.value.single().detail)
+        }
+    }
+
+    @Test
+    fun aDownloadThatFinishesBeforeTheNextRefreshCanBeRetriedImmediately() = runBlocking {
+        QueueFixture().use { fixture ->
+            fixture.afterAccept = { it.state = TransferState.Finished }
+            val controller = fixture.controller
+            controller.setText(link(1))
+            repeat(2) {
+                controller.start()
+                controller.awaitIdle()
+            }
+            assertEquals(listOf(link(1), link(1)), fixture.started)
+            assertEquals(listOf(link(1), link(1)), fixture.prepared)
+        }
+    }
+
+    @Test
+    fun startChecksTheQueueEvenWhenTheDisplayedStateIsOutOfDate() = runBlocking {
+        QueueFixture().use { fixture ->
+            val controller = fixture.controller
+            controller.setText(link(1))
+            assertEquals(MultipleDownloadsController.Status.Pending, controller.items.value.single().status)
+            fixture.addTransfer(link(1), "external.zip")
+            controller.start()
+            controller.awaitIdle()
+            assertEquals(MultipleDownloadsController.Status.Queued, controller.items.value.single().status)
+            assertTrue(fixture.prepared.isEmpty())
+            assertTrue(fixture.started.isEmpty())
+
+            fixture.transfers.single().state = TransferState.Finished
+            // No UI refresh occurs before the user clicks Download again.
+            controller.start()
+            controller.awaitIdle()
+            assertEquals(listOf(link(1)), fixture.started)
+        }
+    }
+
+    private enum class TransferState { Running, Finished, Failed, Paused, Deleted }
+
+    private data class Transfer(val url: String, val name: String, var state: TransferState = TransferState.Running)
+
+    /** Models queue membership independently from the popup's remembered import results. */
+    private inner class QueueFixture : AutoCloseable {
+        private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
+        val transfers = mutableListOf<Transfer>()
+        val prepared = mutableListOf<String>()
+        val started = mutableListOf<String>()
+        var beforePrepare: suspend (String) -> Unit = {}
+        var afterAccept: suspend (Transfer) -> Unit = {}
+        val controller = newController()
+
+        fun newController() = MultipleDownloadsController(scope, folder,
+            prepare = { url, destination ->
+                assertEquals(folder, destination)
+                prepared.add(url)
+                beforePrepare(url)
+                url
+            },
+            enqueue = { url ->
+                started.add(url)
+                val transfer = addTransfer(url)
+                afterAccept(transfer)
+                transfer.name
+            },
+            activeDownloads = {
+                transfers.filter { it.state == TransferState.Running }.associate { it.url to it.name }
+            },
+        )
+
+        fun addTransfer(url: String, name: String = url.substringAfterLast('/').substringBefore('#')): Transfer {
+            return Transfer(url, name).also { transfers.add(it) }
+        }
+
+        override fun close() = scope.cancel()
     }
 
     private suspend fun MultipleDownloadsController<*>.awaitIdle() {

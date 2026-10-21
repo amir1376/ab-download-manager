@@ -52,6 +52,7 @@ Icon "${ICON_FILE}"
 
 VIProductVersion "${APP_VERSION_WITH_BUILD}"
 VIAddVersionKey "ProductName" "${APP_DISPLAY_NAME}"
+VIAddVersionKey "CompanyName" "${APP_PUBLISHER}"
 VIAddVersionKey "FileDescription" "${APP_DISPLAY_NAME}"
 VIAddVersionKey "LegalCopyright" "${COPYRIGHT}"
 VIAddVersionKey "FileVersion" "${APP_VERSION_WITH_BUILD}"

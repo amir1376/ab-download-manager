@@ -20,6 +20,7 @@
 
 - Download multiple files from a popup by pasting plain links or Markdown links.
 - Automatically resolve FuckingFast share pages to direct download links.
+- Publish the Windows fork build with Akshat Singh Baghel as its publisher.
 
 ### Fixed
 
