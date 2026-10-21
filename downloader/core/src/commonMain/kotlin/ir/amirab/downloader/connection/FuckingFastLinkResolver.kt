@@ -4,6 +4,7 @@ import okhttp3.HttpUrl
 
 /** Only the host's share links need resolution; direct /dl/ URLs pass through. */
 internal object FuckingFastPage {
+    private val downloadHosts = setOf("fuckingfast.co", "www.fuckingfast.co", "dl.fuckingfast.co")
     private val sharePath = Regex("""/(?:f/)?([a-zA-Z0-9]{12})/?""")
     private val quotedDownloadUrl = Regex(
         """["']((?:(?:https?:)?//(?:dl\.)?fuckingfast\.co)?/dl/[^\s"'<>\\]+)["']""",
@@ -14,6 +15,8 @@ internal object FuckingFastPage {
         return url.host in setOf("fuckingfast.co", "www.fuckingfast.co") &&
             sharePath.matches(url.encodedPath)
     }
+
+    fun isDownloadHost(url: HttpUrl): Boolean = url.host in downloadHosts
 
     fun downloadButtonUrl(pageUrl: HttpUrl): HttpUrl {
         val id = requireNotNull(sharePath.matchEntire(pageUrl.encodedPath)).groupValues[1]
@@ -34,7 +37,7 @@ internal object FuckingFastPage {
             .replace("&#x26;", "&", ignoreCase = true)
         val url = pageUrl.resolve(decoded) ?: return null
         return url.takeIf {
-            it.host in setOf("fuckingfast.co", "www.fuckingfast.co", "dl.fuckingfast.co") &&
+            isDownloadHost(it) &&
                 it.encodedPath.startsWith("/dl/") && it.encodedPath.length > 4 &&
                 it.username.isEmpty() && it.password.isEmpty() &&
                 (!pageUrl.isHttps || it.isHttps)

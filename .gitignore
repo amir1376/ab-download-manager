@@ -4,6 +4,8 @@
 
 # Ignore Gradle build output directory
 build
+# Keep generated Windows executables out of commits
+*.exe
 .idea
 local.properties
 

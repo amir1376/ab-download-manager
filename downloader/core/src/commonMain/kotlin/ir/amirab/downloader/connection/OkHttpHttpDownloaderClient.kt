@@ -28,6 +28,15 @@ class OkHttpHttpDownloaderClient(
     private val systemProxySelectorProvider: SystemProxySelectorProvider,
     private val autoConfigurableProxyProvider: AutoConfigurableProxyProvider,
 ) : HttpDownloaderClient() {
+    // The app's shared client deliberately uses HTTP/1.1. This host rejects its
+    // button endpoint over HTTP/1.1, so allow ALPN negotiation for this host only.
+    // Deriving the client keeps the app's DNS, TLS, timeouts and interceptors.
+    private val fuckingFastClient by lazy {
+        okHttpClient.newBuilder()
+            .protocols(listOf(Protocol.HTTP_2, Protocol.HTTP_1_1))
+            .build()
+    }
+
     private data class ResolutionKey(val url: HttpUrl, val headers: Headers)
     private data class ResolvedDownload(val url: HttpUrl, val createdAt: Long = System.nanoTime())
 
@@ -46,7 +55,9 @@ class OkHttpHttpDownloaderClient(
         val rangeHeader = start?.let {
             createRangeHeader(start, end)
         }
-        return okHttpClient
+        val target = requestUrl ?: downloadCredentials.link.toHttpUrlOrNull()
+        val client = if (target != null && FuckingFastPage.isDownloadHost(target)) fuckingFastClient else okHttpClient
+        return client
             .applyProxy(downloadCredentials)
             .let { client ->
                 if (followRedirects) client else client.newBuilder()

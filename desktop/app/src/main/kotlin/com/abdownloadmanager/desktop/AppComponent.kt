@@ -168,7 +168,7 @@ class AppComponent(
             enqueue = { item ->
                 val id = downloadSystem.addDownload(item, DefaultQueueInfo.ID, null)
                 downloadSystem.userManualResume(id)
-                item.downloadItem.name
+                downloadSystem.getDownloadItemById(id)?.name ?: item.downloadItem.name
             },
         )
     }

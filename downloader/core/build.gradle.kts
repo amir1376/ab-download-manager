@@ -28,6 +28,8 @@ kotlin {
         val desktopTest by getting {
             dependencies {
                 implementation("junit:junit:4.13.2")
+                implementation("com.squareup.okhttp3:okhttp-tls:${libs.versions.okhttp.get()}")
+                implementation("com.squareup.okhttp3:mockwebserver3:${libs.versions.okhttp.get()}")
             }
         }
     }
