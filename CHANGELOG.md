@@ -4,22 +4,6 @@
 
 ### Added
 
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
-
-## 1.11.2-devilboy.1
-
-Devil Boy edition by Akshat Singh Baghel (@devil-b0y).
-
-### Added
-
 - The "Download multiple files" window now shows every file it starts with live progress, speed, size and time left, in one place.
 - Overall progress for the whole batch, with counts of downloading, waiting, finished and failed files.
 - Pause All, Resume All and Retry Failed buttons for the batch, plus pause, resume and open-folder buttons for each file.
