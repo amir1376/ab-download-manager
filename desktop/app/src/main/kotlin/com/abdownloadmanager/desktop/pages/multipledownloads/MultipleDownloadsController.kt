@@ -51,10 +51,15 @@ class MultipleDownloadsController<T>(
         if (!_running.value) _folder.value = value
     }
 
-    fun start() {
+    fun start() = startItems { it.status != Status.Queued }
+
+    /** Processes only links that failed, so finished links are not downloaded again. */
+    fun retryFailed() = startItems { it.status == Status.Failed }
+
+    private fun startItems(select: (Item) -> Boolean) {
         if (_running.value || _folder.value.isBlank()) return
         refreshActiveDownloads()
-        val pending = _items.value.filter { it.status != Status.Queued }
+        val pending = _items.value.filter(select)
         if (pending.isEmpty()) return
         val destination = _folder.value.trim()
         _running.value = true

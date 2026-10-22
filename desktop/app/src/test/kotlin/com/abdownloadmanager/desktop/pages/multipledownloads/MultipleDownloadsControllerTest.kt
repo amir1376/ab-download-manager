@@ -278,6 +278,28 @@ class MultipleDownloadsControllerTest {
 
     /** Models queue membership independently from the popup's remembered import results. */
     @Test
+    fun retryFailedOnlyRetriesFailedLinksAndNeverDownloadsFinishedOnesAgain() = runBlocking {
+        QueueFixture().use { fixture ->
+            var fail = true
+            fixture.beforePrepare = { url -> if (url == link(2) && fail) error("File unavailable") }
+            val controller = fixture.controller
+            controller.setText((1..2).joinToString("\n", transform = ::link))
+            controller.start()
+            controller.awaitIdle()
+            // link 1 finishes; it becomes "ready to download again" but must not be part of a retry
+            fixture.transfers.single { it.url == link(1) }.state = TransferState.Finished
+            fail = false
+
+            controller.retryFailed()
+            controller.awaitIdle()
+
+            assertEquals(listOf(link(1), link(2)), fixture.started)
+            assertEquals(MultipleDownloadsController.Status.Queued, controller.items.value[1].status)
+            assertEquals(MultipleDownloadsController.Status.Ready, controller.items.value[0].status)
+        }
+    }
+
+    @Test
     fun stopAndJoinWaitsForTheAcceptedItemAndStartsNothingAfterwards() = runBlocking {
         QueueFixture().use { fixture ->
             val release = CompletableDeferred<Unit>()

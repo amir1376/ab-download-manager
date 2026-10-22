@@ -133,7 +133,23 @@ class AppComponent(
     val useSystemTray = appSettings.useSystemTray
     private val _showMultipleDownloads = MutableStateFlow(false)
     val showMultipleDownloads = _showMultipleDownloads.asStateFlow()
+    private val _multipleDownloadsFocusRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val multipleDownloadsFocusRequests = _multipleDownloadsFocusRequests.asSharedFlow()
     private val multipleDownloadsEnqueueMutex = Mutex()
+
+    // downloads started by the multiple-downloads window (link key -> download id).
+    // their progress is shown inside that window instead of opening a dialog per file
+    private val _multipleDownloadIds = MutableStateFlow<Map<String, Long>>(emptyMap())
+    val multipleDownloadIds = _multipleDownloadIds.asStateFlow()
+    private fun isShownInMultipleDownloads(id: Long) = id in _multipleDownloadIds.value.values
+
+    fun pauseDownloads(ids: List<Long>) {
+        scope.launch { ids.forEach { downloadSystem.manualPause(it) } }
+    }
+
+    fun resumeDownloads(ids: List<Long>) {
+        scope.launch { ids.forEach { downloadSystem.userManualResume(it) } }
+    }
 
     private fun activeMultipleDownloadLinks(): Map<String, String> {
         val manager = downloadSystem.downloadManager
@@ -191,6 +207,10 @@ class AppComponent(
                     activeMultipleDownloadLinks()[MultipleDownloadsController.linkKey(item.downloadItem.link)]
                         ?: run {
                             val id = downloadSystem.addDownload(item, DefaultQueueInfo.ID, null)
+                            // record before starting so the start event doesn't open a separate dialog
+                            _multipleDownloadIds.update {
+                                it + (MultipleDownloadsController.linkKey(item.downloadItem.link) to id)
+                            }
                             downloadSystem.userManualResume(id)
                             downloadSystem.getDownloadItemById(id)?.name ?: item.downloadItem.name
                         }
@@ -206,7 +226,14 @@ class AppComponent(
         downloadSystem.stopAnything()
     }
 
-    fun openMultipleDownloads() { _showMultipleDownloads.value = true }
+    fun openMultipleDownloads() {
+        if (_showMultipleDownloads.value) {
+            // already open: bring the existing window forward instead of doing nothing
+            _multipleDownloadsFocusRequests.tryEmit(Unit)
+        } else {
+            _showMultipleDownloads.value = true
+        }
+    }
 
     fun closeMultipleDownloads() {
         multipleDownloads.stop()
@@ -703,6 +730,10 @@ class AppComponent(
     }
 
     private fun onNewDownloadEvent(it: DownloadManagerEvents) {
+        if (it is DownloadManagerEvents.OnJobRemoved) {
+            val removedId = it.downloadItem.id
+            _multipleDownloadIds.update { ids -> ids.filterValues { id -> id != removedId } }
+        }
         if (it.context[ResumedBy]?.by !is User) {
             //only notify events that is started by user
             return
@@ -734,12 +765,12 @@ class AppComponent(
                 description = Res.string.finished.asStringSource(),
                 type = NotificationType.Success,
             )
-            if (appSettings.showDownloadCompletionDialog.value) {
+            if (appSettings.showDownloadCompletionDialog.value && !isShownInMultipleDownloads(it.downloadItem.id)) {
                 openDownloadDialog(it.downloadItem.id)
             }
         }
         if (it is DownloadManagerEvents.OnJobStarting) {
-            if (appSettings.showDownloadProgressDialog.value) {
+            if (appSettings.showDownloadProgressDialog.value && !isShownInMultipleDownloads(it.downloadItem.id)) {
                 openDownloadDialog(it.downloadItem.id)
             }
         }
@@ -753,8 +784,10 @@ class AppComponent(
         val downloadProgressIsAlreadyOpen = openedDownloadDialogs.value.find {
             it.downloadId == downloadItem.id
         } != null
-        val autoShowDownloadErrorDialog =
-            !downloadProgressIsAlreadyOpen && appSettings.showDownloadCompletionDialog.value
+        val autoShowDownloadErrorDialog = !downloadProgressIsAlreadyOpen &&
+            appSettings.showDownloadCompletionDialog.value &&
+            // errors of these downloads are listed in the multiple-downloads window
+            !isShownInMultipleDownloads(downloadItem.id)
         if (userRequested || autoShowDownloadErrorDialog) {
             openDownloadErrorDialog(
                 downloadItem,
