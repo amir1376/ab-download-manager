@@ -6,8 +6,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.yield
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -275,6 +277,30 @@ class MultipleDownloadsControllerTest {
     private data class Transfer(val url: String, val name: String, var state: TransferState = TransferState.Running)
 
     /** Models queue membership independently from the popup's remembered import results. */
+    @Test
+    fun stopAndJoinWaitsForTheAcceptedItemAndStartsNothingAfterwards() = runBlocking {
+        QueueFixture().use { fixture ->
+            val release = CompletableDeferred<Unit>()
+            fixture.afterAccept = { transfer -> if (transfer.url == link(1)) release.await() }
+            val controller = fixture.controller
+            controller.setText((1..3).joinToString("\n", transform = ::link))
+            controller.start()
+            assertEquals(listOf(link(1)), fixture.started)
+
+            val stopping = launch { controller.stopAndJoin() }
+            yield()
+            // stop all must not finish while an accepted item is still being recorded
+            assertFalse(stopping.isCompleted)
+
+            release.complete(Unit)
+            withTimeout(2000) { stopping.join() }
+            assertFalse(controller.running.value)
+            assertEquals(listOf(link(1)), fixture.started)
+            assertEquals(MultipleDownloadsController.Status.Queued, controller.items.value[0].status)
+            assertEquals(MultipleDownloadsController.Status.Pending, controller.items.value[1].status)
+        }
+    }
+
     private inner class QueueFixture : AutoCloseable {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
         val transfers = mutableListOf<Transfer>()

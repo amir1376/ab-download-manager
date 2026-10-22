@@ -6,11 +6,20 @@
 
 ### Changed
 
+- "Stop All" stays enabled while downloads are waiting in the queue or the multiple-download importer is still adding links.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- "Stop All" now stops downloads that are connecting, retrying or preparing their file, not only ones actively receiving data.
+- "Stop All" no longer lets a queue start another download while it is stopping, and waits for every queue to stop.
+- "Stop All", exiting the app and power actions now stop the multiple-download importer first, so it can't add new downloads afterwards.
+- Deleting downloads no longer lets a queue restart an item while it is being removed.
+- Deleting a download now always removes it from the list, even if its file is locked or its saved state can't be loaded.
+- Deleting several downloads continues past an item that fails and shows an error instead of silently stopping.
 
 ### Security
 
