@@ -15,16 +15,6 @@
 - Clicking "Download multiple files" while the window is open brings the existing window to the front instead of doing nothing.
 - Files started from the window no longer open a separate progress, completion or error dialog for each file; their status is shown in the window.
 - "Retry Failed" retries only failed links, so finished files are not downloaded again.
-- "Stop All" stays enabled while downloads are waiting in the queue or the multiple-download importer is still adding links.
-
-### Fixed
-
-- "Stop All" now stops downloads that are connecting, retrying or preparing their file, not only ones actively receiving data.
-- "Stop All" no longer lets a queue start another download while it is stopping, and waits for every queue to stop.
-- "Stop All", exiting the app and power actions now stop the multiple-download importer first, so it can't add new downloads afterwards.
-- Deleting downloads no longer lets a queue restart an item while it is being removed.
-- Deleting a download now always removes it from the list, even if its file is locked or its saved state can't be loaded.
-- Deleting several downloads continues past an item that fails and shows an error instead of silently stopping.
 
 ## 1.11.2-multilink.1
 

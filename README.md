@@ -31,7 +31,6 @@ This fork is maintained by **Akshat Singh Baghel ([@devil-b0y](https://github.co
 - ⏯️ **Batch controls**: Pause All, Resume All and Retry Failed, plus pause, resume and open-folder buttons for each file.
 - 🔗 **FuckingFast links**: share pages are resolved to direct download links automatically.
 - 🔁 **Download again safely**: finished links can be downloaded again without overwriting earlier files, while running links are never duplicated.
-- 🛑 **Reliable Stop All and Delete**: Stop All stops every active, retrying and waiting download, and Delete always removes the selected items.
 
 The Windows installer for this edition is available on the [fork's releases page](https://github.com/devil-b0y/ab-download-manager/releases). See [CHANGELOG.md](CHANGELOG.md) for details. All credit for the original app goes to its author and contributors; the license is unchanged.
 
