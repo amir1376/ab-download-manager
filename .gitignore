@@ -11,3 +11,6 @@ local.properties
 
 # Ignore android keystores
 *.jks
+
+# Local chat session memory
+/MEMORY.md
