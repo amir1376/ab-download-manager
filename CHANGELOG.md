@@ -6,11 +6,32 @@
 
 ### Changed
 
-- "Stop All" stays enabled while downloads are waiting in the queue or the multiple-download importer is still adding links.
-
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+### Security
+
+## 1.11.2-devilboy.1
+
+Devil Boy edition by Akshat Singh Baghel (@devil-b0y).
+
+### Added
+
+- The "Download multiple files" window now shows every file it starts with live progress, speed, size and time left, in one place.
+- Overall progress for the whole batch, with counts of downloading, waiting, finished and failed files.
+- Pause All, Resume All and Retry Failed buttons for the batch, plus pause, resume and open-folder buttons for each file.
+- Open the download folder directly from the window.
+
+### Changed
+
+- Redesigned the "Download multiple files" window to match the app theme, with clear sections for links and downloads.
+- Clicking "Download multiple files" while the window is open brings the existing window to the front instead of doing nothing.
+- Files started from the window no longer open a separate progress, completion or error dialog for each file; their status is shown in the window.
+- "Retry Failed" retries only failed links, so finished files are not downloaded again.
+- "Stop All" stays enabled while downloads are waiting in the queue or the multiple-download importer is still adding links.
 
 ### Fixed
 
@@ -20,8 +41,6 @@
 - Deleting downloads no longer lets a queue restart an item while it is being removed.
 - Deleting a download now always removes it from the list, even if its file is locked or its saved state can't be loaded.
 - Deleting several downloads continues past an item that fails and shows an error instead of silently stopping.
-
-### Security
 
 ## 1.11.2-multilink.1
 

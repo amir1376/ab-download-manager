@@ -20,6 +20,21 @@
 
 [AB Download Manager](https://abdownloadmanager.com) is a desktop app that helps you manage and organize your downloads more efficiently than ever before.
 
+## Devil Boy Edition
+
+This fork is maintained by **Akshat Singh Baghel ([@devil-b0y](https://github.com/devil-b0y))** and builds on the official AB Download Manager with extra features for downloading many files at once.
+
+<a href="https://github.com/devil-b0y/ab-download-manager/releases"><img src="https://img.shields.io/badge/Devil%20Boy%20Edition-Releases-2a2f36?logo=github&logoColor=fff&style=flat-square" alt="Devil Boy Edition Releases" height="28" /></a>
+
+- 📋 **Download multiple files**: paste 20, 30 or more links (plain or Markdown) into one window and every file is fetched and started in order.
+- 📊 **One window for the whole batch**: live progress, speed, size and time left for every file, overall batch progress, and no extra popup per file.
+- ⏯️ **Batch controls**: Pause All, Resume All and Retry Failed, plus pause, resume and open-folder buttons for each file.
+- 🔗 **FuckingFast links**: share pages are resolved to direct download links automatically.
+- 🔁 **Download again safely**: finished links can be downloaded again without overwriting earlier files, while running links are never duplicated.
+- 🛑 **Reliable Stop All and Delete**: Stop All stops every active, retrying and waiting download, and Delete always removes the selected items.
+
+The Windows installer for this edition is available on the [fork's releases page](https://github.com/devil-b0y/ab-download-manager/releases). See [CHANGELOG.md](CHANGELOG.md) for details. All credit for the original app goes to its author and contributors; the license is unchanged.
+
 ## Features
 
 - ⚡️ Faster Download Speed
