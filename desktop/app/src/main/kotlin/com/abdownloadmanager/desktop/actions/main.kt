@@ -51,7 +51,13 @@ private val activeQueuesFlow = downloadSystem
     )
 
 // desktop
-val stopAllAction = createDesktopStopAllAction(scope, downloadSystem, appComponent, activeQueuesFlow)
+val stopAllAction = createDesktopStopAllAction(
+    scope = scope,
+    downloadSystem = downloadSystem,
+    desktopDownloadDialogManager = appComponent,
+    activeQueuesFlow = activeQueuesFlow,
+    multipleDownloads = appComponent.multipleDownloads,
+)
 val newDownloadAction = createNewDownloadAction(appComponent)
 val multipleDownloadsAction = simpleAction(Res.string.download_multiple_files.asStringSource(), MyIcons.download) {
     appComponent.openMultipleDownloads()

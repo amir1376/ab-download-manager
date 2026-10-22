@@ -28,6 +28,9 @@ import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.utils.OnDuplicateStrategy
 import ir.amirab.util.suspendGuardedEntry
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -180,8 +183,11 @@ class DownloadSystem(
     }
 
     suspend fun stopAnything() {
-        queueManager.getAll().forEach {
-            it.stop()
+        // deactivate queues first so none of them can start another download while we are stopping
+        coroutineScope {
+            queueManager.getAll().map {
+                async { it.stopAsync() }
+            }.awaitAll()
         }
         manualDownloadQueue.clearQueue()
         downloadManager.stopAll()

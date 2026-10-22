@@ -200,6 +200,12 @@ class AppComponent(
         )
     }
 
+    /** Stops the link importer first so it can't add new downloads, then stops every queue and download. */
+    suspend fun stopAllDownloads() {
+        multipleDownloads.stopAndJoin()
+        downloadSystem.stopAnything()
+    }
+
     fun openMultipleDownloads() { _showMultipleDownloads.value = true }
 
     fun closeMultipleDownloads() {
@@ -1111,7 +1117,7 @@ class AppComponent(
     }
 
     suspend fun exitApp() {
-        downloadSystem.stopAnything()
+        stopAllDownloads()
         exitProcess(0)
     }
 
@@ -1295,7 +1301,7 @@ class AppComponent(
                 powerActionReason = config.powerActionReason,
                 close = ::dismissPowerAction,
                 onBeforePowerAction = {
-                    downloadSystem.stopAnything()
+                    stopAllDownloads()
                 },
             )
         }

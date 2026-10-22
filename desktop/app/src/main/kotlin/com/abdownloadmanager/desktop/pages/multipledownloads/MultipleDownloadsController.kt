@@ -6,6 +6,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,6 +94,11 @@ class MultipleDownloadsController<T>(
 
     fun stop() {
         job?.cancel()
+    }
+
+    /** Stops importing and waits until an item that was already being added has been recorded. */
+    suspend fun stopAndJoin() {
+        job?.cancelAndJoin()
     }
 
     /** The queue is authoritative; an earlier import never permanently blocks a link. */

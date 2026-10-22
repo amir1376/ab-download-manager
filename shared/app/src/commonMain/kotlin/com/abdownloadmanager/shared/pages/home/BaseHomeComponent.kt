@@ -39,6 +39,7 @@ import ir.amirab.util.coroutines.combine
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.osfileutil.FileUtils
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -109,11 +110,29 @@ abstract class BaseHomeComponent(
     fun confirmDelete(promptState: DeletePromptState) {
         scope.launch {
             val selectionList = promptState.downloadList
-            for (id in selectionList) {
-                downloadSystem.removeDownload(
-                    id = id,
-                    alsoRemoveFile = promptState.alsoDeleteFile,
-                    context = RemovedBy(User),
+            // one failing item must not prevent the rest of the selection from being deleted
+            val failures = selectionList.mapNotNull { id ->
+                try {
+                    downloadSystem.removeDownload(
+                        id = id,
+                        alsoRemoveFile = promptState.alsoDeleteFile,
+                        context = RemovedBy(User),
+                    )
+                    null
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    e
+                }
+            }
+            if (failures.isNotEmpty()) {
+                notificationSender.sendNotification(
+                    Res.string.delete,
+                    Res.string.error.asStringSource(),
+                    "Could not delete ${failures.size} of ${selectionList.size} downloads: ${
+                        failures.first().let { it.message ?: it::class.simpleName }
+                    }".asStringSource(),
+                    NotificationType.Error,
                 )
             }
         }

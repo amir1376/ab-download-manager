@@ -166,6 +166,8 @@ class ManualDownloadQueue(
 
     private fun onDownloadRemoved(id: Long) {
         removeFromQueue(id)
+        // a removed item may have been holding an active slot
+        shake()
     }
 
 
@@ -266,7 +268,10 @@ class ManualDownloadQueue(
         return downloadableItemFromQueue?.let {
             addAnActiveItem(it)
             scope.launch {
-                downloadEvents.startJob(it, ResumedBy(me))
+                // the queue may have been cleared (e.g. by stop all) before this coroutine runs
+                if (it in activeItems) {
+                    downloadEvents.startJob(it, ResumedBy(me))
+                }
             }
             true
         } ?: false

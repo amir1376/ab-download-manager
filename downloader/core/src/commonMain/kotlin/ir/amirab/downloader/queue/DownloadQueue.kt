@@ -13,6 +13,7 @@ import ir.amirab.util.coroutines.debounce
 import ir.amirab.util.guardedEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.util.Collections
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,7 +44,8 @@ class DownloadQueue(
     private val scheduleTimes: ScheduleTimes
         get() = getQueueModel().scheduledTimes
 
-    private val activeItems = mutableSetOf<Long>()
+    // accessed from the event listener, queue coroutines and stop calls
+    private val activeItems: MutableSet<Long> = Collections.synchronizedSet(mutableSetOf())
     private val canceledItems = mutableSetOf<Long>()
     private val trimmedItems = mutableSetOf<Long>()
 
@@ -251,6 +253,8 @@ class DownloadQueue(
 
     private fun onDownloadRemoved(id: Long) {
         removeFromQueue(id)
+        // a removed item may have been holding an active slot
+        shake()
     }
 
     fun stop() {
@@ -266,8 +270,8 @@ class DownloadQueue(
         if (stopping) return
         setActive(false)
         stopping = true
-        //active item is a synchronized list so we should iterate over it FAST!
-        val stopJobs = activeItems.map {
+        val itemsToStop = synchronized(activeItems) { activeItems.toList() }
+        val stopJobs = itemsToStop.map {
             scope.async {
                 downloadEvents.stopJob(it, StoppedBy(me))
             }
@@ -401,7 +405,7 @@ class DownloadQueue(
 
     private val me by lazy { Queue(id) }
     private fun removeAnActiveQueueItem(): Boolean {
-        val id = activeItems.lastOrNull() ?: return false
+        val id = synchronized(activeItems) { activeItems.lastOrNull() } ?: return false
         trimmedItems.add(id)
         val result = activeItems.remove(id)
         scope.launch { downloadEvents.stopJob(id, StoppedBy(me)) }
@@ -424,7 +428,12 @@ class DownloadQueue(
         return getDownloadableItemFromQueue()?.let {
             activeItems.add(it)
             scope.launch {
-                downloadEvents.startJob(it, ResumedBy(me))
+                // the queue may have been stopped, or the item removed, before this coroutine runs
+                if (isQueueActive && it in activeItems) {
+                    downloadEvents.startJob(it, ResumedBy(me))
+                } else {
+                    activeItems.remove(it)
+                }
             }
             true
         } ?: false

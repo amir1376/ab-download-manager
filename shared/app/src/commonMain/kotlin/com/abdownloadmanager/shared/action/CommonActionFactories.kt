@@ -340,19 +340,25 @@ fun createStopAllAction(
     scope: CoroutineScope,
     downloadSystem: DownloadSystem,
     extraJobs: () -> Unit,
-    activeQueuesFlow: StateFlow<List<DownloadQueue>>
+    activeQueuesFlow: StateFlow<List<DownloadQueue>>,
+    // platform work that can add new downloads (e.g. a running link importer)
+    hasPendingWorkFlow: StateFlow<Boolean> = MutableStateFlow(false),
+    stopPendingWork: suspend () -> Unit = {},
 ): AnAction {
     return simpleAction(
         Res.string.stop_all.asStringSource(),
         MyIcons.stop,
         checkEnable = combineStateFlows(
             downloadSystem.downloadMonitor.activeDownloadCount,
-            activeQueuesFlow
-        ) { downloadCount, activeQueues ->
-            downloadCount > 0 || activeQueues.isNotEmpty()
+            activeQueuesFlow,
+            downloadSystem.manualDownloadQueue.pendingItems,
+            hasPendingWorkFlow,
+        ) { downloadCount, activeQueues, waitingDownloads, hasPendingWork ->
+            downloadCount > 0 || activeQueues.isNotEmpty() || waitingDownloads.isNotEmpty() || hasPendingWork
         }
     ) {
         scope.launch {
+            stopPendingWork()
             downloadSystem.stopAnything()
             extraJobs()
         }

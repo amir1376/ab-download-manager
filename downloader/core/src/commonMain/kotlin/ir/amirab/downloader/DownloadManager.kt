@@ -12,9 +12,11 @@ import ir.amirab.downloader.utils.DuplicateFilterByPath
 import ir.amirab.downloader.utils.EmptyFileCreator
 import ir.amirab.downloader.utils.FileNameUtil
 import ir.amirab.downloader.utils.OnDuplicateStrategy.*
+import ir.amirab.downloader.utils.printStackIfNOtUsual
 import ir.amirab.util.FileNameValidator
 import ir.amirab.util.PathValidator
 import ir.amirab.util.suspendGuardedEntry
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
@@ -26,6 +28,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import ir.amirab.downloader.utils.speedlimiter.SpeedLimiter
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 class DownloadManager(
     val dlListDb: IDownloadListDb,
@@ -157,29 +160,43 @@ class DownloadManager(
         alsoRemoveFile: (IDownloadItem) -> Boolean,
         context: DownloadItemContext = EmptyContext,
     ) {
-        kotlin.runCatching { pause(id) }
-        val itemToDelete = dlListDb.getById(id) ?: return
-        val job = getDownloadJob(id) ?: run {
-            createJob(itemToDelete).apply { boot() }
+        // while an item is being removed, queues must not be able to start it again
+        removingIds.add(id)
+        try {
+            kotlin.runCatching { pause(id) }
+            val itemToDelete = dlListDb.getById(id) ?: return
+            val job = getDownloadJob(id) ?: createJob(itemToDelete)
+            contextContainer.updateContext(id) { it + context }
+            // file cleanup is best effort. a locked file or a job that can't boot
+            // must not leave a deleted item in the list
+            try {
+                job.boot()
+                job.downloadRemoved(
+                    removeOutputFile = if (itemToDelete.status == DownloadStatus.Completed) {
+                        alsoRemoveFile(itemToDelete)
+                    } else {
+                        // always remove file if download is not finished!
+                        true
+                    },
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                e.printStackIfNOtUsual()
+            }
+            deleteJob(job.id)
+            dlListDb.remove(itemToDelete)
+            partListDb.removeParts(id)
+            listOfJobsEvents.tryEmit(
+                DownloadManagerEvents.OnJobRemoved(itemToDelete, contextContainer.getContext(id))
+            )
+            contextContainer.removeContext(id)
+        } finally {
+            removingIds.remove(id)
         }
-        // at this point: job will be created (and booted) if it was not created before
-        contextContainer.updateContext(id) { it + context }
-        job.downloadRemoved(
-            removeOutputFile = if (itemToDelete.status == DownloadStatus.Completed) {
-                alsoRemoveFile(itemToDelete)
-            } else {
-                // always remove file if download is not finished!
-                true
-            },
-        )
-        deleteJob(job.id)
-        dlListDb.remove(itemToDelete)
-        partListDb.removeParts(id)
-        listOfJobsEvents.tryEmit(
-            DownloadManagerEvents.OnJobRemoved(itemToDelete, contextContainer.getContext(id))
-        )
-        contextContainer.removeContext(id)
     }
+
+    private val removingIds: MutableSet<Long> = ConcurrentHashMap.newKeySet()
 
     private fun deleteJob(
         id: Long,
@@ -202,6 +219,7 @@ class DownloadManager(
     }
 
     suspend fun resume(id: Long, context: DownloadItemContext = EmptyContext) {
+        if (id in removingIds) return
         val job = getDownloadJob(id) ?: run {
             dlListDb.getById(id)?.let {
                 createJob(it)
@@ -310,6 +328,7 @@ class DownloadManager(
     }
 
     override fun canActivateJob(id: Long): Boolean {
+        if (id in removingIds) return false
         val job = downloadJobs.find { id == it.id }
         val status = job?.status?.value
 //        println("job status $status")
@@ -319,8 +338,10 @@ class DownloadManager(
     suspend fun stopAll(
         context: DownloadItemContext = EmptyContext,
     ) {
+        // include resuming, retrying and preparing jobs, and jobs whose resume has
+        // just been requested but have not reported a status yet
         downloadJobs.filter {
-            it.status.value == DownloadJobStatus.Downloading
+            it.status.value is DownloadJobStatus.IsActive || it.isDownloadActive.value
         }.map {
             scope.async {
                 pause(it.id, context)
