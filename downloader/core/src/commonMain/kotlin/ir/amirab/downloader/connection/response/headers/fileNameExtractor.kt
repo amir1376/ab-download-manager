@@ -29,10 +29,10 @@ fun extractFileNameFromContentDisposition(contentDispositionValue: String): Stri
     return null
 }
 
-private val asciiFileNameRegex = """filename=(["']?)(?<fileName>.*?[^\\])\1(?:; ?|$)"""
+private val asciiFileNameRegex = """filename=(["']?)(?<fileName>.*?[^\\])\1[ \t]*(?:; ?|$)"""
     .toRegex(RegexOption.IGNORE_CASE)
 
-private val utf8FileNameRegex = """filename\*=UTF-8''(?<fileName>[^;\s]+)(?:; ?|$)"""
+private val utf8FileNameRegex = """filename\*=UTF-8''(?<fileName>[^;\s]+)[ \t]*(?:; ?|$)"""
     .toRegex(RegexOption.IGNORE_CASE)
 
 /**
