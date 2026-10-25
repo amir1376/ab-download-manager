@@ -35,6 +35,7 @@ abstract class LinkChecker<
 
     abstract fun infoUpdated(responseInfo: ResponseInfo?)
     abstract suspend fun actualCheck(credentials: Credentials): ResponseInfo
+    open fun isLinkSupported(link: String): Boolean = HttpUrlUtils.isValidUrl(link)
     fun isValidCredentials(credentials: Credentials): Boolean {
         return runCatching {
             credentials.validateCredentials()
@@ -57,7 +58,7 @@ abstract class LinkChecker<
     suspend fun check() {
         val downloadCredentials = credentials.value
         val link = downloadCredentials.link
-        val isValidUrl = HttpUrlUtils.isValidUrl(link)
+        val isValidUrl = isLinkSupported(link)
         setResult(null)
         if (link.isBlank() || !isValidUrl) {
             return

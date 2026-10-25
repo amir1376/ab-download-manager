@@ -1,5 +1,8 @@
 package com.abdownloadmanager.android.di
 
+import ir.amirab.downloader.downloaditem.torrent.TorrentDownloader
+import com.abdownloadmanager.shared.downloaderinui.torrent.TorrentDownloaderInUi
+
 import AndroidDirectLinkUpdateApplier
 import android.app.Application
 import android.content.Context
@@ -223,7 +226,13 @@ val downloaderModule = module {
         HLSDownloader(inject())
     }
     single {
+        TorrentDownloader(inject())
+    }
+    single {
         HLSDownloaderInUi(get(), get())
+    }
+    single {
+        TorrentDownloaderInUi(get(), get())
     }
     single {
         HttpDownloader(inject())
@@ -233,6 +242,7 @@ val downloaderModule = module {
     }
     single {
         DownloaderInUiRegistry().apply {
+            add(get<TorrentDownloaderInUi>())
             add(get<HttpDownloaderInUi>())
             add(get<HLSDownloaderInUi>())
         }
@@ -241,6 +251,7 @@ val downloaderModule = module {
         DownloaderRegistry().apply {
             add(get<HttpDownloader>())
             add(get<HLSDownloader>())
+            add(get<TorrentDownloader>())
         }
     }
     single {
