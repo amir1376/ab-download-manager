@@ -1,0 +1,33 @@
+name: torrent-ci
+on:
+  push:
+    branches: ["torrent-support"]
+jobs:
+  android-debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JBR
+        uses: actions/setup-java@v4
+        with:
+          distribution: "jetbrains"
+          java-package: "jdk"
+          java-version: "25"
+          check-latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: torrent-ci-gradle-${{ hashFiles('**/*.gradle.kts', 'gradle/libs.versions.toml') }}
+          restore-keys: torrent-ci-gradle-
+      - name: Build debug APK
+        run: ./gradlew :android:app:assembleDebug --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: magnetor-debug-apk
+          path: android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
