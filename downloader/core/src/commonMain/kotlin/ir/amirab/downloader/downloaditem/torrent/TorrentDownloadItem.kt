@@ -6,7 +6,6 @@ import ir.amirab.downloader.downloaditem.DownloadStatus
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.downloader.downloaditem.http.IHttpBasedDownloadCredentials
-import ir.amirab.util.HttpUrlUtils
 import kotlinx.serialization.Serializable
 @Serializable
 data class TorrentDownloadItem(
@@ -84,7 +83,7 @@ data class TorrentDownloadItem(
     }
 
     override fun validateCredentials() {
-        HttpUrlUtils.isValidUrl(link)
+        require(TorrentLinks.isSupported(link)) { "not a torrent link" }
     }
 
     companion object {

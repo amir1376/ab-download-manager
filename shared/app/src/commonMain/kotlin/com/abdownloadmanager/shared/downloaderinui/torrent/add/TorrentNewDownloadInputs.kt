@@ -83,7 +83,6 @@ class TorrentNewDownloadInputs(
     override val downloadJobConfig: StateFlow<DownloadJobExtraConfig?> = downloadUiChecker.responseInfo.mapStateFlow {
         it?.let {
             TorrentDownloadJobExtraConfig(
-                hlsManifest = it.hlsManifest
             )
         }
     }

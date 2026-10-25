@@ -565,15 +565,7 @@ class TorrentDownloadJob(
     }
 
     private suspend fun initialParts(): TorrentResponseInfo {
-        val response = client.connect(
-            downloadItem, null, null
-        ).use {
-            TorrentResponseInfo.fromConnection(it)
-        }
-        updateParts(
-            response.hlsManifest
-        )
-        return response
+        throw UnsupportedOperationException("Torrent engine is not implemented yet")
     }
 
     suspend fun cancelDownloadScope() {
@@ -650,10 +642,6 @@ class TorrentDownloadJob(
 
     override suspend fun extraConfigsReceived(config: DownloadJobExtraConfig) {
         if (config !is TorrentDownloadJobExtraConfig) return
-        config.hlsManifest?.let {
-            updateParts(it)
-            saveParts()
-        }
     }
 }
 

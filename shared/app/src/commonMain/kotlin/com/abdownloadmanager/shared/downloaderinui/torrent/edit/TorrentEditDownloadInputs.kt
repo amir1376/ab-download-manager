@@ -182,7 +182,7 @@ class TorrentEditDownloadInputs(
     val duration = linkChecker.duration
     override val downloadJobConfig: StateFlow<DownloadJobExtraConfig?> = linkChecker.responseInfo.mapStateFlow {
         it?.let {
-            TorrentDownloadJobExtraConfig(it.hlsManifest)
+            TorrentDownloadJobExtraConfig()
         }
     }
 
