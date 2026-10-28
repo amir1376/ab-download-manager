@@ -9,6 +9,9 @@ import com.abdownloadmanager.desktop.actions.gotoSettingsAction
 import com.abdownloadmanager.desktop.actions.newDownloadFromClipboardAction
 import com.abdownloadmanager.desktop.actions.requestExitAction
 import com.abdownloadmanager.desktop.actions.showDownloadList
+import com.abdownloadmanager.desktop.actions.startQueueGroupAction
+import com.abdownloadmanager.desktop.actions.stopAllAction
+import com.abdownloadmanager.desktop.actions.stopQueueGroupAction
 import com.abdownloadmanager.desktop.actions.useSpeedLimiterAction
 import com.abdownloadmanager.desktop.pages.about.ShowAboutDialog
 import com.abdownloadmanager.desktop.pages.addDownload.ShowAddDownloadDialogs
@@ -212,6 +215,10 @@ private fun SystemTray(
                 +showDownloadList
                 separator()
                 +newDownloadFromClipboardAction
+                separator()
+                +startQueueGroupAction
+                +stopQueueGroupAction
+                +stopAllAction
                 separator()
                 +useSpeedLimiterAction
                 +gotoSettingsAction
