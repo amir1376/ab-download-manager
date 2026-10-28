@@ -9,6 +9,7 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.repository.BaseAppRepository
 import com.abdownloadmanager.shared.util.BaseComponent
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
@@ -149,7 +150,7 @@ abstract class BasePerHostSettingsComponent(
                             }
                         ),
                         describe = {
-                            "".asStringSource()
+                            EmptyStringSource
                         }
                     ),
                 )
@@ -210,7 +211,7 @@ abstract class BasePerHostSettingsComponent(
                             }
                         ),
                         describe = {
-                            "".asStringSource()
+                            EmptyStringSource
                         }
                     ),
                     StringConfigurable(
@@ -225,7 +226,7 @@ abstract class BasePerHostSettingsComponent(
                             }
                         ),
                         describe = {
-                            "".asStringSource()
+                            EmptyStringSource
                         }
                     ),
                 )
@@ -244,7 +245,7 @@ abstract class BasePerHostSettingsComponent(
                             }
                         ),
                         describe = {
-                            "".asStringSource()
+                            EmptyStringSource
                         }
                     ),
                 )

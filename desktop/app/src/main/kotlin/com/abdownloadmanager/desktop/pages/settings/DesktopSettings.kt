@@ -7,6 +7,7 @@ import com.abdownloadmanager.desktop.utils.renderapi.RenderApi
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
+import com.abdownloadmanager.shared.util.asToggledStringSource
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.platform.Platform
@@ -20,27 +21,19 @@ object DesktopSettings {
             description = Res.string.settings_compact_top_bar_description.asStringSource(),
             backedBy = appSettings.mergeTopBarWithTitleBar,
             describe = {
-                if (it) {
-                    Res.string.enabled.asStringSource()
-                } else {
-                    Res.string.disabled.asStringSource()
-                }
+                it.asToggledStringSource()
             },
         )
     }
 
     fun useNativeMenuBarConfig(appSettings: AppSettingsStorage): BooleanConfigurable? {
-        if (Platform.Companion.isMac().not()) return null
+        if (Platform.isMac().not()) return null
         return BooleanConfigurable(
             title = Res.string.settings_use_native_menu_bar.asStringSource(),
             description = Res.string.settings_use_native_menu_bar_description.asStringSource(),
             backedBy = appSettings.useNativeMenuBar,
             describe = {
-                if (it) {
-                    Res.string.enabled.asStringSource()
-                } else {
-                    Res.string.disabled.asStringSource()
-                }
+                it.asToggledStringSource()
             },
         )
     }
@@ -51,11 +44,7 @@ object DesktopSettings {
             description = Res.string.settings_use_system_tray_description.asStringSource(),
             backedBy = appSettings.useSystemTray,
             describe = {
-                if (it) {
-                    Res.string.enabled.asStringSource()
-                } else {
-                    Res.string.disabled.asStringSource()
-                }
+                it.asToggledStringSource()
             },
         )
     }

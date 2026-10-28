@@ -2,8 +2,8 @@ package com.abdownloadmanager.android.ui.configurable.android.item
 
 import com.abdownloadmanager.android.pages.onboarding.permissions.AppPermission
 import com.abdownloadmanager.shared.ui.configurable.Configurable
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -11,7 +11,7 @@ class PermissionConfigurable(
     title: StringSource,
     description: StringSource,
     backedBy: MutableStateFlow<AppPermission>,
-    describe: () -> StringSource = { "".asStringSource() },
+    describe: () -> StringSource = { EmptyStringSource },
     enabled: StateFlow<Boolean> = DefaultEnabledValue,
     visible: StateFlow<Boolean> = DefaultVisibleValue,
 ) : Configurable<AppPermission>(

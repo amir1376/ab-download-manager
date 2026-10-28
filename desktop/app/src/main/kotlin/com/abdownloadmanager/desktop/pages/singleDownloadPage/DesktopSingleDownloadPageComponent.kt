@@ -86,10 +86,7 @@ class DesktopSingleDownloadComponent(
                     }
                 ),
                 describe = {
-                    when (it) {
-                        true -> Res.string.enabled
-                        false -> Res.string.disabled
-                    }.asStringSource()
+                    it.asToggledStringSource()
                 },
             ),
             BooleanConfigurable(
@@ -102,10 +99,7 @@ class DesktopSingleDownloadComponent(
                     unMap = { it }
                 ),
                 describe = {
-                    when (it) {
-                        true -> Res.string.enabled
-                        false -> Res.string.disabled
-                    }.asStringSource()
+                    it.asToggledStringSource()
                 },
             ),
         )

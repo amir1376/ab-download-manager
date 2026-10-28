@@ -28,11 +28,11 @@ import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.pages.checksum.ChecksumStatus
 import com.abdownloadmanager.shared.pages.checksum.DownloadItemWithChecksum
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
-import com.abdownloadmanager.shared.ui.widget.ActionButton
 import com.abdownloadmanager.shared.ui.widget.Help
 import com.abdownloadmanager.shared.ui.widget.PrimaryMainActionButton
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import com.abdownloadmanager.shared.util.FileChecksum
 import com.abdownloadmanager.shared.util.FileChecksumAlgorithm
 import com.abdownloadmanager.shared.util.FileIconProvider
@@ -336,7 +336,7 @@ private data object FileChecksumTableCellRenderers {
                 description = Res.string.download_item_settings_file_checksum_description.asStringSource(),
                 backedBy = editChecksumFlow,
                 describe = {
-                    "".asStringSource()
+                    EmptyStringSource
                 },
             )
         }

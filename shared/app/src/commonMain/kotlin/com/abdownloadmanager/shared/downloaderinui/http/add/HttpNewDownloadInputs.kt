@@ -13,6 +13,7 @@ import com.abdownloadmanager.shared.util.FileChecksum
 import com.abdownloadmanager.shared.util.convertPositiveSpeedToHumanReadable
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsItem
 import com.abdownloadmanager.shared.downloaderinui.http.applyToHttpDownload
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import ir.amirab.downloader.connection.response.HttpResponseInfo
 import ir.amirab.downloader.downloaditem.DownloadJobExtraConfig
 import ir.amirab.downloader.downloaditem.DownloadStatus
@@ -108,7 +109,7 @@ class HttpNewDownloadInputs(
             Res.string.download_item_settings_file_checksum.asStringSource(),
             Res.string.download_item_settings_file_checksum_description.asStringSource(),
             backedBy = fileChecksum,
-            describe = { "".asStringSource() }
+            describe = { EmptyStringSource }
         ),
         IntConfigurable(
             Res.string.settings_download_thread_count.asStringSource(),
@@ -144,7 +145,7 @@ class HttpNewDownloadInputs(
                 }, scope
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -159,7 +160,7 @@ class HttpNewDownloadInputs(
                 }, scope
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -174,7 +175,7 @@ class HttpNewDownloadInputs(
                 }
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -189,7 +190,7 @@ class HttpNewDownloadInputs(
                 }
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         )
     )

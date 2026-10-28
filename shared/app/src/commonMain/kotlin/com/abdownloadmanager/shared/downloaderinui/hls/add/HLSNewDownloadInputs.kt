@@ -11,6 +11,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.FileChecksumConfigurabl
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ToggleableSpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.util.FileChecksum
@@ -114,7 +115,7 @@ class HLSNewDownloadInputs(
             Res.string.download_item_settings_file_checksum.asStringSource(),
             Res.string.download_item_settings_file_checksum_description.asStringSource(),
             backedBy = fileChecksum,
-            describe = { "".asStringSource() }
+            describe = { EmptyStringSource }
         ),
         IntConfigurable(
             Res.string.settings_download_thread_count.asStringSource(),
@@ -150,7 +151,7 @@ class HLSNewDownloadInputs(
                 }, scope
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -165,7 +166,7 @@ class HLSNewDownloadInputs(
                 }, scope
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -180,7 +181,7 @@ class HLSNewDownloadInputs(
                 }
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -195,7 +196,7 @@ class HLSNewDownloadInputs(
                 }
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         )
     )

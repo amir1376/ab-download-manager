@@ -33,6 +33,7 @@ import com.abdownloadmanager.shared.ui.widget.table.customtable.CellSize
 import com.abdownloadmanager.shared.ui.widget.table.customtable.Table
 import com.abdownloadmanager.shared.ui.widget.table.customtable.TableCell
 import com.abdownloadmanager.shared.ui.widget.table.customtable.TableState
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import com.abdownloadmanager.shared.util.FileChecksum
 import com.abdownloadmanager.shared.util.FileChecksumAlgorithm
 import com.abdownloadmanager.shared.util.div
@@ -67,7 +68,7 @@ fun FileChecksumPage(component: DesktopFileChecksumComponent) {
                     content = it,
                 )
             },
-            wrapItem = { index, item, content ->
+            wrapItem = { _, _, content ->
                 Box(Modifier.padding(horizontal = horizontalPadding).let {
                     val mutableInteractionSource = remember { MutableInteractionSource() }
                     it.indication(mutableInteractionSource, LocalIndication.current)
@@ -343,7 +344,7 @@ private data object FileChecksumTableCellRenderers {
                 description = Res.string.download_item_settings_file_checksum_description.asStringSource(),
                 backedBy = editChecksumFlow,
                 describe = {
-                    "".asStringSource()
+                    EmptyStringSource
                 },
             )
         }

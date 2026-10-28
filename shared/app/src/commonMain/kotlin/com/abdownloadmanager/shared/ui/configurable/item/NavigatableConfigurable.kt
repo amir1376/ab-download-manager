@@ -1,8 +1,8 @@
 package com.abdownloadmanager.shared.ui.configurable.item
 
 import com.abdownloadmanager.shared.ui.configurable.Configurable
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import ir.amirab.util.compose.StringSource
-import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -16,7 +16,7 @@ class NavigatableConfigurable(
     title = title,
     description = description,
     backedBy = MutableStateFlow(Unit),
-    describe = { "".asStringSource() },
+    describe = { EmptyStringSource },
     enabled = enabled,
     visible = visible,
 ) {

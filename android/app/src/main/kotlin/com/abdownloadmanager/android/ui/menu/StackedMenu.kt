@@ -13,8 +13,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import ir.amirab.util.compose.action.MenuItem
-import ir.amirab.util.compose.asStringSource
 
 @Composable
 fun rememberMenuStack(
@@ -33,7 +33,7 @@ fun rememberMenuStack(
         StackMenuState(
             mutableStateListOf(
                 MenuItem.SubMenu(
-                    title = "".asStringSource(),
+                    title = EmptyStringSource,
                     items = menu,
                 )
             )

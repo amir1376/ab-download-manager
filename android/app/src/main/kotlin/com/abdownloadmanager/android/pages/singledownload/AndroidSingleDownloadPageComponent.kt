@@ -11,6 +11,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.util.DownloadItemOpener
 import com.abdownloadmanager.shared.util.DownloadSystem
 import com.abdownloadmanager.shared.util.FileIconProvider
+import com.abdownloadmanager.shared.util.asToggledStringSource
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.flow.mapTwoWayStateFlow
@@ -69,10 +70,7 @@ class AndroidSingleDownloadComponent(
                     unMap = { it }
                 ),
                 describe = {
-                    when (it) {
-                        true -> Res.string.enabled
-                        false -> Res.string.disabled
-                    }.asStringSource()
+                    it.asToggledStringSource()
                 },
             ),
         )

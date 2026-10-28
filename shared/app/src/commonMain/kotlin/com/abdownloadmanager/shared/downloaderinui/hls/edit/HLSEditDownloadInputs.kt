@@ -14,6 +14,7 @@ import com.abdownloadmanager.shared.ui.configurable.item.FileChecksumConfigurabl
 import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.ToggleableSpeedLimitConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import com.abdownloadmanager.shared.util.SizeAndSpeedUnitProvider
 import com.abdownloadmanager.shared.util.ThreadCountLimitation
 import com.abdownloadmanager.shared.util.FileChecksum
@@ -82,7 +83,7 @@ class HLSEditDownloadInputs(
                 map = {
                     it.fileChecksum?.let {
                         runCatching {
-                            FileChecksum.Companion.fromString(it)
+                            FileChecksum.fromString(it)
                         }.onFailure {
                             println(it.printStackTrace())
                         }.getOrNull()
@@ -92,7 +93,7 @@ class HLSEditDownloadInputs(
                     copy(fileChecksum = it?.toString())
                 }
             ),
-            describe = { "".asStringSource() }
+            describe = { EmptyStringSource }
         ),
         IntConfigurable(
             Res.string.settings_download_thread_count.asStringSource(),
@@ -130,7 +131,7 @@ class HLSEditDownloadInputs(
                 }
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -145,7 +146,7 @@ class HLSEditDownloadInputs(
                 }
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -160,7 +161,7 @@ class HLSEditDownloadInputs(
                 }
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
         StringConfigurable(
@@ -175,7 +176,7 @@ class HLSEditDownloadInputs(
                 }
             ),
             describe = {
-                "".asStringSource()
+                EmptyStringSource
             }
         ),
     )

@@ -8,6 +8,8 @@ import com.abdownloadmanager.shared.ui.configurable.item.IntConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.StringConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.TimeConfigurable
 import com.abdownloadmanager.shared.util.BaseComponent
+import com.abdownloadmanager.shared.util.EmptyStringSource
+import com.abdownloadmanager.shared.util.asToggledStringSource
 import com.abdownloadmanager.shared.util.newScopeBasedOn
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.queue.DownloadQueue
@@ -109,8 +111,7 @@ class QueueConfigurationComponent(
                             },
                         ),
                         describe = {
-                            if (it) Res.string.enabled.asStringSource()
-                            else Res.string.disabled.asStringSource()
+                            it.asToggledStringSource()
                         },
                     ),
                 )
@@ -120,8 +121,8 @@ class QueueConfigurationComponent(
                 nestedVisible = enabledSchedulerFlow,
                 mainConfigurable = BooleanConfigurable(
                     Res.string.queue_enable_scheduler.asStringSource(),
-                    description = "".asStringSource(),
-                    describe = { "".asStringSource() },
+                    description = EmptyStringSource,
+                    describe = { EmptyStringSource },
                     backedBy = createMutableStateFlowFromStateFlow(
                         flow = enabledSchedulerFlow,
                         scope = scope,
@@ -153,12 +154,12 @@ class QueueConfigurationComponent(
                         validate = {
                             it.isNotEmpty()
                         },
-                        describe = { "".asStringSource() },
+                        describe = { EmptyStringSource },
                     ),
                     BooleanConfigurable(
                         Res.string.queue_scheduler_enable_auto_start_time.asStringSource(),
-                        description = "".asStringSource(),
-                        describe = { "".asStringSource() },
+                        description = EmptyStringSource,
+                        describe = { EmptyStringSource },
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = enabledStartTimeFlow,
@@ -171,7 +172,7 @@ class QueueConfigurationComponent(
                     ),
                     TimeConfigurable(
                         Res.string.queue_scheduler_auto_start_time.asStringSource(),
-                        "".asStringSource(),
+                        EmptyStringSource,
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = downloadQueue.queueModel.mapStateFlow() {
@@ -188,8 +189,8 @@ class QueueConfigurationComponent(
                     ),
                     BooleanConfigurable(
                         Res.string.queue_scheduler_enable_auto_stop_time.asStringSource(),
-                        description = "".asStringSource(),
-                        describe = { "".asStringSource() },
+                        description = EmptyStringSource,
+                        describe = { EmptyStringSource },
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = enabledEndTimeFlow,
@@ -202,7 +203,7 @@ class QueueConfigurationComponent(
                     ),
                     TimeConfigurable(
                         Res.string.queue_scheduler_auto_stop_time.asStringSource(),
-                        "".asStringSource(),
+                        EmptyStringSource,
                         backedBy = createMutableStateFlowFromStateFlow(
                             scope = scope,
                             flow = downloadQueue.queueModel.mapStateFlow() {

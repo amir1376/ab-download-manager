@@ -7,6 +7,8 @@ import com.abdownloadmanager.android.util.pagemanager.PermissionsPageManager
 import com.abdownloadmanager.resources.Res
 import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.NavigatableConfigurable
+import com.abdownloadmanager.shared.util.EmptyStringSource
+import com.abdownloadmanager.shared.util.asToggledStringSource
 import ir.amirab.util.compose.asStringSource
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -17,7 +19,7 @@ object AndroidSettings {
     ): NavigatableConfigurable {
         return NavigatableConfigurable(
             title = Res.string.permissions.asStringSource(),
-            description = "".asStringSource(),
+            description = EmptyStringSource,
             onRequestNavigate = {
                 permissionsPageManager.openPermissionsPage(false)
             },
@@ -41,11 +43,7 @@ object AndroidSettings {
             description = Res.string.settings_browser_in_launcher_description.asStringSource(),
             backedBy = appSettingsStorage.browserIconInLauncher,
             describe = {
-                if (it) {
-                    Res.string.enabled
-                } else {
-                    Res.string.disabled
-                }.asStringSource()
+                it.asToggledStringSource()
             }
         )
     }

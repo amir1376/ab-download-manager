@@ -21,6 +21,7 @@ import com.abdownloadmanager.shared.ui.configurable.ConfigurableUiProps
 import com.abdownloadmanager.shared.ui.configurable.item.SoundConfigurable
 import com.abdownloadmanager.shared.ui.widget.IconActionButton
 import com.abdownloadmanager.shared.ui.widget.Text
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.notification.INotificationSound
 import com.abdownloadmanager.shared.util.notification.platformNotificationSound
@@ -71,7 +72,7 @@ object SoundConfigurableRenderer : ConfigurableRenderer<SoundConfigurable> {
                     }
                     IconActionButton(
                         MyIcons.resume,
-                        "".asStringSource(),
+                        EmptyStringSource,
                         onClick = {
                             platformNotificationSound().actualPlay(value)
                         }
