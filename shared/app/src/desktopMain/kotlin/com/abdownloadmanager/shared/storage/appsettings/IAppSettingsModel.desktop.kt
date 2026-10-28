@@ -52,6 +52,7 @@ data class AppSettingsModel(
     override val ignoreSSLCertificates: Boolean,
     override val useCategoryByDefault: Boolean,
     override val userAgent: String,
+    override val blockAddWhenLoading: Boolean,
 
     val mergeTopBarWithTitleBar: Boolean,
     val useNativeMenuBar: Boolean,
@@ -109,6 +110,7 @@ val DesktopSettingsSchema = S.typeSafeObject(
             ignoreSSLCertificates = it[AppSettingsModel::ignoreSSLCertificates],
             useCategoryByDefault = it[AppSettingsModel::useCategoryByDefault],
             userAgent = it[AppSettingsModel::userAgent],
+            blockAddWhenLoading = it[AppSettingsModel::blockAddWhenLoading],
 
             mergeTopBarWithTitleBar = it[AppSettingsModel::mergeTopBarWithTitleBar],
             useNativeMenuBar = it[AppSettingsModel::useNativeMenuBar],

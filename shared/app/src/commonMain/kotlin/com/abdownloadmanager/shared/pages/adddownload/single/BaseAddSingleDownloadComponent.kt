@@ -245,10 +245,16 @@ abstract class BaseAddSingleDownloadComponent(
     val checkResponseResult = downloadChecker.responseResult
     val lastError = downloadChecker.lastErrorReason
 
+    private val blockAddWhenLoading = appSettings.blockAddWhenLoading
+
     val canAddToDownloads = combineStateFlows(
-        canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading
-    ) { canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading ->
-        if (isLinkLoading) {
+        canAdd,
+        isDuplicate,
+        onDuplicateStrategy,
+        isLinkLoading,
+        blockAddWhenLoading,
+    ) { canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading, blockAddWhenLoading ->
+        if (isLinkLoading && blockAddWhenLoading) {
             // link is loading wait for it...
             return@combineStateFlows false
         }

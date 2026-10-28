@@ -47,4 +47,5 @@ interface IAppSettingsModel {
     val ignoreSSLCertificates: Boolean
     val useCategoryByDefault: Boolean
     val userAgent: String
+    val blockAddWhenLoading: Boolean
 }
