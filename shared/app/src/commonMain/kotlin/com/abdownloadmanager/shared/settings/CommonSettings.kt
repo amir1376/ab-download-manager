@@ -250,6 +250,20 @@ object CommonSettings {
             },
         )
     }
+    fun blockAddWhenLoading(appSettingsStorage: BaseAppSettingsStorage): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = Res.string.settings_block_add_when_loading.asStringSource(),
+            description = Res.string.settings_block_add_when_loading_description.asStringSource(),
+            backedBy = appSettingsStorage.blockAddWhenLoading,
+            describe = {
+                if (it) {
+                    Res.string.enabled
+                } else {
+                    Res.string.disabled
+                }.asStringSource()
+            },
+        )
+    }
 
     fun useCategoryByDefault(appSettingsStorage: BaseAppSettingsStorage): BooleanConfigurable {
         return BooleanConfigurable(

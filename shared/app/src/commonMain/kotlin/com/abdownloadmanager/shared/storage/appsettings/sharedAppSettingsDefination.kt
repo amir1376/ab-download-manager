@@ -83,6 +83,8 @@ object BaseAppSettingsDefinition {
         prop(IAppSettingsModel::useCategoryByDefault) bind S.boolean()
             .catch(PlatformDefaultSettings::useCategoryByDefault)
         prop(IAppSettingsModel::userAgent) bind S.string().catch(PlatformDefaultSettings::userAgent)
+        prop(IAppSettingsModel::blockAddWhenLoading) bind S.boolean()
+            .catch(PlatformDefaultSettings::blockAddWhenLoading)
     }
 }
 

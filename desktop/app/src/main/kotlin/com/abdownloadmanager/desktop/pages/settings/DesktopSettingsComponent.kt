@@ -159,6 +159,7 @@ class DesktopSettingsComponent(
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
                             CommonSettings.perHostSettings(perHostSettingsPageManager),
+                            CommonSettings.blockAddWhenLoading(appSettings),
                         )
                     ),
                     ConfigurableGroup(
