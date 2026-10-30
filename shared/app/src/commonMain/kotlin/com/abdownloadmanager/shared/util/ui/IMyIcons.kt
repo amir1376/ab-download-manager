@@ -8,6 +8,7 @@ interface IMyIcons {
     val settings: IconSource
     val flag: IconSource
     val fast: IconSource
+    val flashlight: IconSource
     val search: IconSource
     val info: IconSource
     val check: IconSource
@@ -97,5 +98,6 @@ interface IMyIcons {
     val data: IconSource
     val alphabet: IconSource
     val clock: IconSource
+    val qrCode: IconSource
 }
 

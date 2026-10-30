@@ -1,14 +1,22 @@
 package com.abdownloadmanager.shared.util.extractors.linkextractor
 
+import com.abdownloadmanager.shared.downloaderinui.DownloaderInUiRegistry
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
-import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import ir.amirab.downloader.downloaditem.IDownloadItem
 import ir.amirab.util.logger.appLogger
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 object DownloadCredentialsFromJson : DownloadCredentialExtractor<String>, KoinComponent {
-    val json: Json by inject()
+    private val json: Json by inject()
+    private val downloaderInUiRegistry: DownloaderInUiRegistry by inject()
+    private val jsonWithoutEncoded: Json by lazy {
+        Json(json) {
+            encodeDefaults = false
+        }
+    }
+
     override fun extract(input: String): List<IDownloadCredentials> {
         return runCatching {
             listOf(json.decodeFromString<IDownloadCredentials>(input))
@@ -17,12 +25,19 @@ object DownloadCredentialsFromJson : DownloadCredentialExtractor<String>, KoinCo
         }.getOrElse { emptyList() }
     }
 
-    fun asJson(credentialsList: List<HttpDownloadCredentials>): String {
+    fun credentialsAsJson(items: List<IDownloadItem>): String {
+        val json = jsonWithoutEncoded
         return runCatching {
-            return if (credentialsList.size == 1) {
-                json.encodeToString(credentialsList.first())
+            val credentials = items.map {
+                val downloaderInUi = requireNotNull(
+                    downloaderInUiRegistry.getDownloaderOf(it)
+                )
+                downloaderInUi.downloader.convertToCredentials(it)
+            }
+            return if (credentials.size == 1) {
+                json.encodeToString(credentials.first())
             } else {
-                json.encodeToString(credentialsList)
+                json.encodeToString(credentials)
             }
         }.onFailure {
             appLogger.e("fail to export download credentials", it)

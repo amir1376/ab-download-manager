@@ -54,6 +54,7 @@ import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.DefaultCategories
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DefaultDownloadCredentialsExtractor
 import com.abdownloadmanager.shared.util.subscribeAsStateFlow
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.arkivanov.decompose.ComponentContext
@@ -174,6 +175,7 @@ class HomeComponent(
         openWith = ::openWith,
         requestDelete = ::requestDelete,
         onRequestShareFiles = ::shareFiles,
+        requestShowQR = ::requestOpenQRCodeScreen
     )
 
     private fun shareFiles(finishedDownloads: List<CompletedDownloadItemState>) {
@@ -377,10 +379,29 @@ class HomeComponent(
             +createOpenAboutPage(aboutPageManager)
         }
     }
+
+    fun onQRCodeScanned(scannedContent: String) {
+        val items = DefaultDownloadCredentialsExtractor
+            .extract(scannedContent)
+        if (items.isNotEmpty()) {
+            addDownloadDialogManager.openAddDownloadDialog(
+                items.map {
+                    AddDownloadCredentialsInUiProps(it)
+                }
+            )
+        }
+    }
+
     val addMenu = buildMenu {
         +createDownloadFromClipboardAction(addDownloadDialogManager = addDownloadDialogManager)
         +createNewDownloadAction(enterNewURLDialogManager = enterNewURLDialogManager)
         +createOpenBatchDownloadAction(batchDownloadPageManager = batchDownloadPageManager)
+        item(
+            title = Res.string.scan_qr_code.asStringSource(),
+            icon = MyIcons.qrCode,
+        ) {
+            sendEffect(Effects.ScanQRCode)
+        }
     }
 
     val isOverlayVisible = currentActivePopup.mapStateFlow {
@@ -494,6 +515,7 @@ class HomeComponent(
         data class ShareFiles(
             val files: List<File>,
         ) : Effects
+        data object ScanQRCode : Effects
     }
 }
 

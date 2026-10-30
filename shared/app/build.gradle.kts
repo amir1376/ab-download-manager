@@ -58,6 +58,7 @@ kotlin {
             api(libs.fastscroller.core)
             api(libs.markdownRenderer.core)
             api(libs.compose.reorderable)
+            api(libs.qrose.qr)
         }
         androidMain {
             dependencies {

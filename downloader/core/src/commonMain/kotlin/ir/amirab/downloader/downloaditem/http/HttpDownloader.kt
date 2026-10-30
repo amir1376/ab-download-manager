@@ -3,6 +3,7 @@ package ir.amirab.downloader.downloaditem.http
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.Downloader
 import ir.amirab.downloader.connection.HttpDownloaderClient
+import ir.amirab.downloader.downloaditem.IDownloadCredentials
 import ir.amirab.downloader.downloaditem.IDownloadItem
 import kotlinx.serialization.KSerializer
 import kotlin.reflect.KClass
@@ -32,4 +33,8 @@ class HttpDownloader(
     override val downloadItemSerializer: KSerializer<HttpDownloadItem> = HttpDownloadItem.serializer()
     override val downloadCredentialsSerializer: KSerializer<HttpDownloadCredentials> =
         HttpDownloadCredentials.serializer()
+
+    override fun convertToCredentials(item: HttpDownloadItem): HttpDownloadCredentials {
+        return HttpDownloadCredentials.from(item)
+    }
 }

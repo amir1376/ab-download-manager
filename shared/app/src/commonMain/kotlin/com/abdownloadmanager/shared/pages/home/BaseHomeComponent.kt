@@ -23,6 +23,7 @@ import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.CategoryItemWithId
 import com.abdownloadmanager.shared.util.category.CategoryManager
 import com.abdownloadmanager.shared.util.category.DefaultCategories
+import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialsFromJson
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.arkivanov.decompose.ComponentContext
@@ -73,6 +74,30 @@ abstract class BaseHomeComponent(
     protected abstract val enterNewURLDialogManager: EnterNewURLDialogManager
     val filterState = FilterState()
     val failedDownloads = downloadSystem.downloadErrorsFlow
+
+
+    private val _copyQRCodeScreen = MutableStateFlow(
+        null as CopyDownloadAsQRCode?
+    )
+    val copyQRCodeScreen = _copyQRCodeScreen.asStateFlow()
+
+    fun requestOpenQRCodeScreen(downloadId: Long) {
+        scope.launch {
+            runCatching {
+                downloadSystem.getDownloadItemById(downloadId)
+            }.getOrNull()?.let { item ->
+                _copyQRCodeScreen.value = CopyDownloadAsQRCode(
+                    title = item.name,
+                    qrCode = DownloadCredentialsFromJson.credentialsAsJson(listOf(item))
+                )
+            }
+        }
+    }
+
+    fun closeQRCodeScreen() {
+        _copyQRCodeScreen.value = null
+    }
+
 
     protected fun requestDelete(
         downloadList: List<Long>,

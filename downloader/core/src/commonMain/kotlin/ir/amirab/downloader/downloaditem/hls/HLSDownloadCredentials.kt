@@ -3,6 +3,8 @@ package ir.amirab.downloader.downloaditem.hls
 import arrow.core.Option
 import arrow.core.getOrElse
 import ir.amirab.downloader.downloaditem.IDownloadCredentials
+import ir.amirab.downloader.downloaditem.http.HttpDownloadCredentials
+import ir.amirab.downloader.downloaditem.http.IHttpDownloadCredentials
 import ir.amirab.util.HttpUrlUtils
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -29,5 +31,23 @@ data class HLSDownloadCredentials(
 
     override fun validateCredentials() {
         HttpUrlUtils.isValidUrl(link)
+    }
+
+    companion object {
+        fun from(credentials: IHLSCredentials): HLSDownloadCredentials {
+            credentials.run {
+                return when (this) {
+                    is HLSDownloadCredentials -> this
+                    else -> HLSDownloadCredentials(
+                        link = link,
+                        headers = headers,
+                        username = username,
+                        password = password,
+                        downloadPage = downloadPage,
+                        userAgent = userAgent,
+                    )
+                }
+            }
+        }
     }
 }

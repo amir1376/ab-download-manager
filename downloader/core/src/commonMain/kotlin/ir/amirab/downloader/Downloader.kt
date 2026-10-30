@@ -26,5 +26,8 @@ interface Downloader<
 
     val downloadItemSerializer: KSerializer<TDownloadItem>
     val downloadCredentialsSerializer: KSerializer<TDownloadCredentials>
+
+    fun convertToCredentials(item: TDownloadItem): TDownloadCredentials
+
 }
 

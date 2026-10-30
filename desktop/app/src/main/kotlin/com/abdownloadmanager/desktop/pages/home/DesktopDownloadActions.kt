@@ -32,6 +32,7 @@ class DesktopDownloadActions(
     openWith: (Long) -> Unit,
     requestDelete: (List<Long>) -> Unit,
     mainItem: StateFlow<Long?>,
+    requestShowQRCode: (Long) -> Unit,
     private val openFolder: (Long) -> Unit,
 ) : AbstractDownloadActions(
     scope = scope,
@@ -46,6 +47,7 @@ class DesktopDownloadActions(
     openWith = openWith,
     requestDelete = requestDelete,
     mainItem = mainItem,
+    requestShowQR = requestShowQRCode,
 ) {
     val openFolderAction = simpleAction(
         title = Res.string.open_folder.asStringSource(),
@@ -64,22 +66,23 @@ class DesktopDownloadActions(
             +openWithAction
         }
         +openFolderAction
-        +(resumeAction)
+        +resumeAction
         +pauseAction
         separator()
-        +(deleteAction)
-        +(reDownloadAction)
+        +deleteAction
+        +reDownloadAction
         separator()
         +moveToQueueItems
         +moveToCategoryAction
         separator()
         subMenu(Res.string.copy.asStringSource(), MyIcons.copy) {
-            +(copyDownloadLinkAction)
-            +(copyDownloadCredentialsAsJsonAction)
-            +(copyDownloadCredentialsAsCurlAction)
+            +copyDownloadLinkAction
+            +copyDownloadCredentialsAsJsonAction
+            +copyDownloadCredentialsAsCurlAction
+            +copyDownloadCredentialsAsQRAction
         }
         +editDownloadAction
         +fileChecksumAction
-        +(openDownloadDialogAction)
+        +openDownloadDialogAction
     }
 }

@@ -7,6 +7,7 @@ import android.os.Environment
 import android.os.PowerManager
 import androidx.annotation.RequiresApi
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.util.EmptyStringSource
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import ir.amirab.util.compose.asStringSource
 
@@ -91,5 +92,16 @@ object ABDMPermissions {
             }
         }
     )
+
+    val cameraPermission = AppPermission(
+        title = Res.string.permissions_camera_title.asStringSource(),
+        description = Res.string.permissions_camera_reason.asStringSource(),
+        icon = MyIcons.qrCode,
+        isOptional = true,
+        permissions = listOf(
+            Manifest.permission.CAMERA
+        ),
+    )
+
 }
 
