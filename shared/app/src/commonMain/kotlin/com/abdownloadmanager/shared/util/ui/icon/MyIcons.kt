@@ -11,6 +11,7 @@ object MyIcons : BaseMyColors() {
     override val settings = ABDMIcons.Settings.asIconSource("settings")
     override val flag = ABDMIcons.Flag.asIconSource("flag")
     override val fast = ABDMIcons.Fast.asIconSource("fast")
+    override val flashlight = fast
     override val search = ABDMIcons.Search.asIconSource("search")
     override val info = ABDMIcons.Info.asIconSource("info")
     override val check = ABDMIcons.Check.asIconSource("check")
@@ -110,4 +111,5 @@ object MyIcons : BaseMyColors() {
     override val data: IconSource = ABDMIcons.Data.asIconSource("alphabet")
     override val alphabet: IconSource = ABDMIcons.Alphabet.asIconSource("alphabet")
     override val clock: IconSource = ABDMIcons.Clock.asIconSource("clock")
+    override val qrCode = applicationFile
 }

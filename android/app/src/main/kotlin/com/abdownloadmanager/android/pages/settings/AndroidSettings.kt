@@ -34,6 +34,14 @@ object AndroidSettings {
             backedBy = MutableStateFlow(permission),
         )
     }
+    fun cameraPermission(): PermissionConfigurable {
+        val permission = ABDMPermissions.cameraPermission
+        return PermissionConfigurable(
+            title = permission.title,
+            description = permission.description,
+            backedBy = MutableStateFlow(permission),
+        )
+    }
 
     fun browserIconInLauncher(
         appSettingsStorage: AppSettingsStorage

@@ -44,6 +44,9 @@ slf4jApi = "2.0.20"
 kotlinRpc = "0.10.4"
 ktor = "3.6.0"
 clikit = "5.1.0"
+qrose = "1.3.1"
+androidxCamera = "1.6.2"
+zxing = "3.5.4"
 androidCompileSdk = "37"
 schemakt = "0.2.3"
 
@@ -144,6 +147,13 @@ ktor-server-auth-core = { module = "io.ktor:ktor-server-auth", version.ref = "kt
 ktor-server-auth-apiKey = { module = "io.ktor:ktor-server-auth-api-key", version.ref = "ktor" }
 
 clikit = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikit" }
+
+qrose-qr = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
+
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidxCamera" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidxCamera" }
+androidx-camera-compose = { module = "androidx.camera:camera-compose", version.ref = "androidxCamera" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 composeNativeTray = { module = "dev.nucleusframework:composenativetray", version.ref = "composeNativeTray" }
 nucleus-plugin = { module = "dev.nucleusframework:dev.nucleusframework.gradle.plugin", version.ref = "nucleus" }

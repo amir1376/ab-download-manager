@@ -48,6 +48,7 @@ abstract class AbstractDownloadActions(
     private val openFile: (Long) -> Unit,
     private val openWith: (Long) -> Unit,
     private val requestDelete: (List<Long>) -> Unit,
+    private val requestShowQR: (Long) -> Unit,
 ) {
     val defaultItem = combineStateFlows(
         selections,
@@ -229,12 +230,24 @@ abstract class AbstractDownloadActions(
             scope.launch {
                 val credentialsList = selections.value
                     .mapNotNull { downloadSystem.getDownloadItemById(it.id) }
-                    .filterIsInstance<HttpDownloadItem>()
-                    .map { HttpDownloadCredentials.from(it) }
-                ClipboardUtil.copy(DownloadCredentialsFromJson.asJson(credentialsList))
+
+                ClipboardUtil.copy(DownloadCredentialsFromJson.credentialsAsJson(credentialsList))
             }
         }
     )
+    val copyDownloadCredentialsAsQRAction = simpleAction(
+        title = Res.string.copy_as_x.asStringSourceWithARgs(
+            Res.string.copy_as_x_createArgs(
+                name = "QR Code"
+            )
+        ),
+        MyIcons.qrCode,
+        checkEnable = defaultItem.mapStateFlow(::isNotNull)
+    ) {
+        defaultItem.value?.let { itemState ->
+            requestShowQR(itemState.id)
+        }
+    }
 
     val openDownloadDialogAction = simpleAction(
         Res.string.show_properties.asStringSource(),

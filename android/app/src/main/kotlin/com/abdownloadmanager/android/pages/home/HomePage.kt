@@ -47,7 +47,9 @@ import androidx.compose.ui.unit.roundToIntRect
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.abdownloadmanager.android.pages.enterurl.EnterNewURLPage
+import com.abdownloadmanager.android.pages.home.sections.DownloadQRDialog
 import com.abdownloadmanager.android.pages.home.sections.sort.RenderSortMenu
+import com.abdownloadmanager.android.pages.qrcode.rememberQrCodeScannerLauncher
 import com.abdownloadmanager.android.ui.menu.RenderMenuInSinglePage
 import com.abdownloadmanager.android.ui.page.PageFooter
 import com.abdownloadmanager.android.ui.page.PageUi
@@ -99,6 +101,9 @@ fun HomePage(component: HomeComponent) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val direction = LocalLayoutDirection.current
+    val qrCodeScannerLaunch = rememberQrCodeScannerLauncher {
+        component.onQRCodeScanned(it)
+    }
     HandleEffects(component) { effect ->
         when (effect) {
             is BaseHomeComponent.Effects.Common -> {
@@ -160,6 +165,9 @@ fun HomePage(component: HomeComponent) {
                 when (effect) {
                     is HomeComponent.Effects.ShareFiles -> {
                         AndroidIntentUtils.shareFiles(context, effect.files)
+                    }
+                    is HomeComponent.Effects.ScanQRCode -> {
+                        qrCodeScannerLaunch()
                     }
                 }
             }
@@ -322,6 +330,14 @@ fun HomePage(component: HomeComponent) {
             showDeletePromptState = null
         },
     )
+
+    val showQRCode by component.copyQRCodeScreen.collectAsState()
+    showQRCode?.let {
+        DownloadQRDialog(
+            data = it,
+            onClose = component::closeQRCodeScreen
+        )
+    }
 }
 
 @Composable

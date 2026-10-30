@@ -36,6 +36,7 @@ class AndroidDownloadActions(
     openWith: (Long) -> Unit,
     requestDelete: (List<Long>) -> Unit,
     onRequestShareFiles: (ids: List<CompletedDownloadItemState>) -> Unit,
+    requestShowQR: (Long) -> Unit,
 ) : AbstractDownloadActions(
     scope = scope,
     downloadSystem = downloadSystem,
@@ -49,6 +50,7 @@ class AndroidDownloadActions(
     openFile = openFile,
     openWith = openWith,
     requestDelete = requestDelete,
+    requestShowQR = requestShowQR,
 ) {
     val shareAction = simpleAction(
         title = Res.string.share.asStringSource(),
@@ -79,9 +81,10 @@ class AndroidDownloadActions(
         +moveToCategoryAction
         separator()
         subMenu(Res.string.copy.asStringSource(), MyIcons.copy) {
-            +(copyDownloadLinkAction)
-            +(copyDownloadCredentialsAsJsonAction)
-            +(copyDownloadCredentialsAsCurlAction)
+            +copyDownloadLinkAction
+            +copyDownloadCredentialsAsJsonAction
+            +copyDownloadCredentialsAsCurlAction
+            +copyDownloadCredentialsAsQRAction
         }
         +editDownloadAction
         +fileChecksumAction

@@ -52,6 +52,12 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.decompose.jbCompose)
     implementation(libs.aboutLibraries.core)
+    
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.compose)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.zxing.core)
+    
     implementation(project(":shared:app"))
     ksp(libs.arrow.opticKsp)
 }
