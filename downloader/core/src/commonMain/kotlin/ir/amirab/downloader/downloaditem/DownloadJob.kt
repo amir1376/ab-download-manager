@@ -2,6 +2,7 @@ package ir.amirab.downloader.downloaditem
 
 import ir.amirab.downloader.DownloadManager
 import ir.amirab.downloader.destination.DownloadDestination
+import ir.amirab.downloader.downloaditem.contexts.ResumingInfo
 import ir.amirab.downloader.utils.ExceptionUtils
 import ir.amirab.util.suspendGuardedEntry
 import kotlinx.coroutines.CancellationException
@@ -60,11 +61,21 @@ abstract class DownloadJob(
         }
     }
 
-    protected fun onDownloadResuming() {
+    /**
+     * [isFirstAttempt]: is this the first resume attempt or its after retry
+     */
+    protected fun onDownloadResuming(
+        isFirstAttempt: Boolean,
+    ) {
         _status.update {
             DownloadJobStatus.Resuming
         }
-        downloadManager.onDownloadResuming(downloadItem)
+        downloadManager.onDownloadResuming(
+            downloadItem,
+            ResumingInfo(
+                isFirstAttempt = isFirstAttempt
+            )
+        )
     }
 
     protected fun onDownloadResumed() {
