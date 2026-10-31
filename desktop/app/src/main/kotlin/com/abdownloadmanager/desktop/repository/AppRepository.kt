@@ -52,8 +52,8 @@ class AppRepository(
             IntegrationSettings(
                 port = apiPort,
                 apiKey = apiAuthKey
-                    .takeIf { apiAuthEnabled }
-                    .takeIf { ApiKeyUtil.isValidKey(apiAuthKey) }
+                    .takeIf { ApiKeyUtil.isValidKey(apiAuthKey) },
+                apiKeyEnforced = apiAuthEnabled,
             )
         }
             .debounce(500.milliseconds)

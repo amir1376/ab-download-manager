@@ -18,6 +18,9 @@ import kotlinx.serialization.json.Json
 
 private data class AppPrincipal(val key: String)
 
+private const val AuthOptional = "auth-optional"
+private const val AuthRequired = "auth-required"
+
 internal fun Application.setupRouting(
     json: Json,
     integrationHandler: IntegrationHandler,
@@ -25,19 +28,26 @@ internal fun Application.setupRouting(
 ) {
     val apiKey = settings.apiKey
     install(Authentication) {
-        apiKey {
+        apiKey(AuthOptional) {
             validate { receivedKey ->
                 if (receivedKey == apiKey) {
                     AppPrincipal(receivedKey)
                 } else null
             }
             skipWhen {
-                apiKey == null
+                !settings.apiKeyEnforced
+            }
+        }
+        apiKey(AuthRequired) {
+            validate { receivedKey ->
+                if (receivedKey == apiKey) {
+                    AppPrincipal(receivedKey)
+                } else null
             }
         }
     }
     routing {
-        authenticate {
+        authenticate(AuthOptional) {
             post("/add") {
                 val itemsToAdd = kotlin.runCatching {
                     val message = call.receiveText()
@@ -62,6 +72,11 @@ internal fun Application.setupRouting(
                 val jsonResponse = json.encodeToString(ListSerializer(ApiQueueModel.serializer()), queues)
                 call.respondText(jsonResponse)
             }
+            post("/ping") {
+                call.respondText("pong")
+            }
+        }
+        authenticate(AuthRequired) {
             post("/start-headless-download") {
                 val itemsToAdd = kotlin.runCatching {
                     val message = call.receiveText()
@@ -70,9 +85,6 @@ internal fun Application.setupRouting(
                 itemsToAdd.onFailure { it.printStackTrace() }
                 integrationHandler.addDownload(itemsToAdd.getOrThrow())
                 call.respondText("OK")
-            }
-            post("/ping") {
-                call.respondText("pong")
             }
         }
     }
