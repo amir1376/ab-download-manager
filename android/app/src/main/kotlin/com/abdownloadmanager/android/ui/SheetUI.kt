@@ -103,14 +103,10 @@ fun ResponsiveDialogScope.SheetUI(
                                 bottomEnd = isBottomEndFree,
                             )
                         )
+                        .background(myColors.surface)
                         .imePadding()
                 ) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                    ) {
-                        content()
-                    }
+                    content()
 
                     Box(
                         Modifier
