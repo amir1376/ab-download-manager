@@ -12,7 +12,14 @@ import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.viewfinder.core.ImplementationMode
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -25,8 +32,20 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -251,23 +270,110 @@ private fun ScannerSheet(
             },
             type = SheetType.Overlay
         ) {
-            Box(
-                modifier = Modifier,
-            ) {
-                Box(
-                ) {
-                    surfaceRequest?.let { req ->
-                        CameraXViewfinder(
-                            surfaceRequest = req,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(400.dp),
-                            contentScale = ContentScale.Crop,
-                            implementationMode = ImplementationMode.EMBEDDED
-                        )
-                    }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)) {
+                surfaceRequest?.let { req ->
+                    CameraXViewfinder(
+                        surfaceRequest = req,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        implementationMode = ImplementationMode.EMBEDDED
+                    )
                 }
+
+                QRBoxOverlay()
             }
         }
+    }
+}
+
+@Composable
+private fun QRBoxOverlay() {
+    val infiniteTransition = rememberInfiniteTransition()
+    val density = LocalDensity.current
+    val minQrBoxSizePx = with(density) { 200.dp.toPx() }
+    val maxQrBoxSizePx = with(density) { 210.dp.toPx() }
+    val qrBoxSize by infiniteTransition.animateFloat(
+        minQrBoxSizePx, maxQrBoxSizePx, animationSpec = infiniteRepeatable(
+            animation = tween(2000),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val cornerRadius = 12.dp.toPx()
+        val left = (size.width - qrBoxSize) / 2
+        val top = (size.height - qrBoxSize) / 2
+        val right = left + qrBoxSize
+        val bottom = top + qrBoxSize
+        val path = Path().apply {
+            // 1. Full-screen outer rectangle
+            addRect(Rect(Offset.Zero, size))
+            // 2. Center cutout rectangle with rounded corners
+            addRoundRect(
+                RoundRect(
+                    rect = Rect(Offset(left, top), Size(qrBoxSize, qrBoxSize)),
+                    cornerRadius = CornerRadius(cornerRadius)
+                )
+            )
+            fillType = PathFillType.EvenOdd
+        }
+        // Corner reticle configurations
+        val cornerLength = 20.dp.toPx() // Length of each corner arm
+        val strokeWidth = 3.dp.toPx()   // Thickness of the white corner lines
+        // Build path for the 4 rounded corner reticles matching the cutout radius
+        val cornersPath = Path().apply {
+            val arcSize = cornerRadius * 2
+            // Top-Left corner
+            moveTo(left, top + cornerLength)
+            arcTo(
+                rect = Rect(left, top, left + arcSize, top + arcSize),
+                startAngleDegrees = 180f,
+                sweepAngleDegrees = 90f,
+                forceMoveTo = false
+            )
+            lineTo(left + cornerLength, top)
+            // Top-Right corner
+            moveTo(right - cornerLength, top)
+            arcTo(
+                rect = Rect(right - arcSize, top, right, top + arcSize),
+                startAngleDegrees = 270f,
+                sweepAngleDegrees = 90f,
+                forceMoveTo = false
+            )
+            lineTo(right, top + cornerLength)
+            // Bottom-Right corner
+            moveTo(right, bottom - cornerLength)
+            arcTo(
+                rect = Rect(right - arcSize, bottom - arcSize, right, bottom),
+                startAngleDegrees = 0f,
+                sweepAngleDegrees = 90f,
+                forceMoveTo = false
+            )
+            lineTo(right - cornerLength, bottom)
+            // Bottom-Left corner
+            moveTo(left + cornerLength, bottom)
+            arcTo(
+                rect = Rect(left, bottom - arcSize, left + arcSize, bottom),
+                startAngleDegrees = 90f,
+                sweepAngleDegrees = 90f,
+                forceMoveTo = false
+            )
+            lineTo(left, bottom - cornerLength)
+        }
+
+        drawPath(
+            path = path,
+            color = Color.Black.copy(0.8f)
+        )
+        drawPath(
+            path = cornersPath,
+            color = Color.White,
+            style = Stroke(
+                width = strokeWidth,
+                cap = StrokeCap.Round,  // Rounded line caps
+                join = StrokeJoin.Round // Rounded joints
+            )
+        )
     }
 }
