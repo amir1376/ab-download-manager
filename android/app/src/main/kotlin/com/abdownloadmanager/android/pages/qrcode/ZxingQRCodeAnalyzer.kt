@@ -5,12 +5,13 @@ import androidx.camera.core.ImageProxy
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.NotFoundException
 import com.google.zxing.RGBLuminanceSource
+import com.google.zxing.Result
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.qrcode.QRCodeReader
 
 
 class ZxingQRCodeAnalyzer(
-    private val onSuccess: ((String) -> Unit),
+    private val onSuccess: ((result: Result, imageWidth: Int, imageHeight: Int, rotation: Int) -> Unit),
     private val onFailure: ((Exception) -> Unit),
 ) : ImageAnalysis.Analyzer {
     private val qrCodeReader = QRCodeReader()
@@ -37,7 +38,7 @@ class ZxingQRCodeAnalyzer(
                     return
                 }
             }
-            onSuccess(result.text)
+            onSuccess(result, image.width, image.height, image.imageInfo.rotationDegrees)
         } catch (e: Exception) {
             onFailure(e)
         } finally {
