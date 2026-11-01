@@ -216,31 +216,33 @@ private fun ScannerSheet(
             setSurfaceProvider { req -> surfaceRequest = req }
         }
 
-        val imageAnalysis = ImageAnalysis.Builder().build().apply {
-            setAnalyzer(
-                analysisExecutor,
-                ZxingQRCodeAnalyzer(
-                    onSuccess = { result, imageWidth, imageHeight, rotation ->
-                        val text = result.text
-                        scope.launch {
-                            detectedQrBounds.value = result.resultPoints?.let {
-                                mapQrPointsToScreen(
-                                    points = it,
-                                    imageWidth = imageWidth,
-                                    imageHeight = imageHeight,
-                                    rotationDegrees = rotation,
-                                    containerWidth = containerSize.value.width,
-                                    containerHeight = containerSize.value.height
-                                )
+        val imageAnalysis = ImageAnalysis.Builder()
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build().apply {
+                setAnalyzer(
+                    analysisExecutor,
+                    ZxingQRCodeAnalyzer(
+                        onSuccess = { result, imageWidth, imageHeight, rotation ->
+                            val text = result.text
+                            scope.launch {
+                                detectedQrBounds.value = result.resultPoints?.let {
+                                    mapQrPointsToScreen(
+                                        points = it,
+                                        imageWidth = imageWidth,
+                                        imageHeight = imageHeight,
+                                        rotationDegrees = rotation,
+                                        containerWidth = containerSize.value.width,
+                                        containerHeight = containerSize.value.height
+                                    )
+                                }
+                                delay(1.seconds) // to see qr box overlay on camera movement
+                                component.onSuccess(text)
                             }
-                            delay(1.seconds) // to see qr box overlay on camera movement
-                            component.onSuccess(text)
-                        }
-                    },
-                    onFailure = {},
-                ),
-            )
-        }
+                        },
+                        onFailure = {},
+                    ),
+                )
+            }
 
         val camera = provider.bindToLifecycle(
             lifecycleOwner,
@@ -303,12 +305,13 @@ private fun ScannerSheet(
             },
             type = SheetType.Overlay
         ) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp)
-                .onSizeChanged {
-                    containerSize.value = it.toSize()
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp)
+                    .onSizeChanged {
+                        containerSize.value = it.toSize()
+                    }
             ) {
                 surfaceRequest?.let { req ->
                     CameraXViewfinder(
