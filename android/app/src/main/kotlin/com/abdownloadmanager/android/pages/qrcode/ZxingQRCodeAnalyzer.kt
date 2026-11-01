@@ -42,7 +42,7 @@ class ZxingQRCodeAnalyzer(
             }
             byteBuffer.get(buffer, 0, requiredSize)
 
-            // خواندن مستقیم از لایه خاکستری بدون تبدیل بیهوده به Bitmap
+            // Read directly from the grayscale layer without unnecessary Bitmap conversion
             val source = PlanarYUVLuminanceSource(
                 buffer,
                 rowStride,
