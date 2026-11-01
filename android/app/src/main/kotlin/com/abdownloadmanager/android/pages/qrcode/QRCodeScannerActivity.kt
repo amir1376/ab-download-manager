@@ -11,6 +11,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +34,7 @@ import com.abdownloadmanager.android.pages.onboarding.permissions.ABDMPermission
 import com.abdownloadmanager.android.pages.onboarding.permissions.rememberAppPermissionState
 import com.abdownloadmanager.android.ui.SheetHeader
 import com.abdownloadmanager.android.ui.SheetTitle
+import com.abdownloadmanager.android.ui.SheetType
 import com.abdownloadmanager.android.ui.SheetUI
 import com.abdownloadmanager.android.util.activity.ABDMActivity
 import com.abdownloadmanager.resources.Res
@@ -247,20 +249,21 @@ private fun ScannerSheet(
                     }
                 )
             },
+            type = SheetType.Overlay
         ) {
             Box(
                 modifier = Modifier,
             ) {
                 Box(
-                    modifier = Modifier
                 ) {
                     surfaceRequest?.let { req ->
                         CameraXViewfinder(
                             surfaceRequest = req,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(300.dp),
-                            contentScale = ContentScale.Fit
+                                .height(400.dp),
+                            contentScale = ContentScale.Crop,
+                            implementationMode = ImplementationMode.EMBEDDED
                         )
                     }
                 }
