@@ -48,7 +48,7 @@ abstract class AbstractDownloadActions(
     private val openFile: (Long) -> Unit,
     private val openWith: (Long) -> Unit,
     private val requestDelete: (List<Long>) -> Unit,
-    private val requestShowQR: (Long) -> Unit,
+    private val requestShowQR: (List<Long>) -> Unit,
 ) {
     val defaultItem = combineStateFlows(
         selections,
@@ -242,10 +242,10 @@ abstract class AbstractDownloadActions(
             )
         ),
         MyIcons.qrCode,
-        checkEnable = defaultItem.mapStateFlow(::isNotNull)
+        checkEnable = selections.mapStateFlow { it.isNotEmpty() }
     ) {
-        defaultItem.value?.let { itemState ->
-            requestShowQR(itemState.id)
+        selections.value.map { it.id }.let { ids ->
+            requestShowQR(ids)
         }
     }
 
