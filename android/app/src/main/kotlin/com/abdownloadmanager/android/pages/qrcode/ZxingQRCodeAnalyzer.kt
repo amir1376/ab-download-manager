@@ -54,10 +54,8 @@ class ZxingQRCodeAnalyzer(
                 false
             )
 
-            val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
-
             val result = try {
-                qrCodeReader.decode(binaryBitmap, hints)
+                qrCodeReader.decode(BinaryBitmap(HybridBinarizer(source)), hints)
             } catch (_: NotFoundException) {
                 try {
                     qrCodeReader.decode(BinaryBitmap(HybridBinarizer(source.invert())), hints)

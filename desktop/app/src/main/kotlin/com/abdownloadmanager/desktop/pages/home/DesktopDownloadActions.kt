@@ -32,7 +32,7 @@ class DesktopDownloadActions(
     openWith: (Long) -> Unit,
     requestDelete: (List<Long>) -> Unit,
     mainItem: StateFlow<Long?>,
-    requestShowQRCode: (Long) -> Unit,
+    requestShowQRCode: (List<Long>) -> Unit,
     private val openFolder: (Long) -> Unit,
 ) : AbstractDownloadActions(
     scope = scope,

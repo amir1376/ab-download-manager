@@ -36,7 +36,7 @@ class AndroidDownloadActions(
     openWith: (Long) -> Unit,
     requestDelete: (List<Long>) -> Unit,
     onRequestShareFiles: (ids: List<CompletedDownloadItemState>) -> Unit,
-    requestShowQR: (Long) -> Unit,
+    requestShowQR: (List<Long>) -> Unit,
 ) : AbstractDownloadActions(
     scope = scope,
     downloadSystem = downloadSystem,

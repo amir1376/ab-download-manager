@@ -22,11 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.shared.ui.widget.Text
 import com.abdownloadmanager.shared.util.ResponsiveDialogScope
 import com.abdownloadmanager.shared.util.div
@@ -39,90 +36,47 @@ import com.abdownloadmanager.shared.util.ui.theme.myTextSizes
 import com.abdownloadmanager.shared.util.ui.widget.MyIcon
 import ir.amirab.util.compose.IconSource
 
-enum class SheetType {
-    Standard, Overlay
-}
-
 @Composable
 fun ResponsiveDialogScope.SheetUI(
-    type: SheetType = SheetType.Standard,
     header: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
     WithContentColor(myColors.onSurface) {
-        when (type) {
-            SheetType.Standard -> {
-                Column(
-                    Modifier
-                        .padding(
-                            WindowInsets.navigationBars
-                                .only(WindowInsetsSides.Horizontal)
-                                .asPaddingValues()
-                        )
-                        .fillMaxWidth()
-                        .statusBarsPadding()
-                        .clip(
-                            myShapes.createSheetWithCustomEdges(
-                                topStart = isTopStartFree,
-                                bottomStart = isBottomStartFree,
-                                topEnd = isTopEndFree,
-                                bottomEnd = isBottomEndFree,
-                            )
-                        )
-                        .background(myColors.surface)
-                        .let { modifier ->
-                            val verticalNavigationBarPaddingValues = WindowInsets.navigationBars
-                                .only(WindowInsetsSides.Vertical)
-                                .asPaddingValues()
-                            modifier
-                                .padding(verticalNavigationBarPaddingValues)
-                                .consumeWindowInsets(verticalNavigationBarPaddingValues)
-                        }
-                        .imePadding()
-                        .padding(mySpacings.smallSpace)) {
-                    header()
-                    Spacer(Modifier.height(mySpacings.mediumSpace))
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                    ) {
-                        content()
-                    }
-                }
-            }
-
-            SheetType.Overlay -> {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .clip(
-                            myShapes.createSheetWithCustomEdges(
-                                topStart = isTopStartFree,
-                                bottomStart = isBottomStartFree,
-                                topEnd = isTopEndFree,
-                                bottomEnd = isBottomEndFree,
-                            )
-                        )
-                        .background(myColors.surface)
-                        .imePadding()
-                ) {
-                    content()
-
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(90.dp)
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(
-                                        myColors.surface.copy(if (myColors.isLight) .5f else 1f),
-                                        Color.Transparent
-                                    )
-                                )
-                            )
+        Column(
+            Modifier
+                .padding(
+                    WindowInsets.navigationBars
+                        .only(WindowInsetsSides.Horizontal)
+                        .asPaddingValues()
+                )
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .clip(
+                    myShapes.createSheetWithCustomEdges(
+                        topStart = isTopStartFree,
+                        bottomStart = isBottomStartFree,
+                        topEnd = isTopEndFree,
+                        bottomEnd = isBottomEndFree,
                     )
-                    header()
+                )
+                .background(myColors.surface)
+                .let { modifier ->
+                    val verticalNavigationBarPaddingValues = WindowInsets.navigationBars
+                        .only(WindowInsetsSides.Vertical)
+                        .asPaddingValues()
+                    modifier
+                        .padding(verticalNavigationBarPaddingValues)
+                        .consumeWindowInsets(verticalNavigationBarPaddingValues)
                 }
+                .imePadding()
+                .padding(mySpacings.smallSpace)) {
+            header()
+            Spacer(Modifier.height(mySpacings.mediumSpace))
+            Box(
+                Modifier
+                    .fillMaxWidth()
+            ) {
+                content()
             }
         }
     }

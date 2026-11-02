@@ -14,6 +14,7 @@ object DownloadCredentialsFromJson : DownloadCredentialExtractor<String>, KoinCo
     private val jsonWithoutEncoded: Json by lazy {
         Json(json) {
             encodeDefaults = false
+            prettyPrint = false
         }
     }
 

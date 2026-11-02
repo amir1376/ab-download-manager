@@ -12,6 +12,7 @@ import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.viewfinder.core.ImplementationMode
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -21,15 +22,23 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,11 +46,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
@@ -52,6 +63,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -60,27 +72,29 @@ import com.abdownloadmanager.android.pages.onboarding.permissions.ABDMPermission
 import com.abdownloadmanager.android.pages.onboarding.permissions.rememberAppPermissionState
 import com.abdownloadmanager.android.ui.SheetHeader
 import com.abdownloadmanager.android.ui.SheetTitle
-import com.abdownloadmanager.android.ui.SheetType
-import com.abdownloadmanager.android.ui.SheetUI
 import com.abdownloadmanager.android.util.activity.ABDMActivity
 import com.abdownloadmanager.resources.Res
+import com.abdownloadmanager.shared.ui.theme.ABDownloaderTheme
+import com.abdownloadmanager.shared.ui.theme.DefaultThemes
 import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialog
+import com.abdownloadmanager.shared.util.ResponsiveDialogScope
 import com.abdownloadmanager.shared.util.asToggledStringSource
 import com.abdownloadmanager.shared.util.mvi.HandleEffects
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
+import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.arkivanov.decompose.retainedComponent
 import com.google.zxing.ResultPoint
 import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.resources.myStringResource
 import ir.amirab.util.ifThen
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
-import kotlin.time.Duration.Companion.seconds
+import kotlin.math.roundToInt
 
 class ScannerActivity : ABDMActivity() {
 
@@ -192,7 +206,7 @@ private fun ScannerSheet(
         mutableStateOf(Size.Zero)
     }
     val detectedQrBounds = remember {
-        mutableStateOf(null as? Rect)
+        mutableStateOf<Rect?>(null)
     }
     DisposableEffect(Unit) {
         onDispose {
@@ -235,8 +249,7 @@ private fun ScannerSheet(
                                         containerHeight = containerSize.value.height
                                     )
                                 }
-                                delay(1.seconds) // to see qr box overlay on camera movement
-                                component.onSuccess(text)
+                                component.onQRScanned(text)
                             }
                         },
                         onFailure = {},
@@ -273,7 +286,7 @@ private fun ScannerSheet(
         state = responsiveDialogState,
         onDismiss = closeDialog,
     ) {
-        SheetUI(
+        CameraSheetUi(
             header = {
                 SheetHeader(
                     headerTitle = {
@@ -303,12 +316,11 @@ private fun ScannerSheet(
                     }
                 )
             },
-            type = SheetType.Overlay
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp)
+                    .height(500.dp)
                     .onSizeChanged {
                         containerSize.value = it.toSize()
                     }
@@ -320,7 +332,10 @@ private fun ScannerSheet(
                         contentScale = ContentScale.Crop,
                         implementationMode = ImplementationMode.EMBEDDED
                     )
-                    QRBoxOverlay(qrRect = detectedQrBounds.value)
+                    QRBoxOverlay(
+                        qrRect = detectedQrBounds.value,
+                        state = state,
+                    )
                 }
 
             }
@@ -329,7 +344,42 @@ private fun ScannerSheet(
 }
 
 @Composable
-private fun QRBoxOverlay(qrRect: Rect? = null) {
+private fun RenderParts(
+    parts: List<Boolean>,
+    modifier: Modifier = Modifier,
+) {
+    val colors = myColors
+    Row(
+        modifier.clip(CircleShape)
+    ) {
+        if (parts.isNotEmpty()) {
+            for ((index, isFetched) in parts.withIndex()) {
+                key(index) {
+                    Box(
+                        Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .background(
+                                animateColorAsState(
+                                    if (isFetched) {
+                                        colors.primary
+                                    } else {
+                                        colors.surface
+                                    }
+                                ).value
+                            )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun QRBoxOverlay(
+    qrRect: Rect? = null,
+    state: ScannerComponent.State,
+) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val density = LocalDensity.current
         val containerWidth = with(density) { maxWidth.toPx() }
@@ -453,6 +503,21 @@ private fun QRBoxOverlay(qrRect: Rect? = null) {
                 )
             )
         }
+        if (state.total > 1) {
+            val density = LocalDensity.current
+            RenderParts(
+                state.readValues,
+                Modifier
+                    .offset {
+                        IntOffset(
+                            x = animatedRect.left.roundToInt(),
+                            y = (animatedRect.bottom + 8.dp.toPx()).roundToInt()
+                        )
+                    }
+                    .width(density.run { animatedRect.width.toDp() })
+                    .height(4.dp)
+            )
+        }
     }
 }
 
@@ -503,4 +568,43 @@ private fun mapQrPointsToScreen(
         right = maxX + padding,
         bottom = maxY + padding
     )
+}
+
+@Composable
+private fun ResponsiveDialogScope.CameraSheetUi(
+    header: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    ABDownloaderTheme(myColors = DefaultThemes.black) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .clip(
+                    myShapes.createSheetWithCustomEdges(
+                        topStart = isTopStartFree,
+                        bottomStart = isBottomStartFree,
+                        topEnd = isTopEndFree,
+                        bottomEnd = isBottomEndFree,
+                    )
+                )
+                .background(myColors.surface)
+                .imePadding()
+        ) {
+            content()
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                myColors.surface,
+                                Color.Transparent,
+                            )
+                        )
+                    )
+            ) {
+                header()
+            }
+        }
+    }
 }

@@ -26,6 +26,7 @@ import com.abdownloadmanager.shared.util.category.DefaultCategories
 import com.abdownloadmanager.shared.util.extractors.linkextractor.DownloadCredentialsFromJson
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
+import com.abdownloadmanager.shared.util.qrcode.QRCodeCreator
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.downloader.DownloadManagerEvents
 import ir.amirab.downloader.db.QueueModel
@@ -36,6 +37,7 @@ import ir.amirab.downloader.queue.DownloadQueue
 import ir.amirab.downloader.queue.QueueManager
 import ir.amirab.downloader.queue.queueModelsFlow
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.compose.asStringSourceWithARgs
 import ir.amirab.util.coroutines.combine
 import ir.amirab.util.flow.combineStateFlows
 import ir.amirab.util.flow.mapStateFlow
@@ -81,16 +83,27 @@ abstract class BaseHomeComponent(
     )
     val copyQRCodeScreen = _copyQRCodeScreen.asStateFlow()
 
-    fun requestOpenQRCodeScreen(downloadId: Long) {
+    fun requestOpenQRCodeScreen(downloadId: List<Long>) {
         scope.launch {
-            runCatching {
-                downloadSystem.getDownloadItemById(downloadId)
-            }.getOrNull()?.let { item ->
-                _copyQRCodeScreen.value = CopyDownloadAsQRCode(
-                    title = item.name,
-                    qrCode = DownloadCredentialsFromJson.credentialsAsJson(listOf(item))
+            val items = runCatching {
+                downloadId.mapNotNull {
+                    downloadSystem.getDownloadItemById(it)
+                }
+            }.getOrElse { emptyList() }
+            if (items.isEmpty()) return@launch
+            val title = if (items.size == 1) {
+                items.first().name.asStringSource()
+            } else {
+                Res.string.n_items_selected.asStringSourceWithARgs(
+                    Res.string.n_items_selected_createArgs(
+                        count = items.size.toString()
+                    )
                 )
             }
+            _copyQRCodeScreen.value = CopyDownloadAsQRCode(
+                title = title,
+                qrCode = DownloadCredentialsFromJson.credentialsAsJson(items)
+            )
         }
     }
 
