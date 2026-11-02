@@ -7,6 +7,8 @@ import ir.amirab.util.logger.thisLogger
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.io.File
+import java.util.Properties
 
 data class NativeMessagingManifests(
     val firefoxNativeMessagingManifest: FirefoxNativeMessagingManifest,
@@ -54,9 +56,8 @@ class NativeMessaging(
             logger.e(e) { "can't install native messaging manifests" }
         }
     }
-
     fun installManifests() {
-        val execFile = AppInfo.nativeMessagingExeFile ?: return
+        val execFile = getNativeMessagingExeFile() ?: return
         val firefox = createFirefoxManifest(execFile)
         val chrome = createChromeManifest(execFile)
         nativeMessagingManifestApplier.updateManifests(
@@ -66,6 +67,19 @@ class NativeMessaging(
             )
         )
     }
+
+    private fun getNativeMessagingExeFile(): String? {
+        val default = AppInfo.nativeMessagingExeFile ?: return null
+        val info = File("/.flatpak-info").takeIf { it.exists() } ?: return default
+        val base = Regex("^(/.*?)/app/").find(
+            runCatching {
+                Properties().apply { info.inputStream().use(::load) }.getProperty("app-path")
+            }.getOrNull().orEmpty()
+        )?.groupValues?.get(1) ?: "/var/lib/flatpak"
+
+        return "$base/exports/bin/com.abdownloadmanager.abdownloadmanager"
+    }
+
     fun uninstallManifests() {
         nativeMessagingManifestApplier.removeManifests()
     }
