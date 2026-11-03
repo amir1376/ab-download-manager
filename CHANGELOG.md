@@ -14,6 +14,23 @@
 
 ### Security
 
+## 1.11.3
+
+### Added
+
+- Added a Network section to the desktop settings page
+
+### Fixed
+
+- Fixed incorrect category icon names being saved to storage. If you notice any mismatched category icons, right-click
+  the category and select **Reset to Defaults**
+
+### Improved
+
+- Updated translations
+- Improved the QR Code scanner UI/UX on Android (#1516)
+- Improved QR Code sharing, allowing users to share multiple download credentials across multiple QR Codes (#1520)
+
 ## 1.11.2
 
 ### Added
