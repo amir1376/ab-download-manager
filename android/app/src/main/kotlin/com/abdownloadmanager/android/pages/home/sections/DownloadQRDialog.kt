@@ -1,8 +1,8 @@
 package com.abdownloadmanager.android.pages.home.sections
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -25,6 +25,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.abdownloadmanager.android.ui.SheetHeader
 import com.abdownloadmanager.android.ui.SheetTitle
@@ -37,12 +39,14 @@ import com.abdownloadmanager.shared.ui.widget.TransparentIconActionButton
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.OnFullyDismissed
 import com.abdownloadmanager.shared.util.ResponsiveDialog
+import com.abdownloadmanager.shared.util.div
 import com.abdownloadmanager.shared.util.qrcode.QRCodeCreator
 import com.abdownloadmanager.shared.util.qrcode.QRCodePlayer
 import com.abdownloadmanager.shared.util.qrcode.QRCodeRenderController
 import com.abdownloadmanager.shared.util.rememberResponsiveDialogState
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import io.github.alexzhirkevich.qrose.options.QrBrush
 import io.github.alexzhirkevich.qrose.options.QrColors
@@ -116,39 +120,53 @@ private fun DownloadQRPage(
     val painter = rememberQrCodePainter(
         data = qrCodeController.currentQRCode,
         colors = QrColors(
-            dark = QrBrush.solid(myColors.onBackground),
-            light = QrBrush.solid(myColors.background),
+            dark = QrBrush.solid(Color.Black),
+            light = QrBrush.solid(Color.White),
         ),
     )
-    Column(
-        Modifier
-            .padding(16.dp),
-    ) {
-        Image(
-            painter = painter,
-            contentDescription = null,
-            modifier = Modifier
-                .weight(1f, fill = false)
-                .aspectRatio(1f)
-                .fillMaxWidth(),
-        )
-        if (!qrCodeController.isSingle()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            RenderParts(
+    Column {
+        Column(
+            Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 16.dp)
+        ) {
+            Image(
+                painter = painter,
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(mySpacings.thumbSize / 2)
-                    .clip(CircleShape)
-                    .background(myColors.surface),
-                total = totalItems,
-                current = currentItem,
-                onItemSelected = { selectedIndex ->
-                    qrCodeController.selectCurrentIndex(selectedIndex)
-                },
+                    .wrapContentWidth()
+                    .aspectRatio(1f)
+                    .weight(1f, fill = false)
+                    .clip(myShapes.defaultRounded)
+                    .background(Color.White)
+                    .padding(12.dp)
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Column(Modifier.fillMaxWidth()) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 16.dp)
+        ) {
+            if (!qrCodeController.isSingle()) {
+                val shape = CircleShape
+                RenderParts(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(mySpacings.thumbSize / 2)
+                        .clip(shape)
+                        .border(Dp.Hairline, myColors.onSurface / 0.15f, shape)
+                        .background(myColors.background, shape),
+                    total = totalItems,
+                    current = currentItem,
+                    onItemSelected = { selectedIndex ->
+                        qrCodeController.selectCurrentIndex(selectedIndex)
+                    },
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            // player controls
             if (!qrCodeController.isSingle()) {
                 Row(
                     Modifier.align(Alignment.CenterHorizontally),
@@ -180,8 +198,8 @@ private fun DownloadQRPage(
                         }
                     )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(modifier = Modifier.height(8.dp))
             PrimaryMainActionButton(
                 text = myStringResource(Res.string.copy),
                 modifier = Modifier.fillMaxWidth(),
@@ -199,8 +217,8 @@ private fun RenderParts(
     current: Int,
     modifier: Modifier = Modifier,
     onItemSelected: (Int) -> Unit,
+    selectedColor: Color = myColors.primary,
 ) {
-    val colors = myColors
     Row(modifier) {
         repeat(total) {
             key(it) {
@@ -212,13 +230,11 @@ private fun RenderParts(
                         .fillMaxHeight()
                         .weight(1f)
                         .background(
-                            animateColorAsState(
-                                if (it == current) {
-                                    colors.primary
-                                } else {
-                                    colors.surface
-                                }
-                            ).value
+                            if (it == current) {
+                                selectedColor
+                            } else {
+                                Color.Transparent
+                            }
                         )
                 )
             }

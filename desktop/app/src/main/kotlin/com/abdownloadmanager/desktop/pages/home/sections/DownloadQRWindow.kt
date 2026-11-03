@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -45,6 +47,7 @@ import com.abdownloadmanager.shared.util.qrcode.QRCodeRenderController
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.abdownloadmanager.shared.util.ui.myColors
 import com.abdownloadmanager.shared.util.ui.theme.LocalUiScale
+import com.abdownloadmanager.shared.util.ui.theme.myShapes
 import com.abdownloadmanager.shared.util.ui.theme.mySpacings
 import io.github.alexzhirkevich.qrose.options.QrBrush
 import io.github.alexzhirkevich.qrose.options.QrColors
@@ -105,8 +108,8 @@ private fun DownloadQRPage(
     val painter = rememberQrCodePainter(
         data = qrCodeController.currentQRCode,
         colors = QrColors(
-            dark = QrBrush.solid(myColors.onBackground),
-            light = QrBrush.solid(myColors.background),
+            dark = QrBrush.solid(Color.Black),
+            light = QrBrush.solid(Color.White),
         ),
     )
     Column(
@@ -121,8 +124,13 @@ private fun DownloadQRPage(
                 painter = painter,
                 contentDescription = null,
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth()
+                    .aspectRatio(1f)
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .clip(myShapes.defaultRounded)
+                    .background(Color.White)
+                    .padding(12.dp),
             )
         }
         Column(
@@ -159,6 +167,7 @@ private fun DownloadQRPage(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 Row {
+                    // player controls
                     if (!qrCodeController.isSingle()) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -223,13 +232,11 @@ private fun RenderParts(
                         .fillMaxHeight()
                         .weight(1f)
                         .background(
-                            animateColorAsState(
-                                if (it == current) {
-                                    selectedColor
-                                } else {
-                                    Color.Transparent
-                                }
-                            ).value
+                            if (it == current) {
+                                selectedColor
+                            } else {
+                                Color.Transparent
+                            }
                         )
                 )
             }
