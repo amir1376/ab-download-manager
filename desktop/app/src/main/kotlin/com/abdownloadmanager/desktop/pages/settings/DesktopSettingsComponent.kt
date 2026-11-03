@@ -35,13 +35,12 @@ sealed class SettingSection(
     data object Appearance :
         SettingSection(MyIcons.appearance, Res.string.appearance.asStringSource())
 
-    //    TODO ADD Network section (proxy , etc..)
-    //    data object Network : SettingSections(MyIcons.network, "Network")
+    data object Network : SettingSection(MyIcons.network, Res.string.network.asStringSource())
     data object DownloadEngine :
         SettingSection(MyIcons.downloadEngine, Res.string.download_engine.asStringSource())
 
     data object BrowserIntegration :
-        SettingSection(MyIcons.network, Res.string.browser_integration.asStringSource())
+        SettingSection(MyIcons.earth, Res.string.browser_integration.asStringSource())
 }
 
 interface SettingSectionGetter {
@@ -126,7 +125,17 @@ class DesktopSettingsComponent(
                     )
                 )
 
-//                Network -> listOf()
+                Network -> listOf(
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            CommonSettings.proxyConfig(proxyManager),
+                            CommonSettings.dnsConfig(dNSStorage),
+                            CommonSettings.userAgent(appSettings),
+                            CommonSettings.ignoreSSLCertificates(appSettings),
+                        )
+                    )
+                )
+
                 BrowserIntegration -> listOf(
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
@@ -164,10 +173,6 @@ class DesktopSettingsComponent(
                     ),
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
-                            CommonSettings.proxyConfig(proxyManager),
-                            CommonSettings.dnsConfig(dNSStorage),
-                            CommonSettings.userAgent(appSettings),
-                            CommonSettings.ignoreSSLCertificates(appSettings),
                             CommonSettings.useServerLastModified(appRepository),
                         )
                     ),
@@ -216,8 +221,8 @@ class DesktopSettingsComponent(
 
     var pages = listOf(
         Appearance,
-//        Network,
         DownloadEngine,
+        Network,
         BrowserIntegration,
     )
     private val _currentPage: MutableStateFlow<SettingSection> = MutableStateFlow(Appearance)
