@@ -14,6 +14,17 @@
 
 ### Security
 
+## 1.11.4
+
+### Fixed
+
+- Fixed QR code rendering on dark themes
+
+### Improved
+
+- Updated translations
+- Improved the speed of reading multiple QR codes
+
 ## 1.11.3
 
 ### Added
