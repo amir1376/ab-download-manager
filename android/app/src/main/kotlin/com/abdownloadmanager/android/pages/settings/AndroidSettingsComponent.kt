@@ -118,6 +118,8 @@ class AndroidSettingsComponent(
                     CommonSettings.proxyConfig(proxyManager),
                     CommonSettings.dnsConfig(dnsStorage),
                     CommonSettings.userAgent(appSettings),
+                    CommonSettings.allDebridApiKey(appSettings),
+                    CommonSettings.allDebridAutoUnlock(appSettings),
                     CommonSettings.ignoreSSLCertificates(appSettings),
                     CommonSettings.useServerLastModified(appRepository),
                 )

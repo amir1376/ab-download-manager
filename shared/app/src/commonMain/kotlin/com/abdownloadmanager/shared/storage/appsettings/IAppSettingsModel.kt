@@ -48,4 +48,6 @@ interface IAppSettingsModel {
     val useCategoryByDefault: Boolean
     val userAgent: String
     val blockAddWhenLoading: Boolean
+    val allDebridApiKey: String
+    val allDebridAutoUnlock: Boolean
 }

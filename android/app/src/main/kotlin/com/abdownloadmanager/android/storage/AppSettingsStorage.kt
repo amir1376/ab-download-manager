@@ -86,6 +86,8 @@ class AppSettingsStorage(
     override val useCategoryByDefault = from(AppSettingsModel.useCategoryByDefault)
     override val userAgent = from(AppSettingsModel.userAgent)
     override val blockAddWhenLoading = from(AppSettingsModel.blockAddWhenLoading)
+    override val allDebridApiKey = from(AppSettingsModel.allDebridApiKey)
+    override val allDebridAutoUnlock = from(AppSettingsModel.allDebridAutoUnlock)
 
     val browserIconInLauncher = from(AppSettingsModel.browserIconInLauncher)
 }

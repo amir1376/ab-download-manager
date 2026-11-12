@@ -224,6 +224,29 @@ object CommonSettings {
             },
         )
     }
+    fun allDebridApiKey(appSettingsStorage: BaseAppSettingsStorage): StringConfigurable {
+        return StringConfigurable(
+            title = Res.string.settings_alldebrid_api_key.asStringSource(),
+            description = Res.string.settings_alldebrid_api_key_description.asStringSource(),
+            backedBy = appSettingsStorage.allDebridApiKey,
+            describe = {
+                it.isNotBlank().asToggledStringSource()
+            },
+        )
+    }
+
+    fun allDebridAutoUnlock(appSettingsStorage: BaseAppSettingsStorage): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = Res.string.settings_alldebrid_auto_unlock.asStringSource(),
+            description = Res.string.settings_alldebrid_auto_unlock_description.asStringSource(),
+            backedBy = appSettingsStorage.allDebridAutoUnlock,
+            describe = {
+                it.asToggledStringSource()
+            },
+            enabled = appSettingsStorage.allDebridApiKey.mapStateFlow { it.isNotBlank() },
+        )
+    }
+
     fun blockAddWhenLoading(appSettingsStorage: BaseAppSettingsStorage): BooleanConfigurable {
         return BooleanConfigurable(
             title = Res.string.settings_block_add_when_loading.asStringSource(),

@@ -53,6 +53,8 @@ data class AppSettingsModel(
     override val useCategoryByDefault: Boolean,
     override val userAgent: String,
     override val blockAddWhenLoading: Boolean,
+    override val allDebridApiKey: String,
+    override val allDebridAutoUnlock: Boolean,
 
     val mergeTopBarWithTitleBar: Boolean,
     val useNativeMenuBar: Boolean,
@@ -111,6 +113,8 @@ val DesktopSettingsSchema = S.typeSafeObject(
             useCategoryByDefault = it[AppSettingsModel::useCategoryByDefault],
             userAgent = it[AppSettingsModel::userAgent],
             blockAddWhenLoading = it[AppSettingsModel::blockAddWhenLoading],
+            allDebridApiKey = it[AppSettingsModel::allDebridApiKey],
+            allDebridAutoUnlock = it[AppSettingsModel::allDebridAutoUnlock],
 
             mergeTopBarWithTitleBar = it[AppSettingsModel::mergeTopBarWithTitleBar],
             useNativeMenuBar = it[AppSettingsModel::useNativeMenuBar],

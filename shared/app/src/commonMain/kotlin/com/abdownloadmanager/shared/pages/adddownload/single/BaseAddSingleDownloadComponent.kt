@@ -3,6 +3,7 @@ package com.abdownloadmanager.shared.pages.adddownload.single
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import arrow.core.Some
 import com.abdownloadmanager.shared.downloaderinui.DownloaderInUi
 import com.abdownloadmanager.shared.downloaderinui.add.CanAddResult
 import com.abdownloadmanager.shared.pagemanager.DownloadErrorDialogManager
@@ -21,6 +22,7 @@ import com.abdownloadmanager.shared.util.FileIconProvider
 import com.abdownloadmanager.shared.util.category.Category
 import com.abdownloadmanager.shared.util.category.CategoryItem
 import com.abdownloadmanager.shared.util.category.CategoryManager
+import com.abdownloadmanager.shared.util.debrid.AllDebrid
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.abdownloadmanager.shared.util.perhostsettings.PerHostSettingsManager
@@ -42,6 +44,9 @@ import ir.amirab.util.toSingleLine
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
+import okhttp3.OkHttpClient
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -77,7 +82,8 @@ abstract class BaseAddSingleDownloadComponent(
     appRepository = appRepository,
     categoryManager = categoryManager,
 ),
-    ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects() {
+    ContainsEffects<BaseAddSingleDownloadComponent.Effects> by supportEffects(),
+    KoinComponent {
     private val _shouldShowWindow = MutableStateFlow(importOptions.silentImport == null)
     override val shouldShowWindow: StateFlow<Boolean> = _shouldShowWindow.asStateFlow()
     val downloadInputsComponent = downloaderInUi.createNewDownloadInputs(
@@ -193,7 +199,77 @@ abstract class BaseAddSingleDownloadComponent(
         return downloadInputsComponent.getLengthString()
     }
 
+    private val httpClient: OkHttpClient by inject()
+    val allDebrid = appSettings.allDebridApiKey.mapStateFlow { apiKey ->
+        apiKey.trim().takeIf { it.isNotEmpty() }?.let { AllDebrid(it, httpClient) }
+    }
+    val canUnlockManually = combineStateFlows(
+        allDebrid,
+        appSettings.allDebridAutoUnlock,
+    ) { allDebrid, autoUnlock ->
+        allDebrid != null && !autoUnlock
+    }
+    private val _isDebridLoading = MutableStateFlow(false)
+    val isDebridLoading = _isDebridLoading.asStateFlow()
+    private val _debridError = MutableStateFlow<String?>(null)
+    val debridError = _debridError.asStateFlow()
+
+    fun unlockLinkWithDebrid() {
+        val debrid = allDebrid.value ?: return
+        val link = credentials.value.link
+        if (link.isBlank() || _isDebridLoading.value) return
+        _isDebridLoading.value = true
+        scope.launch {
+            try {
+                unlockLink(debrid, link)
+            } finally {
+                _isDebridLoading.value = false
+            }
+        }
+    }
+
+    private suspend fun unlockLink(debrid: AllDebrid, link: String) {
+        try {
+            val unlocked = debrid.unlock(link)
+            setCredentials(credentials.value.copy(link = Some(unlocked.link)))
+            unlocked.fileName?.let(::setName)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            _debridError.value = e.message ?: e::class.simpleName
+        }
+    }
+
     init {
+        credentials
+            .map { it.link }
+            .distinctUntilChanged()
+            .onEach { _debridError.value = null }
+            .launchIn(scope)
+        combine(
+            credentials.map { it.link }.distinctUntilChanged(),
+            allDebrid,
+            appSettings.allDebridAutoUnlock,
+        ) { link, debrid, autoUnlock ->
+            debrid?.takeIf { autoUnlock && link.isNotBlank() }?.let { it to link }
+        }
+            .onEachLatest { request ->
+                val (debrid, link) = request ?: return@onEachLatest
+                _isDebridLoading.value = true
+                try {
+                    delay(300.milliseconds)
+                    if (debrid.isSupported(link)) {
+                        unlockLink(debrid, link)
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    _debridError.value = e.message ?: e::class.simpleName
+                } finally {
+                    _isDebridLoading.value = false
+                }
+            }
+            .launchIn(scope)
         credentials
             .map { it.link }
             .distinctUntilChanged()
@@ -253,7 +329,11 @@ abstract class BaseAddSingleDownloadComponent(
         onDuplicateStrategy,
         isLinkLoading,
         blockAddWhenLoading,
-    ) { canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading, blockAddWhenLoading ->
+        isDebridLoading,
+    ) { canAdd, isDuplicate, onDuplicateStrategy, isLinkLoading, blockAddWhenLoading, isDebridLoading ->
+        if (isDebridLoading) {
+            return@combineStateFlows false
+        }
         if (isLinkLoading && blockAddWhenLoading) {
             // link is loading wait for it...
             return@combineStateFlows false
