@@ -101,11 +101,15 @@ fun ResponsiveDialogScope.AddSingleDownloadPage(
 
                 val canAddResult by component.canAddResult.collectAsState()
                 Column {
+                    val canDebrid = component.canUnlockManually.collectAsState().value
                     UrlTextField(
                         text = credentials.link,
                         setText = {
                             setLink(it)
                         },
+                        errorText = component.debridError.collectAsState().value,
+                        onDebrid = component::unlockLinkWithDebrid.takeIf { canDebrid },
+                        isDebridLoading = component.isDebridLoading.collectAsState().value,
                         modifier = Modifier
                     )
                     AnimatedVisibility(showMoreInputs) {
@@ -619,6 +623,8 @@ private fun UrlTextField(
     text: String,
     setText: (String) -> Unit,
     errorText: String? = null,
+    onDebrid: (() -> Unit)? = null,
+    isDebridLoading: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     MyTextFieldWithIcons(
@@ -627,6 +633,14 @@ private fun UrlTextField(
         myStringResource(Res.string.download_link),
         modifier = modifier.fillMaxWidth(),
         end = {
+            if (onDebrid != null) {
+                MyTextFieldIcon(
+                    icon = MyIcons.fast,
+                    enabled = !isDebridLoading,
+                    contentDescription = myStringResource(Res.string.debrid_unlock_link),
+                    onClick = onDebrid,
+                )
+            }
             MyTextFieldIcon(MyIcons.paste) {
                 setText(
                     ClipboardUtil.read()

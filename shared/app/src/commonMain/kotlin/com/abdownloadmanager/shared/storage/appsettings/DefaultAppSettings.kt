@@ -50,4 +50,6 @@ abstract class DefaultAppSettings {
     open val useCategoryByDefault: Boolean get() = true
     open val userAgent: String get() = ""
     open val blockAddWhenLoading: Boolean get() = true
+    open val allDebridApiKey: String get() = ""
+    open val allDebridAutoUnlock: Boolean get() = false
 }

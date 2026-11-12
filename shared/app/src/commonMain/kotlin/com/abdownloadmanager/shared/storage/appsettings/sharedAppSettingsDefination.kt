@@ -85,6 +85,9 @@ object BaseAppSettingsDefinition {
         prop(IAppSettingsModel::userAgent) bind S.string().catch(PlatformDefaultSettings::userAgent)
         prop(IAppSettingsModel::blockAddWhenLoading) bind S.boolean()
             .catch(PlatformDefaultSettings::blockAddWhenLoading)
+        prop(IAppSettingsModel::allDebridApiKey) bind S.string().catch(PlatformDefaultSettings::allDebridApiKey)
+        prop(IAppSettingsModel::allDebridAutoUnlock) bind S.boolean()
+            .catch(PlatformDefaultSettings::allDebridAutoUnlock)
     }
 }
 

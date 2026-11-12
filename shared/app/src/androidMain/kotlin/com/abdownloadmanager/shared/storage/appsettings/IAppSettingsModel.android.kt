@@ -55,6 +55,8 @@ data class AppSettingsModel(
     override val useCategoryByDefault: Boolean,
     override val userAgent: String,
     override val blockAddWhenLoading: Boolean,
+    override val allDebridApiKey: String,
+    override val allDebridAutoUnlock: Boolean,
     val browserIconInLauncher: Boolean,
 ) : IAppSettingsModel {
     companion object {
@@ -109,6 +111,8 @@ private val AndroidSettingsSchema = S.typeSafeObject(
             useCategoryByDefault = it[AppSettingsModel::useCategoryByDefault],
             userAgent = it[AppSettingsModel::userAgent],
             blockAddWhenLoading = it[AppSettingsModel::blockAddWhenLoading],
+            allDebridApiKey = it[AppSettingsModel::allDebridApiKey],
+            allDebridAutoUnlock = it[AppSettingsModel::allDebridAutoUnlock],
 
             browserIconInLauncher = it[AppSettingsModel::browserIconInLauncher],
         )
