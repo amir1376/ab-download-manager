@@ -57,7 +57,10 @@ class NativeMessaging(
         }
     }
     fun installManifests() {
-        val execFile = getNativeMessagingExeFile() ?: return
+        val execFile = System.getenv("AB_DOWNLOAD_MANAGER_NATIVE_MESSAGING_EXEC")
+                            ?.takeIf { it.isNotBlank() }
+                            ?: AppInfo.nativeMessagingExeFile
+                            ?: return
         val firefox = createFirefoxManifest(execFile)
         val chrome = createChromeManifest(execFile)
         nativeMessagingManifestApplier.updateManifests(
@@ -66,18 +69,6 @@ class NativeMessaging(
                 chromeNativeMessagingManifest = chrome,
             )
         )
-    }
-
-    private fun getNativeMessagingExeFile(): String? {
-        val default = AppInfo.nativeMessagingExeFile ?: return null
-        val info = File("/.flatpak-info").takeIf { it.exists() } ?: return default
-        val base = Regex("^(/.*?)/app/").find(
-            runCatching {
-                Properties().apply { info.inputStream().use(::load) }.getProperty("app-path")
-            }.getOrNull().orEmpty()
-        )?.groupValues?.get(1) ?: "/var/lib/flatpak"
-
-        return "$base/exports/bin/com.abdownloadmanager.abdownloadmanager"
     }
 
     fun uninstallManifests() {
