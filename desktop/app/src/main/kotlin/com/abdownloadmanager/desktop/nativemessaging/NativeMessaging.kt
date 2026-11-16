@@ -7,8 +7,6 @@ import ir.amirab.util.logger.thisLogger
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.io.File
-import java.util.Properties
 
 data class NativeMessagingManifests(
     val firefoxNativeMessagingManifest: FirefoxNativeMessagingManifest,
@@ -57,10 +55,11 @@ class NativeMessaging(
         }
     }
     fun installManifests() {
-        val execFile = System.getenv("AB_DOWNLOAD_MANAGER_NATIVE_MESSAGING_EXEC")
-                            ?.takeIf { it.isNotBlank() }
-                            ?: AppInfo.nativeMessagingExeFile
-                            ?: return
+        val overrideExecFile = System.getenv("AB_DOWNLOAD_MANAGER_NATIVE_MESSAGING_EXEC")?.takeIf { it.isNotBlank() }
+        // Allow overriding the native messaging executable path via an environment variable.
+        // Enabling native messaging to work in environments where the default path is inaccessible.
+        val execFile = overrideExecFile ?: AppInfo.nativeMessagingExeFile ?: return
+
         val firefox = createFirefoxManifest(execFile)
         val chrome = createChromeManifest(execFile)
         nativeMessagingManifestApplier.updateManifests(
