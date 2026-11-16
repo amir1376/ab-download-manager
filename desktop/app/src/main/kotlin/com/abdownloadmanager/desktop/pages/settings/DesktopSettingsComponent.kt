@@ -131,6 +131,8 @@ class DesktopSettingsComponent(
                             CommonSettings.proxyConfig(proxyManager),
                             CommonSettings.dnsConfig(dNSStorage),
                             CommonSettings.userAgent(appSettings),
+                            CommonSettings.allDebridApiKey(appSettings),
+                            CommonSettings.allDebridAutoUnlock(appSettings),
                             CommonSettings.ignoreSSLCertificates(appSettings),
                         )
                     )

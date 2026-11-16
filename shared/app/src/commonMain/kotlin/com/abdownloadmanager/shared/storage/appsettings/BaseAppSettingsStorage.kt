@@ -51,4 +51,6 @@ interface BaseAppSettingsStorage :
     val useCategoryByDefault: MutableStateFlow<Boolean>
     val userAgent: MutableStateFlow<String>
     val blockAddWhenLoading: MutableStateFlow<Boolean>
+    val allDebridApiKey: MutableStateFlow<String>
+    val allDebridAutoUnlock: MutableStateFlow<Boolean>
 }
