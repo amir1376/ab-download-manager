@@ -54,9 +54,12 @@ class NativeMessaging(
             logger.e(e) { "can't install native messaging manifests" }
         }
     }
-
     fun installManifests() {
-        val execFile = AppInfo.nativeMessagingExeFile ?: return
+        val overrideExecFile = System.getenv("AB_DOWNLOAD_MANAGER_NATIVE_MESSAGING_EXEC")?.takeIf { it.isNotBlank() }
+        // Allow overriding the native messaging executable path via an environment variable.
+        // Enabling native messaging to work in environments where the default path is inaccessible.
+        val execFile = overrideExecFile ?: AppInfo.nativeMessagingExeFile ?: return
+
         val firefox = createFirefoxManifest(execFile)
         val chrome = createChromeManifest(execFile)
         nativeMessagingManifestApplier.updateManifests(
@@ -66,6 +69,7 @@ class NativeMessaging(
             )
         )
     }
+
     fun uninstallManifests() {
         nativeMessagingManifestApplier.removeManifests()
     }
