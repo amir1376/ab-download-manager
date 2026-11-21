@@ -35,7 +35,7 @@ data class FileChecksum(
 
     companion object {
         fun fromString(string: String): FileChecksum {
-            val segments = string.split(":")
+            val segments = string.split(":", limit = 2)
             require(segments.size == 2) {
                 "Invalid checksum string: $string it should be in format algorithm:value"
             }
