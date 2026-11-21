@@ -20,7 +20,7 @@ import kotlin.math.max
 open class BaseBatchDownloadComponent(
     ctx: ComponentContext,
     val onClose: () -> Unit,
-    val importLinks: (List<String>) -> Unit,
+    val importLinks: (links: List<String>, subFolder: String?) -> Unit,
 ) : BaseComponent(ctx), ContainsEffects<BaseBatchDownloadComponent.Effects> by supportEffects() {
 
     private val rangeRegex = Regex("""\[(\d+)-(\d+)\]""")
@@ -182,6 +182,41 @@ open class BaseBatchDownloadComponent(
         it is BatchDownloadValidationResult.Ok
     }
 
+    val detectedSubFolder: StateFlow<String> = combineStateFlows(
+        mode,
+        parsedUrls,
+        batch,
+    ) { mode, parsed, batch ->
+        val urls = when (mode) {
+            BatchDownloadMode.UrlList -> parsed
+            BatchDownloadMode.Wildcard -> batch?.toList().orEmpty()
+        }
+        BatchFolderDetector.detect(urls)
+    }
+
+    private val _customSubFolder = MutableStateFlow<String?>(null)
+    val subFolder: StateFlow<String> = combineStateFlows(
+        detectedSubFolder,
+        _customSubFolder,
+    ) { detected, custom ->
+        custom ?: detected
+    }
+
+    fun setSubFolder(name: String) {
+        _customSubFolder.value = name
+    }
+
+    fun resetSubFolderToAuto() {
+        _customSubFolder.value = null
+    }
+
+    private val _saveInSubFolder = MutableStateFlow(true)
+    val saveInSubFolder = _saveInSubFolder.asStateFlow()
+
+    fun setSaveInSubFolder(save: Boolean) {
+        _saveInSubFolder.value = save
+    }
+
     fun confirm() {
         if (!canConfirm.value) {
             return
@@ -192,7 +227,12 @@ open class BaseBatchDownloadComponent(
         }?.takeIf { it.isNotEmpty() }
 
         if (items != null) {
-            importLinks(items)
+            val targetSubFolder = if (saveInSubFolder.value) {
+                subFolder.value.trim().takeIf { it.isNotEmpty() }
+            } else {
+                null
+            }
+            importLinks(items, targetSubFolder)
         }
         onClose()
     }

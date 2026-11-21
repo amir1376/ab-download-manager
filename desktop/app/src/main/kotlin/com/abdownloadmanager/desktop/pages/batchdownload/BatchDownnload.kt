@@ -72,6 +72,7 @@ fun BatchDownload(
                         WildcardSection(component, validationResult)
                     }
                 }
+                BatchSubFolderSection(component)
             }
             MultiplatformVerticalScrollbar(scrollAdapter, Modifier.fillMaxHeight())
         }
@@ -201,6 +202,46 @@ private fun UrlListSection(
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun BatchSubFolderSection(
+    component: DesktopBatchDownloadComponent,
+) {
+    val saveInSubFolder by component.saveInSubFolder.collectAsState()
+    val subFolder by component.subFolder.collectAsState()
+
+    Spacer(Modifier.height(12.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(myShapes.defaultRounded)
+            .clickable { component.setSaveInSubFolder(!saveInSubFolder) }
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CheckBox(
+            value = saveInSubFolder,
+            onValueChange = component::setSaveInSubFolder,
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            myStringResource(Res.string.batch_download_save_in_subfolder),
+            fontSize = myTextSizes.base,
+        )
+    }
+
+    AnimatedVisibility(visible = saveInSubFolder) {
+        Column(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+            MyTextField(
+                text = subFolder,
+                onTextChange = component::setSubFolder,
+                placeholder = myStringResource(Res.string.batch_download_subfolder_placeholder),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+            )
         }
     }
 }

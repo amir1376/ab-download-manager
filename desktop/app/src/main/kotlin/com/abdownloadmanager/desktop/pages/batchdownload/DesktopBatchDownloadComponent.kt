@@ -6,7 +6,7 @@ import com.arkivanov.decompose.ComponentContext
 class DesktopBatchDownloadComponent(
     ctx: ComponentContext,
     onClose: () -> Unit,
-    importLinks: (List<String>) -> Unit,
+    importLinks: (links: List<String>, subFolder: String?) -> Unit,
 ) : BaseBatchDownloadComponent(
     ctx = ctx,
     onClose = onClose,

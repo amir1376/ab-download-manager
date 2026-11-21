@@ -225,9 +225,9 @@ class MainComponent(
             AndroidBatchDownloadComponent(
                 ctx = ctx,
                 onClose = ::closeBatchDownload,
-                importLinks = { links ->
+                importLinks = { links, subFolder ->
                     openAddDownloadDialog(
-                        links.mapNotNull { link ->
+                        links = links.mapNotNull { link ->
                             downloaderInUiRegistry
                                 .bestMatchForThisLink(link)
                                 ?.createMinimumCredentials(link)
@@ -236,7 +236,8 @@ class MainComponent(
                                         credentials = credentials,
                                     )
                                 }
-                        }
+                        },
+                        subFolder = subFolder,
                     )
                 }
             )
@@ -487,6 +488,7 @@ class MainComponent(
 
     override fun openAddDownloadDialog(
         links: List<AddDownloadCredentialsInUiProps>,
+        subFolder: String?,
         importOptions: ImportOptions
     ) {
         scope.launch {
@@ -509,6 +511,7 @@ class MainComponent(
                         context = context,
                         multipleAddConfig = AddDownloadConfig.MultipleAddConfig(
                             newDownloads = links,
+                            subFolder = subFolder,
                             importOptions = importOptions,
                         ),
                         json = json,
