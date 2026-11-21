@@ -2,6 +2,7 @@ package com.abdownloadmanager.shared.pages.batchdownload
 
 import com.abdownloadmanager.shared.util.ClipboardUtil
 import com.abdownloadmanager.shared.util.BaseComponent
+import com.abdownloadmanager.shared.util.extractors.linkextractor.StringUrlExtractor
 import com.abdownloadmanager.shared.util.mvi.ContainsEffects
 import com.abdownloadmanager.shared.util.mvi.supportEffects
 import com.arkivanov.decompose.ComponentContext
@@ -19,13 +20,50 @@ import kotlin.math.max
 open class BaseBatchDownloadComponent(
     ctx: ComponentContext,
     val onClose: () -> Unit,
-    val importLinks: (List<String>) -> Unit,
+    val importLinks: (links: List<String>, subFolder: String?) -> Unit,
 ) : BaseComponent(ctx), ContainsEffects<BaseBatchDownloadComponent.Effects> by supportEffects() {
+
+    private val rangeRegex = Regex("""\[(\d+)-(\d+)\]""")
+
+    private val _mode = MutableStateFlow(BatchDownloadMode.UrlList)
+    val mode = _mode.asStateFlow()
+
+    fun setMode(mode: BatchDownloadMode) {
+        _mode.value = mode
+    }
+
+    private val _urlsText = MutableStateFlow("")
+    val urlsText = _urlsText.asStateFlow()
+
+    fun setUrlsText(text: String) {
+        _urlsText.value = text
+    }
+
+    val parsedUrls: StateFlow<List<String>> = _urlsText.mapStateFlow { text ->
+        StringUrlExtractor.extract(text)
+    }
 
     private val _link = MutableStateFlow("")
     val link = _link.asStateFlow()
 
     fun setLink(link: String) {
+        val trimmed = link.trim()
+        val extracted = StringUrlExtractor.extract(trimmed)
+        if (extracted.size > 1) {
+            setMode(BatchDownloadMode.UrlList)
+            setUrlsText(trimmed)
+            return
+        }
+        val rangeMatch = rangeRegex.find(trimmed)
+        if (rangeMatch != null) {
+            val startVal = rangeMatch.groupValues[1]
+            val endVal = rangeMatch.groupValues[2]
+            val replaced = trimmed.replaceRange(rangeMatch.range, "*")
+            _link.value = replaced
+            if (_start.value.isBlank()) setStart(startVal)
+            if (_end.value.isBlank()) setEnd(endVal)
+            return
+        }
         _link.value = link
     }
 
@@ -57,8 +95,27 @@ open class BaseBatchDownloadComponent(
         scope.launch {
             withContext(Dispatchers.Default) {
                 val clipboard = ClipboardUtil.read() ?: return@withContext
-                if (HttpUrlUtils.isValidUrl(clipboard)) {
-                    setLink(clipboard.trim())
+                val trimmed = clipboard.trim()
+                if (trimmed.isEmpty()) return@withContext
+
+                val extracted = StringUrlExtractor.extract(trimmed)
+                if (extracted.size > 1) {
+                    setMode(BatchDownloadMode.UrlList)
+                    setUrlsText(trimmed)
+                } else if (extracted.size == 1) {
+                    val singleUrl = extracted.first()
+                    val rangeMatch = rangeRegex.find(singleUrl)
+                    if (singleUrl.contains("*") || rangeMatch != null) {
+                        setMode(BatchDownloadMode.Wildcard)
+                        setLink(singleUrl)
+                    } else {
+                        setMode(BatchDownloadMode.UrlList)
+                        setUrlsText(singleUrl)
+                        setLink(singleUrl)
+                    }
+                } else if (trimmed.contains("*")) {
+                    setMode(BatchDownloadMode.Wildcard)
+                    setLink(trimmed)
                 }
             }
         }
@@ -84,41 +141,98 @@ open class BaseBatchDownloadComponent(
         )
     }
 
-
     val startLinkResult: StateFlow<String> = batch
         .mapStateFlow { it?.first() ?: "" }
     val endLinkResult: StateFlow<String> = batch
         .mapStateFlow { it?.last() ?: "" }
 
-
-    val validationResult = batch.mapStateFlow {
-        when (it) {
-            null -> BatchDownloadValidationResult.Others
-            else -> {
-                val listSize = it.size()
+    val validationResult: StateFlow<BatchDownloadValidationResult> = combineStateFlows(
+        mode,
+        batch,
+        parsedUrls,
+        urlsText,
+    ) { mode, batch, parsedUrls, urlsText ->
+        when (mode) {
+            BatchDownloadMode.Wildcard -> {
+                when (batch) {
+                    null -> BatchDownloadValidationResult.Others
+                    else -> {
+                        val listSize = batch.size()
+                        when {
+                            listSize < 1 -> BatchDownloadValidationResult.Others
+                            listSize > MAX_ALLOWED_RANGE -> BatchDownloadValidationResult.MaxRangeExceed(MAX_ALLOWED_RANGE)
+                            !HttpUrlUtils.isValidUrl(batch.first()) -> BatchDownloadValidationResult.URLInvalid
+                            else -> BatchDownloadValidationResult.Ok
+                        }
+                    }
+                }
+            }
+            BatchDownloadMode.UrlList -> {
                 when {
-                    listSize < 1 -> BatchDownloadValidationResult.Others
-                    listSize > MAX_ALLOWED_RANGE -> BatchDownloadValidationResult.MaxRangeExceed(MAX_ALLOWED_RANGE)
-                    !HttpUrlUtils.isValidUrl(it.first()) -> BatchDownloadValidationResult.URLInvalid
+                    urlsText.isBlank() -> BatchDownloadValidationResult.Others
+                    parsedUrls.isEmpty() -> BatchDownloadValidationResult.NoUrlsFound
+                    parsedUrls.size > MAX_ALLOWED_RANGE -> BatchDownloadValidationResult.MaxRangeExceed(MAX_ALLOWED_RANGE)
                     else -> BatchDownloadValidationResult.Ok
                 }
             }
         }
-
     }
 
     val canConfirm = validationResult.mapStateFlow {
         it is BatchDownloadValidationResult.Ok
     }
 
+    val detectedSubFolder: StateFlow<String> = combineStateFlows(
+        mode,
+        parsedUrls,
+        batch,
+    ) { mode, parsed, batch ->
+        val urls = when (mode) {
+            BatchDownloadMode.UrlList -> parsed
+            BatchDownloadMode.Wildcard -> batch?.toList().orEmpty()
+        }
+        BatchFolderDetector.detect(urls)
+    }
+
+    private val _customSubFolder = MutableStateFlow<String?>(null)
+    val subFolder: StateFlow<String> = combineStateFlows(
+        detectedSubFolder,
+        _customSubFolder,
+    ) { detected, custom ->
+        custom ?: detected
+    }
+
+    fun setSubFolder(name: String) {
+        _customSubFolder.value = name
+    }
+
+    fun resetSubFolderToAuto() {
+        _customSubFolder.value = null
+    }
+
+    private val _saveInSubFolder = MutableStateFlow(true)
+    val saveInSubFolder = _saveInSubFolder.asStateFlow()
+
+    fun setSaveInSubFolder(save: Boolean) {
+        _saveInSubFolder.value = save
+    }
+
     fun confirm() {
         if (!canConfirm.value) {
-            println(batch.value?.toList())
             return
         }
-        val items = batch.value?.toList()?.takeIf { it.isNotEmpty() }
+        val items = when (mode.value) {
+            BatchDownloadMode.Wildcard -> batch.value?.toList()
+            BatchDownloadMode.UrlList -> parsedUrls.value
+        }?.takeIf { it.isNotEmpty() }
+
         if (items != null) {
-            importLinks(items)
+            val targetSubFolder = if (saveInSubFolder.value) {
+                subFolder.value.trim().takeIf { it.isNotEmpty() }
+            } else {
+                null
+            }
+            importLinks(items, targetSubFolder)
         }
         onClose()
     }
@@ -132,11 +246,17 @@ open class BaseBatchDownloadComponent(
     }
 }
 
+enum class BatchDownloadMode {
+    UrlList,
+    Wildcard,
+}
+
 sealed interface BatchDownloadValidationResult {
     data object Ok : BatchDownloadValidationResult
     data object Others : BatchDownloadValidationResult
     data class MaxRangeExceed(val allowed: Int) : BatchDownloadValidationResult
     data object URLInvalid : BatchDownloadValidationResult
+    data object NoUrlsFound : BatchDownloadValidationResult
 }
 
 sealed class WildcardLength {
@@ -187,5 +307,4 @@ data class WildcardString(
             .map(::get)
             .iterator()
     }
-
 }

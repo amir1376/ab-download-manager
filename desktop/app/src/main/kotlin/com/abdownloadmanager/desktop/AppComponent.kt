@@ -206,9 +206,9 @@ class AppComponent(
             DesktopBatchDownloadComponent(
                 ctx = componentContext,
                 onClose = this::closeBatchDownload,
-                importLinks = {
+                importLinks = { links, subFolder ->
                     openAddDownloadDialog(
-                        it.mapNotNull {
+                        links = links.mapNotNull {
                             downloaderInUiRegistry
                                 .bestMatchForThisLink(it)
                                 ?.createMinimumCredentials(it)
@@ -217,8 +217,8 @@ class AppComponent(
                                         credentials = credentials,
                                     )
                                 }
-                        }
-
+                        },
+                        subFolder = subFolder,
                     )
                 }
             )
@@ -406,7 +406,15 @@ class AppComponent(
                         queueManager = queueManager,
                         categoryManager = categoryManager,
                         categoryDialogManager = this,
-                    ).apply { addItems(config.newDownloads) }
+                    ).apply {
+                        if (!config.subFolder.isNullOrBlank()) {
+                            val baseFolder = appRepository.saveLocation.value
+                            val targetFolder = java.io.File(baseFolder, config.subFolder).canonicalPath
+                            setFolder(targetFolder)
+                            setAllItemsInSameLocation(true)
+                        }
+                        addItems(config.newDownloads)
+                    }
                 }
 
                 else -> error("should not happened")
@@ -820,12 +828,13 @@ class AppComponent(
                 editDownloadComponent.bringToFront()
             }
         } else {
-            openAddDownloadDialog(list, options)
+            openAddDownloadDialog(links = list, importOptions = options)
         }
     }
 
     override fun openAddDownloadDialog(
         links: List<AddDownloadCredentialsInUiProps>,
+        subFolder: String?,
         importOptions: ImportOptions,
     ) {
         scope.launch {
@@ -839,8 +848,9 @@ class AppComponent(
                     if (addDownloadCredentialsProps.size > 1) {
                         add(
                             AddDownloadConfig.MultipleAddConfig(
-                                addDownloadCredentialsProps,
-                                importOptions,
+                                newDownloads = addDownloadCredentialsProps,
+                                subFolder = subFolder,
+                                importOptions = importOptions,
                             )
                         )
                     } else {

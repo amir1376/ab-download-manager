@@ -31,7 +31,7 @@ private fun BatchDownloadWindow(desktopBatchDownloadComponent: DesktopBatchDownl
         state = rememberWindowState(
             initialBoundsProvider = WindowBoundsProvider(
                 sizeProvider = WindowSizeProvider.Fixed(
-                    size = DpSize(500.dp, 420.dp)
+                    size = DpSize(540.dp, 540.dp)
                         .applyUiScale(LocalUiScale.current),
                 ),
                 positionProvider = WindowPositionProvider.CenteredOnScreen

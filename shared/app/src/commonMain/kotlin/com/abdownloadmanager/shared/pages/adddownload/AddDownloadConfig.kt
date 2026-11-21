@@ -18,6 +18,7 @@ sealed interface AddDownloadConfig {
     @Serializable
     data class MultipleAddConfig(
         val newDownloads: List<AddDownloadCredentialsInUiProps> = emptyList(),
+        val subFolder: String? = null,
         override val importOptions: ImportOptions = ImportOptions(),
         override val id: String = UUID.randomUUID().toString(),
     ) : AddDownloadConfig

@@ -67,7 +67,15 @@ class AddMultiDownloadActivity : ABDMActivity() {
                 fileIconProvider = iconProvider,
                 appRepository = appRepository,
                 downloaderInUiRegistry = downloaderInUiRegistry,
-            ).apply { addItems(config.newDownloads) }
+            ).apply {
+                if (!config.subFolder.isNullOrBlank()) {
+                    val baseFolder = appRepository.saveLocation.value
+                    val targetFolder = java.io.File(baseFolder, config.subFolder).canonicalPath
+                    setFolder(targetFolder)
+                    setAllItemsInSameLocation(true)
+                }
+                addItems(config.newDownloads)
+            }
         }
         val addDownloadComponent = myRetainedComponent.component
         setABDMContent {

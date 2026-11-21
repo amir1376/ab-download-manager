@@ -7,6 +7,7 @@ interface AddDownloadDialogManager {
     fun closeAddDownloadDialog()
     fun openAddDownloadDialog(
         links: List<AddDownloadCredentialsInUiProps>,
+        subFolder: String? = null,
         importOptions: ImportOptions = ImportOptions(),
     )
 }
