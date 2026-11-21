@@ -87,12 +87,18 @@ open class BaseFileChecksumComponent(
         setState {
             it.copy(
                 items = downloadItems.map { downloadItem ->
-                    val savedChecksum = FileChecksum.Companion.fromNullableString(downloadItem.fileChecksum)
+                    val parsedChecksum = runCatching {
+                        FileChecksum.fromNullableString(downloadItem.fileChecksum)
+                    }
+                    val savedChecksum = parsedChecksum.getOrNull()
+                    val parseError = parsedChecksum.exceptionOrNull()
                     DownloadItemWithChecksum(
                         downloadItem = downloadItem,
-                        checksumStatus = ChecksumStatus.Waiting,
+                        checksumStatus = parseError?.let { error ->
+                            ChecksumStatus.Error.Exception(error)
+                        } ?: ChecksumStatus.Waiting,
                         algorithm = savedChecksum?.algorithm ?: selectedDefaultAlgorithm.value.algorithm,
-                        savedChecksum = savedChecksum?.value,
+                        savedChecksum = savedChecksum?.value ?: downloadItem.fileChecksum,
                         calculatedChecksum = null,
                     )
                 },
@@ -154,12 +160,20 @@ open class BaseFileChecksumComponent(
                                 calculatedChecksum = FileChecksum(algorithm, modified.calculatedChecksum)
                             )
                         )
+                    } else if (it.checksumStatus is ChecksumStatus.Error.Exception) {
+                        modified = modified.copy(
+                            checksumStatus = ChecksumStatus.Waiting,
+                        )
                     }
                 } else {
                     // we don't have saved checksum, so we don't know if its matches or not!
                     if (it.checksumStatus is ChecksumStatus.Finished) {
                         modified = modified.copy(
                             checksumStatus = ChecksumStatus.Finished.Done,
+                        )
+                    } else if (it.checksumStatus is ChecksumStatus.Error.Exception) {
+                        modified = modified.copy(
+                            checksumStatus = ChecksumStatus.Waiting,
                         )
                     }
                 }
@@ -201,7 +215,8 @@ open class BaseFileChecksumComponent(
             return
         }
         try {
-            val algorithm = getChecksumAlgorithmForItem(item)
+            val savedChecksum = FileChecksum.fromNullableString(item.fileChecksum)
+            val algorithm = savedChecksum?.algorithm ?: selectedDefaultAlgorithm.value.algorithm
             val hash = HashUtil.fileHash(
                 algorithm = algorithm,
                 file = file,
@@ -212,7 +227,7 @@ open class BaseFileChecksumComponent(
                 }
             )
             val newStatus = compareHashes(
-                FileChecksum.Companion.fromNullableString(item.fileChecksum),
+                savedChecksum,
                 FileChecksum(algorithm, hash),
             )
             scope.launch {
@@ -246,7 +261,7 @@ open class BaseFileChecksumComponent(
 
     private fun getChecksumAlgorithmForItem(downloadItem: IDownloadItem): String {
         return downloadItem.fileChecksum?.let {
-            FileChecksum.Companion.fromString(it).algorithm
+            runCatching { FileChecksum.fromString(it).algorithm }.getOrNull()
         } ?: selectedDefaultAlgorithm.value.algorithm
     }
 
