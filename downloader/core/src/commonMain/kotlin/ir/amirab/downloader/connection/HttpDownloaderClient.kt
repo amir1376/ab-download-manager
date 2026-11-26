@@ -63,7 +63,11 @@ abstract class HttpDownloaderClient {
             val rangeLength = rangeEnd - rangeStart + 1 // 256
             val response = head(credentials, rangeStart, rangeEnd)
 
-            if (response.isSuccessFul && response.totalLength != rangeLength) {
+            // a partial response proves that the server honored the range and that the
+            // link works, even when the server reports a broken total size (some hosts
+            // do that for files they have not fetched yet). asking again without a range
+            // would download the whole file here and usually end up in a connection reset
+            if (response.isSuccessFul && (response.isPartial || response.totalLength != rangeLength)) {
                 return response
             }
         } catch (e: Exception) {
