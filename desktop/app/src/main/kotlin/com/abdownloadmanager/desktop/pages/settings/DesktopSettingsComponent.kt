@@ -15,6 +15,7 @@ import com.abdownloadmanager.shared.storage.impl.DNSStorage
 import com.abdownloadmanager.shared.ui.configurable.ConfigurableGroup
 import com.abdownloadmanager.shared.ui.theme.ThemeManager
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
+import com.abdownloadmanager.shared.util.realdebrid.RealDebridSettingsStorage
 import com.abdownloadmanager.shared.util.ui.icon.MyIcons
 import com.arkivanov.decompose.ComponentContext
 import ir.amirab.util.compose.IconSource
@@ -41,6 +42,9 @@ sealed class SettingSection(
 
     data object BrowserIntegration :
         SettingSection(MyIcons.earth, Res.string.browser_integration.asStringSource())
+
+    data object RealDebrid :
+        SettingSection(MyIcons.downloadEngine, Res.string.real_debrid.asStringSource())
 }
 
 interface SettingSectionGetter {
@@ -57,6 +61,7 @@ class DesktopSettingsComponent(
     private val appRepository by inject<AppRepository>()
     private val proxyManager by inject<ProxyManager>()
     private val dNSStorage by inject<DNSStorage>()
+    private val realDebridSettingsStorage by inject<RealDebridSettingsStorage>()
     private val themeManager by inject<ThemeManager>()
     private val languageManager by inject<LanguageManager>()
     private val fontManager by inject<FontManager>()
@@ -134,6 +139,15 @@ class DesktopSettingsComponent(
                             CommonSettings.ignoreSSLCertificates(appSettings),
                         )
                     )
+                )
+
+                RealDebrid -> listOf(
+                    ConfigurableGroup(
+                        nestedConfigurable = listOf(
+                            CommonSettings.realDebridEnabled(realDebridSettingsStorage),
+                            CommonSettings.realDebridApiToken(realDebridSettingsStorage),
+                        )
+                    ),
                 )
 
                 BrowserIntegration -> listOf(
@@ -223,6 +237,7 @@ class DesktopSettingsComponent(
         Appearance,
         DownloadEngine,
         Network,
+        RealDebrid,
         BrowserIntegration,
     )
     private val _currentPage: MutableStateFlow<SettingSection> = MutableStateFlow(Appearance)

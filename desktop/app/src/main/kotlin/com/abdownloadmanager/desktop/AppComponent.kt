@@ -1148,7 +1148,18 @@ class AppComponent(
                             ),
                         )
                     }
-                }
+                },
+                onRequestFinishedMultiple = { credentialsList ->
+                    scope.launch {
+                        openAddDownloadDialog(
+                            links = credentialsList.map { credentials ->
+                                AddDownloadCredentialsInUiProps(
+                                    credentials = credentials
+                                )
+                            },
+                        )
+                    }
+                },
             )
         }
     ).subscribeAsStateFlow()

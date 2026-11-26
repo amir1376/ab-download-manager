@@ -11,12 +11,14 @@ class DesktopEnterNewURLComponent(
     downloaderInUiRegistry: DownloaderInUiRegistry,
     onCloseRequest: () -> Unit,
     onRequestFinished: (IDownloadCredentials) -> Unit,
+    onRequestFinishedMultiple: ((List<IDownloadCredentials>) -> Unit)? = null,
 ) : BaseEnterNewURLComponent(
     ctx = ctx,
     config = config,
     downloaderInUiRegistry = downloaderInUiRegistry,
     onCloseRequest = onCloseRequest,
     onRequestFinished = onRequestFinished,
+    onRequestFinishedMultiple = onRequestFinishedMultiple,
 ) {
     sealed interface Effects : BaseEnterNewURLComponent.Effects.PlatformEffects {
         data object BringToFront : Effects
