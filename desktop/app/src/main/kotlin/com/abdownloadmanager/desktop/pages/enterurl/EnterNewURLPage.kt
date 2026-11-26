@@ -69,6 +69,7 @@ fun EnterNewURLPage(component: DesktopEnterNewURLComponent) {
             UrlTextField(
                 text = text,
                 setText = component::setURL,
+                errorText = component.realDebridError.collectAsState().value,
                 modifier = Modifier
                     .focusRequester(linkFocus)
                     .fillMaxWidth()
@@ -219,6 +220,11 @@ private fun rememberDownloaderSelectionItemString(
 private fun Actions(
     component: DesktopEnterNewURLComponent,
 ) {
+    val isResolvingRealDebrid by component.isResolvingRealDebrid.collectAsState()
+    if (isResolvingRealDebrid) {
+        Text(myStringResource(Res.string.real_debrid_resolving))
+        Spacer(Modifier.width(8.dp))
+    }
     ActionButton(
         myStringResource(Res.string.ok),
         enabled = component.canAdd.collectAsState().value,

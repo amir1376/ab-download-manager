@@ -97,6 +97,10 @@ import com.abdownloadmanager.shared.util.category.*
 import com.abdownloadmanager.shared.util.di.BaseOKHttpClientQualifier
 import com.abdownloadmanager.shared.util.dns.AppDns
 import com.abdownloadmanager.shared.util.dns.DnsOptionProvider
+import com.abdownloadmanager.shared.util.realdebrid.RealDebridClient
+import com.abdownloadmanager.shared.util.realdebrid.RealDebridResolver
+import com.abdownloadmanager.shared.util.realdebrid.RealDebridSettings
+import com.abdownloadmanager.shared.util.realdebrid.RealDebridSettingsStorage
 import com.abdownloadmanager.shared.util.downloaderror.DownloadErrorMapperRegistryFactory
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloadErrorStorageInMemory
 import com.abdownloadmanager.shared.util.downloaderror.faileddownloads.FailedDownloads
@@ -650,6 +654,22 @@ val appModule = module {
     }.apply {
         bind<IDNSSettingsStorage>()
         bind<DnsOptionProvider>()
+    }
+    single {
+        val definedPaths = get<DefinedPaths>()
+        RealDebridSettingsStorage(
+            kotlinxSerializationDataStore(
+                definedPaths.realDebridSettingsFile.toFile(),
+                get(),
+                { RealDebridSettings() },
+            )
+        )
+    }
+    single {
+        RealDebridClient(get())
+    }
+    single {
+        RealDebridResolver(get(), get())
     }
     single<OkHttpClient>(BaseOKHttpClientQualifier) {
         val appSSLFactoryProvider: AppSSLFactoryProvider = get()

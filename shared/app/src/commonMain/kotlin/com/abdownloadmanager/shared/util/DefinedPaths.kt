@@ -32,6 +32,7 @@ abstract class DefinedPaths(
 
     val proxySettingsFile: Path = optionsDir.resolve("proxySettings.json")
     val dnsSettingsFile: Path = optionsDir.resolve("dnsSettings.json")
+    val realDebridSettingsFile: Path = optionsDir.resolve("realDebridSettings.json")
     val appSettingsFile: Path = configDir.resolve("appSettings.json")
     val perHostSettingsFile: Path = optionsDir.resolve("perHostSettings.json")
 }
