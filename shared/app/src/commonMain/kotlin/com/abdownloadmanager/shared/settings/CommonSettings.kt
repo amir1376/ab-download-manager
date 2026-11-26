@@ -31,6 +31,7 @@ import com.abdownloadmanager.shared.util.dns.DnsModes
 import com.abdownloadmanager.shared.util.notification.INotificationSound
 import com.abdownloadmanager.shared.util.proxy.ProxyManager
 import com.abdownloadmanager.shared.util.proxy.ProxyMode
+import com.abdownloadmanager.shared.util.realdebrid.RealDebridSettingsStorage
 import com.abdownloadmanager.shared.util.ui.theme.DEFAULT_UI_SCALE
 import ir.amirab.downloader.DownloadSettings
 import ir.amirab.util.compose.StringSource
@@ -748,6 +749,32 @@ object CommonSettings {
                     it.address.asStringSource()
                 }
             }
+        )
+    }
+
+    fun realDebridEnabled(realDebridSettingsStorage: RealDebridSettingsStorage): BooleanConfigurable {
+        return BooleanConfigurable(
+            title = Res.string.settings_real_debrid_enabled.asStringSource(),
+            description = Res.string.settings_real_debrid_enabled_description.asStringSource(),
+            backedBy = realDebridSettingsStorage.enabled,
+            describe = {
+                it.asToggledStringSource()
+            },
+        )
+    }
+
+    fun realDebridApiToken(realDebridSettingsStorage: RealDebridSettingsStorage): StringConfigurable {
+        return StringConfigurable(
+            title = Res.string.settings_real_debrid_api_token.asStringSource(),
+            description = Res.string.settings_real_debrid_api_token_description.asStringSource(),
+            backedBy = realDebridSettingsStorage.apiToken,
+            describe = {
+                if (it.isBlank()) {
+                    Res.string.disabled.asStringSource()
+                } else {
+                    EmptyStringSource
+                }
+            },
         )
     }
 }

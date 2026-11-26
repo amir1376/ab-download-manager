@@ -37,7 +37,9 @@ class HttpLinkChecker(
             ?.fileName ?: HttpUrlUtils.extractNameFromLink(credentials.value.link)
             ?.let(FilenameFixer::fix)
         val length = responseInfo?.run {
-            totalLength.takeIf { isSuccessFul }
+            // a zero length is not a real size here, some servers report it for
+            // files they have not fetched yet, so we show the size as unknown
+            totalLength.takeIf { isSuccessFul && (it ?: 0L) > 0L }
         }
         _suggestedName.update { suggestedName }
         _length.update { length }
