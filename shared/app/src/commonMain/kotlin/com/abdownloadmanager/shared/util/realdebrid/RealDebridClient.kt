@@ -3,6 +3,8 @@ package com.abdownloadmanager.shared.util.realdebrid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
@@ -90,7 +92,9 @@ class RealDebridClient(
         val error = errorBody?.error?.takeIf { it.isNotBlank() }
         val message = when (error) {
             "bad_token" -> "Real-Debrid API token is invalid or has expired"
-            "unsupported_hoster" -> "Real-Debrid does not support this host"
+            "hoster_unsupported", "unsupported_hoster" ->
+                "Real-Debrid does not support this link (unsupported host)"
+
             "unavailable_file" -> "This file is not available on Real-Debrid anymore"
             "too_many_requests" -> "Too many Real-Debrid requests, try again later"
             null -> "Real-Debrid request failed (HTTP $httpCode)"
@@ -112,6 +116,28 @@ class RealDebridClient(
             .build()
         return json.decodeFromString(
             RealDebridUnrestrictedLink.serializer(),
+            execute(request),
+        )
+    }
+
+    /**
+     * Expands a hoster folder link (for example a public Mega folder) into the
+     * links of the files that it contains. Those links still have to be
+     * unrestricted one by one.
+     */
+    suspend fun unrestrictFolder(
+        token: String,
+        link: String,
+    ): List<String> {
+        val request = requestBuilder(token, "unrestrict/folder")
+            .post(
+                FormBody.Builder()
+                    .add("link", link)
+                    .build()
+            )
+            .build()
+        return json.decodeFromString(
+            ListSerializer(String.serializer()),
             execute(request),
         )
     }

@@ -23,6 +23,19 @@ class RealDebridResolver(
         return link.trim().startsWith("magnet:?", ignoreCase = true)
     }
 
+    /**
+     * Folder links (for example a public Mega folder) are not accepted by the
+     * `unrestrict/link` endpoint, they have to go through `unrestrict/folder`.
+     */
+    fun isFolderLink(link: String): Boolean {
+        val url = link.trim().toHttpUrlOrNull() ?: return false
+        val host = url.host.lowercase()
+        if (host != "mega.nz" && host != "mega.co.nz") return false
+        val path = url.encodedPath.lowercase()
+        if (path.contains("/folder/") || path.endsWith("/folder")) return true
+        return url.fragment.orEmpty().startsWith("F!", ignoreCase = true)
+    }
+
     fun supportsThisLink(link: String): Boolean {
         val settings = settingsStorage.data.value
         if (!settings.isUsable) return false
@@ -43,10 +56,16 @@ class RealDebridResolver(
             throw RealDebridException("Real-Debrid API token is not set")
         }
         val trimmedLink = link.trim()
-        return if (isMagnetLink(trimmedLink)) {
-            resolveMagnet(apiToken, trimmedLink)
-        } else {
-            listOf(resolveLink(apiToken, trimmedLink))
+        return when {
+            isMagnetLink(trimmedLink) -> resolveMagnet(apiToken, trimmedLink)
+            isFolderLink(trimmedLink) -> resolveFolder(
+                apiToken = apiToken,
+                folderLink = trimmedLink,
+                notFoundMessage = "Real-Debrid did not return any file for this folder link. " +
+                        "Make sure the folder is shared publicly with its link and key.",
+            )
+
+            else -> resolveSingleLink(apiToken, trimmedLink)
         }
     }
 
@@ -55,6 +74,60 @@ class RealDebridResolver(
         link: String,
     ): RealDebridResolvedLink {
         return client.unrestrictLink(apiToken, link).toResolvedLink()
+    }
+
+    /**
+     * Some hosts (Mega for example) reject their folder links on the
+     * `unrestrict/link` endpoint, so if that happens we try again as a folder.
+     */
+    private suspend fun resolveSingleLink(
+        apiToken: String,
+        link: String,
+    ): List<RealDebridResolvedLink> {
+        return try {
+            listOf(resolveLink(apiToken, link))
+        } catch (e: RealDebridException) {
+            if (e.errorCode == HOSTER_UNSUPPORTED_ERROR_CODE) {
+                resolveFolder(
+                    apiToken = apiToken,
+                    folderLink = link,
+                    notFoundMessage = "Real-Debrid does not support this link. " +
+                            "Folder links must be public and from a supported host.",
+                )
+            } else {
+                throw e
+            }
+        }
+    }
+
+    /**
+     * @return one direct link per file inside the folder
+     */
+    private suspend fun resolveFolder(
+        apiToken: String,
+        folderLink: String,
+        notFoundMessage: String,
+    ): List<RealDebridResolvedLink> {
+        val fileLinks = client.unrestrictFolder(apiToken, folderLink)
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .filterNot { isFolderLink(it) }
+            .filterNot { it.trimEnd('/').equals(folderLink.trimEnd('/'), ignoreCase = true) }
+            .distinct()
+        if (fileLinks.isEmpty()) {
+            throw RealDebridException(notFoundMessage)
+        }
+        val failures = mutableListOf<Throwable>()
+        val resolvedLinks = fileLinks.mapNotNull { fileLink ->
+            runCatching { resolveLink(apiToken, fileLink) }
+                .onFailure { failures.add(it) }
+                .getOrNull()
+        }
+        if (resolvedLinks.isEmpty()) {
+            throw failures.firstOrNull() as? RealDebridException
+            ?: RealDebridException(notFoundMessage)
+        }
+        return resolvedLinks
     }
 
     private fun RealDebridUnrestrictedLink.toResolvedLink(): RealDebridResolvedLink {
@@ -133,6 +206,7 @@ class RealDebridResolver(
     }
 
     companion object {
+        private const val HOSTER_UNSUPPORTED_ERROR_CODE = 16
         private val POLL_INTERVAL = 2.seconds
         private val MAGNET_CONVERSION_TIMEOUT = 2.minutes
         private val TORRENT_DOWNLOAD_TIMEOUT = 20.minutes
