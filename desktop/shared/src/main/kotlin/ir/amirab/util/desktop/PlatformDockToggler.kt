@@ -6,6 +6,7 @@ import ir.amirab.util.platform.Platform
 interface PlatformDockToggler {
     fun show()
     fun hide()
+    fun setIcon(png: ByteArray?)
 
     companion object : PlatformDockToggler by getForCurrentOs()
 }
@@ -17,6 +18,10 @@ class EmptyDockDockToggler : PlatformDockToggler {
     }
 
     override fun hide() {
+        // no-op
+    }
+
+    override fun setIcon(png: ByteArray?) {
         // no-op
     }
 }

@@ -1,5 +1,7 @@
 package ir.amirab.util.desktop.dock.mac
 
+import com.sun.jna.Memory
+import com.sun.jna.Pointer
 import ir.amirab.util.desktop.PlatformDockToggler
 import ir.amirab.util.desktop.utils.mac.FoundationLibrary
 
@@ -12,6 +14,13 @@ class MacDockToggler : PlatformDockToggler {
     private val nsAppClass by lazy { foundation!!.objc_getClass("NSApplication") }
     private val sharedAppSel by lazy { foundation!!.sel_registerName("sharedApplication") }
     private val setPolicySel by lazy { foundation!!.sel_registerName("setActivationPolicy:") }
+    private val setApplicationIconImageSel by lazy { foundation!!.sel_registerName("setApplicationIconImage:") }
+
+    private val nsDataClass by lazy { foundation!!.objc_getClass("NSData") }
+    private val nsImageClass by lazy { foundation!!.objc_getClass("NSImage") }
+    private val dataWithBytesLengthSel by lazy { foundation!!.sel_registerName("dataWithBytes:length:") }
+    private val allocSel by lazy { foundation!!.sel_registerName("alloc") }
+    private val initWithDataSel by lazy { foundation!!.sel_registerName("initWithData:") }
 
     private val nsRunningAppClass by lazy { foundation!!.objc_getClass("NSRunningApplication") }
     private val currentAppSel by lazy { foundation!!.sel_registerName("currentApplication") }
@@ -30,6 +39,32 @@ class MacDockToggler : PlatformDockToggler {
     override fun hide() {
         if (isAvailable) {
             hideAndKeepFocus()
+        }
+    }
+
+    override fun setIcon(png: ByteArray?) {
+        if (!isAvailable) return
+        val f = foundation!!
+        val pool = f.objc_autoreleasePoolPush()
+        try {
+            val nsApp = f.objc_msgSend(nsAppClass, sharedAppSel)
+            if (png == null) {
+                // nil restores the icon from the app bundle
+                f.objc_msgSend(nsApp, setApplicationIconImageSel, Pointer(0))
+                return
+            }
+            val bytes = Memory(png.size.toLong())
+            bytes.write(0, png, 0, png.size)
+            val data = f.objc_msgSend(nsDataClass, dataWithBytesLengthSel, bytes, png.size.toLong())
+            val image = f.objc_msgSend(
+                f.objc_msgSend(nsImageClass, allocSel),
+                initWithDataSel,
+                data,
+            )
+            f.objc_msgSend(nsApp, setApplicationIconImageSel, image)
+            f.objc_release(image)
+        } finally {
+            f.objc_autoreleasePoolPop(pool)
         }
     }
 

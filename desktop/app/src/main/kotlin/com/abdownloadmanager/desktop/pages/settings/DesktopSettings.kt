@@ -49,6 +49,18 @@ object DesktopSettings {
         )
     }
 
+    fun showSpeedOnDockIconConfig(appSettings: AppSettingsStorage): BooleanConfigurable? {
+        if (Platform.isMac().not()) return null
+        return BooleanConfigurable(
+            title = Res.string.settings_show_speed_on_dock_icon.asStringSource(),
+            description = Res.string.settings_show_speed_on_dock_icon_description.asStringSource(),
+            backedBy = appSettings.showSpeedOnDockIcon,
+            describe = {
+                it.asToggledStringSource()
+            },
+        )
+    }
+
     fun fontConfig(
         fontManager: FontManager,
         scope: CoroutineScope,

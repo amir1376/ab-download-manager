@@ -91,9 +91,10 @@ class DesktopSettingsComponent(
                         )
                     ),
                     ConfigurableGroup(
-                        nestedConfigurable = listOf(
+                        nestedConfigurable = listOfNotNull(
                             CommonSettings.autoStartConfig(appSettings),
                             DesktopSettings.useSystemTray(appSettings),
+                            DesktopSettings.showSpeedOnDockIconConfig(appSettings),
                         )
                     ),
                     ConfigurableGroup(

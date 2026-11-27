@@ -308,6 +308,10 @@ class AppComponent(
     private val selectQueueStorage: ISelectQueueStorage by inject()
 
     val downloadSystem: DownloadSystem by inject()
+    val globalSpeedFlow = downloadSystem.downloadMonitor.activeDownloadListFlow.map {
+        it.sumOf { item -> item.speed }
+    }
+    val showSpeedOnDockIcon = appSettings.showSpeedOnDockIcon
     private val fileIconProvider: FileIconProvider by inject()
     private val addDownloadPageControl = PagesNavigation<AddDownloadConfig>()
     val _openedAddDownloadDialogs = childPages(

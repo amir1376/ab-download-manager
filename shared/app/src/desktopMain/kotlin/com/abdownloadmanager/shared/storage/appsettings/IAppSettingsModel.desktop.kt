@@ -57,6 +57,7 @@ data class AppSettingsModel(
     val mergeTopBarWithTitleBar: Boolean,
     val useNativeMenuBar: Boolean,
     val useSystemTray: Boolean,
+    val showSpeedOnDockIcon: Boolean,
 ) : IAppSettingsModel {
     companion object {
     }
@@ -69,6 +70,8 @@ val DesktopSettingsSchema = S.typeSafeObject(
             .catch(PlatformDefaultSettings.mergeTopBarWithTitleBar)
         prop(AppSettingsModel::useNativeMenuBar) bind S.boolean().catch(PlatformDefaultSettings.useNativeMenuBar)
         prop(AppSettingsModel::useSystemTray) bind S.boolean().catch(PlatformDefaultSettings.useSystemTray)
+        prop(AppSettingsModel::showSpeedOnDockIcon) bind S.boolean()
+            .catch(PlatformDefaultSettings.showSpeedOnDockIcon)
     },
     factory = {
         PlatformAppSettingsModel(
@@ -115,6 +118,7 @@ val DesktopSettingsSchema = S.typeSafeObject(
             mergeTopBarWithTitleBar = it[AppSettingsModel::mergeTopBarWithTitleBar],
             useNativeMenuBar = it[AppSettingsModel::useNativeMenuBar],
             useSystemTray = it[AppSettingsModel::useSystemTray],
+            showSpeedOnDockIcon = it[AppSettingsModel::showSpeedOnDockIcon],
         )
     }
 ).asSettingsSchema()
