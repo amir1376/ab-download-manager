@@ -98,6 +98,7 @@ val isAOTEnabled = false
 
 tasks.processResources {
     from(tasks.named("exportLibraryDefinitions"))
+    from("icons/icon.png")
 }
 
 val cliBinaryName = "${getAppName()}Cli"
