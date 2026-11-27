@@ -38,6 +38,9 @@ fun BaseOptionDialog(
                 }
 
                 override fun windowLostFocus(e: WindowEvent) {
+                    // Hide the native window first; if composition cleanup is delayed an
+                    // invisible always-on-top window must not keep intercepting clicks.
+                    window.isVisible = false
                     onCloseRequest()
                 }
             }
@@ -46,6 +49,7 @@ fun BaseOptionDialog(
             window.addWindowFocusListener(focusListener)
             onDispose {
                 window.removeWindowFocusListener(focusListener)
+                window.isVisible = false
             }
         }
 //        window.subtractInset()
