@@ -17,7 +17,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.awt.toAwtColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -47,6 +52,8 @@ import ir.amirab.util.desktop.LocalFrameWindowScope
 import com.abdownloadmanager.shared.ui.util.LocalWindow
 import ir.amirab.util.desktop.screen.applyUiScale
 import ir.amirab.util.ifThen
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -392,7 +399,19 @@ fun CustomWindow(
         title = title,
         resizable = resizable,
         onCloseRequest = onCloseRequest,
-        onKeyEvent = onKeyEvent,
+        onKeyEvent = { event ->
+            if (
+                Platform.isMac() &&
+                event.type == KeyEventType.KeyDown &&
+                event.key == Key.W &&
+                event.isMetaPressed
+            ) {
+                onCloseRequest()
+                true
+            } else {
+                onKeyEvent(event)
+            }
+        },
         alwaysOnTop = alwaysOnTop,
         minSize = minSize,
         maxSize = maxSize,
