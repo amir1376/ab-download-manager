@@ -38,6 +38,7 @@ import com.abdownloadmanager.desktop.ui.configurable.platform.PlatformConfigurab
 import com.abdownloadmanager.desktop.ui.widget.ShowMessageDialogs
 import com.abdownloadmanager.desktop.ui.widget.Tray
 import com.abdownloadmanager.desktop.utils.AppInfo
+import com.abdownloadmanager.desktop.utils.FinderProgressTracker
 import com.abdownloadmanager.desktop.utils.GlobalAppExceptionHandler
 import com.abdownloadmanager.desktop.utils.ProvideGlobalExceptionHandler
 import com.abdownloadmanager.desktop.utils.isInDebugMode
@@ -111,6 +112,7 @@ object Ui : KoinComponent {
             ) {
                 HandleEffectsForApp(appComponent)
                 SystemTray(appComponent)
+                FinderProgressIntegration(appComponent)
 
                 HomeWindow(appComponent)
                 SettingWindow(appComponent)
@@ -199,6 +201,23 @@ private fun HandleEffectsForApp(appComponent: AppComponent) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FinderProgressIntegration(
+    component: AppComponent,
+) {
+    if (!Platform.isMac()) return
+
+    val finderProgress = remember(component) { FinderProgressTracker(component.appSettings) }
+    DisposableEffect(finderProgress) {
+        onDispose { finderProgress.close() }
+    }
+    LaunchedEffect(finderProgress) {
+        component.downloadSystem.downloadMonitor.activeDownloadListFlow.collect {
+            finderProgress.update(it)
         }
     }
 }
