@@ -65,6 +65,12 @@ import kotlinx.coroutines.withTimeout
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import java.awt.AWTEvent
+import java.awt.Dialog
+import java.awt.Frame
+import java.awt.Toolkit
+import java.awt.Window
+import java.awt.event.AWTEventListener
 import kotlin.time.Duration.Companion.seconds
 
 object Ui : KoinComponent {
@@ -208,8 +214,16 @@ private fun SystemTray(
     component: AppComponent,
 ) {
     val useSystemTray by component.useSystemTray.collectAsState()
+    val showDockIcon by component.showDockIcon.collectAsState()
+    // unset means "keep what this setting did before dock visibility was configurable"
+    val showDock = showDockIcon ?: !useSystemTray
+    // With both icons enabled, keep only the menu bar item while the app has no windows.
+    val hasOpenWindows by rememberHasOpenWindows()
+    val dockVisible = showDock && (!useSystemTray || hasOpenWindows)
+    LaunchedEffect(dockVisible) {
+        if (dockVisible) PlatformDockToggler.show() else PlatformDockToggler.hide()
+    }
     if (useSystemTray) {
-        LaunchedEffect(Unit) { PlatformDockToggler.hide() }
         val menu = remember {
             buildMenu {
                 +showDownloadList
@@ -232,7 +246,26 @@ private fun SystemTray(
             primaryAction = { showDownloadList.onClick() },
             menu = menu,
         )
-    } else {
-        LaunchedEffect(Unit) { PlatformDockToggler.show() }
+    }
+}
+
+@Composable
+private fun rememberHasOpenWindows(): State<Boolean> {
+    val hasOpenWindows = remember { mutableStateOf(hasOpenAppWindows()) }
+    DisposableEffect(Unit) {
+        val listener = AWTEventListener {
+            hasOpenWindows.value = hasOpenAppWindows()
+        }
+        Toolkit.getDefaultToolkit().addAWTEventListener(listener, AWTEvent.WINDOW_EVENT_MASK)
+        onDispose {
+            Toolkit.getDefaultToolkit().removeAWTEventListener(listener)
+        }
+    }
+    return hasOpenWindows
+}
+
+private fun hasOpenAppWindows(): Boolean {
+    return Window.getWindows().any {
+        it.isVisible && (it is Frame || it is Dialog)
     }
 }

@@ -9,10 +9,18 @@ import com.abdownloadmanager.shared.ui.configurable.item.BooleanConfigurable
 import com.abdownloadmanager.shared.ui.configurable.item.EnumConfigurable
 import com.abdownloadmanager.shared.util.asToggledStringSource
 import ir.amirab.util.compose.asStringSource
+import ir.amirab.util.flow.createMutableStateFlowFromFlow
 import ir.amirab.util.flow.createMutableStateFlowFromStateFlow
 import ir.amirab.util.platform.Platform
 import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.combine
+
+enum class AppIconMode {
+    SystemTrayOnly,
+    DockIconOnly,
+    Both,
+}
 
 object DesktopSettings {
     fun mergeTopBarWithTitleBarConfig(appSettings: AppSettingsStorage): BooleanConfigurable {
@@ -45,6 +53,38 @@ object DesktopSettings {
             backedBy = appSettings.useSystemTray,
             describe = {
                 it.asToggledStringSource()
+            },
+        )
+    }
+
+    fun appIcon(appSettings: AppSettingsStorage, scope: CoroutineScope): EnumConfigurable<AppIconMode> {
+        fun modeOf(useSystemTray: Boolean, showDockIcon: Boolean?) = when {
+            !useSystemTray -> AppIconMode.DockIconOnly
+            showDockIcon == true -> AppIconMode.Both
+            else -> AppIconMode.SystemTrayOnly
+        }
+
+        return EnumConfigurable(
+            title = Res.string.settings_app_icon.asStringSource(),
+            description = Res.string.settings_app_icon_description.asStringSource(),
+            backedBy = createMutableStateFlowFromFlow(
+                flow = combine(appSettings.useSystemTray, appSettings.showDockIcon) { useSystemTray, showDockIcon ->
+                    modeOf(useSystemTray, showDockIcon)
+                },
+                initialValue = modeOf(appSettings.useSystemTray.value, appSettings.showDockIcon.value),
+                updater = { mode ->
+                    appSettings.useSystemTray.value = mode != AppIconMode.DockIconOnly
+                    appSettings.showDockIcon.value = mode != AppIconMode.SystemTrayOnly
+                },
+                scope = scope,
+            ),
+            possibleValues = AppIconMode.entries,
+            itemTitle = {
+                when (it) {
+                    AppIconMode.SystemTrayOnly -> Res.string.settings_app_icon_system_tray_only
+                    AppIconMode.DockIconOnly -> Res.string.settings_app_icon_dock_icon_only
+                    AppIconMode.Both -> Res.string.settings_app_icon_both
+                }.asStringSource()
             },
         )
     }

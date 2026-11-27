@@ -7,6 +7,7 @@ import io.github.amir1376.schemakt.S
 import io.github.amir1376.schemakt.schema.composite.TypeSafeObjectSchema
 import io.github.amir1376.schemakt.schema.composite.typeSafeObject
 import io.github.amir1376.schemakt.schema.modifier.catch
+import io.github.amir1376.schemakt.schema.modifier.nullable
 import io.github.amir1376.schemakt.schema.primitive.boolean
 import ir.amirab.util.config.datastore.asSettingsSchema
 import kotlinx.serialization.Serializable
@@ -57,6 +58,7 @@ data class AppSettingsModel(
     val mergeTopBarWithTitleBar: Boolean,
     val useNativeMenuBar: Boolean,
     val useSystemTray: Boolean,
+    val showDockIcon: Boolean?,
 ) : IAppSettingsModel {
     companion object {
     }
@@ -69,6 +71,7 @@ val DesktopSettingsSchema = S.typeSafeObject(
             .catch(PlatformDefaultSettings.mergeTopBarWithTitleBar)
         prop(AppSettingsModel::useNativeMenuBar) bind S.boolean().catch(PlatformDefaultSettings.useNativeMenuBar)
         prop(AppSettingsModel::useSystemTray) bind S.boolean().catch(PlatformDefaultSettings.useSystemTray)
+        prop(AppSettingsModel::showDockIcon) bind S.boolean().nullable().catch(PlatformDefaultSettings.showDockIcon)
     },
     factory = {
         PlatformAppSettingsModel(
@@ -115,6 +118,7 @@ val DesktopSettingsSchema = S.typeSafeObject(
             mergeTopBarWithTitleBar = it[AppSettingsModel::mergeTopBarWithTitleBar],
             useNativeMenuBar = it[AppSettingsModel::useNativeMenuBar],
             useSystemTray = it[AppSettingsModel::useSystemTray],
+            showDockIcon = it[AppSettingsModel::showDockIcon],
         )
     }
 ).asSettingsSchema()

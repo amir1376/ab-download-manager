@@ -120,6 +120,7 @@ class AppComponent(
     val updaterManager: UpdateManager by inject()
     val extraDownloadSettingStorage: ExtraDownloadSettingsStorage<DesktopExtraDownloadItemSettings> by inject()
     val useSystemTray = appSettings.useSystemTray
+    val showDockIcon = appSettings.showDockIcon
     fun openHome() {
         scope.launch {
             showHomeSlot.value.child?.instance.let {
