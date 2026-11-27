@@ -23,6 +23,8 @@ import ir.amirab.util.compose.asStringSource
 import ir.amirab.util.compose.localizationmanager.LanguageManager
 import ir.amirab.util.flow.mapStateFlow
 import ir.amirab.util.flow.mapTwoWayStateFlow
+import ir.amirab.util.platform.Platform
+import ir.amirab.util.platform.isMac
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -93,7 +95,11 @@ class DesktopSettingsComponent(
                     ConfigurableGroup(
                         nestedConfigurable = listOf(
                             CommonSettings.autoStartConfig(appSettings),
-                            DesktopSettings.useSystemTray(appSettings),
+                            if (Platform.isMac()) {
+                                DesktopSettings.appIcon(appSettings, scope)
+                            } else {
+                                DesktopSettings.useSystemTray(appSettings)
+                            },
                         )
                     ),
                     ConfigurableGroup(
